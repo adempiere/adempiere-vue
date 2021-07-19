@@ -80,11 +80,6 @@ export default {
 </script>
 
 <style>
-  .select-filter {
-    width: 280px !important;
-    float: right;
-    top: 0;
-  }
   .select-filter-header {
     width: 60% !important;
     float: right;
