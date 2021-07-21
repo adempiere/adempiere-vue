@@ -21,7 +21,13 @@
         <div v-if="active === 0" class="app-container">
           <upload-excel-component :on-success="handleSuccess" :before-upload="beforeUpload" />
           <el-table :data="tableData" border highlight-current-row style="width: 100%;margin-top:20px;">
-            <el-table-column v-for="item of tableHeader" :key="item" :prop="item" :label="item" />
+            <el-table-column v-for="item of tableHeader" :key="item" :label="item">
+              <template slot-scope="scope">
+                <span :style="alignTable(scope.row[item])">
+                  {{ scope.row[item] }}
+                </span>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <el-table v-if="active === 1" :data="tableData" border highlight-current-row style="width: 100%;margin-top:20px;">
@@ -130,6 +136,12 @@ export default {
     }
   },
   methods: {
+    alignTable(row) {
+      if (typeof row === 'number') {
+        return 'float: right;'
+      }
+      return 'float: left;'
+    },
     displaye(label, newLabel, key) {
       if (this.isEmptyValue(newLabel)) {
         return label
@@ -160,7 +172,8 @@ export default {
       })
       return false
     },
-    handleSuccess({ results, header }) {
+    handleSuccess({ data, workbook, firstSheetName, worksheet, results, header }) {
+      console.log({ data, workbook, firstSheetName, worksheet, results, header })
       const epale = results.filter((data, index) => {
         if (index <= 5) {
           return data
