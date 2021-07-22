@@ -75,6 +75,11 @@ export default defineComponent({
       seekTab: function(eventInfo) {
         console.log('seekTab: ', eventInfo)
         return new Promise()
+      },
+
+      // action menu
+      relationsManager: {
+        menuParentUuid: root.$route.meta.parentUuid
       }
     }
 

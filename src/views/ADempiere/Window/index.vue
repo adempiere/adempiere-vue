@@ -22,6 +22,12 @@
       <el-aside style="width: 100%; margin-bottom: 0px; padding-right: 10px; padding-left: 10px;">
 
         <!-- // TODO: Add header window component for auxiliary menu and worflow status -->
+        <actions-menu
+          :parent-uuid="parentUuid"
+          :references-manager="referencesManager"
+          :actions-manager="actionsManager"
+          :relations-manager="relationsManager"
+        />
 
         <component
           :is="renderWindowComponent"
@@ -45,10 +51,16 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
+import ActionsMenu from '@/components/ADempiere/ActionsMenu'
 import { generateWindow as generateWindowRespose } from './windowUtils'
+import { createNewRecord, deleteRecord, sharedLink, refreshRecords } from '@/utils/ADempiere/constants/actionsMenu'
 
 export default defineComponent({
   name: 'Window',
+
+  components: {
+    ActionsMenu
+  },
 
   props: {
     // implement by test view
@@ -90,6 +102,8 @@ export default defineComponent({
         ...props.containerManager
       }
     }
+    const actionsManager = ref({})
+    const referencesManager = ref({})
 
     const isLoaded = ref(false)
     const windowMetadata = ref({})
@@ -102,7 +116,7 @@ export default defineComponent({
 
     const generateWindow = (window) => {
       windowMetadata.value = window
-
+      generateActionsMenu()
       isLoaded.value = true
     }
 
@@ -125,6 +139,35 @@ export default defineComponent({
       return windowComponent
     })
 
+    const generateActionsMenu = () => {
+      // current tab properties
+      const { tableName, uuid } = windowMetadata.value.currentTab
+
+      actionsManager.value = {
+        tableName,
+        actionsList: [
+          createNewRecord,
+          {
+            ...refreshRecords,
+            callBack: () => {
+              console.log('call getEntitiesList')
+              root.$store.dispatch('dataManager/getEntitiesList', {
+                parentUuid: props.parentUuid,
+                containerUuid: uuid,
+                tableName
+              })
+            }
+          },
+          deleteRecord,
+          sharedLink
+        ]
+      }
+
+      referencesManager.value = {
+        tableName
+      }
+    }
+
     // load metadata and generate window
     // getWindow()
     setTimeout(getWindow, 1000)
@@ -133,6 +176,8 @@ export default defineComponent({
       windowUuid,
       containerManagerWindow,
       windowMetadata,
+      actionsManager,
+      referencesManager,
       // computed
       renderWindowComponent,
       isLoaded

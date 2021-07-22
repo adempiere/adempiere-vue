@@ -33,13 +33,6 @@
       />
     </el-drawer>
 
-    <actions-menu
-      :parent-uuid="parentUuid"
-      :references-manager="referencesManager"
-      :actions-manager="actionsManager"
-      :relations-manager="relationsManager"
-    />
-
     <el-tabs
       v-model="currentTab"
       type="border-card"
@@ -92,14 +85,11 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 import LockRecord from '@/components/ADempiere/ContainerOptions/LockRecord'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition'
 import RecordNavigation from '@/components/ADempiere/RecordNavigation'
-import ActionsMenu from '@/components/ADempiere/ActionsMenu'
-import { createNewRecord, deleteRecord, sharedLink, refreshRecords } from '@/utils/ADempiere/constants/actionsMenu'
 
 export default defineComponent({
   name: 'TabManager',
 
   components: {
-    ActionsMenu,
     LockRecord,
     PanelDefinition,
     RecordNavigation
@@ -126,12 +116,6 @@ export default defineComponent({
     const currentTab = ref(tabNo)
 
     const tabUuid = ref(props.tabsList[tabNo].uuid)
-
-    const actionsManager = ref({})
-    const referencesManager = ref({})
-    const relationsManager = ref({
-      menuParentUuid: root.$route.meta.parentUuid
-    })
 
     const tabStyle = computed(() => {
       // height in card
@@ -198,7 +182,6 @@ export default defineComponent({
         //   currentTab
         // }).then(() => {})
       }
-      generateActionsMenu()
       return tabNumber
     }
 
@@ -230,35 +213,6 @@ export default defineComponent({
       })
     }
 
-    const generateActionsMenu = () => {
-      // current tab properties
-      const { tableName, uuid } = props.tabsList[currentTab.value]
-
-      actionsManager.value = {
-        tableName,
-        actionsList: [
-          createNewRecord,
-          {
-            ...refreshRecords,
-            callBack: () => {
-              console.log('call getEntitiesList')
-              root.$store.dispatch('dataManager/getEntitiesList', {
-                parentUuid: props.parentUuid,
-                containerUuid: uuid,
-                tableName
-              })
-            }
-          },
-          deleteRecord,
-          sharedLink
-        ]
-      }
-
-      referencesManager.value = {
-        tableName
-      }
-    }
-
     getData()
 
     setTabNumber(currentTab.value)
@@ -269,9 +223,6 @@ export default defineComponent({
       isShowRecords,
       tabUuid,
       currentTab,
-      actionsManager,
-      relationsManager,
-      referencesManager,
       // computed
       containerManagerTab,
       tabStyle,
