@@ -675,7 +675,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped lang="scss" src="./common.scss">
+<style scoped lang="scss" src="./common-style.scss">
 </style>
 <style scoped lang="scss">
 .menu-actions {

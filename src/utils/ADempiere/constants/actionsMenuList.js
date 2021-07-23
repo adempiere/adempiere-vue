@@ -21,7 +21,7 @@ import language from '@/lang'
  */
 export const createNewRecord = {
   sequence: 0,
-  name: language.t('actionsMenu.createNewRecord'),
+  name: language.t('actionMenu.createNewRecord'),
   enabled: true,
   svg: false,
   icon: 'el-icon-circle-plus-outline',
@@ -32,7 +32,7 @@ export const createNewRecord = {
  * Shared url link
  */
 export const sharedLink = {
-  name: language.t('actionsMenu.shareLink'),
+  name: language.t('actionMenu.shareLink'),
   enabled: true,
   svg: false,
   icon: 'el-icon-share',
@@ -40,7 +40,7 @@ export const sharedLink = {
 }
 
 export const deleteRecord = {
-  name: language.t('actionsMenu.deleteRecord'),
+  name: language.t('actionMenu.deleteRecord'),
   enabled: true,
   svg: false,
   icon: 'el-icon-delete',
@@ -48,7 +48,7 @@ export const deleteRecord = {
 }
 
 export const refreshRecords = {
-  name: language.t('actionsMenu.refreshRecords'),
+  name: language.t('actionMenu.refreshRecords'),
   enabled: true,
   svg: false,
   icon: 'el-icon-refresh',

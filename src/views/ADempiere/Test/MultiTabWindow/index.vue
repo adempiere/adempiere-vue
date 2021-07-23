@@ -31,7 +31,7 @@ import { defineComponent } from '@vue/composition-api'
 import WindowView from '@/views/ADempiere/Window'
 import multiTabMetadata from './multiTabWindow.json'
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
-import { createNewRecord, deleteRecord, sharedLink, refreshRecords } from '@/utils/ADempiere/constants/actionsMenu'
+import { createNewRecord, deleteRecord, sharedLink, refreshRecords } from '@/utils/ADempiere/constants/actionsMenuList'
 
 export default defineComponent({
   name: 'TestWindow',
@@ -78,7 +78,7 @@ export default defineComponent({
         return new Promise()
       },
 
-      generateActionsMenu: (currentTab) => {
+      loadActionMenu: (currentTab) => {
         // current tab properties
         const { tableName, uuid } = currentTab
 

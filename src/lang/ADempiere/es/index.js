@@ -1,5 +1,5 @@
 
-import actionsMenu from './actionsMenu'
+import actionMenu from './actionMenu'
 
 export default {
   language: 'Idioma',
@@ -536,5 +536,6 @@ export default {
       }
     }
   },
-  actionsMenu
+
+  actionMenu
 }

@@ -22,7 +22,7 @@
       <el-aside style="width: 100%; margin-bottom: 0px; padding-right: 10px; padding-left: 10px;">
 
         <!-- // TODO: Add header window component for auxiliary menu and worflow status -->
-        <actions-menu
+        <action-menu
           :parent-uuid="windowUuid"
           :references-manager="referencesManager"
           :actions-manager="actionsManager"
@@ -51,14 +51,14 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import ActionsMenu from '@/components/ADempiere/ActionsMenu'
+import ActionMenu from '@/components/ADempiere/ActionMenu'
 import { generateWindow as generateWindowRespose } from './windowUtils'
 
 export default defineComponent({
   name: 'Window',
 
   components: {
-    ActionsMenu
+    ActionMenu
   },
 
   props: {
@@ -121,7 +121,7 @@ export default defineComponent({
         actionsManager: action,
         relationsManager: relation,
         referencesManager: references
-      } = props.containerManager.generateActionsMenu(window.currentTab)
+      } = props.containerManager.loadActionMenu(window.currentTab)
 
       actionsManager.value = action
       referencesManager.value = references

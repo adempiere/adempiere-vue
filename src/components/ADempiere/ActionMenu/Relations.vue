@@ -28,7 +28,7 @@
       type="success"
       plain
     >
-      {{ $t('components.contextMenuRelations') }}
+      {{ $t('actionMenu.relations') }}
       <i class="el-icon-arrow-down el-icon--right" />
     </el-button>
 
@@ -40,7 +40,7 @@
       >
         <span class="contents">
           <b class="label">
-            {{ $t('actionsMenu.withoutRelations') }}
+            {{ $t('actionMenu.withoutRelations') }}
           </b>
         </span>
       </el-dropdown-item>
@@ -150,7 +150,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped lang="scss" src="./common.scss">
+<style scoped lang="scss" src="./common-style.scss">
 </style>
 <style lang="scss">
 // dropdown menu item list container

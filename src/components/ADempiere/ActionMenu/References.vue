@@ -30,7 +30,7 @@
       type="warning"
       :disabled="isDisabledMenu"
     >
-      {{ $t('components.contextMenuReferences') }}
+      {{ $t('actionMenu.references') }}
 
       <i
         v-if="!isReferecesContent || isLoadedReferences"
@@ -47,7 +47,7 @@
       >
         <span class="contents">
           <b class="label">
-            {{ $t('components.withOutReferences') }}
+            {{ $t('actionMenu.withOutReferences') }}
           </b>
         </span>
       </el-dropdown-item>
@@ -199,7 +199,7 @@ export default defineComponent({
 })
 </script>
 
-<style scoped lang="scss" src="./common.scss">
+<style scoped lang="scss" src="./common-style.scss">
 </style>
 <style lang="scss">
 .menu-references {
