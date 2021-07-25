@@ -31,6 +31,7 @@ import { defineComponent } from '@vue/composition-api'
 import WindowView from '@/views/ADempiere/Window'
 import multiTabMetadata from './multiTabWindow.json'
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
+import { createNewRecord, deleteRecord, sharedLink, refreshRecords } from '@/utils/ADempiere/constants/actionsMenuList'
 
 export default defineComponent({
   name: 'TestWindow',
@@ -75,6 +76,40 @@ export default defineComponent({
       seekTab: function(eventInfo) {
         console.log('seekTab: ', eventInfo)
         return new Promise()
+      },
+
+      loadActionMenu: (currentTab) => {
+        // current tab properties
+        const { tableName, uuid } = currentTab
+
+        return {
+          // action menu
+          relationsManager: {
+            menuParentUuid: root.$route.meta.parentUuid
+          },
+          actionsManager: {
+            tableName,
+            actionsList: [
+              createNewRecord,
+              {
+                ...refreshRecords,
+                callBack: () => {
+                  console.log('call getEntitiesList')
+                  root.$store.dispatch('dataManager/getEntitiesList', {
+                    parentUuid: props.parentUuid,
+                    containerUuid: uuid,
+                    tableName
+                  })
+                }
+              },
+              deleteRecord,
+              sharedLink
+            ]
+          },
+          referencesManager: {
+            tableName
+          }
+        }
       }
     }
 

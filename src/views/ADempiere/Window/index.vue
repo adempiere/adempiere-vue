@@ -22,6 +22,12 @@
       <el-aside style="width: 100%; margin-bottom: 0px; padding-right: 10px; padding-left: 10px;">
 
         <!-- // TODO: Add header window component for auxiliary menu and worflow status -->
+        <action-menu
+          :parent-uuid="windowUuid"
+          :references-manager="referencesManager"
+          :actions-manager="actionsManager"
+          :relations-manager="relationsManager"
+        />
 
         <component
           :is="renderWindowComponent"
@@ -41,13 +47,15 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import { generateWindow as generateWindowRespose } from './windowUtils'
+import ActionMenu from '@/components/ADempiere/ActionMenu'
 import LoadingView from '@/components/ADempiere/LoadingView'
+import { generateWindow as generateWindowRespose } from './windowUtils'
 
 export default defineComponent({
   name: 'Window',
 
   components: {
+    ActionMenu,
     LoadingView
   },
 
@@ -91,6 +99,9 @@ export default defineComponent({
         ...props.containerManager
       }
     }
+    const actionsManager = ref({})
+    const referencesManager = ref({})
+    const relationsManager = ref({})
 
     const isLoaded = ref(false)
     const windowMetadata = ref({})
@@ -103,6 +114,17 @@ export default defineComponent({
 
     const generateWindow = (window) => {
       windowMetadata.value = window
+
+      const {
+        actionsManager: action,
+        relationsManager: relation,
+        referencesManager: references
+      } = props.containerManager.loadActionMenu(window.currentTab)
+
+      actionsManager.value = action
+      referencesManager.value = references
+      relationsManager.value = relation
+
       isLoaded.value = true
     }
 
@@ -133,6 +155,9 @@ export default defineComponent({
       windowUuid,
       containerManagerWindow,
       windowMetadata,
+      actionsManager,
+      referencesManager,
+      relationsManager,
       // computed
       renderWindowComponent,
       isLoaded

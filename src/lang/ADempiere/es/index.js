@@ -1,3 +1,6 @@
+
+import actionMenu from './actionMenu'
+
 export default {
   language: 'Idioma',
   route: {
@@ -324,7 +327,7 @@ export default {
     deleteRecordSuccessful: 'Registro eliminado exitosamente',
     deleteRecordError: 'Error al eliminar el regitro',
     exportRecord: 'Exportar Registro',
-    lockRecord: 'Registro Bloqueado',
+    lockRecord: 'Bloquear Registro',
     noDescription: 'Sin Descripción',
     recordAccess: {
       modeMobile: {
@@ -532,5 +535,7 @@ export default {
         title: 'Herramientas del Punto de Venta'
       }
     }
-  }
+  },
+
+  actionMenu
 }

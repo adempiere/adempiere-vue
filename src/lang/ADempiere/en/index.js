@@ -1,3 +1,6 @@
+
+import actionMenu from './actionMenu'
+
 export default {
   language: 'Language',
   route: {
@@ -557,5 +560,7 @@ export default {
         title: 'Point of Sale Tools'
       }
     }
-  }
+  },
+
+  actionMenu
 }

@@ -85,3 +85,44 @@ export function getImagePath({
     uri
   }
 }
+
+/**
+ * Build link from ouput report
+ * @param {string} fileName
+ * @param {string} mimeType
+ * @param {array} outputStream
+ * @param {boolean} isDownload
+ * @returns link
+ */
+export function buildLinkHref({
+  fileName,
+  mimeType,
+  outputStream,
+  isDownload = false
+}) {
+  const link = document.createElement('a')
+  link.download = fileName
+  link.href = window.URL.createObjectURL(blob)
+
+  // const blob = new Blob(
+  //   [outputStream],
+  //   { type: mimeType }
+  // )
+
+  const reportObject = Object.values(outputStream)
+  const blob = new Blob(
+    [
+      Uint8Array.from(reportObject)
+    ],
+    {
+      type: mimeType
+    }
+  )
+
+  // download report file
+  if (isDownload) {
+    link.click()
+  }
+
+  return link
+}
