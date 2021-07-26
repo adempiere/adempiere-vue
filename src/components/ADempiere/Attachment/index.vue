@@ -77,7 +77,7 @@
           </div>
         </el-upload>
         <el-dialog :title="dialogImage.name" :visible.sync="dialogVisible">
-          <img width="100%" :src="dialogImage.url" alt="">
+          <img :src="dialogImage.url" style="width: 50%; height: 50%">
         </el-dialog>
       </el-scrollbar>
     </el-card>
