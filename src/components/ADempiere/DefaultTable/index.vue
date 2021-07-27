@@ -75,7 +75,7 @@
 
     <!-- pagination table, set custom or use default change page method -->
     <custom-pagination
-      :total="0"
+      :total="recordsWithFilter.length"
       :current-page="1"
       :selection="0"
       :handle-change-page="handleChangePage"
