@@ -24,6 +24,8 @@
       :container-uuid="containerUuid"
       :container-manager="recordNavigationManager"
       :panel-metadata="panelMetadata"
+      :header="tableheaders"
+      :data-table="recordsList"
     />
   </el-container>
 </template>
@@ -91,7 +93,28 @@ export default defineComponent({
         panelMetadata: props.currentTab
       })
     })
+    // create the table header
+    const tableheaders = computed(() => {
+      const panel = panelMetadata.value
+      if (panel && panel.fieldsList) {
+        return panel.fieldsList
+      }
+      return []
+    })
 
+    // namespace to vuex store module
+    const vuexStore = props.containerManager.vuexStore()
+
+    // get records list
+    const recordsList = computed(() => {
+      const data = root.$store.getters[vuexStore + '/getContainerData']({
+        containerUuid: props.containerUuid
+      })
+      if (data && data.recordsList) {
+        return data.recordsList
+      }
+      return []
+    })
     const actionAdvancedQuery = () => {
       const activeNames = []
       if (!activeName.value.length) {
@@ -106,9 +129,11 @@ export default defineComponent({
     return {
       activeName,
       // computeds
+      recordsList,
       recordNavigationManager,
       isLoadedPanel,
       panelMetadata,
+      tableheaders,
       shorcutKey,
       // methods
       actionAdvancedQuery

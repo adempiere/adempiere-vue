@@ -51,7 +51,7 @@
         min-width="50"
       />
 
-      <template v-for="(fieldAttributes, key) in fieldsList">
+      <template v-for="(fieldAttributes, key) in header">
         <el-table-column
           v-if="isDisplayed(fieldAttributes)"
           :key="key"
@@ -117,6 +117,17 @@ export default defineComponent({
     panelMetadata: {
       type: Object,
       required: true
+    },
+    // get the table header
+    header: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+    dataTable: {
+      type: Array,
+      required: true,
+      default: () => []
     }
   },
 
@@ -129,20 +140,12 @@ export default defineComponent({
       }
     })
 
-    const fieldsList = computed(() => {
-      const panel = props.panelMetadata
-      if (panel && panel.fieldsList) {
-        return panel.fieldsList
-      }
-      return []
-    })
-
     /**
      * Selection columns to be taken into account during the search
      */
     const selectionColumns = computed(() => {
       const displayColumnsName = []
-      const columnsName = fieldsList.value
+      const columnsName = props.header
         .filter(fieldItem => {
           return fieldItem.isSelectionColumn
         }).map(fieldItem => {
@@ -151,7 +154,6 @@ export default defineComponent({
           }
           return fieldItem.columnName
         })
-
       return columnsName.concat(displayColumnsName)
     })
 
@@ -186,22 +188,10 @@ export default defineComponent({
       return
     }
 
-    // namespace to vuex store module
-    const vuexStore = props.containerManager.vuexStore()
-
-    // get records list
-    const recordsList = computed(() => {
-      const data = root.$store.getters[vuexStore + '/getContainerData']({
-        containerUuid: props.containerUuid
-      })
-      if (data && data.recordsList) {
-        return data.recordsList
-      }
-      return []
-    })
+    // get table data
     const recordsWithFilter = computed(() => {
       if (!root.isEmptyValue(valueToSearch.value)) {
-        return recordsList.value.filter(row => {
+        return props.dataTable.filter(row => {
           return selectionColumns.value.some(columnName => {
             const value = !root.isEmptyValue(row[columnName]) ? row[columnName].toString() : ''
             const search = valueToSearch.value
@@ -217,16 +207,14 @@ export default defineComponent({
           })
         })
       }
-      return recordsList.value
+      return props.dataTable
     })
 
     return {
       valueToSearch,
       // computeds
-      recordsList,
       recordsWithFilter,
       keyColumn,
-      fieldsList,
       // methods
       headerLabel,
       handleChangePage,
