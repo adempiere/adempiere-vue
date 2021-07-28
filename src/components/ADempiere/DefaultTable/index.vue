@@ -18,18 +18,26 @@
 
 <template>
   <el-main class="default-table">
-    <el-input
-      v-model="valueToSearch"
-      clearable
-      size="mini"
-      class="input-search"
-    >
-      <i
-        slot="prefix"
-        class="el-icon-search el-input__icon"
-      />
-    </el-input>
-
+    <el-row>
+      <el-col :span="23">
+        <el-input
+          v-model="valueToSearch"
+          clearable
+          size="mini"
+          class="input-search"
+        >
+          <i
+            slot="prefix"
+            class="el-icon-search el-input__icon"
+          />
+        </el-input>
+      </el-col>
+      <el-col :span="1">
+        <columns-display-option
+          :option="currentOption"
+        />
+      </el-col>
+    </el-row>
     <el-table
       ref="multipleTable"
       style="width: 100%;height: 93% !important;"
@@ -51,9 +59,9 @@
         min-width="50"
       />
 
-      <template v-for="(fieldAttributes, key) in header">
+      <template v-for="(fieldAttributes, key) in settingHeader">
         <el-table-column
-          v-if="isDisplayed(fieldAttributes)"
+          v-if="isDisplayed(fieldAttributes) && tableColumnDataType(fieldAttributes, currentOption)"
           :key="key"
           :label="headerLabel(fieldAttributes)"
           :column-key="fieldAttributes.columnName"
@@ -88,6 +96,7 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 
 import FieldDefinition from '@/components/ADempiere/Field'
 import CellInfo from './CellInfo'
+import columnsDisplayOption from './columnsDisplayOption'
 import CustomPagination from '@/components/ADempiere/Pagination'
 import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
 import { isLookup } from '@/utils/ADempiere/references'
@@ -97,6 +106,7 @@ export default defineComponent({
 
   components: {
     CellInfo,
+    columnsDisplayOption,
     CustomPagination,
     FieldDefinition
   },
@@ -145,7 +155,7 @@ export default defineComponent({
      */
     const selectionColumns = computed(() => {
       const displayColumnsName = []
-      const columnsName = props.header
+      const columnsName = settingHeader.value
         .filter(fieldItem => {
           return fieldItem.isSelectionColumn
         }).map(fieldItem => {
@@ -209,11 +219,20 @@ export default defineComponent({
       }
       return props.dataTable
     })
-
+    // setting up the header
+    const settingHeader = computed(() => {
+      return props.header
+    })
+    const currentOption = computed(() => {
+      return root.$store.getters.getTableOption
+    })
     return {
+      // data
       valueToSearch,
       // computeds
+      currentOption,
       recordsWithFilter,
+      settingHeader,
       keyColumn,
       // methods
       headerLabel,
@@ -239,5 +258,9 @@ export default defineComponent({
     margin-left: 10px;
     margin-bottom: 10px;
   }
+}
+.el-table--scrollable-y .el-table__body-wrapper {
+  overflow-y: auto;
+  height: 90% !important;
 }
 </style>

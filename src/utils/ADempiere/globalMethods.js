@@ -25,5 +25,6 @@ export {
   tenderTypeFind,
   formatConversionCurrenty,
   convertValuesToSend,
-  typeValue
+  typeValue,
+  tableColumnDataType
 } from '@/utils/ADempiere/valueUtils.js'
