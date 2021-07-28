@@ -59,7 +59,7 @@
         min-width="50"
       />
 
-      <template v-for="(fieldAttributes, key) in settingHeader">
+      <template v-for="(fieldAttributes, key) in header">
         <el-table-column
           v-if="isDisplayed(fieldAttributes) && tableColumnDataType(fieldAttributes, currentOption)"
           :key="key"
@@ -155,7 +155,7 @@ export default defineComponent({
      */
     const selectionColumns = computed(() => {
       const displayColumnsName = []
-      const columnsName = settingHeader.value
+      const columnsName = props.header
         .filter(fieldItem => {
           return fieldItem.isSelectionColumn
         }).map(fieldItem => {
@@ -219,10 +219,6 @@ export default defineComponent({
       }
       return props.dataTable
     })
-    // setting up the header
-    const settingHeader = computed(() => {
-      return props.header
-    })
     const currentOption = computed(() => {
       return root.$store.getters.getTableOption
     })
@@ -230,9 +226,8 @@ export default defineComponent({
       // data
       valueToSearch,
       // computeds
-      currentOption,
       recordsWithFilter,
-      settingHeader,
+      currentOption,
       keyColumn,
       // methods
       headerLabel,
