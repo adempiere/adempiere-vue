@@ -452,6 +452,7 @@ export default {
         convertAmount: 'Convertir Cantidad',
         convertedAmount: 'Monto Convertido',
         fullPayment: 'Cobro Completo',
+        Currency: 'Moneda',
         dayRate: 'Tasa del Día',
         noDayRate: 'No se a generado una tasa del día para la moneda',
         TenderType: {

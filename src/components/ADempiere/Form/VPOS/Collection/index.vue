@@ -97,10 +97,12 @@
                 :disabled="isDisabled"
               >
                 <el-row id="fieldListCollection">
-                  <el-col v-for="(field, index) in fieldsList" :key="index" :span="8">
-                    <!-- Add selected currency symbol -->
+                  <el-col
+                    v-for="field in primaryFieldsList"
+                    :key="field.sequence"
+                    :span="8"
+                  >
                     <field-definition
-                      v-if="field.sequence <= 1"
                       :metadata-field="field.columnName === 'PayAmt' ? {
                         ...field,
                         labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
@@ -108,10 +110,9 @@
                     />
                   </el-col>
                   <el-col :span="8">
-                    <el-form-item :label="fieldsList[1].name">
+                    <el-form-item :label="$t('form.pos.collect.Currency')">
                       <el-select
                         v-model="currentFieldCurrency"
-                        :placeholder="fieldsList[1].help"
                         @change="changeCurrency"
                       >
                         <el-option
@@ -123,13 +124,13 @@
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col v-for="(field, key) in fieldsList" :key="key" :span="8">
+                  <el-col
+                    v-for="field in hiddenFieldsList"
+                    :key="field.sequence"
+                    :span="8"
+                  >
                     <field-definition
-                      v-if="field.sequence > 2"
-                      :metadata-field="field.columnName === 'PayAmt' ? {
-                        ...field,
-                        labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
-                      } : field"
+                      :metadata-field="field"
                     />
                   </el-col>
                 </el-row>
@@ -562,6 +563,12 @@ export default {
     },
     fieldsPaymentType() {
       return this.fieldsList[1]
+    },
+    primaryFieldsList() {
+      return this.fieldsList.filter(field => field.sequence <= 1)
+    },
+    hiddenFieldsList() {
+      return this.fieldsList.filter(field => field.sequence > 1)
     }
   },
   watch: {

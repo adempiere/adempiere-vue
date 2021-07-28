@@ -165,9 +165,6 @@ export default {
           query: value.reference.query
         })
       }
-    },
-    labelTypesPayment(value) {
-      console.log(value)
     }
   },
   created() {
@@ -273,7 +270,6 @@ export default {
           query
         })
           .then(response => {
-            console.log(response)
             this.labelTypesPayment = response
           })
       }

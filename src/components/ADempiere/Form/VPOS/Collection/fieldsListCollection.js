@@ -57,7 +57,7 @@ export default [
     columnName: 'C_Bank_ID',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 3,
+      sequence: 2,
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       handleContentSelection: true,
@@ -73,7 +73,7 @@ export default [
     elementColumnName: 'DateTrx',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 4,
+      sequence: 3,
       handleFocusGained: true,
       handleFocusLost: true,
       handleKeyPressed: true,
@@ -93,7 +93,7 @@ export default [
     columnName: 'ReferenceNo',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 5,
+      sequence: 4,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
@@ -110,7 +110,7 @@ export default [
     columnName: 'CreditCardType',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 6,
+      sequence: 5,
       defaultValue: 'M',
       handleActionKeyPerformed: true,
       handleContentSelection: true,
@@ -128,7 +128,7 @@ export default [
     columnName: 'CreditCardNumber',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 7,
+      sequence: 6,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
@@ -145,7 +145,7 @@ export default [
     columnName: 'AccountNo',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 8,
+      sequence: 7,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
