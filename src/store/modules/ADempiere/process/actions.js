@@ -420,7 +420,7 @@ export default {
               link.href = window.URL.createObjectURL(blob)
               link.download = output.fileName
               // download report file
-              if (!['pdf', 'html'].includes(reportType)) {
+              if (!['csv', 'xlsx', 'xls', 'pdf', 'html'].includes(reportType)) {
                 link.click()
               }
               const contextMenuMetadata = rootGetters.getContextMenu(processResult.processUuid)
