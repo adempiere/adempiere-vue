@@ -55,9 +55,12 @@
                   <el-table-column
                     v-for="item of excelData.header"
                     :key="item"
-                    :prop="item"
                     :label="item"
-                  />
+                  >
+                    <template slot-scope="scope">
+                      {{ scope.row[item] }} {{ item }}
+                    </template>
+                  </el-table-column>
                 </el-table>
               </el-main>
             </el-container>
