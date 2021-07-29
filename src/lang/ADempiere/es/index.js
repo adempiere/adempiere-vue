@@ -238,6 +238,7 @@ export default {
       advancedQuery: 'Consulta Avanzada',
       exportZip: 'Exportar Zip',
       showOnlyMandatoryColumns: 'Mostrar Solo Columnas Obligatorias',
+      ShowTableColumnsOnly: 'Mostrar Solo Columnas de la Tabla',
       showAllAvailableColumns: 'Mostrar Todas Columnas Disponibles',
       exportRecordTable: 'Exportar Registros Seleccionados',
       showTotal: 'Mostrar Totales',

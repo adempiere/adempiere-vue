@@ -18,18 +18,26 @@
 
 <template>
   <el-main class="default-table">
-    <el-input
-      v-model="valueToSearch"
-      clearable
-      size="mini"
-      class="input-search"
-    >
-      <i
-        slot="prefix"
-        class="el-icon-search el-input__icon"
-      />
-    </el-input>
-
+    <el-row>
+      <el-col :span="23">
+        <el-input
+          v-model="valueToSearch"
+          clearable
+          size="mini"
+          class="input-search"
+        >
+          <i
+            slot="prefix"
+            class="el-icon-search el-input__icon"
+          />
+        </el-input>
+      </el-col>
+      <el-col :span="1">
+        <columns-display-option
+          :option="currentOption"
+        />
+      </el-col>
+    </el-row>
     <el-table
       ref="multipleTable"
       style="width: 100%;height: 93% !important;"
@@ -51,9 +59,9 @@
         min-width="50"
       />
 
-      <template v-for="(fieldAttributes, key) in fieldsList">
+      <template v-for="(fieldAttributes, key) in header">
         <el-table-column
-          v-if="isDisplayed(fieldAttributes)"
+          v-if="isDisplayed(fieldAttributes) && tableColumnDataType(fieldAttributes, currentOption)"
           :key="key"
           :label="headerLabel(fieldAttributes)"
           :column-key="fieldAttributes.columnName"
@@ -75,7 +83,7 @@
 
     <!-- pagination table, set custom or use default change page method -->
     <custom-pagination
-      :total="0"
+      :total="recordsWithFilter.length"
       :current-page="1"
       :selection="0"
       :handle-change-page="handleChangePage"
@@ -88,6 +96,7 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 
 import FieldDefinition from '@/components/ADempiere/Field'
 import CellInfo from './CellInfo'
+import columnsDisplayOption from './columnsDisplayOption'
 import CustomPagination from '@/components/ADempiere/Pagination'
 import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
 import { isLookup } from '@/utils/ADempiere/references'
@@ -97,6 +106,7 @@ export default defineComponent({
 
   components: {
     CellInfo,
+    columnsDisplayOption,
     CustomPagination,
     FieldDefinition
   },
@@ -117,6 +127,17 @@ export default defineComponent({
     panelMetadata: {
       type: Object,
       required: true
+    },
+    // get the table header
+    header: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+    dataTable: {
+      type: Array,
+      required: true,
+      default: () => []
     }
   },
 
@@ -129,20 +150,12 @@ export default defineComponent({
       }
     })
 
-    const fieldsList = computed(() => {
-      const panel = props.panelMetadata
-      if (panel && panel.fieldsList) {
-        return panel.fieldsList
-      }
-      return []
-    })
-
     /**
      * Selection columns to be taken into account during the search
      */
     const selectionColumns = computed(() => {
       const displayColumnsName = []
-      const columnsName = fieldsList.value
+      const columnsName = props.header
         .filter(fieldItem => {
           return fieldItem.isSelectionColumn
         }).map(fieldItem => {
@@ -151,7 +164,6 @@ export default defineComponent({
           }
           return fieldItem.columnName
         })
-
       return columnsName.concat(displayColumnsName)
     })
 
@@ -186,22 +198,10 @@ export default defineComponent({
       return
     }
 
-    // namespace to vuex store module
-    const vuexStore = props.containerManager.vuexStore()
-
-    // get records list
-    const recordsList = computed(() => {
-      const data = root.$store.getters[vuexStore + '/getContainerData']({
-        containerUuid: props.containerUuid
-      })
-      if (data && data.recordsList) {
-        return data.recordsList
-      }
-      return []
-    })
+    // get table data
     const recordsWithFilter = computed(() => {
       if (!root.isEmptyValue(valueToSearch.value)) {
-        return recordsList.value.filter(row => {
+        return props.dataTable.filter(row => {
           return selectionColumns.value.some(columnName => {
             const value = !root.isEmptyValue(row[columnName]) ? row[columnName].toString() : ''
             const search = valueToSearch.value
@@ -217,16 +217,18 @@ export default defineComponent({
           })
         })
       }
-      return recordsList.value
+      return props.dataTable
     })
-
+    const currentOption = computed(() => {
+      return root.$store.getters.getTableOption
+    })
     return {
+      // data
       valueToSearch,
       // computeds
-      recordsList,
       recordsWithFilter,
+      currentOption,
       keyColumn,
-      fieldsList,
       // methods
       headerLabel,
       handleChangePage,
@@ -251,5 +253,9 @@ export default defineComponent({
     margin-left: 10px;
     margin-bottom: 10px;
   }
+}
+.el-table--scrollable-y .el-table__body-wrapper {
+  overflow-y: auto;
+  height: 90% !important;
 }
 </style>

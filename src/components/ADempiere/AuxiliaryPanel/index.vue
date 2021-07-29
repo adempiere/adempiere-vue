@@ -20,11 +20,18 @@
   <div class="container-main">
     <el-row :gutter="12" style="height: 100% !important;">
       <transition name="slide-fade" style="height: 100% !important;">
-        <el-col :span="8" class="container-main" :style="!isEmptyValue(position) ? {right: percent(position)} : ''">
+        <el-col :span="10" class="container-main" :style="fullscreen ? {width: 100 + '%'} : ''">
           <el-card class="table">
             <div slot="header">
               {{ label }}
-              <el-button type="text" icon="el-icon-close" style="float: right; padding: 3px 0" @click="closeContainer" />
+              <el-button type="text" icon="el-icon-close" style="float: right;padding: 3px 0px;font-size: 22px;padding-left: 5px;" @click="closeContainer" />
+              <el-button
+                type="text"
+                style="float: right; font-size: 18px; padding: 3px 0"
+                @click="fullscreen = !fullscreen"
+              >
+                <svg-icon :icon-class="!fullscreen ? 'fullscreen' : 'exit-fullscreen'" />
+              </el-button>
             </div>
             <slot />
           </el-card>
@@ -35,7 +42,7 @@
 </template>
 
 <script>
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent, ref } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'AuxiliaryPanel',
@@ -53,6 +60,7 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
+    const fullscreen = ref(false)
     const closeContainer = () => {
       root.$store.commit('setExternalContainer', false)
     }
@@ -64,6 +72,7 @@ export default defineComponent({
     }
 
     return {
+      fullscreen,
       // methodo
       closeContainer,
       percent
@@ -87,8 +96,8 @@ export default defineComponent({
 </style>
 <style scoped>
 .container-main{
-  padding-left: 0px;
-  padding-right: 0px;
+  padding-left: 0% !important;
+  padding-right: 3% !important;
   height: 100% !important;
   position: fixed;
   z-index: 5;
@@ -101,7 +110,7 @@ export default defineComponent({
 /* Enter and leave animations can use different */
 /* durations and timing functions.              */
 .slide-fade-enter-active {
-  transition: all .3s ease;
+  transition: all .0 ease;
 }
 .slide-fade-leave-active {
   transition: all .0s ease;

@@ -16,6 +16,7 @@
 
 import { convertStringToBoolean, convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
 import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
+import language from '@/lang'
 
 /**
  * Checks if value is empty. Deep-checks arrays and objects
@@ -498,6 +499,20 @@ export function calculationValue(value, event) {
     }
   }
 }
+
+export function tableColumnDataType(column, currentOption) {
+  if (currentOption === language.t('table.dataTable.showAllColumns')) {
+    return true
+  }
+  if (currentOption === language.t('table.dataTable.showOnlyMandatoryColumns') && (column.isMandatory || column.isMandatoryFromLogic)) {
+    return true
+  }
+  if (currentOption === language.t('table.dataTable.ShowTableColumnsOnly') && column.isDisplayedGrid) {
+    return true
+  }
+  return false
+}
+
 /**
  * Search in the currency lists for the current currency
  * @author Elsio Sanchez <elsiosanches@gmail.com>
