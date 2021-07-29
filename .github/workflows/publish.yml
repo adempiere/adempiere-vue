@@ -137,7 +137,7 @@ jobs:
       - name: Generate dist docs
         run: |
           cd docs
-          npm ci
+          npm i
           npm run build --if-present
 
       - name: Upload dist docs
