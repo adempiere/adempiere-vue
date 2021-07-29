@@ -30,7 +30,7 @@
 import { defineComponent } from '@vue/composition-api'
 
 export default defineComponent({
-  name: 'columnsDisplayOption',
+  name: 'ColumnsDisplayOption',
 
   props: {
     option: {

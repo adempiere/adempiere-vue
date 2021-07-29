@@ -78,6 +78,14 @@ export default defineComponent({
         return new Promise()
       },
 
+      // To Default Table
+      setSelection: ({ containerUuid, recordsSelected }) => {
+        console.info('setSelection callback', containerUuid, recordsSelected)
+      },
+      setSelectionAll: ({ containerUuid, recordsSelected }) => {
+        console.info('setSelectionAll callback', containerUuid, recordsSelected)
+      },
+
       loadActionMenu: (currentTab) => {
         // current tab properties
         const { tableName, uuid } = currentTab

@@ -38,6 +38,7 @@
         />
       </el-col>
     </el-row>
+
     <el-table
       ref="multipleTable"
       style="width: 100%;height: 93% !important;"
@@ -50,6 +51,8 @@
       :element-loading-text="$t('notifications.loading')"
       element-loading-background="rgba(255, 255, 255, 0.8)"
       @row-click="handleRowClick"
+      @select="handleSelection"
+      @select-all="handleSelectionAll"
     >
       <!-- column with the checkbox -->
       <el-table-column
@@ -94,7 +97,6 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import FieldDefinition from '@/components/ADempiere/Field'
 import CellInfo from './CellInfo'
 import columnsDisplayOption from './columnsDisplayOption'
 import CustomPagination from '@/components/ADempiere/Pagination'
@@ -107,8 +109,7 @@ export default defineComponent({
   components: {
     CellInfo,
     columnsDisplayOption,
-    CustomPagination,
-    FieldDefinition
+    CustomPagination
   },
 
   props: {
@@ -148,6 +149,7 @@ export default defineComponent({
       if (props.panelMetadata) {
         return props.panelMetadata.keyColumn
       }
+      return undefined
     })
 
     /**
@@ -219,9 +221,25 @@ export default defineComponent({
       }
       return props.dataTable
     })
+
     const currentOption = computed(() => {
       return root.$store.getters.getTableOption
     })
+
+    const handleSelection = (rowsSelection, rowsSelected) => {
+      props.containerManager.setSelection({
+        containerUuid: props.containerUuid,
+        recordsSelected: rowsSelected
+      })
+    }
+
+    const handleSelectionAll = (rowsSelection) => {
+      props.containerManager.setSelection({
+        containerUuid: props.containerUuid,
+        recordsSelected: rowsSelection
+      })
+    }
+
     return {
       // data
       valueToSearch,
@@ -233,6 +251,8 @@ export default defineComponent({
       headerLabel,
       handleChangePage,
       handleRowClick,
+      handleSelection,
+      handleSelectionAll,
       isDisplayed
     }
   }

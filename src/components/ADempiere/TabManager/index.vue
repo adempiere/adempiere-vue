@@ -74,6 +74,8 @@
           :parent-uuid="parentUuid"
           :container-uuid="tabAttributes.uuid"
           :container-manager="containerManagerTab"
+          :header="tableheaders"
+          :data-table="recordsList"
           :panel-metadata="generatePanelAndFields({
             parentUuid: parentUuid,
             containerUuid: tabAttributes.uuid,
@@ -182,6 +184,15 @@ export default defineComponent({
       }
     })
 
+    // create the table header
+    const tableheaders = computed(() => {
+      const panel = props.tabsList[tabNo]
+      if (panel && panel.fieldsList) {
+        return panel.fieldsList
+      }
+      return []
+    })
+
     /**
      * @param {object} tabHTML DOM HTML the tab clicked
      */
@@ -221,6 +232,17 @@ export default defineComponent({
       }
       return tabNumber
     }
+
+    // get records list
+    const recordsList = computed(() => {
+      const data = root.$store.getters['dataManager/getContainerData']({
+        containerUuid: props.containerUuid
+      })
+      if (data && data.recordsList) {
+        return data.recordsList
+      }
+      return []
+    })
 
     const getData = () => {
       // TODO: Add store get data from tab
@@ -267,6 +289,8 @@ export default defineComponent({
       tabUuid,
       currentTab,
       isShowMultiRecords,
+      tableheaders,
+      recordsList,
       // computed
       containerManagerTab,
       isShowRecords,
