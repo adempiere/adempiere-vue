@@ -149,14 +149,11 @@ export default defineComponent({
 
         reader.onload = (e) => {
           const workbook = XLSX.read(data, { type: 'array' })
-          console.log(workbook)
           const firstSheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[firstSheetName]
 
           const header = getHeaderRow(worksheet)
           const results = XLSX.utils.sheet_to_json(worksheet)
-
-          console.log(header, results)
 
           // value to render
           excelData.value = {
