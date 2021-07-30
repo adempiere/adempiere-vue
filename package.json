@@ -69,7 +69,7 @@
     "vue-workflow-chart": "^0.4.5",
     "vuedraggable": "2.24.3",
     "vuex": "3.6.2",
-    "xlsx": "0.16.9"
+    "xlsx": "0.17.0"
   },
   "devDependencies": {
     "@babel/core": "7.12.13",
