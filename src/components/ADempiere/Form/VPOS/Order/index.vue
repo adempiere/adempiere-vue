@@ -91,7 +91,7 @@
                     </el-tag>
                   </el-col>
                   <el-col :span="14" style="padding-left: 0px; padding-right: 0px;">
-                    <el-button type="primary" plain :disabled="isEmptyValue(this.$route.query.action)" @click="newOrder">
+                    <el-button type="primary" plain :disabled="isEmptyValue(currentOrder.documentNo)" @click="newOrder">
                       {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
                     </el-button>
                   </el-col>

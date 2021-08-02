@@ -665,7 +665,7 @@ export default {
     addCollectToList() {
       const containerUuid = this.containerUuid
       const posUuid = this.currentPointOfSales.uuid
-      const orderUuid = this.$route.query.action
+      const orderUuid = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid
       const bankUuid = this.$store.getters.getValueOfField({
         containerUuid,
         columnName: 'C_Bank_ID_UUID'
