@@ -3,6 +3,7 @@ import {
 } from '@/api/ADempiere/process'
 import { showNotification } from '@/utils/ADempiere/notification'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { viewerSupportedFormats } from '@/utils/ADempiere/exportUtil'
 import language from '@/lang'
 import router from '@/router'
 import { getToken } from '@/utils/auth'
@@ -231,7 +232,9 @@ export default {
                   link = document.createElement('a')
                   link.href = window.URL.createObjectURL(blob)
                   link.download = output.fileName
-                  if (reportType !== 'pdf' && reportType !== 'html') {
+
+                  // download report file if not is viewer
+                  if (!viewerSupportedFormats.includes(reportType)) {
                     link.click()
                   }
 
@@ -419,8 +422,9 @@ export default {
               link = document.createElement('a')
               link.href = window.URL.createObjectURL(blob)
               link.download = output.fileName
-              // download report file
-              if (!['csv', 'xlsx', 'xls', 'pdf', 'html'].includes(reportType)) {
+
+              // download report file if not is viewer
+              if (!viewerSupportedFormats.includes(reportType)) {
                 link.click()
               }
               const contextMenuMetadata = rootGetters.getContextMenu(processResult.processUuid)
@@ -669,7 +673,9 @@ export default {
             link = document.createElement('a')
             link.href = window.URL.createObjectURL(blob)
             link.download = output.fileName
-            if (reportType !== 'pdf' && reportType !== 'html') {
+
+            // download report file if not is viewer
+            if (!viewerSupportedFormats.includes(reportType)) {
               link.click()
             }
             const contextMenuMetadata = rootGetters.getContextMenu(processResult.processUuid)
