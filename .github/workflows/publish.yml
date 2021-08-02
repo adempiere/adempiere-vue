@@ -170,7 +170,7 @@ jobs:
         run: echo ${{ steps.docker_build.outputs.digest }}
 
 
-  # # Build dist documentation ADempiere-Vue
+  # Build dist documentation ADempiere-Vue
   build-docs:
     name: Build dist ADempiere-Vue docs
     runs-on: ubuntu-latest
@@ -200,7 +200,7 @@ jobs:
           path: docs/.vuepress/dist
 
 
-  # # Publish dist binaries to documentation
+  # Publish dist binaries to documentation
   publish-docs-dist:
     name: Upload ADempiere-Vue docs binaries
     needs:
