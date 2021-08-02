@@ -678,6 +678,17 @@ export default {
     if (!this.isEmptyValue(this.$route.query.action)) {
       this.$store.dispatch('reloadOrder', { orderUuid: this.$route.query.action })
     }
+    if (this.isEmptyValue(this.$route.query.action) && !this.isEmptyValue(this.currentOrder.uuid)) {
+      this.$router.push({
+        params: {
+          ...this.$route.params
+        },
+        query: {
+          ...this.$route.query,
+          action: this.currentOrder.uuid
+        }
+      })
+    }
   },
   methods: {
     formatDate,
