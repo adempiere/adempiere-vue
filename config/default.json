@@ -1,6 +1,6 @@
 {
   "server": {
-    "host": "20.12.0.102",
+    "host": "localhost",
     "port": 9527
   },
   "adempiere": {
