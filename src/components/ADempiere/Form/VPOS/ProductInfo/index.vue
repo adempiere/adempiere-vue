@@ -213,8 +213,7 @@ export default {
       // call callback function to return suggestions
       callBack(results)
     },
-    close(a) {
-      console.log('alo', a)
+    close() {
       this.visible = false
     },
     handleSelect(elementSelected) {
