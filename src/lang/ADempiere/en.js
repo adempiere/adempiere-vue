@@ -629,6 +629,7 @@ export default {
         YTDBudget: 'Budget YTD',
         Variance: 'Variance'
       }
-    }
+    },
+    weight: 'Weight'
   }
 }

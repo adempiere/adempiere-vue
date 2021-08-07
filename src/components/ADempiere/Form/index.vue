@@ -66,6 +66,9 @@ export default {
         case 'WTrialBalance':
           form = import('@/components/ADempiere/Form/WTrialBalance')
           break
+        case 'VGetWeight':
+          form = import('@/components/ADempiere/Form/VGetWeight')
+          break
         default:
           form = import('@/views/ADempiere/Unsupported')
           break

@@ -611,6 +611,7 @@ export default {
         YTDBudget: 'Presupuesto YTD',
         Variance: 'Varianza'
       }
-    }
+    },
+    weight: 'Peso'
   }
 }
