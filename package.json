@@ -40,7 +40,7 @@
     "driver.js": "0.9.8",
     "dropzone": "5.7.3",
     "echarts": "5.0.2",
-    "element-ui": "2.15.0",
+    "element-ui": "2.15.3",
     "file-saver": "2.0.5",
     "fuse.js": "6.4.6",
     "js-cookie": "2.2.1",
@@ -66,6 +66,7 @@
     "vue-shortkey": "^3.1.7",
     "vue-split-panel": "^1.0.4",
     "vue-splitpane": "1.0.6",
+    "vue-workflow-chart": "^0.4.5",
     "vuedraggable": "2.24.3",
     "vuex": "3.6.2",
     "xlsx": "0.16.9"

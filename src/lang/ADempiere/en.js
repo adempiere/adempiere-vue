@@ -311,6 +311,7 @@ export default {
     deleteRecord: 'Delete Record',
     undoNew: 'Undo New Record',
     containerInfo: {
+      attachment: 'Attachment',
       notes: 'Notes List',
       changeLog: 'ACtivity',
       workflowLog: 'Workflow Log',
@@ -473,11 +474,13 @@ export default {
         pending: 'Pending',
         payment: 'Payment',
         change: 'Change',
+        totalInvoiced: 'Total Invoiced',
         convertAmount: 'Convert Quantity',
         convertedAmount: 'Converted Amount',
         fullPayment: 'Full Payment',
         dayRate: 'Day Rate',
         noDayRate: 'No daily rate has been generated for the currency.',
+        Currency: 'Currency',
         TenderType: {
           directDeposit: 'Direct Deposit',
           creditCard: 'Credit Card',
@@ -488,6 +491,15 @@ export default {
           account: 'Account',
           cash: 'Cash',
           zelle: 'Zelle'
+        },
+        overdrawnInvoice: {
+          title: 'OverdrawnInvoice',
+          below: 'Invoice will remain with an open balance',
+          above: 'Customer Details',
+          returned: 'Your change is',
+          coupon: 'Generate a Gift Card or Vale',
+          returnMoney: 'Return money in another form of payment',
+          adjustDocument: 'You want to Adjust Document'
         }
       },
       keyLayout: {
@@ -555,6 +567,49 @@ export default {
       },
       toolsPoint: {
         title: 'Point of Sale Tools'
+      }
+    },
+    activity: {
+      title: 'Your Workflow Activities',
+      filtersSearch: {
+        history: 'History records',
+        forward: 'Re-send'
+      },
+      table: {
+        priority: 'Priority',
+        node: 'Node'
+      },
+      workflow: {
+        title: 'Workflow',
+        description: 'Workflow life cycle diagram. The highlighted Node is the one currently awaiting verification.'
+      },
+      workflowLogs: {
+        title: 'Change Log',
+        description: 'Workflow timeline'
+      }
+    },
+    match: {
+      title: {
+        invoice: 'Invoice',
+        deliveryReceipt: 'Delivery / Receipt'
+      },
+      description: {
+        searchCriteria: 'Select a Business Partner to check the pending documents to be assigned',
+        invoice: 'Select an Invoice to assign the corresponding Delivery/Receipt to',
+        deliveryReceipt: 'Select at least one Delivery/Receipt to which you require to assign the selected invoice'
+      },
+      field: {
+        toAssigned: 'To be Assigned',
+        assigning: 'Assigning',
+        difference: 'Difference'
+      },
+      filtersSearch: {
+        sameBusinessPartner: 'Same Business Partner',
+        sameProduct: 'Same Product ',
+        sameQuantity: 'SameQuantity '
+      },
+      table: {
+        nrDocument: 'Nr Document'
       }
     },
     wTrialBalance: {

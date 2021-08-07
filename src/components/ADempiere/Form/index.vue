@@ -54,6 +54,12 @@ export default {
         case 'ProductInfo':
           form = import('@/components/ADempiere/Form/ProductInfo')
           break
+        case 'WFActivity':
+          form = import('@/components/ADempiere/Form/WorkflowActivity')
+          break
+        case 'VMatch':
+          form = import('@/components/ADempiere/Form/VMatch')
+          break
         case 'VPOS':
           form = import('@/components/ADempiere/Form/VPOS')
           break
