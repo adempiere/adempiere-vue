@@ -23,24 +23,28 @@ import { getCurrentRole } from '@/utils/auth'
 const dashboard = {
   state: {
     dashboard: [],
-    recentItems: []
+    recentItems: [],
+    mainashboard: {}
   },
   mutations: {
     addDashboard(state, payload) {
-      state.dashboard.push(payload)
+      state.dashboard = payload
     },
     notifyDashboardRefresh: (state, payload) => {
 
     },
     setRecentItems(state, payload) {
       state.recentItems = payload
+    },
+    setMainDashboard(state, payload) {
+      state.mainashboard = payload
     }
   },
   actions: {
     refreshDashboard({ commit }, parameters) {
       commit('notifyDashboardRefresh', parameters)
     },
-    listDashboard({ commit, rootGetters }, {
+    listDashboard({ commit, state, rootGetters }, {
       roleId,
       roleUuid
     }) {
@@ -62,25 +66,24 @@ const dashboard = {
               roleUuid: roleUuid,
               ...dashboardResponse
             }
-            commit('addDashboard', roleDashboards)
+            commit('addDashboard', dashboardResponse.dashboardsList)
             resolve(roleDashboards)
           })
           .catch(error => {
             console.warn(`Error getting List Dashboards: ${error.message}. Code: ${error.code}.`)
           })
       })
+    },
+    mainDashboard({ commit }, dashboard) {
+      commit('setMainDashboard', dashboard)
     }
   },
   getters: {
-    getDashboard: (state) => (dashboardUuid) => {
-      return state.dashboard.find(
-        item => item.uuid === dashboardUuid
-      )
+    getDashboard: (state) => {
+      return state.dashboard
     },
-    getDashboardByRole: (state) => (roleUuid) => {
-      return state.dashboard.find(
-        item => item.roleUuid === roleUuid
-      )
+    getMainDashboard: (state) => {
+      return state.mainashboard
     }
   }
 }

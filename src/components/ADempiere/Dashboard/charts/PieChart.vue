@@ -87,12 +87,16 @@ export default {
         })
     },
     loadChartMetrics(metrics) {
-      let xAxisValues = []
+      const xAxisValues = []
       let seriesToShow = []
       if (!this.isEmptyValue(metrics.series)) {
         if (metrics.series.length > 0) {
           metrics.series.forEach(serie => {
-            xAxisValues = xAxisValues.concat(serie.data_set.map(set => set.name))
+            serie.data_set.forEach(set => {
+              if (!xAxisValues.find(value => value === set.name)) {
+                xAxisValues.push(set.name)
+              }
+            })
           })
         }
         seriesToShow = metrics.series.map(serie => {
@@ -118,6 +122,18 @@ export default {
         tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        toolbox: {
+          // y: 'bottom',
+          feature: {
+            magicType: {
+              type: ['stack', 'tiled']
+            },
+            dataView: {},
+            saveAsImage: {
+              pixelRatio: 2
+            }
+          }
         },
         legend: {
           left: 'center',

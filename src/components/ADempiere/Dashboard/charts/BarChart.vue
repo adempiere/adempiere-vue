@@ -87,12 +87,16 @@ export default {
         })
     },
     loadChartMetrics(metrics) {
-      let xAxisValues = []
+      const xAxisValues = []
       let seriesToShow = []
       if (!this.isEmptyValue(metrics.series)) {
         if (metrics.series.length > 0) {
           metrics.series.forEach(serie => {
-            xAxisValues = xAxisValues.concat(serie.data_set.map(set => set.name))
+            serie.data_set.forEach(set => {
+              if (!xAxisValues.find(value => value === set.name)) {
+                xAxisValues.push(set.name)
+              }
+            })
           })
         }
         seriesToShow = metrics.series.map(serie => {
@@ -111,6 +115,18 @@ export default {
           trigger: 'axis',
           axisPointer: { // 坐标轴指示器，坐标轴触发有效
             type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+          }
+        },
+        toolbox: {
+          // y: 'bottom',
+          feature: {
+            magicType: {
+              type: ['stack', 'tiled']
+            },
+            dataView: {},
+            saveAsImage: {
+              pixelRatio: 2
+            }
           }
         },
         grid: {

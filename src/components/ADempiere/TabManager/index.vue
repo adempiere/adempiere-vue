@@ -29,9 +29,10 @@
         :windowuuid="windowUuid"
         :tabuuid="tabAttributes.uuid"
         :name="String(key)"
+        :tabindex="String(key)"
         lazy
         :disabled="isDisabledTab(key)"
-        :style="tabParentStyle"
+        :style="tabStyle"
       >
         <lock-record
           slot="label"
@@ -46,7 +47,6 @@
           :container-uuid="tabAttributes.uuid"
           :panel-metadata="tabAttributes"
           :group-tab="tabAttributes.tabGroup"
-          panel-type="window"
         />
       </el-tab-pane>
     </template>
@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { defineComponent, computed, ref, watch } from '@vue/composition-api'
+import { defineComponent, computed, ref } from '@vue/composition-api'
 
 import PanelDefinition from '@/components/ADempiere/PanelDefinition'
 import LockRecord from '@/components/ADempiere/ContainerOptions/LockRecord'
@@ -83,10 +83,13 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const currentTab = ref(root.$route.query.tabParent)
+    // if tabParent is present in path set this
+    const tabNo = root.$route.query.tab || '0'
+    const currentTab = ref(tabNo)
+
     const tabUuid = ref(props.tabsList[0].uuid)
 
-    const tabParentStyle = computed(() => {
+    const tabStyle = computed(() => {
       return {
         height: '75vh',
         overflow: 'auto'
@@ -113,29 +116,28 @@ export default defineComponent({
      * @param {object} tabHTML DOM HTML the tab clicked
      */
     const handleClick = (tabHTML) => {
-      if (tabUuid.value !== tabHTML.$attrs.tabuuid) {
-        tabUuid.value = tabHTML.$attrs.tabuuid
+      const { tabuuid, tabindex } = tabHTML.$attrs
+      if (tabUuid.value !== tabuuid) {
+        tabUuid.value = tabuuid
         setCurrentTab()
-        setTabNumber(tabHTML.$attrs.key)
+      }
+      if (currentTab.value !== tabindex) {
+        setTabNumber(tabindex)
       }
     }
 
-    // watch router query tab parent value
-    watch(() => root.$route.query.tabParent, (newValue) => {
-      if (root.isEmptyValue(newValue) || newValue === 'create-new') {
-        setTabNumber('0')
-        return
+    const setTabNumber = (tabNumber = '0') => {
+      if (root.isEmptyValue(tabNumber)) {
+        tabNumber = '0'
       }
-      setTabNumber(newValue)
-    })
-
-    const setTabNumber = (tabNumber) => {
-      currentTab.value = tabNumber
+      if (tabNumber !== currentTab.value) {
+        currentTab.value = tabNumber
+      }
 
       root.$router.push({
         query: {
           ...root.$route.query,
-          tabParent: currentTab.value
+          tab: currentTab.value
         },
         params: {
           ...root.$route.params
@@ -144,13 +146,28 @@ export default defineComponent({
 
       // TODO: Delete this to production
       console.log('Click tab number ', tabNumber)
+      return tabNumber
     }
+
+    const getData = () => {
+      root.$store.dispatch('getDataListTab', {
+        parentUuid: props.windowUuid,
+        containerUuid: tabUuid.value
+      })
+        .catch(error => {
+          console.warn(`Error getting data list tab. Message: ${error.message}, code ${error.code}.`)
+        })
+    }
+
+    getData()
+
+    setTabNumber(currentTab.value)
 
     return {
       currentTab,
       tabUuid,
       // computed
-      tabParentStyle,
+      tabStyle,
       // meyhods
       handleClick,
       isDisabledTab
