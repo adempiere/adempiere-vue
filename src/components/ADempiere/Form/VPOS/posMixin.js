@@ -24,6 +24,7 @@ import {
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 import orderLineMixin from './Order/orderLineMixin.js'
+import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'POSMixin',
@@ -46,7 +47,11 @@ export default {
         quantityAvailable: 0
       },
       edit: false,
-      displayType: ''
+      displayType: '',
+      pin: '',
+      attributePin: {},
+      validatePin: false,
+      visible: false
     }
   },
   computed: {
@@ -140,6 +145,13 @@ export default {
         return []
       }
       return this.currentOrder.lineOrder
+    },
+    isPosRequiredPin() {
+      const pos = this.$store.getters.posAttributes.currentPointOfSales
+      if (!this.isEmptyValue(pos.isPosRequiredPin)) {
+        return pos.isPosRequiredPin
+      }
+      return false
     }
   },
   watch: {
@@ -183,6 +195,69 @@ export default {
     formatDate,
     formatPrice,
     formatQuantity,
+    openPin(pin) {
+      validatePin({
+        posUuid: this.currentPointOfSales.uuid,
+        pin
+      })
+        .then(response => {
+          this.validatePin = true
+          this.pin = ''
+          this.visible = false
+          this.pinAction(this.attributePin)
+        })
+        .catch(error => {
+          console.error(error.message)
+          this.$message({
+            type: 'error',
+            message: error.message,
+            showClose: true
+          })
+          this.pin = ''
+        })
+        .finally(() => {
+          this.visible = false
+        })
+    },
+    pinAction(action) {
+      if (action.type === 'updateOrder') {
+        switch (action.columnName) {
+          case 'QtyEntered':
+          case 'PriceEntered':
+          case 'Discount':
+            this.updateOrderLine(action)
+            break
+          case 'C_DocTypeTarget_ID': {
+            const documentTypeUuid = this.$store.getters.getValueOfField({
+              containerUuid: this.$route.meta.uuid,
+              columnName: 'C_DocTypeTarget_ID_UUID'
+            })
+            this.$store.dispatch('updateOrder', {
+              orderUuid: this.$route.query.action,
+              posUuid: this.currentPointOfSales.uuid,
+              documentTypeUuid
+            })
+            break
+          }
+        }
+      } else if (action.type === 'actionPos') {
+        switch (action.action) {
+          case 'changeWarehouse':
+            this.$store.commit('setCurrentWarehousePos', action)
+            break
+          case 'changeDocumentType':
+            this.$store.commit('setCurrentDocumentTypePos', action)
+            break
+          case 'changePriceList':
+            this.$store.commit('setCurrentPriceList', action)
+            break
+        }
+      }
+    },
+    closePin() {
+      this.visible = false
+      this.setDocumentType(this.currentOrder.documentType)
+    },
     withoutPOSTerminal() {
       if (this.isEmptyValue(this.currentPointOfSales)) {
         this.$message({
@@ -271,7 +346,8 @@ export default {
       }
       findProduct({
         searchValue: searchProduct,
-        priceListUuid: this.curretnPriceList.uuid
+        priceListUuid: this.curretnPriceList.uuid,
+        posUuid: this.currentPointOfSales.uuid
       })
         .then(productPrice => {
           this.product = productPrice.product
@@ -283,17 +359,6 @@ export default {
             type: 'info',
             message: error.message,
             showClose: true
-          })
-
-          this.$store.commit('updateValueOfField', {
-            containerUuid: 'Products-Price-List',
-            columnName: 'ProductValue',
-            value: `${searchProduct}`
-          })
-
-          this.$store.commit('showListProductPrice', {
-            attribute: 'isShowPopoverField',
-            isShowed: true
           })
         })
         .finally(() => {
@@ -362,7 +427,7 @@ export default {
     reloadOrder(requery, orderUuid) {
       if (requery) {
         if (this.isEmptyValue(orderUuid)) {
-          orderUuid = this.$route.query.action
+          orderUuid = this.currentOrder.uuid
           // if (this.isEmptyValue(orderUuid)) {
           //   orderUuid = this.$store.getters.currentOrder.uuid // this.currentOrder.uuid
           // }
@@ -371,6 +436,7 @@ export default {
           this.$store.dispatch('reloadOrder', { orderUuid })
         }
       }
+      this.setDocumentType(this.currentOrder.documentType)
     },
     fillOrder(order, setToStore = true) {
       const orderToPush = {
@@ -406,9 +472,19 @@ export default {
         } else if (mutation.type === 'addActionPerformed') {
           switch (mutation.payload.columnName) {
             case 'QtyEntered':
+              if (!this.isEmptyValue(this.$store.state['pointOfSales/orderLine/index'].line)) {
+                this.updateOrderLine(mutation.payload)
+              }
+              break
             case 'PriceEntered':
             case 'Discount':
-              if (!this.isEmptyValue(this.$store.state['pointOfSales/orderLine/index'].line)) {
+              if (this.isPosRequiredPin && !this.isEmptyValue(this.$store.state['pointOfSales/orderLine/index'].line)) {
+                this.attributePin = {
+                  ...mutation.payload,
+                  type: 'updateOrder'
+                }
+                this.visible = true
+              } else if (!this.isEmptyValue(this.$store.state['pointOfSales/orderLine/index'].line)) {
                 this.updateOrderLine(mutation.payload)
               }
               break
@@ -417,7 +493,13 @@ export default {
                 containerUuid: mutation.payload.containerUuid,
                 columnName: 'C_DocTypeTarget_ID_UUID'
               })
-              if (!this.isEmptyValue(documentTypeUuid) && !this.isEmptyValue(this.currentOrder.documentType.uuid) && this.currentOrder.documentType.uuid !== documentTypeUuid) {
+              if (this.isPosRequiredPin && !this.isEmptyValue(documentTypeUuid) && !this.isEmptyValue(this.currentOrder.documentType.uuid)) {
+                this.attributePin = {
+                  ...mutation.payload,
+                  type: 'updateOrder'
+                }
+                this.visible = true
+              } else if (!this.isEmptyValue(documentTypeUuid) && !this.isEmptyValue(this.currentOrder.documentType.uuid)) {
                 this.$store.dispatch('updateOrder', {
                   orderUuid: this.$route.query.action,
                   posUuid: this.currentPointOfSales.uuid,
@@ -435,7 +517,7 @@ export default {
 
             case 'C_BPartner_ID_UUID': {
               const bPartnerValue = mutation.payload.value
-              if (!this.isEmptyValue(this.currentPointOfSales)) {
+              if (!this.isEmptyValue(this.currentPointOfSales.templateBusinessPartner)) {
                 const bPartnerPOS = this.currentPointOfSales.templateBusinessPartner.uuid
                 // Does not send values to server, when empty values are set or
                 // if BPartner set equal to BPartner POS template

@@ -57,6 +57,7 @@ export default {
   navbar: {
     badge: {
       Notifications: 'Notificaciones',
+      activity: 'Flujos de Trabajos por Aprobar',
       link: 'Ir a Histórico de Procesos'
     },
     logOut: 'Salir',
@@ -286,6 +287,7 @@ export default {
     deleteRecord: 'Eliminar Registro',
     undoNew: 'Descartar Nuevo Registro',
     containerInfo: {
+      attachment: 'Anexo',
       notes: 'Listado de Notas',
       changeLog: 'Actividad',
       workflowLog: 'Histórico de Flujo de Trabajo',
@@ -448,9 +450,11 @@ export default {
         pending: 'Pendiente',
         payment: 'Pago',
         change: 'Cambio',
+        totalInvoiced: 'Total Facturado',
         convertAmount: 'Convertir Cantidad',
         convertedAmount: 'Monto Convertido',
         fullPayment: 'Cobro Completo',
+        Currency: 'Moneda',
         dayRate: 'Tasa del Día',
         noDayRate: 'No se a generado una tasa del día para la moneda',
         TenderType: {
@@ -463,6 +467,15 @@ export default {
           account: 'Cuenta',
           cash: 'Efectivo',
           zelle: 'Zelle'
+        },
+        overdrawnInvoice: {
+          title: 'Factura Sobregirada',
+          below: 'Factura quedará con un saldo abierto',
+          above: 'Datos del Cliente',
+          returned: 'Su vuelto es',
+          coupon: 'Generar una Tarjeta de Regalo o Vale',
+          returnMoney: 'Devolver dinero en otra forma de pago',
+          adjustDocument: 'Desea Ajustar Documento'
         }
       },
       keyLayout: {
@@ -530,6 +543,31 @@ export default {
       },
       toolsPoint: {
         title: 'Herramientas del Punto de Venta'
+      }
+    },
+    activity: {
+      title: 'Sus Actividades de Flujo de Trabajo',
+      filtersSearch: {
+        history: 'Registros históricos',
+        forward: 'Re-enviar'
+      },
+      table: {
+        priority: 'Prioridad',
+        node: 'Nodo'
+      },
+      guide: {
+        table: {
+          title: 'Lista de Flujos de trabajos por aprobar',
+          description: 'Seleccione al menos uno para ver el detalle y responsable de aprobación. De igual manera puede decidir si aprueba, rechaza o redirecciona el mismo'
+        },
+        workflow: {
+          title: 'Flujo de Trabajo',
+          description: 'Diagrama del ciclo de vida del flijo de trabajo. El Nodo resaltado es el que se encuentra actualmente a la espera de verificación.'
+        },
+        workflowLogs: {
+          title: 'Bitacora de Cambios',
+          description: 'Linea de tiempo del flujo de trabajo'
+        }
       }
     },
     match: {

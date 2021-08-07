@@ -1,15 +1,19 @@
 <template>
   <div class="dashboard-editor-container">
-    <el-row :gutter="8">
-      <el-col :span="24" style="padding-right:8px;margin-bottom:2px;">
+    <el-row v-if="!isEmptyValue(listDashboard)" :gutter="8">
+      <el-col v-if="!isEmptyValue(maindashboard)" :span="24" style="padding-right:8px;margin-bottom:2px;">
         <dashboard
-          :metadata="mainashboard"
-          :title="mainashboard.name"
+          :metadata="maindashboard"
+          :title="maindashboard.name"
         />
       </el-col>
-      <template v-for="(dashboardAttributes, index) in dashboardList">
-        <el-col v-if="index > 0" :key="index" :xs="{ span: 24 }" :sm="{ span: 24 }" :md="{ span: 24 }" :lg="{ span: 12 }" :xl="{ span: 12 }" style="padding-right:8px;margin-bottom:2px;">
-          <dashboard :metadata="dashboardAttributes" />
+      <template v-for="(dashboardAttributes, index) in listDashboard">
+        <el-col :key="index" :xs="{ span: 24 }" :sm="{ span: 24 }" :md="{ span: 24 }" :lg="{ span: 12 }" :xl="{ span: 12 }" style="padding-right:8px;margin-bottom:2px;">
+          <dashboard
+            :metadata="dashboardAttributes"
+            :title="dashboardAttributes.name"
+            :main="true"
+          />
         </el-col>
       </template>
     </el-row>
@@ -31,8 +35,9 @@ export default {
     }
   },
   computed: {
-    getterDashboard() {
-      return this.$store.getters.getDashboardByRole(this.roleUuid)
+    listDashboard() {
+      const list = this.$store.getters.getDashboard
+      return list.filter(dashboard => this.maindashboard.id !== dashboard.id)
     },
     currentRole() {
       return this.$store.getters['user/getRole']
@@ -40,15 +45,15 @@ export default {
     getterRol() {
       return this.$store.getters.getRoleUuid
     },
-    mainashboard() {
-      return this.$store.state.dashboard.mainashboard
+    maindashboard() {
+      return this.$store.getters.getMainDashboard
     }
   },
   watch: {
     getterRol(value) {
       this.getDashboardListFromServer()
     },
-    mainashboard(value) {
+    maindashboard(value) {
       this.getDashboardListFromServer()
     }
   },
@@ -62,8 +67,8 @@ export default {
         roleUuid: this.currentRole.uuid
       })
         .then(response => {
-          if (this.isEmptyValue(this.mainashboard)) {
-            this.$store.commit('setMainDashboard', response.dashboardsList[1])
+          if (this.isEmptyValue(this.maindashboard)) {
+            this.$store.dispatch('mainDashboard', response.dashboardsList[0])
           }
           this.dashboardList = response.dashboardsList
           this.$forceUpdate()
