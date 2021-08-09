@@ -19,6 +19,7 @@
 <template>
   <!-- actions or process on container -->
   <el-dropdown
+    v-if="!isEmptyValue(actionsManager)"
     :hide-on-click="true"
     :size="size"
     split-button
@@ -155,6 +156,7 @@ export default defineComponent({
   props: {
     actionsManager: {
       type: Object,
+      default: () => {},
       required: true
     },
     size: {

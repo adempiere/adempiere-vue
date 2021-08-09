@@ -17,12 +17,24 @@
 import { requestWindowMetadata } from '@/api/ADempiere/dictionary/window'
 
 export default {
-  getWindowDefinitionFromServer({ commit }, uuid) {
-    return requestWindowMetadata({
-      uuid
+  addWindow({ commit }, windowResponse) {
+    return new Promise(resolve => {
+      commit('addWindowToList', windowResponse)
+
+      resolve(windowResponse)
     })
-      .then(window => {
-        commit('addWindowToList', window)
+  },
+
+  getWindowDefinitionFromServer({ dispatch }, {
+    uuid
+  }) {
+    return new Promise(resolve => {
+      requestWindowMetadata({
+        uuid
       })
+        .then(async windowResponse => {
+          resolve(windowResponse)
+        })
+    })
   }
 }

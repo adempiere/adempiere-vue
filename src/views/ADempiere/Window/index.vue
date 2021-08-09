@@ -28,7 +28,6 @@
           :actions-manager="actionsManager"
           :relations-manager="relationsManager"
         />
-
         <component
           :is="renderWindowComponent"
           :container-manager="containerManagerWindow"
@@ -49,7 +48,8 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 
 import ActionMenu from '@/components/ADempiere/ActionMenu'
 import LoadingView from '@/components/ADempiere/LoadingView'
-import { generateWindow as generateWindowRespose } from './windowUtils'
+import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
+import { generateWindow as generateWindowDictionary } from './windowUtils'
 
 export default defineComponent({
   name: 'Window',
@@ -112,33 +112,45 @@ export default defineComponent({
       windowUuid = props.uuid
     }
 
+    const storedWindow = computed(() => {
+      return root.$store.getters.getStoredWindow(windowUuid)
+    })
+
     const generateWindow = (window) => {
       windowMetadata.value = window
-
-      const {
-        actionsManager: action,
-        relationsManager: relation,
-        referencesManager: references
-      } = props.containerManager.loadActionMenu(window.currentTab)
-
-      actionsManager.value = action
-      referencesManager.value = references
-      relationsManager.value = relation
-
       isLoaded.value = true
     }
 
     // get window from vuex store or request from server
     const getWindow = () => {
+      let window = storedWindow.value
+      if (!root.isEmptyValue(window)) {
+        generateWindow(window)
+        return
+      }
       // metadata props use for test
       if (!root.isEmptyValue(props.metadata)) {
-        return new Promise(resolve => {
-          const windowResponse = generateWindowRespose(props.metadata)
-
-          generateWindow(windowResponse)
-          resolve(windowResponse)
-        })
+        // from server response
+        window = convertWindow(props.metadata)
+        // add apps properties
+        window = generateWindowDictionary(window)
+        // add into store
+        return root.$store.dispatch('addWindow', window)
+          .then(windowResponse => {
+            // to obtain the load effect
+            setTimeout(() => {
+              generateWindow(windowResponse)
+            }, 1000)
+          })
       }
+      root.$store.dispatch('getWindowDefinitionFromServer', {
+        uuid: windowUuid
+      })
+        .then(windowResponse => {
+          // add apps properties
+          window = generateWindowDictionary(windowResponse)
+          generateWindow(window)
+        })
     }
 
     const renderWindowComponent = computed(() => {
@@ -149,7 +161,8 @@ export default defineComponent({
 
     // load metadata and generate window
     // getWindow()
-    setTimeout(getWindow, 1000)
+    // setTimeout(getWindow, 1000)
+    getWindow()
 
     return {
       windowUuid,
