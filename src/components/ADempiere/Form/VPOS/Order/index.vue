@@ -139,6 +139,7 @@
                 <template slot-scope="scope">
                   <el-popover
                     v-if="!isEmptyValue(listOrderLine)"
+                    popper-class="el-popper-info"
                     placement="right-start"
                     trigger="click"
                     :title="$t('form.productInfo.productInformation')"
@@ -744,7 +745,7 @@ export default {
       return this.formatPrice(this.currentOrder.grandTotal - this.currentOrder.totalLines, currency)
     },
     newOrder() {
-      this.createOrder({ withLine: true, newOrder: true })
+      this.createOrder({ withLine: false, newOrder: true })
     },
     changePos(pointOfSales) {
       this.$store.dispatch('setCurrentPOS', pointOfSales)
@@ -1001,7 +1002,7 @@ export default {
 </style>
 
 <style>
-  .el-popper {
+  .el-popper-info {
     margin-left: 12px;
     max-width: 65%;
     min-width: 50%;
