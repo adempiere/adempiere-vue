@@ -34,7 +34,13 @@
   "priceChecking": {
     "endpoint": "/form/addons/point-of-sales"
   },
-  "vBankState": {
-    "endpoint": "/form/addons/v-bank-state" 
+  "match": {
+    "endpoint": "/form/addons/match"
+  },
+  "weight": {
+    "endpoint": "/form/addons/weight"
+  },
+  "bankStatement": {
+    "endpoint": "/form/addons/bank-statement" 
   }
 }

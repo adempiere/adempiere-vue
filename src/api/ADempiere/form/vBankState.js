@@ -24,7 +24,7 @@ export function importedMovements({
   formUuid
 }) {
   return request({
-    url: `${config.vBankState.endpoint}/movements`,
+    url: `${config.bankStatement.endpoint}/movements`,
     method: 'get',
     params: {
       bank_account_uuid: bankAccountUuid,
@@ -41,7 +41,7 @@ export function systemPay({
   formUuid
 }) {
   return request({
-    url: `${config.vBankState.endpoint}/system-payments`,
+    url: `${config.bankStatement.endpoint}/system-payments`,
     method: 'get',
     params: {
       bank_account_uuid: bankAccountUuid,
@@ -58,7 +58,7 @@ export function matchingPay({
   formUuid
 }) {
   return request({
-    url: `${config.vBankState.endpoint}/matching-payments`,
+    url: `${config.bankStatement.endpoint}/matching-payments`,
     method: 'get',
     params: {
       bank_account_uuid: bankAccountUuid,

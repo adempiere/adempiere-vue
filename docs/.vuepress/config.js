@@ -316,7 +316,9 @@ function genComponentSidebar(type = '') {
     '/guide/components/hide-menu.md',
     '/guide/components/references.md',
     '/guide/components/lock-unlock-records.md',
-    '/guide/forms/point-of-sales.md'
+    '/guide/components/dashboard.md',
+    '/guide/components/guide.md',
+    '/guide/components/workflows-and-activities.md'
   ]
   return mapArr.map(i => {
     return type + i
@@ -324,7 +326,11 @@ function genComponentSidebar(type = '') {
 }
 
 function genFormsSidebar(type = '') {
-  const mapArr = ['/guide/forms/point-of-sales.md']
+  const mapArr = [
+    '/guide/forms/point-of-sales.md',
+    '/guide/forms/check-price.md',
+    '/guide/forms/product-information.md'
+  ]
   return mapArr.map(i => {
     return type + i
   })

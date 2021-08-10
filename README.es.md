@@ -4,24 +4,28 @@
 
 <p align="center">
   <a href="https://github.com/vuejs/vue">
-    <img src="https://img.shields.io/badge/vue-2.6.10-brightgreen.svg" alt="vue">
+    <img src="https://img.shields.io/badge/vue-2.6.10-brightgreen.svg" alt="vue version">
   </a>
   <a href="https://github.com/ElemeFE/element">
-    <img src="https://img.shields.io/badge/element--ui-2.7.0-brightgreen.svg" alt="element-ui">
+    <img src="https://img.shields.io/badge/element--ui-2.15.3-brightgreen.svg" alt="element-ui">
   </a>
-  <a href="https://travis-ci.org/adempiere/adempiere-vue" rel="nofollow">
-    <img src="https://travis-ci.org/adempiere/adempiere=vue.svg?branch=develop" alt="Estado de Construcción">
+  <a href="https://hub.docker.com/r/erpya/adempiere-vue/">
+    <img src="https://img.shields.io/docker/pulls/erpya/adempiere-vue.svg" alt="Docker Pulls">
+  </a>
+  <a href="https://github.com/adempiere/adempiere-vue/actions/workflows/publish.yml">
+    <img src="https://github.com/adempiere/adempiere-vue/actions/workflows/publish.yml/badge.svg" alt="Publish GH Action">
   </a>
   <a href="https://github.com/adempiere/adempiere-vue/blob/master/LICENSE">
-    <img src="https://img.shields.io/badge/license-GNU/GPL%20(v3)-blue" alt="Licencia">
+    <img src="https://img.shields.io/badge/license-GNU/GPL%20(v3)-blue" alt="license">
   </a>
-  <a href="https://github.com/adempiere/adempiere-vue/releases">
-    <img src="https://img.shields.io/github/release/adempiere/adempiere-vue.svg" alt="Liberación Github">
+  <a href="https://github.com/adempiere/adempiere-vue/releases/latest">
+    <img src="https://img.shields.io/github/release/adempiere/adempiere-vue.svg" alt="GitHub release">
   </a>
   <a href="https://gitter.im/adempiere/adempiere-vue">
     <img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter">
   </a>
 </p>
+
 
 Español | [Inglés](./README.md)
 
@@ -36,7 +40,7 @@ Este es una gran UI para [ADempiere ERP, CRM & SCM](https://github.com/adempiere
 [adempiere-vue](https://github.com/adempiere/adempiere-vue) usa como RPC (Llamado a Procedimientos Remotos)[gRPC](https://grpc.io/) como [server](https://github.com/adempiere/adempiere-gRPC-Server).
 
 - [Vista Prévia de la Aplicación](https://demo-ui.erpya.com/)
-  
+
   - **User**: demo
   - **Password**: demo
 
@@ -65,18 +69,88 @@ Entendiendo y aprendiendo acerca de lo anterior le ayudará a conocer el proyect
   <img width="900" src="https://wpimg.wallstcn.com/a5894c1b-f6af-456e-82df-1151da0839bf.png">
 </p>
 
-### Para todo el entorno puede descargar las siguientes imágenes:
-- ADempiere gRPC: https://hub.docker.com/r/erpya/adempiere-grpc-all-in-one
+## Corriendo Contenedores de Docker
+
+### Requerimientos Mínimos
+
+Para usar la imagen de Docker debes usar la versión 3.0 o superior de Docker.
+
+Construye la Imagen de docker (solo para desarrollo):
 ```shell
-docker pull erpya/adempiere-grpc-all-in-one
+docker build -t erpya/adempiere-vue:dev -f ./Dockerfile .
 ```
-- Proxy ADempiere API: https://hub.docker.com/r/erpya/proxy-adempiere-api
-```shell
-docker pull erpya/proxy-adempiere-api
-```
-- ADempiere Vue: https://hub.docker.com/r/erpya/adempiere-vue
+
+Descarga de Imagen:
 ```shell
 docker pull erpya/adempiere-vue
+```
+
+Ejecución de Contenedor:
+```shell
+docker run -it \
+	--name adempiere-vue \
+	-p 80:80 \
+	-e API_URL="https://api.erpya.com" \
+	erpya/adempiere-vue
+```
+
+
+### Variables de entorno para la configuración
+
+ * `API_URL`: Indica la dirección URL del servidor con el que se comunicará por defecto el cliente web [Proxy-Adempiere-Api](https://github.com/adempiere/proxy-adempiere-api), el valor por defecto es `https://https://api.erpya.com`.
+
+NOTA: Si no cambias los valores de esta variable de entorno, no es necesario indicarlo en el comando `docker run`, por defecto colocará el valor que se encuentra predeterminado.
+
+
+### Corriendo los contenedores con docker-compose:
+
+Facilmente puedes correr el contenedor usando docker-compose con el siguiente comando:
+```shell
+docker-compose up
+```
+
+Salida de la consola:
+```shell
+Building web-client
+Step 1/8 : FROM node:12-alpine
+ ---> 057fa4cc38c2
+Step 2/8 : LABEL maintainer="EdwinBetanc0urt@outlook.com"       description="ADempiere-Vue"
+ ---> Running in d096cf76ce2d
+Removing intermediate container d096cf76ce2d
+ ---> 46cc05704121
+Step 3/8 : ENV RELEASE_VERSION="3.9.3"
+ ---> Running in 9048d159aaf9
+Removing intermediate container 9048d159aaf9
+ ---> a19699234a5d
+Step 4/8 : ENV URL_REPO="https://github.com/adempiere/adempiere-vue"    BINARY_NAME="v$RELEASE_VERSION.zip"     VUE_APP_PROXY_ADDRESS="localhost"       VUE_APP_PROXY_PORT="8989"
+ ---> Running in c703a3818cbf
+Removing intermediate container c703a3818cbf
+ ---> 86b0c2b269c6
+Step 5/8 : RUN mkdir -p /opt/Apps &&    cd /opt/Apps &&         echo "Install needed packages... $BINARY_NAME $RELEASE_VERSION" &&      apk --no-cache add curl unzip &&        curl --output "$BINARY_NAME" -L "$URL_REPO/archive/$BINARY_NAME" &&     unzip -o "$BINARY_NAME" &&      rm "$BINARY_NAME" &&    mv "adempiere-vue-$RELEASE_VERSION" adempiere-vue &&    cd adempiere-vue &&    npm install &&   npm run build:prod
+ ---> Running in 6f3cb21924dd
+Install needed packages... v3.9.3.zip 3.9.3
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.11/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.11/community/x86_64/APKINDEX.tar.gz
+(1/5) Installing ca-certificates (20191127-r2)
+(2/5) Installing nghttp2-libs (1.40.0-r1)
+(3/5) Installing libcurl (7.67.0-r0)
+(4/5) Installing curl (7.67.0-r0)
+(5/5) Installing unzip (6.0-r6)
+Executing busybox-1.31.1-r9.trigger
+Executing ca-certificates-20191127-r2.trigger
+OK: 9 MiB in 21 packages
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   128  100   128    0     0    149      0 --:--:-- --:--:-- --:--:--   149
+100  916k    0  916k    0     0   180k      0 --:--:--  0:00:05 --:--:--  254k
+Archive:  v3.9.3.zip
+1d684b76328e3f6bcd3f75ea011087cce1c13a3c
+   creating: adempiere-vue-3.9.3/
+  inflating: adempiere-vue-3.9.3/.babelrc
+  inflating: adempiere-vue-3.9.3/.editorconfig
+adempiere-ui-client |
+adempiere-ui-client | > Listening at  http://localhost:9526/
+
 ```
 
 ## Patrocinantes
@@ -217,7 +291,7 @@ npm run lint
 npm run lint -- --fix
 ```
 
-Vaya a [Documentación](https://panjiachen.github.io/vue-element-admin-site/guide/essentials/deploy.html) para mayor información.
+Vaya a [Documentación](https://adempiere.github.io/adempiere-vue/es/guide/essentials/deploy.html#compilar) para mayor información.
 
 ## Contenedor Docker
 
@@ -233,7 +307,7 @@ Los cambios detallados por cada liberación se encuentran en [notas de liberaci�
 ## Demostración en línea
 
 [Vista Prévia de la Aplicación](https://demo-ui.erpya.com/)
-  
+
   - **User**: demo
   - **Password**: demo
 
