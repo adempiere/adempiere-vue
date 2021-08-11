@@ -27,11 +27,11 @@
       v-if="showContextMenu"
       style="height: 30px;"
     >
-      <context-menu
-        :menu-parent-uuid="$route.meta.parentUuid"
-        :container-uuid="processUuid"
-        :panel-type="panelType"
-        :is-report="processMetadata.isReport"
+      <action-menu
+        :parent-uuid="processUuid"
+        :references-manager="referencesManager"
+        :actions-manager="actionsManager"
+        :relations-manager="relationsManager"
       />
     </el-header>
 
@@ -53,30 +53,27 @@
     </el-main>
   </el-container>
 
-  <div
+  <loading-view
     v-else
-    key="process-loading"
-    v-loading="!isLoadedMetadata"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="view-loading"
+    key="window-loading"
   />
 </template>
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import ContextMenu from '@/components/ADempiere/ContextMenu'
+import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
 export default defineComponent({
   name: 'ProcessOrReport',
 
   components: {
+    ActionMenu,
+    LoadingView,
     PanelDefinition,
-    ContextMenu,
     TitleAndHelp
   },
 
