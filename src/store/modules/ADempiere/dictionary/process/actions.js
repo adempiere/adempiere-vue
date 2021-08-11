@@ -18,11 +18,19 @@ import { requestProcessMetadata } from '@/api/ADempiere/dictionary/process.js'
 
 export default {
   getProcessDefinitionFromServer({ commit }, uuid) {
-    return requestProcessMetadata({
-      uuid
-    })
-      .then(process => {
-        commit('addProcessToList', process)
+    return new Promise(resolve => {
+      requestProcessMetadata({
+        uuid
       })
+        .then(process => {
+          process = {
+            ...process,
+            fields: process.parameters
+          }
+
+          commit('addProcessToList', process)
+          resolve(process)
+        })
+    })
   }
 }

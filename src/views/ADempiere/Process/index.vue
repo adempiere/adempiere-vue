@@ -45,8 +45,8 @@
         <el-scrollbar wrap-class="scroll-child">
           <panel-definition
             :container-uuid="processUuid"
-            :metadata="processMetadata"
-            :panel-type="panelType"
+            :panel-metadata="processMetadata"
+            :container-manager="containerManager"
           />
         </el-scrollbar>
       </el-card>
@@ -68,11 +68,11 @@
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
 import ContextMenu from '@/components/ADempiere/ContextMenu'
-import PanelDefinition from '@/components/ADempiere/PanelDefinition'
+import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 
 export default defineComponent({
-  name: 'Process',
+  name: 'ProcessOrReport',
 
   components: {
     PanelDefinition,
@@ -103,32 +103,42 @@ export default defineComponent({
       return root.$store.state.settings.showContextMenu
     })
 
-    const getterProcess = computed(() => {
-      return root.$store.getters.getPanel(processUuid)
+    const storedProcess = computed(() => {
+      return root.$store.getters.getStoredProcess(processUuid)
     })
 
-    root.$store.dispatch('settings/changeSetting', {
-      key: 'showContextMenu',
-      value: true
-    })
+    // root.$store.dispatch('settings/changeSetting', {
+    //   key: 'showContextMenu',
+    //   value: true
+    // })
 
     const getProcess = async() => {
-      const process = getterProcess.value
+      const process = storedProcess.value
       if (process) {
         processMetadata.value = process
         isLoadedMetadata.value = true
         return
       }
 
-      root.$store.dispatch('getPanelAndFields', {
-        containerUuid: processUuid,
-        panelType,
-        routeToDelete: root.$route
-      }).then(processResponse => {
-        processMetadata.value = processResponse
-      }).finally(() => {
-        isLoadedMetadata.value = true
-      })
+      root.$store.dispatch('getProcessDefinitionFromServer', processUuid)
+        .then(processResponse => {
+          processMetadata.value = processResponse
+        }).finally(() => {
+          isLoadedMetadata.value = true
+        })
+    }
+
+    const containerManager = {
+      actionPerformed: ({ field, value }) => {
+        // let action = 'processActionPerformed'
+        // if (field.isReport) {
+        //   action = 'reportActionPerformed'
+        // }
+        // root.$store.dispatch(action, {
+        //   field,
+        //   value
+        // })
+      }
     }
 
     getProcess()
@@ -138,9 +148,9 @@ export default defineComponent({
       panelType,
       isLoadedMetadata,
       processMetadata,
+      containerManager,
       // computeds
       showContextMenu,
-      getterProcess,
       // methods
       getProcess
     }
