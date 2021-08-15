@@ -16,7 +16,7 @@
 
 export function generateWindow(responseWindow) {
   const {
-    tabsList, tabsListParent,
+    tabsList, tabsListParent, tabsListChild,
     firstTab, firstTabUuid
   } = generateTabs({
     tabs: responseWindow.tabs,
@@ -26,6 +26,7 @@ export function generateWindow(responseWindow) {
     ...responseWindow,
     tabsList,
     currentTab: tabsListParent[0],
+    tabsListChild,
     tabsListParent,
     // app attributes
     currentTabUuid: tabsListParent[0].uuid,
