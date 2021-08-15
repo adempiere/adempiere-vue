@@ -63,7 +63,7 @@ export default defineComponent({
     // used only window
     referencesManager: {
       type: Object,
-      default: () => {}
+      default: () => ({})
     },
     relationsManager: {
       type: Object,

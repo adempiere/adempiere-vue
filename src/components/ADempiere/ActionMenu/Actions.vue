@@ -28,10 +28,22 @@
     @command="clickRunAction"
     @click="runAction(defaultActionToRun)"
   >
-    {{ actionsManager.actionsList[0].name }}
+    {{ defaultActionName }}
 
     <el-dropdown-menu slot="dropdown">
-      <el-scrollbar wrap-class="scroll-child">
+      <el-dropdown-item
+        v-if="isEmptyValue(actionsList)"
+        key="withoutActions"
+        style="min-height: 26px"
+      >
+        <span class="contents">
+          <b class="label">
+            {{ $t('actionMenu.withoutActions') }}
+          </b>
+        </span>
+      </el-dropdown-item>
+
+      <el-scrollbar v-else key="withActions" wrap-class="scroll-child">
         <!-- <el-dropdown-item
           command="refreshData"
         >
@@ -173,7 +185,9 @@ export default defineComponent({
       menuParentUuid, lastParameter
     } = props.actionsManager
 
-    const actionsList = ref([])
+    const actionsList = ref(
+      props.actionsManager.actionsList
+    )
 
     const setShareLink = () => {
 

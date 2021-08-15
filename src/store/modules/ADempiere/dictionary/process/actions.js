@@ -23,10 +23,8 @@ export default {
         uuid
       })
         .then(process => {
-          process = {
-            ...process,
-            fields: process.parameters
-          }
+          // parameters as fields in panel
+          process.fields = process.parameters
 
           commit('addProcessToList', process)
           resolve(process)

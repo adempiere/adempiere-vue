@@ -24,12 +24,10 @@ const processControl = {
   mutations: {},
 
   actions: {
-    startProcess({ getters }, {
-      containerUuid
-    }) {
+    startProcess({ getters }, processUuid) {
       return Promise(resolve => {
         requestRunProcess({
-          uuid: containerUuid
+          uuid: processUuid
         })
           .then(processResponse => {
             resolve(processResponse)

@@ -29,7 +29,6 @@
     >
       <action-menu
         :parent-uuid="processUuid"
-        :references-manager="referencesManager"
         :actions-manager="actionsManager"
         :relations-manager="relationsManager"
       />
@@ -66,9 +65,10 @@ import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
+import { sharedLink } from '@/utils/ADempiere/constants/actionsMenuList'
 
 export default defineComponent({
-  name: 'ProcessOrReport',
+  name: 'ProcessView',
 
   components: {
     ActionMenu,
@@ -104,10 +104,10 @@ export default defineComponent({
       return root.$store.getters.getStoredProcess(processUuid)
     })
 
-    // root.$store.dispatch('settings/changeSetting', {
-    //   key: 'showContextMenu',
-    //   value: true
-    // })
+    root.$store.dispatch('settings/changeSetting', {
+      key: 'showContextMenu',
+      value: true
+    })
 
     const getProcess = async() => {
       const process = storedProcess.value
@@ -140,12 +140,24 @@ export default defineComponent({
 
     getProcess()
 
+    const actionsManager = ref({
+      actionsList: [
+        sharedLink
+      ]
+    })
+
+    const relationsManager = ref({
+      menuParentUuid: root.$route.meta.parentUuid
+    })
+
     return {
       processUuid,
       panelType,
       isLoadedMetadata,
       processMetadata,
       containerManager,
+      actionsManager,
+      relationsManager,
       // computeds
       showContextMenu,
       // methods

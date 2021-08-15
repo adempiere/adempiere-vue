@@ -1,13 +1,17 @@
 
 const actionMenu = {
+  // actions
   refreshRecords: 'Refresh Records',
   deleteRecord: 'Delete Record',
   createNewRecord: 'New Record',
+  shareLink: 'Share Link',
+  withoutActions: 'Without Actions',
+  // relations
   relations: 'Relations',
   withoutRelations: 'Without Relations',
+  // references
   references: 'References',
-  withOutReferences: 'Without references for record',
-  shareLink: 'Share Link'
+  withoutReferences: 'Without references for record'
 }
 
 export default actionMenu

@@ -47,7 +47,7 @@
       >
         <span class="contents">
           <b class="label">
-            {{ $t('actionMenu.withOutReferences') }}
+            {{ $t('actionMenu.withoutReferences') }}
           </b>
         </span>
       </el-dropdown-item>
