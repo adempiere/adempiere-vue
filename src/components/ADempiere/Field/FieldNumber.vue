@@ -180,11 +180,6 @@ export default {
     },
     customFocusGained(event) {
       this.isFocus = true
-      // this.focusGained(event)
-
-      this.$nextTick(() => {
-        // this.$refs[this.metadata.columnName].handleFocus()
-      })
     },
     customFocusLost(event) {
       this.isFocus = false
