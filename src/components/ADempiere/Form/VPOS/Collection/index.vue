@@ -635,7 +635,6 @@ export default {
       }
     },
     listPayments(payment) {
-      console.log(payment, this.convertionsList.length, this.convertionsList)
       if (!this.isEmptyValue(this.convertionsList)) {
         let rate
         payment.forEach((pay) => {
@@ -676,9 +675,10 @@ export default {
       let sum = 0
       if (cash) {
         cash.forEach((pay) => {
-          const amount = this.amountConvertion(pay.currencyUuid)
+          const amount = this.convertAmount(pay.currencyUuid)
+          console.log({ pay, amount })
           if (!this.isEmptyValue(pay.divideRate)) {
-            sum += amount
+            sum += amount * pay.amount
           } else {
             sum += pay.amount
           }
@@ -686,7 +686,7 @@ export default {
       }
       return sum
     },
-    amountConvertion(currencyUuid) {
+    convertAmount(currencyUuid) {
       const currencyPay = this.convertionsList.find(currency => {
         if (!this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === currencyUuid) {
           return currency
@@ -695,6 +695,7 @@ export default {
       if (!currencyPay) {
         return 0
       }
+      console.log({ currencyPay, rate })
       const rate = (currencyPay.divideRate > currencyPay.multiplyRate) ? currencyPay.divideRate : currencyPay.multiplyRate
       return rate
     },
@@ -733,7 +734,7 @@ export default {
           bankUuid,
           referenceNo,
           amount: this.amontSend,
-          convertedAmount: this.amontSend * this.dayRate.divideRate * this.convertion,
+          convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
           currencyUuid: this.dayRate.currencyTo.uuid
@@ -745,7 +746,7 @@ export default {
           bankUuid,
           referenceNo,
           amount: this.amontSend,
-          convertedAmount: this.amontSend * this.dayRate.divideRate * this.convertion,
+          convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
           currencyUuid: this.dayRate.currencyTo.uuid
