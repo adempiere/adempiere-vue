@@ -676,7 +676,6 @@ export default {
       if (cash) {
         cash.forEach((pay) => {
           const amount = this.convertAmount(pay.currencyUuid)
-          console.log({ pay, amount })
           if (!this.isEmptyValue(pay.divideRate)) {
             sum += amount * pay.amount
           } else {
@@ -695,7 +694,6 @@ export default {
       if (!currencyPay) {
         return 0
       }
-      console.log({ currencyPay, rate })
       const rate = (currencyPay.divideRate > currencyPay.multiplyRate) ? currencyPay.divideRate : currencyPay.multiplyRate
       return rate
     },
