@@ -22,7 +22,8 @@ export default {
   getStoredBrowsers: (state) => {
     return state.storedBrowsers
   },
+
   getStoredBrowser: (state) => (browserUuid) => {
-    return state.storedBrowsers.find(browser => browser.uuid === browserUuid)
+    return state.storedBrowsers[browserUuid]
   }
 }

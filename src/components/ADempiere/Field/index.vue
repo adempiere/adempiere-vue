@@ -246,6 +246,7 @@ export default {
       }
       return undefined
     },
+
     /**
      * Idicate if field is read only
      * TODO: Create common method to evaluate isReadOnly
@@ -260,6 +261,12 @@ export default {
 
       if (!this.field.isActive) {
         return true
+      }
+
+      // validate with container manager
+      if (!this.isEmptyValue(this.containerManager) &&
+        this.containerManager.validateReadOnly) {
+        return this.containerManager.validateReadOnly(this.field)
       }
 
       const isUpdateableAllFields = this.field.isReadOnly || this.field.isReadOnlyFromLogic
@@ -298,6 +305,7 @@ export default {
       // other type of panels (process/report)
       return Boolean(isUpdateableAllFields)
     },
+
     isFieldOnly() {
       if (this.inTable || this.field.isFieldOnly) {
         return undefined

@@ -112,7 +112,7 @@ export default {
 
 <style>
   .custom-field-text {
-    max-height: 34px;
+    max-height: 36px;
   }
   .el-textarea__inner {
     resize: none !important;

@@ -18,22 +18,16 @@
 
 <template>
   <el-container
-    v-if="isLoaded"
+    v-if="isLoadedMetadata"
     key="browser-loaded"
     class="view-base"
     style="height: 86vh;"
   >
-    <modal-dialog
-      :parent-uuid="browserUuid"
-      :container-uuid="browserUuid"
-      :panel-type="panelType"
-    />
-
     <el-header v-if="isShowContextMenu">
-      <context-menu
-        :menu-parent-uuid="$route.meta.parentUuid"
-        :container-uuid="browserUuid"
-        :panel-type="panelType"
+      <action-menu
+        :parent-uuid="browserUuid"
+        :actions-manager="actionsManager"
+        :relations-manager="relationsManager"
       />
 
       <div class="center" style="width: 100%">
@@ -52,8 +46,8 @@
         <el-collapse-item :title="$t('views.searchCriteria')" name="opened-criteria">
           <panel-definition
             :container-uuid="browserUuid"
-            :metadata="browserMetadata"
-            :panel-type="panelType"
+            :panel-metadata="browserMetadata"
+            :container-manager="containerManager"
           />
         </el-collapse-item>
       </el-collapse>
@@ -61,36 +55,39 @@
       <!-- result of records in the table -->
       <default-table
         :container-uuid="browserUuid"
+        :container-manager="containerManagerTable"
+        :panel-metadata="browserMetadata"
+        :header="tableHeader"
+        :data-table="[]"
       />
     </el-main>
   </el-container>
 
-  <div
+  <loading-view
     v-else
-    key="browser-loading"
-    v-loading="!isLoaded"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="view-loading"
+    key="window-loading"
   />
 </template>
 
 <script>
 import { computed, defineComponent, ref } from '@vue/composition-api'
 
-import ContextMenu from '@/components/ADempiere/ContextMenu'
-import ModalDialog from '@/components/ADempiere/Dialog'
+import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
+import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
-import PanelDefinition from '@/components/ADempiere/PanelDefinition'
-import DefaultTable from '@/components/ADempiere/DefaultTable'
+import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
+
+import { sharedLink } from '@/utils/ADempiere/constants/actionsMenuList'
+import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
 
 export default defineComponent({
-  name: 'Browser',
+  name: 'BrowserView',
 
   components: {
-    ContextMenu,
+    ActionMenu,
     DefaultTable,
-    ModalDialog,
+    LoadingView,
     PanelDefinition,
     TitleAndHelp
   },
@@ -104,8 +101,7 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const panelType = 'browser'
-    const isLoaded = ref(false)
+    const isLoadedMetadata = ref(false)
     const browserMetadata = ref({})
 
     let browserUuid = root.$route.meta.uuid
@@ -114,10 +110,11 @@ export default defineComponent({
       browserUuid = props.uuid
     }
 
-    const browserDefinition = computed(() => {
-      return root.$store.getters.getBrowser(browserUuid)
+    const storedBrowser = computed(() => {
+      return root.$store.getters.getStoredBrowser(browserUuid)
     })
 
+    // TODO: Handle per individual smart browser
     // by default enable context menu and title
     root.$store.dispatch('settings/changeSetting', {
       key: 'showContextMenu',
@@ -128,23 +125,11 @@ export default defineComponent({
       return root.$store.state.settings.showContextMenu
     })
 
-    const isLoadedRecords = computed(() => {
-      return root.$store.getters.getDataRecordAndSelection(browserUuid).isLoaded
-    })
-
-    const isReadyToSearch = computed(() => {
-      // TODO: Add timer to await
-      if (browserMetadata.value.awaitForValuesToQuery) {
-        return false
-      }
-      return !root.$store.getters.isNotReadyForSubmit(browserUuid)
-    })
-
     const openedCriteria = computed({
       get() {
         // by default criteria if closed
         const openCriteria = []
-        const browser = browserDefinition.value
+        const browser = browserMetadata.value
         if (!root.isEmptyValue(browser)) {
           if (browser.isShowedCriteria) {
             // open criteria
@@ -159,67 +144,80 @@ export default defineComponent({
           showCriteria = true
         }
 
-        root.$store.dispatch('changeBrowserAttribute', {
-          containerUuid: browserUuid,
+        root.$store.commit('changeBrowserAttribute', {
+          uuid: browserUuid,
           attributeName: 'isShowedCriteria',
           attributeValue: showCriteria
         })
       }
     })
 
+    const tableHeader = computed(() => {
+      const panel = generatePanelAndFields({
+        containerUuid: browserUuid,
+        panelMetadata: browserMetadata.value
+      })
+      return panel.fieldsList
+    })
+
     const getBrowserDefinition = () => {
-      const browser = browserDefinition.value
+      const browser = storedBrowser.value
       if (browser) {
         browserMetadata.value = browser
-        isLoaded.value = true
-        defaultSearch()
+        isLoadedMetadata.value = true
         return
       }
-      root.$store.dispatch('getPanelAndFields', {
-        containerUuid: browserUuid,
-        panelType,
-        routeToDelete: root.$route
-      })
+
+      root.$store.dispatch('getBrowserDefinitionFromServer', browserUuid)
         .then(browserResponse => {
           browserMetadata.value = browserResponse
-          defaultSearch()
-        })
-        .finally(() => {
-          isLoaded.value = true
+        }).finally(() => {
+          isLoadedMetadata.value = true
         })
     }
 
-    const defaultSearch = () => {
-      if (isLoadedRecords.value) {
-        // not research
-        return
-      }
+    const containerManager = {
+      actionPerformed({ field, value }) {
+        console.log(value)
+      },
 
-      if (isReadyToSearch.value) {
-        // first search by default
-        root.$store.dispatch('getBrowserSearch', {
-          containerUuid: browserUuid
-        })
-        return
+      validateReadOnly(field) {
+        return field.isReadOnlyFromLogic
       }
-
-      // set default values into data
-      root.$store.dispatch('setRecordSelection', {
-        containerUuid: browserUuid,
-        panelType
-      })
     }
+
+    const containerManagerTable = {
+      ...containerManager,
+
+      validateReadOnly(field) {
+        return field.isReadOnly
+      }
+    }
+
+    const actionsManager = ref({
+      actionsList: [
+        sharedLink
+      ]
+    })
+
+    const relationsManager = ref({
+      menuParentUuid: root.$route.meta.parentUuid
+    })
 
     getBrowserDefinition()
 
     return {
-      isLoaded,
+      isLoadedMetadata,
       browserUuid,
       browserMetadata,
-      panelType,
+      containerManager,
+      containerManagerTable,
+      actionsManager,
+      relationsManager,
       // computed
       openedCriteria,
-      isShowContextMenu
+      isShowContextMenu,
+      tableHeader
     }
   }
 })

@@ -18,11 +18,15 @@ import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser
 
 export default {
   getBrowserDefinitionFromServer({ commit }, uuid) {
-    return requestBrowserMetadata({
-      uuid
-    })
-      .then(browser => {
-        commit('addBrowserToList', browser)
+    return new Promise(resolve => {
+      requestBrowserMetadata({
+        uuid
       })
+        .then(browser => {
+          commit('addBrowserToList', browser)
+
+          resolve(browser)
+        })
+    })
   }
 }
