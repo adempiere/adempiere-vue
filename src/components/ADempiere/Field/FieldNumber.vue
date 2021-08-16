@@ -183,7 +183,7 @@ export default {
       // this.focusGained(event)
 
       this.$nextTick(() => {
-        this.$refs[this.metadata.columnName].focus()
+        // this.$refs[this.metadata.columnName].handleFocus()
       })
     },
     customFocusLost(event) {
