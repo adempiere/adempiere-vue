@@ -90,7 +90,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="completePreparedOrder"
+                @click="(currentPointOfSales.uuid === adviserPin) ? '' : completePreparedOrder"
               >
                 <i class="el-icon-success" />
                 <br>
@@ -103,7 +103,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="reverseSalesTransaction"
+                @click="(currentPointOfSales.uuid === adviserPin) ? '' : reverseSalesTransaction"
               >
                 <i class="el-icon-error" />
                 <br>
@@ -380,7 +380,13 @@ export default {
         }
       }
     },
+    adviserPin() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAisleSeller
+    },
     blockOption() {
+      if (this.adviserPin) {
+        return 'cursor: not-allowed; text-align: center !important; color: gray;min-height: 50px;'
+      }
       if (!this.isEmptyValue(this.currentOrder.uuid)) {
         return 'cursor: pointer; text-align: center !important; color: black;min-height: 50px;'
       }
@@ -433,6 +439,9 @@ export default {
         }
       }
       return this.currentPointOfSales.currentOrder
+    },
+    allowsReturnOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.allowsReturnOrder
     }
   },
   created() {

@@ -784,7 +784,7 @@ export function listCurrencies({
  * Tender Type
  * @param {string} posUuidd - POS UUID reference
  */
-export function listTenderType({
+export function listTenderTypes({
   posUuid
 }) {
   return request({

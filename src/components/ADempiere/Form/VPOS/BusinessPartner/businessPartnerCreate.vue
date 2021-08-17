@@ -91,6 +91,14 @@ export default {
       unsubscribe: () => {}
     }
   },
+  computed: {
+    adviserPin() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAisleSeller
+    },
+    currentPointOfSales() {
+      return this.$store.getters.posAttributes.currentPointOfSales
+    }
+  },
   watch: {
     showField(value) {
       if (value) {
@@ -123,7 +131,7 @@ export default {
         containerUuid: this.containerUuid,
         formatReturn: 'name'
       })
-      if (this.isEmptyValue(emptyMandatoryFields)) {
+      if (this.isEmptyValue(emptyMandatoryFields) || (this.adviserPin)) {
         this.isLoadingRecord = true
         requestCreateBusinessPartner(values)
           .then(responseBPartner => {

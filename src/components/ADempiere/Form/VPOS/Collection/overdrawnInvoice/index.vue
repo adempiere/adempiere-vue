@@ -21,14 +21,14 @@
       :title="$t('form.pos.collect.overdrawnInvoice.title')"
       :visible.sync="showDialogo"
       :before-close="close"
-      width="70%"
+      width="80%"
       @close="close"
     >
       <div v-if="caseOrder === 1">
         <el-form>
           <el-form-item>
             <el-radio v-model="option" :label="1"> {{ $t('form.pos.collect.overdrawnInvoice.returned') }} {{ formatPrice(change, currency.iSOCode) }} </el-radio>
-            <el-radio v-model="option" :label="2"> {{ $t('form.pos.collect.overdrawnInvoice.coupon') }}</el-radio>
+            <el-radio v-show="cashierPin !== currentPointOfSales.uuid" v-model="option" :label="2"> {{ $t('form.pos.collect.overdrawnInvoice.coupon') }}</el-radio>
             <el-radio v-model="option" :label="3"> {{ $t('form.pos.collect.overdrawnInvoice.returnMoney') }}</el-radio>
             <el-radio v-model="option" :label="4"> {{ $t('form.pos.collect.overdrawnInvoice.adjustDocument') }}</el-radio>
           </el-form-item>
@@ -61,6 +61,9 @@
         <el-card v-if="option === 3" class="box-card">
           <div slot="header" class="clearfix">
             <span>{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
+            <span style="float: right">
+              <b>Limite Diario USD 20,00$ = Bs.S 85.000.000,00 </b> | <b>Disponible Bs.S 85.000.000,00 </b>
+            </span>
           </div>
           <div class="text item">
             <el-form
@@ -77,6 +80,22 @@
                     :key="field.columnName"
                     :metadata-field="field"
                   />
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="Tipo de pago">
+                    <el-select
+                      v-model="currentPaymentType"
+                      style="width: -webkit-fill-available;"
+                      @change="changePaymentType"
+                    >
+                      <el-option
+                        v-for="item in paymentTypeList"
+                        :key="item.uuid"
+                        :label="item.name"
+                        :value="item.key"
+                      />
+                    </el-select>
+                  </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item v-if="displayeCurrency" :label="$t('form.pos.collect.Currency')">
@@ -193,11 +212,13 @@ export default {
     return {
       option: 1,
       fieldsList: fieldsListOverdrawnInvoice,
-      currentFieldCurrency: ''
+      currentFieldCurrency: '',
+      currentPaymentType: ''
     }
   },
   computed: {
     showDialogo() {
+      console.log(this.$store.state['pointOfSales/payments/index'].dialogoInvoce.show)
       return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.show
     },
     caseOrder() {
@@ -214,7 +235,7 @@ export default {
       return false
     },
     primaryFieldsList() {
-      return this.fieldsList.filter(field => field.sequence <= 3)
+      return this.fieldsList.filter(field => field.sequence <= 2)
     },
     hiddenFieldsList() {
       return this.fieldsList.filter(field => field.sequence > 4)
@@ -237,6 +258,12 @@ export default {
     },
     emptyMandatoryFields() {
       return this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', formatReturn: 'name' })
+    },
+    cashierPin() {
+      return 'c8fdd9b2-a566-4b2b-a7ed-764de32a96fc'
+    },
+    paymentTypeList() {
+      return this.$store.getters.getPaymentTypeList
     }
   },
   methods: {
@@ -265,6 +292,15 @@ export default {
     },
     changeCurrency(value) {
       this.currentFieldCurrency = value
+    },
+    changePaymentType(value) {
+      this.$store.commit('currentTenderChange', value)
+      this.currentPaymentType = value
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'OverdrawnInvoice',
+        columnName: 'TenderType',
+        value: value
+      })
     },
     optionSelected({ posUuid, orderUuid, customerDetails, payments }) {
       switch (this.option) {
