@@ -7,9 +7,7 @@ on:
   # Triggers the workflow on push events but only for the develop branch
   push:
     branches:
-      - master
       - develop
-      - window-redefinition
 
 jobs:
 
