@@ -90,7 +90,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="(currentPointOfSales.uuid === adviserPin) ? '' : completePreparedOrder"
+                @click="adviserPin ? '' : completePreparedOrder"
               >
                 <i class="el-icon-success" />
                 <br>
@@ -103,7 +103,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="(currentPointOfSales.uuid === adviserPin) ? '' : reverseSalesTransaction"
+                @click="adviserPin ? '' : reverseSalesTransaction"
               >
                 <i class="el-icon-error" />
                 <br>
@@ -129,7 +129,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="printOrder"
+                @click="adviserPin ? '' : printOrder"
               >
                 <i class="el-icon-printer" />
                 <br>
