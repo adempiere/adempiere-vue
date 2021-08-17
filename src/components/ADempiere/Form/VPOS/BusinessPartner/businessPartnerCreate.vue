@@ -93,7 +93,19 @@ export default {
   },
   computed: {
     adviserPin() {
-      return this.$store.getters.posAttributes.currentPointOfSales.isAisleSeller
+      const value = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'Value'
+      })
+      const name = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'Name'
+      })
+      const isSeller = this.$store.getters.posAttributes.currentPointOfSales.isAisleSeller
+      if (!this.isEmptyValue(value) && !this.isEmptyValue(name) && isSeller) {
+        return isSeller
+      }
+      return false
     },
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
@@ -131,7 +143,7 @@ export default {
         containerUuid: this.containerUuid,
         formatReturn: 'name'
       })
-      if (this.isEmptyValue(emptyMandatoryFields) || (this.adviserPin)) {
+      if (this.isEmptyValue(emptyMandatoryFields) || this.adviserPin) {
         this.isLoadingRecord = true
         requestCreateBusinessPartner(values)
           .then(responseBPartner => {

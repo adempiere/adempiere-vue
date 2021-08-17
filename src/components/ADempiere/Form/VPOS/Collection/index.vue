@@ -479,6 +479,13 @@ export default {
       }
       return true
     },
+    isPosRequiredPin() {
+      const pos = this.$store.getters.posAttributes.currentPointOfSales
+      if (!this.isEmptyValue(pos.isPosRequiredPin)) {
+        return pos.isPosRequiredPin
+      }
+      return false
+    },
     validPay() {
       const containerUuid = this.containerUuid
       // filter by visible fields
@@ -917,7 +924,7 @@ export default {
       if (this.pay > this.currentOrder.grandTotal) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
       } else if (this.pay < this.currentOrder.grandTotal) {
-        if (this.cashierPin === this.currentPointOfSales.uuid) {
+        if (this.isPosRequiredPin) {
           const attributePin = {
             ...payment,
             action: 'openBalanceInvoice',

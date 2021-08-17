@@ -239,7 +239,7 @@
                   v-show="isValidForDeleteLine(listOrderLine)"
                   type="success"
                   icon="el-icon-bank-card"
-                  :disabled="adviserPin"
+                  :disabled="allowsCollectOrder"
                   @click="openCollectionPanel"
                 >
                   {{ labelButtonCollections }}
@@ -672,7 +672,6 @@ export default {
   },
   watch: {
     showOverdrawnInvoice(value) {
-      console.log({ value })
       if (value) {
         this.visible = value
       }
@@ -737,8 +736,9 @@ export default {
       return this.formatPrice(this.currentOrder.grandTotal - this.currentOrder.totalLines, currency)
     },
     newOrder() {
+      this.clearOrder()
       this.$store.commit('setShowPOSCollection', false)
-      this.createOrder({ withLine: false, newOrder: true })
+      this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateBusinessPartner.uuid })
     },
     changePos(pointOfSales) {
       this.$store.dispatch('setCurrentPOS', pointOfSales)

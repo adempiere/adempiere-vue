@@ -278,7 +278,7 @@
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
                     v-for="item in warehousesListPointOfSales"
-                    :key="item.uuid"
+                    :key="item.id"
                     :command="item"
                   >
                     {{ item.name }}

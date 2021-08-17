@@ -28,7 +28,7 @@
         <el-form>
           <el-form-item>
             <el-radio v-model="option" :label="1"> {{ $t('form.pos.collect.overdrawnInvoice.returned') }} {{ formatPrice(change, currency.iSOCode) }} </el-radio>
-            <el-radio v-show="cashierPin !== currentPointOfSales.uuid" v-model="option" :label="2"> {{ $t('form.pos.collect.overdrawnInvoice.coupon') }}</el-radio>
+            <el-radio v-model="option" :label="2"> {{ $t('form.pos.collect.overdrawnInvoice.coupon') }}</el-radio>
             <el-radio v-model="option" :label="3"> {{ $t('form.pos.collect.overdrawnInvoice.returnMoney') }}</el-radio>
             <el-radio v-model="option" :label="4"> {{ $t('form.pos.collect.overdrawnInvoice.adjustDocument') }}</el-radio>
           </el-form-item>
@@ -218,7 +218,6 @@ export default {
   },
   computed: {
     showDialogo() {
-      console.log(this.$store.state['pointOfSales/payments/index'].dialogoInvoce.show)
       return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.show
     },
     caseOrder() {
@@ -258,9 +257,6 @@ export default {
     },
     emptyMandatoryFields() {
       return this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', formatReturn: 'name' })
-    },
-    cashierPin() {
-      return 'c8fdd9b2-a566-4b2b-a7ed-764de32a96fc'
     },
     paymentTypeList() {
       return this.$store.getters.getPaymentTypeList

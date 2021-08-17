@@ -68,9 +68,6 @@ export default {
     adviserPin() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAisleSeller
     },
-    getWarehouse() {
-      return this.$store.getters['user/getWarehouse']
-    },
     isSetTemplateBP() {
       const currentPOS = this.currentPointOfSales
       if (!this.isEmptyValue(currentPOS) &&
@@ -133,7 +130,6 @@ export default {
       return this.currentPointOfSales.listOrder
     },
     currentOrder() {
-      console.log(this.$store.getters.posAttributes.currentPointOfSales)
       if (this.isEmptyValue(this.currentPointOfSales)) {
         return {
           documentType: {},
@@ -163,7 +159,7 @@ export default {
     isPosRequiredPin() {
       const pos = this.$store.getters.posAttributes.currentPointOfSales
       if (!this.isEmptyValue(pos.isPosRequiredPin)) {
-        return true
+        return pos.isPosRequiredPin
       }
       return false
     }
@@ -240,7 +236,6 @@ export default {
     },
     pinAction(action) {
       action = this.isEmptyValue(action) ? this.$store.getters.getOverdrawnInvoice.attributePin : action
-      console.log({ action })
       if (action.type === 'updateOrder') {
         switch (action.columnName) {
           case 'QtyEntered':
@@ -261,8 +256,9 @@ export default {
             break
           }
         }
+      } else if (action.type === 'addProduct') {
+        this.findProduct(action.value)
       } else if (action.type === 'actionPos') {
-        console.log(action)
         switch (action.action) {
           case 'changeWarehouse':
             this.$store.commit('setCurrentWarehousePos', action)
@@ -397,7 +393,7 @@ export default {
           })
         })
     },
-    createOrder({ withLine = false, newOrder = false }) {
+    createOrder({ withLine = false, newOrder = false, customer }) {
       if (this.withoutPOSTerminal()) {
         return
       }
@@ -418,6 +414,9 @@ export default {
         })
         if (this.isEmptyValue(customerUuid) || id === 1000006) {
           customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+        }
+        if (customer) {
+          customerUuid = customer
         }
         // user session
         this.$store.dispatch('createOrder', {
@@ -521,21 +520,21 @@ export default {
           switch (mutation.payload.columnName) {
             case 'ProductValue':
               // this.findProduct(mutation.payload.value)
-              if (this.isPosRequiredPin) {
-                if (this.allowsCollectOrder) {
-                  this.findProduct(mutation.payload.value)
-                } else {
-                  const attributePin = {
-                    ...mutation.payload,
-                    type: 'addProduct',
-                    label: this.$t('form.pos.pinMessage.addProduct')
-                  }
-                  this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-                  this.visible = true
-                }
-              } else {
+              // if (this.isPosRequiredPin) {
+              if (this.allowsCollectOrder) {
                 this.findProduct(mutation.payload.value)
+              } else {
+                const attributePin = {
+                  ...mutation.payload,
+                  type: 'addProduct',
+                  label: this.$t('form.pos.pinMessage.addProduct')
+                }
+                this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+                this.visible = true
               }
+              // } else {
+              //   this.findProduct(mutation.payload.value)
+              // }
               break
           }
         } else if (mutation.type === 'addActionPerformed') {
