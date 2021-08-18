@@ -1,8 +1,9 @@
 <template>
-  <el-dropdown trigger="click" class="option" @command="handleCommand">
+  <el-dropdown trigger="click" class="column-option" @command="handleCommand">
     <span class="el-dropdown-link">
       <svg-icon icon-class="list" />
     </span>
+
     <el-dropdown-menu slot="dropdown" style="max-width: 300px;">
       <el-dropdown-item
         :command="$t('table.dataTable.showAllColumns')"
@@ -47,24 +48,26 @@ export default defineComponent({
       }
       return 'eye'
     }
+
     const handleCommand = (command) => {
       root.$store.dispatch('selectOption', command)
     }
 
     return {
-      // methodo
+      // methods
       handleCommand,
       optionIcon
     }
   }
 })
 </script>
+
 <style scoped>
-  .option{
+  .column-option {
     display: inline-block;
     position: relative;
     color: #606266;
     font-size: 16px;
-    float: right;
+    /* float: right; */
   }
 </style>

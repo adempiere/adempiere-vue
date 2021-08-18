@@ -237,6 +237,7 @@ export default {
       deleteSelection: 'Eliminar Registros Seleccionados',
       advancedQuery: 'Consulta Avanzada',
       exportZip: 'Exportar Zip',
+      showAllColumns: 'Mostrar Todas Las Colummnas',
       showOnlyMandatoryColumns: 'Mostrar Solo Columnas Obligatorias',
       ShowTableColumnsOnly: 'Mostrar Solo Columnas de la Tabla',
       showAllAvailableColumns: 'Mostrar Todas Columnas Disponibles',
@@ -250,6 +251,31 @@ export default {
       name: 'Nombre',
       description: 'Descripción'
     }
+  },
+  example: {
+    warning: 'La creación y edición de páginas no puede ser cacheada por keep-alive porque keep-alive include no soporta actualmente el cacheado basado en rutas, por lo que actualmente se cachea basado en el nombre del componente. Si quiere conseguir un efecto de caché similar, puede utilizar un esquema de caché del navegador como localStorage. O no utilizar keep-alive include para almacenar en caché todas las páginas directamente. Ver detalles'
+  },
+  errorLog: {
+    tips: 'Por favor, haga clic en el icono de error en la esquina superior derecha',
+    description: 'Ahora el sistema de gestión son básicamente la forma del balneario, mejora la experiencia del usuario, pero también aumenta la posibilidad de problemas de la página, una pequeña negligencia puede conducir a la página entera de punto muerto. Afortunadamente Vue proporciona una forma de captura de manejo de excepciones, donde se puede manejar los errores o informar de las excepciones.',
+    documentation: 'Introducción del documento'
+  },
+  excel: {
+    export: 'Exportar',
+    selectedExport: 'Exportar Elementos Seleccionados',
+    placeholder: 'Por favor, introduzca el nombre del archivo (por defecto lista-excel)'
+  },
+  zip: {
+    export: 'Exportar',
+    placeholder: 'Introduzca el nombre del archivo (archivo por defecto)'
+  },
+  pdf: {
+    tips: 'Aquí utilizamos window.print() para implementar la función de descarga de PDF.'
+  },
+  theme: {
+    change: 'Cambiar el tema',
+    documentation: 'Documentación del tema',
+    tips: 'Tips: Es diferente de la selección de temas en la barra de navegación es dos métodos diferentes de desollar, cada uno con diferentes escenarios de aplicación. Consulte la documentación para más detalles.'
   },
   tagsView: {
     refresh: 'Actualizar',
