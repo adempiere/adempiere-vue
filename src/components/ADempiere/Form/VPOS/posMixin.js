@@ -56,11 +56,21 @@ export default {
     }
   },
   computed: {
+    allowsCreateOrder() {
+      console.log(this.$store.getters.posAttributes.currentPointOfSales)
+      if (this.$store.getters.posAttributes.currentPointOfSales.id !== 1000002) {
+        return true
+      }
+      return false
+    },
     allowsCollectOrder() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCollectOrder
     },
     allowsModifyQuantity() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsModifyQuantity
+    },
+    allowsReturnOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsReturnOrder
     },
     modifyPrice() {
       return this.$store.getters.posAttributes.currentPointOfSales.isModifyPrice
@@ -521,7 +531,7 @@ export default {
             case 'ProductValue':
               // this.findProduct(mutation.payload.value)
               // if (this.isPosRequiredPin) {
-              if (this.allowsCollectOrder) {
+              if (!this.allowsCreateOrder) {
                 this.findProduct(mutation.payload.value)
               } else {
                 const attributePin = {

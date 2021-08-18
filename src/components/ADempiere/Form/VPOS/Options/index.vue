@@ -34,7 +34,7 @@
             <el-card shadow="hover">
               <p
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
-                @click="newOrder"
+                @click="allowsCreateOrder ? '' : newOrder"
               >
                 <i class="el-icon-news" />
                 <br>
@@ -137,8 +137,7 @@
               </p>
             </el-card>
           </el-col>
-
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="allowsReturnOrder" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover">
               <p
                 :style="blockOption"
@@ -357,6 +356,15 @@ export default {
     }
   },
   computed: {
+    allowsReturnOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsReturnOrder
+    },
+    allowsCreateOrder() {
+      if (this.$store.getters.posAttributes.currentPointOfSales.id !== 1000002) {
+        return true
+      }
+      return false
+    },
     isShowProductsPriceList: {
       get() {
         return this.$store.state['pointOfSales/point/index'].productPrice.isShowPopoverMenu
@@ -439,9 +447,6 @@ export default {
         }
       }
       return this.currentPointOfSales.currentOrder
-    },
-    allowsReturnOrder() {
-      return this.$store.getters.posAttributes.currentPointOfSales.allowsReturnOrder
     }
   },
   created() {
@@ -545,9 +550,11 @@ export default {
       })
     },
     createNewCustomerReturnOrder() {
-      createNewReturnOrder({
-        orderUuid: this.$route.query.action
-      })
+      if (this.isPosRequiredPin) {
+        createNewReturnOrder({
+          orderUuid: this.$route.query.action
+        })
+      }
     },
     showModal(action) {
       this.$store.dispatch('setShowDialog', {
