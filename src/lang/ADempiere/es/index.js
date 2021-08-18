@@ -237,7 +237,6 @@ export default {
       deleteSelection: 'Eliminar Registros Seleccionados',
       advancedQuery: 'Consulta Avanzada',
       exportZip: 'Exportar Zip',
-      showAllColumns: 'Mostrar Todas Las Colummnas',
       showAllColumns: 'Mostrar todas las Columnas',
       showOnlyMandatoryColumns: 'Mostrar Solo Columnas Obligatorias',
       showTableColumnsOnly: 'Mostrar Solo Columnas de la Tabla',
