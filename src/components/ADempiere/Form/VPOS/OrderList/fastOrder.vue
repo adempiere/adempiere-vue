@@ -22,10 +22,21 @@
     trigger="click"
   >
     <el-container>
-      <el-header>
+      <el-header style="height: 2%;">
+        <p style="text-align: center;"> <b> Pedidos Vendedor de Pasillo por Facturar </b></p>
         <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
           <el-form-item label="No. del Documento">
             <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
+          </el-form-item>
+          <el-form-item>
+            <field
+              v-if="!isEmptyValue(metadataList)"
+              :key="metadataList.columnName"
+              :metadata-field="{
+                ...metadataList,
+                size: 24
+              }"
+            />
           </el-form-item>
         </el-form>
       </el-header>
@@ -37,7 +48,6 @@
           border
           fit
           :highlight-current-row="highlightRow"
-          @shortkey.native="keyAction"
           @current-change="handleCurrentChange"
         >
           <el-table-column
@@ -94,8 +104,8 @@
       </el-main>
       <el-footer>
         <custom-pagination
-          :total="ordersList.recordCount"
-          :current-page="ordersList.pageNumber"
+          :total="total"
+          :current-page="currentPage"
           :handle-change-page="handleChangePage"
           layout="total, prev, pager, next"
           style="float: right;"
@@ -122,24 +132,23 @@ import {
 import {
   listOrders
 } from '@/api/ADempiere/form/point-of-sales.js'
-import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
+import Field from '@/components/ADempiere/Field'
+import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
-  name: 'FastOrdesList',
+  name: 'AisleVendorList',
   components: {
-    CustomPagination
+    CustomPagination,
+    Field
   },
-  mixins: [
-    posMixin
-  ],
   props: {
     metadata: {
       type: Object,
       default: () => {
         return {
           panelType: 'from',
-          uuid: 'Orders-List',
-          containerUuid: 'Orders-List'
+          uuid: 'Aisle-Vendor-List',
+          containerUuid: 'Aisle-Vendor-List'
         }
       }
     },
@@ -150,12 +159,14 @@ export default {
   },
   data() {
     return {
-      defaultMaxPagination: 50,
       fieldsList: fieldsListOrders,
-      metadataList: [],
+      metadataList: {},
+      total: 0,
+      currentPage: 1,
+      tokenPage: '',
       input: '',
       isCustomForm: true,
-      activeAccordion: 'query-criteria',
+      businessPartner: '',
       timeOut: null,
       isloading: true,
       ordersInvoiced: [],
@@ -163,12 +174,6 @@ export default {
     }
   },
   computed: {
-    heightTable() {
-      if (this.isEmptyValue(this.activeAccordion)) {
-        return 500
-      }
-      return 250
-    },
     highlightRow() {
       if (!this.isEmptyValue(this.selectOrder)) {
         return true
@@ -177,42 +182,22 @@ export default {
     },
     selectOrder() {
       const action = this.$route.query.action
-      if (!this.isEmptyValue(this.ordersList.ordersList)) {
-        const order = this.ordersList.ordersList.find(item => item.uuid === action)
+      if (!this.isEmptyValue(this.ordersInvoiced)) {
+        const order = this.ordersInvoiced.find(item => item.uuid === action)
         if (!this.isEmptyValue(order)) {
           return order
         }
       }
       return null
     },
-    isReadyFromGetData() {
-      const { isReload } = this.ordersList
-      return isReload
-    },
-    shortsKey() {
-      return {
-        closeOrdersList: ['esc'],
-        refreshList: ['f5']
-      }
-    },
     sortFieldsListOrder() {
-      return this.sortfield(this.metadataList)
-    },
-    sortTableOrderList() {
-      if (this.isEmptyValue(this.ordersList.ordersList)) {
-        return []
-      }
-      return this.sortDate(this.ordersList.ordersList)
+      return this.fieldsList.find(field => field.columnName === 'C_BPartner_ID')
     }
   },
   watch: {
-    showField(value) {
-      if (value && this.isEmptyValue(this.metadataList)) {
-        this.setFieldsList()
-      }
-    },
     openPopover(value) {
       if (value && this.isEmptyValue(this.ordersInvoiced)) {
+        this.setFieldsList()
         this.listOrdersInvoiced()
       }
     }
@@ -226,36 +211,15 @@ export default {
   methods: {
     formatDate,
     formatQuantity,
+    extractPagingToken,
     createFieldFromDictionary,
     notSubmitForm(event) {
       event.preventDefault()
       return false
     },
-    keyAction(event) {
-      switch (event.srcKey) {
-        case 'refreshList':
-          this.loadOrdersList()
-          break
-
-        case 'closeOrdersList':
-          this.$store.commit('showListOrders', false)
-          break
-      }
-    },
-    loadOrdersList() {
-      const point = this.$store.getters.posAttributes.currentPointOfSales.uuid
-      if (!this.isEmptyValue(point)) {
-        this.$store.dispatch('listOrdersFromServer', {
-          posUuid: point
-        })
-      }
-    },
     handleChangePage(newPage) {
-      this.$store.dispatch('setOrdersListPageNumber', newPage)
-      const point = this.$store.getters.posAttributes.currentPointOfSales.uuid
-      this.$store.dispatch('listOrdersFromServer', {
-        posUuid: point
-      })
+      this.tokenPage = this.tokenPage + '-' + newPage
+      this.listOrdersInvoiced()
     },
     handleCurrentChange(row) {
       // close popover
@@ -278,14 +242,16 @@ export default {
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
-        console.log({ mutation, state })
+        if (mutation.type === 'updateValueOfField' && mutation.payload.columnName === 'C_BPartner_ID_UUID' && mutation.payload.containerUuid === 'Aisle-Vendor-List' && mutation.payload.value !== this.businessPartner) {
+          this.businessPartner = mutation.payload.value
+        }
         if (mutation.type === 'updateValueOfField' &&
           !mutation.payload.columnName.includes('DisplayColumn') &&
           !mutation.payload.columnName.includes('_UUID') &&
           mutation.payload.containerUuid === this.metadata.containerUuid) {
           clearTimeout(this.timeOut)
           this.timeOut = setTimeout(() => {
-            this.loadOrdersList()
+            this.listOrdersInvoiced()
           }, 2000)
         }
       })
@@ -298,38 +264,31 @@ export default {
       this.$store.dispatch('addParametersProcessPos', parametersList)
     },
     setFieldsList() {
-      const list = []
+      const list = {
+        ...this.sortFieldsListOrder,
+        containerUuid: 'Aisle-Vendor-List'
+      }
       // Create Panel
       this.$store.dispatch('addPanel', {
-        containerUuid: this.metadata.containerUuid,
-        isCustomForm: false,
-        uuid: this.metadata.uuid,
-        panelType: this.metadata.panelType,
-        fieldsList: this.fieldsList
+        containerUuid: 'Aisle-Vendor-List',
+        isCustomForm: true,
+        uuid: this.metadata.uuid + 1,
+        fieldsList: [list]
       })
       // Product Code
-      this.fieldsList.forEach(element => {
-        this.createFieldFromDictionary(element)
-          .then(response => {
-            const data = response
-            list.push({
-              ...data,
-              containerUuid: 'Orders-List'
-            })
-          }).catch(error => {
-            console.warn(`LookupFactory: Get Field From Server (State) - Error ${error.code}: ${error.message}.`)
-          })
-      })
-      this.metadataList = list
+      this.createFieldFromDictionary(list)
+        .then(response => {
+          // this.metadataList = response
+          this.metadataList = {
+            ...response
+          }
+        }).catch(error => {
+          console.warn(`LookupFactory: Get Field From Server (State) - Error ${error.code}: ${error.message}.`)
+        })
     },
     sortDate(listDate) {
       return listDate.sort((elementA, elementB) => {
         return new Date().setTime(new Date(elementB.dateOrdered).getTime()) - new Date().setTime(new Date(elementA.dateOrdered).getTime())
-      })
-    },
-    sortfield(field) {
-      return field.sort((elementA, elementB) => {
-        return elementA.sequence - elementB.sequence
       })
     },
     listOrdersInvoiced() {
@@ -337,10 +296,14 @@ export default {
       listOrders({
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
-        isAisleSeller: true
+        isAisleSeller: true,
+        pageToken: this.tokenPage,
+        businessPartnerUuid: this.businessPartner
       })
         .then(response => {
           this.isloading = false
+          this.tokenPage = this.extractPagingToken(response.nextPageToken)
+          this.total = response.recordCount
           this.ordersInvoiced = response.ordersList
         })
         .catch(error => {
