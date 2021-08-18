@@ -507,7 +507,7 @@ export function tableColumnDataType(column, currentOption) {
   if (currentOption === language.t('table.dataTable.showOnlyMandatoryColumns') && (column.isMandatory || column.isMandatoryFromLogic)) {
     return true
   }
-  if (currentOption === language.t('table.dataTable.ShowTableColumnsOnly') && column.isDisplayedGrid) {
+  if (currentOption === language.t('table.dataTable.showTableColumnsOnly') && column.isDisplayedGrid) {
     return true
   }
   return false

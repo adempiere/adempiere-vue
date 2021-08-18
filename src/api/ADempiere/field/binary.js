@@ -23,9 +23,9 @@ export function getResource({
   uuid,
   tableName
 }) {
-  const { requestGetEntity } = require('@/api/ADempiere/common/persistence.js')
+  const { getEntity } = require('@/api/ADempiere/common/persistence.js')
 
-  return requestGetEntity({
+  return getEntity({
     recordUuid: uuid,
     tableName
   })
@@ -42,9 +42,9 @@ export function updateResource({
   tableName,
   binaryFile
 }) {
-  const { requestUpdateEntity } = require('@/api/ADempiere/common/persistence.js')
+  const { updateEntity } = require('@/api/ADempiere/common/persistence.js')
 
-  return requestUpdateEntity({
+  return updateEntity({
     recordUuid: uuid,
     tableName,
     attributesList: binaryFile

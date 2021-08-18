@@ -22,9 +22,9 @@ const tableName = 'M_Locator'
 export function getLocatorList({
   warehouseId
 }) {
-  const { requestListEntities } = require('@/api/ADempiere/common/persistence.js')
+  const { getEntities } = require('@/api/ADempiere/common/persistence.js')
   return new Promise(resolve => {
-    requestListEntities({
+    getEntities({
       tableName,
       whereClause: `M_Warehouse_ID = ${warehouseId}`
     }).then(locatorData => {

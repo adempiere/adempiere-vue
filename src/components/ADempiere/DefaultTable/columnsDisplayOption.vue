@@ -18,10 +18,10 @@
         {{ $t('table.dataTable.showOnlyMandatoryColumns') }}
       </el-dropdown-item>
       <el-dropdown-item
-        :command="$t('table.dataTable.ShowTableColumnsOnly')"
+        :command="$t('table.dataTable.showTableColumnsOnly')"
       >
-        <svg-icon :icon-class="optionIcon($t('table.dataTable.ShowTableColumnsOnly'))" />
-        {{ $t('table.dataTable.ShowTableColumnsOnly') }}
+        <svg-icon :icon-class="optionIcon($t('table.dataTable.showTableColumnsOnly'))" />
+        {{ $t('table.dataTable.showTableColumnsOnly') }}
       </el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>

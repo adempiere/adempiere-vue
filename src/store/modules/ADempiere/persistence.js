@@ -1,6 +1,6 @@
 import {
-  requestCreateEntity,
-  requestUpdateEntity
+  createEntity,
+  updateEntity
 } from '@/api/ADempiere/common/persistence.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/dataUtils.js'
@@ -94,7 +94,7 @@ const persistence = {
         if (attributesList) {
           if (recordUuid) {
             // Update existing entity
-            requestUpdateEntity({
+            updateEntity({
               tableName,
               recordUuid,
               attributesList
@@ -108,7 +108,7 @@ const persistence = {
             attributesList = attributesList.filter(itemAttribute => !isEmptyValue(itemAttribute.value))
 
             // Create new entity
-            requestCreateEntity({
+            createEntity({
               tableName,
               attributesList
             })

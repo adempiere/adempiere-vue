@@ -1,7 +1,7 @@
 
 import {
-  requestGetEntity,
-  requestListEntities
+  getEntity,
+  getEntities
 } from '@/api/ADempiere/common/persistence.js'
 import {
   requestDefaultValue,
@@ -390,7 +390,7 @@ const actions = {
     recordId
   }) {
     return new Promise(resolve => {
-      requestGetEntity({
+      getEntity({
         tableName,
         recordUuid,
         recordId
@@ -463,7 +463,7 @@ const actions = {
         isGetServer: false
       })
     }
-    return requestListEntities({
+    return getEntities({
       tableName,
       query,
       whereClause,

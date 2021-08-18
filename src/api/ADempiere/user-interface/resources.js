@@ -22,7 +22,7 @@ import { request } from '@/utils/ADempiere/request'
  * @param {number}  recordId
  * @param {string}  recordUuid // TODO: Add suppport to record uuid on backend
  */
-export function requestResourceReference({
+export function getResourceReference({
   recordId,
   recordUuid
 }) {
@@ -45,7 +45,7 @@ export function requestResourceReference({
  * @param {number}  recordId
  * @param {string}  recordUuid
  */
-export function requestAttachment({
+export function getAttachment({
   tableName,
   recordId,
   recordUuid

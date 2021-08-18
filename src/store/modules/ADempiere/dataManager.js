@@ -1,6 +1,6 @@
 import {
-  requestListEntities
-} from '@/api/ADempiere/common/persistence'
+  getEntities
+} from '@/api/ADempiere/user-interface/persistence'
 
 const dataManager = {
   namespaced: true,
@@ -29,23 +29,19 @@ const dataManager = {
     }, {
       parentUuid,
       containerUuid,
-      tableName,
-      query,
-      whereClause,
       pageToken,
       pageSize
     }) {
       // TODO: Parsed query and where clause
       return new Promise((resolve) => {
-        requestListEntities({
-          tableName,
-          query,
-          whereClause,
+        getEntities({
+          windowUuid: parentUuid,
+          tabUuid: containerUuid,
           pageToken,
           pageSize
         })
-          .then(responseData => {
-            const dataToStored = responseData.recordsList.map(record => {
+          .then(data => {
+            const dataToStored = data.recordsList.map(record => {
               return record.attributes
             })
 

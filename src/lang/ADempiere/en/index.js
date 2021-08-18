@@ -239,7 +239,7 @@ export default {
       exportZip: 'Export Zip',
       showAllColumns: 'Show All Columns',
       showOnlyMandatoryColumns: 'Show Only Mandatory Columns',
-      ShowTableColumnsOnly: 'Show Table Columns Only',
+      showTableColumnsOnly: 'Show Table Columns Only',
       showAllAvailableColumns: 'Show All Available Columns',
       exportRecordTable: 'Export Selected Records',
       showTotal: 'Show Totals',

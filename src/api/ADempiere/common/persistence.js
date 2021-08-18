@@ -22,7 +22,7 @@ import { request } from '@/utils/ADempiere/request'
  * @param {string}  tableName
  * @param {array}   attributesList
  */
-export function requestCreateEntity({
+export function createEntity({
   tableName,
   attributesList
 }) {
@@ -55,7 +55,7 @@ export function requestCreateEntity({
  * @param {string}  recordUuid
  * @param {array}   attributesList
  */
-export function requestUpdateEntity({
+export function updateEntity({
   tableName,
   recordId,
   recordUuid,
@@ -91,7 +91,7 @@ export function requestUpdateEntity({
  * @param {number}  recordId
  * @param {string}  recordUuid
  */
-export function requestDeleteEntity({
+export function deleteEntity({
   tableName,
   recordId,
   recordUuid
@@ -139,7 +139,7 @@ export function rollbackEntity({
 }
 
 // Get entity from table name and record id or record uuid
-export function requestGetEntity({
+export function getEntity({
   tableName,
   recordId,
   recordUuid
@@ -170,7 +170,7 @@ export function requestGetEntity({
  * @param {string} orderByClause
  * @param {string} pageToken
  */
-export function requestListEntities({
+export function getEntities({
   tableName,
   query,
   whereClause,
