@@ -61,7 +61,7 @@
                 <el-dropdown
                   v-if="!isEmptyValue(currentDocumentType)"
                   trigger="click"
-                  style="padding-top: 10%;font-size: 15px;color: black;"
+                  style="padding-top: 15%;font-size: 15px;color: black;"
                   @command="changeDocumentType"
                 >
                   <span>
