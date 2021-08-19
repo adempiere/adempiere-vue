@@ -128,6 +128,11 @@ export default defineComponent({
     }
 
     const clickRelation = (item) => {
+      if (root.isEmptyValue(item)) {
+        // whitout relations
+        return
+      }
+
       let tabParent
       if (item.meta && item.meta.type === 'window') {
         tabParent = 0
