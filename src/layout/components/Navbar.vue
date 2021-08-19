@@ -171,6 +171,7 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
+      this.clearStoreTagsView()
       await this.$store.dispatch('user/logout')
       this.$router.push({
         path: '/login'
@@ -225,6 +226,9 @@ export default {
           break
       }
       return field
+    },
+    clearStoreTagsView() {
+      this.$store.dispatch('clearStorePointOfSales')
     }
   }
 }

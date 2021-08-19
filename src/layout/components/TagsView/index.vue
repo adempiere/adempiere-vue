@@ -175,6 +175,7 @@ export default {
       })
     },
     refreshSelectedTag(view) {
+      this.clearStoreTagsView()
       this.$store.dispatch('tagsView/delCachedView', view).then(() => {
         const { fullPath } = view
         this.$nextTick(() => {
@@ -212,6 +213,7 @@ export default {
             })
           }
         }
+        this.clearStoreTagsView()
       })
     },
     closeOthersTags() {
@@ -272,6 +274,9 @@ export default {
     },
     handleScroll() {
       this.closeMenu()
+    },
+    clearStoreTagsView() {
+      this.$store.dispatch('clearStorePointOfSales')
     }
   }
 }
