@@ -147,7 +147,6 @@ export default {
   },
   // get Payment type list
   getPaymentTypeList: (state) => {
-    console.log(state.tenderTypes, { state })
     return state.tenderTypes
   }
 }

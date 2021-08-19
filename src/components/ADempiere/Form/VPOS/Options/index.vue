@@ -360,8 +360,8 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsReturnOrder
     },
     allowsCreateOrder() {
-      if (this.$store.getters.posAttributes.currentPointOfSales.id !== 1000002) {
-        return true
+      if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder)) {
+        return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
       }
       return false
     },

@@ -190,7 +190,6 @@ export default {
         attributePin,
         visible
       }
-      console.log(overdrawn)
       commit('popoverOverdrawnInvoice', overdrawn)
     }
   },
