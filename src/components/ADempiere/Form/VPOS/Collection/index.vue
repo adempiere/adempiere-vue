@@ -749,13 +749,14 @@ export default {
         containerUuid,
         columnName: 'ReferenceNo'
       })
+
       if (this.sendToServer) {
         this.$store.dispatch('setPaymentBox', {
           posUuid,
           orderUuid,
           bankUuid,
           referenceNo,
-          amount: this.amontSend,
+          amount: this.roundNumber(this.amontSend),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
@@ -767,7 +768,7 @@ export default {
           orderUuid,
           bankUuid,
           referenceNo,
-          amount: this.amontSend,
+          amount: this.roundNumber(this.amontSend),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,

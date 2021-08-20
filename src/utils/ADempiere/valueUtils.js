@@ -115,6 +115,13 @@ export function extractPagingToken(token) {
 }
 
 /**
+ * @param {number} number
+ */
+export function roundNumber(number) {
+  return Math.round(number * 100 + Number.EPSILON) / 100
+}
+
+/**
  * zero pad
  * @author EdwinBetanc0urt <EdwinBetanc0urt@oulook.com>
  * @param {number|string} number

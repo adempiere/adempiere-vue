@@ -24,6 +24,7 @@ export {
   currencyFind,
   tenderTypeFind,
   formatConversionCurrenty,
+  roundNumber,
   convertValuesToSend,
   typeValue
 } from '@/utils/ADempiere/valueUtils.js'
