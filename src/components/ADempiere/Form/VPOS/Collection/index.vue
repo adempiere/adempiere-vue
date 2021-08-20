@@ -670,6 +670,9 @@ export default {
           }
         })
       }
+    },
+    precision() {
+      return this.$store.getters.getCurrency.standardPrecision
     }
   },
   created() {
@@ -756,7 +759,7 @@ export default {
           orderUuid,
           bankUuid,
           referenceNo,
-          amount: this.roundNumber(this.amontSend),
+          amount: this.round(this.amontSend, this.precision),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
@@ -768,7 +771,7 @@ export default {
           orderUuid,
           bankUuid,
           referenceNo,
-          amount: this.roundNumber(this.amontSend),
+          amount: this.round(this.amontSend, this.precision),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
