@@ -18,7 +18,7 @@
 <template>
   <el-popover
     placement="bottom"
-    width="700"
+    width="1010"
     trigger="click"
   >
     <el-container>
@@ -56,6 +56,30 @@
             width="130"
           />
           <el-table-column
+            label="Fecha de Orden"
+            width="135"
+          >
+            <template slot-scope="scope">
+              {{ formatDate(scope.row.dateOrdered) }}
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            label="Socio de Negocio"
+            min-width="150"
+          >
+            <template slot-scope="scope">
+              {{ scope.row.businessPartner.name }}
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            prop="salesRepresentative.name"
+            label="Agente Comercial"
+            min-width="170"
+          />
+
+          <el-table-column
             label="Estado"
             width="100"
           >
@@ -68,29 +92,6 @@
             </template>
           </el-table-column>
 
-          <el-table-column
-            prop="salesRepresentative.name"
-            label="Agente Comercial"
-            min-width="170"
-          />
-
-          <el-table-column
-            label="Socio de Negocio"
-            min-width="150"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.businessPartner.name }}
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            label="Fecha de Orden"
-            width="135"
-          >
-            <template slot-scope="scope">
-              {{ formatDate(scope.row.dateOrdered) }}
-            </template>
-          </el-table-column>
           <el-table-column
             label="Total General"
             align="right"
@@ -112,7 +113,7 @@
         />
       </el-footer>
     </el-container>
-    <el-button slot="reference" type="text" style="color: black;margin-left: 5%;margin-top: 15%;font-size: 15px;" @click="openPopover = !openPopover">
+    <el-button slot="reference" type="primary" plain style="margin-left: 5%;margin-top: 15%;font-size: 15px;" @click="openPopover = !openPopover">
       <svg-icon icon-class="tree-table" />
       <b> Por Facturar </b>
     </el-button>
