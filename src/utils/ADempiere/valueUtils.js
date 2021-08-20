@@ -16,6 +16,7 @@
 
 import { convertStringToBoolean, convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
 import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
+import store from '@/store'
 
 /**
  * Checks if value is empty. Deep-checks arrays and objects
@@ -117,10 +118,13 @@ export function extractPagingToken(token) {
 /**
  * @param {number} number
  */
-export function roundNumber(number) {
-  return Math.round(number * 100 + Number.EPSILON) / 100
+export function roundNumber(number, currency) {
+  if (isEmptyValue(currency)) {
+    currency = store.getters.getCurrency
+  }
+  const amount = number.toFixed(currency.standardPrecision)
+  return Number(amount)
 }
-
 /**
  * zero pad
  * @author EdwinBetanc0urt <EdwinBetanc0urt@oulook.com>

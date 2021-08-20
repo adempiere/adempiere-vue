@@ -97,7 +97,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
-                <el-col :span="8">
+                <!-- <el-col :span="8">
                   <el-form-item v-if="displayeCurrency" :label="$t('form.pos.collect.Currency')">
                     <el-select
                       v-model="currentFieldCurrency"
@@ -112,7 +112,7 @@
                       />
                     </el-select>
                   </el-form-item>
-                </el-col>
+                </el-col> -->
                 <el-col
                   v-for="field in hiddenFieldsList"
                   :key="field.sequence"
