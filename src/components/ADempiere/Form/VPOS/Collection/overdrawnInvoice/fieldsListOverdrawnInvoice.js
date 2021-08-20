@@ -86,7 +86,7 @@ export default [
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='D' || @TenderType@=='Z'`,
+      displayLogic: `@TenderType@=='T' || @TenderType@=='D' || @TenderType@=='Z'`,
       isActiveLogics: true,
       isMandatory: true
     }
@@ -101,7 +101,7 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       handleContentSelection: true,
-      displayLogic: `@TenderType@<>'X'|| @TenderType@<>'Z'`,
+      displayLogic: `@TenderType@=='T' || @TenderType@=='D' || @TenderType@=='P'`,
       size: 24,
       isActiveLogics: true,
       isMandatory: true

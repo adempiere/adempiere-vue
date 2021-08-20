@@ -474,6 +474,7 @@ export default {
         orderTotal: 'Order Total',
         pending: 'Pending',
         payment: 'Payment',
+        datePayment: 'Payment Date',
         change: 'Change',
         totalInvoiced: 'Total Invoiced',
         convertAmount: 'Convert Quantity',

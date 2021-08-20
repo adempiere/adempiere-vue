@@ -81,15 +81,25 @@
                     :metadata-field="field"
                   />
                 </el-col>
-                <el-col :span="8">
-                  <el-form-item label="Tipo de pago">
-                    <el-select
-                      v-model="currentPaymentType"
+                <el-col v-if="displayeDatePay" :span="8">
+                  <el-form-item :label="$t('form.pos.collect.datePayment')">
+                    <el-date-picker
+                      v-model="value"
+                      type="date"
+                      placeholder="Pick a day"
                       style="width: -webkit-fill-available;"
-                      @change="changePaymentType"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col v-if="displayeCurrency" :span="8">
+                  <el-form-item :label="$t('form.pos.collect.Currency')">
+                    <el-select
+                      v-model="currentFieldCurrency"
+                      style="width: -webkit-fill-available;"
+                      @change="changeCurrency"
                     >
                       <el-option
-                        v-for="item in paymentTypeList"
+                        v-for="item in listCurrency"
                         :key="item.uuid"
                         :label="item.name"
                         :value="item.key"
@@ -197,6 +207,7 @@ export default {
       option: 1,
       fieldsList: fieldsListOverdrawnInvoice,
       currentFieldCurrency: '',
+      value: '',
       currentPaymentType: ''
     }
   },
@@ -218,12 +229,21 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.maximumRefundAllowed
     },
     displayeCurrency() {
-      console.log(this.$store.getters.posAttributes.currentPointOfSales)
       const tenderType = this.$store.getters.getValueOfField({
         containerUuid: 'OverdrawnInvoice',
         columnName: 'TenderType'
       })
-      if (tenderType === 'D') {
+      if (tenderType === 'D' || tenderType === 'T') {
+        return true
+      }
+      return false
+    },
+    displayeDatePay() {
+      const tenderType = this.$store.getters.getValueOfField({
+        containerUuid: 'OverdrawnInvoice',
+        columnName: 'TenderType'
+      })
+      if (tenderType === 'D' || tenderType === 'Z' || tenderType === 'P') {
         return true
       }
       return false
@@ -279,6 +299,30 @@ export default {
       })
     },
     close() {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid: this.containerUuid,
+        attributes: [{
+          columnName: 'Name',
+          value: undefined
+        }, {
+          columnName: 'Value',
+          value: undefined
+        }, {
+          columnName: 'Phone',
+          value: undefined
+        }, {
+          columnName: 'TenderType',
+          value: undefined
+        }, {
+          columnName: 'EMail',
+          value: undefined
+        }, {
+          columnName: 'C_Bank_ID',
+          value: undefined
+        }]
+      })
+      this.currentFieldCurrency = ''
+      this.value = ''
       this.$store.commit('dialogoInvoce', { show: false })
     },
     changeCurrency(value) {
@@ -349,6 +393,7 @@ export default {
           this.$store.commit('dialogoInvoce', { show: false, success: true })
           break
       }
+      this.close()
     },
     completePreparedOrder(posUuid, orderUuid, payments) {
       this.$store.dispatch('updateOrderPos', true)
