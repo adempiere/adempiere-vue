@@ -500,7 +500,10 @@ export default {
           returned: 'Your change is',
           coupon: 'Generate a Gift Card or Vale',
           returnMoney: 'Return money in another form of payment',
-          adjustDocument: 'You want to Adjust Document'
+          adjustDocument: 'You want to Adjust Document',
+          dailyLimit: 'Daily Limit',
+          customerLimit: 'Customer Limit',
+          available: 'Available'
         }
       },
       keyLayout: {
@@ -522,6 +525,13 @@ export default {
     priceChecking: {
       productNotFound: 'Unavailable Product',
       basePrice: 'Base price'
+    },
+    byInvoice: {
+      title: 'Aisle Vendor Orders to be Invoiced',
+      label: 'To be invoiced',
+      salesRepresentative: 'Sales Agent',
+      businessPartner: 'Business Partner',
+      documentNo: 'Document No.'
     },
     productInfo: {
       product: 'Product',

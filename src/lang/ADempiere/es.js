@@ -476,7 +476,10 @@ export default {
           returned: 'Su vuelto es',
           coupon: 'Generar una Tarjeta de Regalo o Vale',
           returnMoney: 'Devolver dinero en otra forma de pago',
-          adjustDocument: 'Desea Ajustar Documento'
+          adjustDocument: 'Desea Ajustar Documento',
+          dailyLimit: 'Limite Diario',
+          customerLimit: 'Limite Cliente',
+          available: 'Disponible'
         }
       },
       keyLayout: {
@@ -498,6 +501,13 @@ export default {
     priceChecking: {
       productNotFound: 'Producto No Disponible',
       basePrice: 'Precio Base'
+    },
+    byInvoice: {
+      title: 'Pedidos Vendedor de Pasillo por Facturar',
+      label: 'Por Facturar',
+      salesRepresentative: 'Agente Comercial',
+      businessPartner: 'Socio de Negocio',
+      documentNo: 'Nro. Documento'
     },
     productInfo: {
       product: 'Producto',
