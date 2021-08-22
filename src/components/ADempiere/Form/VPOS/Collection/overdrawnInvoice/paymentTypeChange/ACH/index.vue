@@ -41,10 +41,10 @@
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
-import fieldsListTransfer from './fieldsListTransfer.js'
+import fieldsListACH from './fieldsListACH.js'
 
 export default {
-  name: 'Transfer',
+  name: 'ACH',
   mixins: [
     formMixin,
     posMixin
@@ -74,8 +74,8 @@ export default {
       type: Object,
       default: () => {
         return {
-          uuid: 'Transfer',
-          containerUuid: 'Transfer'
+          uuid: 'ACH',
+          containerUuid: 'ACH'
         }
       }
     }
@@ -84,7 +84,7 @@ export default {
     return {
       option: 1,
       typePay: 0,
-      fieldsList: fieldsListTransfer,
+      fieldsList: fieldsListACH,
       currentFieldCurrency: '',
       currentPaymentType: ''
     }
@@ -147,7 +147,7 @@ export default {
   },
   created() {
     this.$store.commit('updateValueOfField', {
-      containerUuid: 'Transfer',
+      containerUuid: 'ACH',
       columnName: 'PayAmt',
       value: this.change
     })
