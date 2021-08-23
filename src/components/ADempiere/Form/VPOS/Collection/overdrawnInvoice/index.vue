@@ -59,11 +59,16 @@
         </el-card>
         <el-card v-if="option === 3" class="box-card">
           <div slot="header" class="clearfix">
-            <span>{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
-            <span style="float: right;text-align: end">
-              <!-- <b>{{ $t('form.pos.collect.overdrawnInvoice.dailyLimit') }}: {{ formatPrice(maximumDailyRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }} | {{ $t('form.pos.collect.overdrawnInvoice.available') }}: {{ formatPrice(maximumDailyRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }}</b> <br>
-              <b>{{ $t('form.pos.collect.overdrawnInvoice.customerLimit') }}: {{ formatPrice(maximumRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }} </b> -->
-            </span>
+            <span v-if="isEmptyValue(selectionTypeRefund)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
+            <template v-else>
+              <span>
+                {{ selectionTypeRefund.name }}
+              </span>
+              <span style="float: right;text-align: end">
+                <b>{{ $t('form.pos.collect.overdrawnInvoice.dailyLimit') }}: {{ formatPrice(selectionTypeRefund.maximum_refund_allowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }}<br> {{ $t('form.pos.collect.overdrawnInvoice.available') }}: {{ formatPrice(selectionTypeRefund.maximum_daily_refund_allowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }}</b> <br>
+                <b>{{ $t('form.pos.collect.overdrawnInvoice.customerLimit') }}: {{ formatPrice(selectionTypeRefund.maximum_refund_allowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }} </b>
+              </span>
+            </template>
           </div>
           <div v-if="isEmptyValue(selectionTypeRefund)" class="text item">
             <el-row :gutter="12">
@@ -211,13 +216,16 @@ export default {
           typePay = () => import('./paymentTypeChange/MobilePayment/index')
           break
         case 'X':
-          typePay = () => import('./paymentTypeChange/cash/index.vue')
+          typePay = () => import('./paymentTypeChange/Cash/index.vue')
           break
         case 'A':
           typePay = () => import('./paymentTypeChange/ACH/index')
           break
+        case 'M':
+          typePay = () => import('./paymentTypeChange/GiftCards/index.vue')
+          break
         case 'Z':
-          typePay = () => import('./paymentTypeChange/zelle/index.vue')
+          typePay = () => import('./paymentTypeChange/Zelle/index.vue')
           break
       }
       return typePay
@@ -230,6 +238,15 @@ export default {
           break
         case 'A':
           container = 'ACH'
+          break
+        case 'X':
+          container = 'Cash'
+          break
+        case 'M':
+          container = 'GiftCards'
+          break
+        case 'Z':
+          container = 'Zelle'
           break
       }
       return container
@@ -291,6 +308,9 @@ export default {
       return this.$store.getters.getRefundLoaded
     }
   },
+  mounted() {
+    this.selectionTypeRefund = {}
+  },
   methods: {
     formatPrice,
     addRefund() {
@@ -320,8 +340,10 @@ export default {
         customerDetails,
         payments: this.currentOrder.listPayments.payments
       })
+      this.selectionTypeRefund = {}
     },
     close() {
+      this.selectionTypeRefund = {}
       this.$store.commit('dialogoInvoce', { show: false })
     },
     changeCurrency(value) {
