@@ -197,8 +197,14 @@ export default {
         case 'P':
           typePay = () => import('./paymentTypeChange/MobilePayment.vue')
           break
+        case 'X':
+          typePay = () => import('./paymentTypeChange/cash/index.vue')
+          break
         case 'A':
           typePay = () => import('./paymentTypeChange/ACH/index.vue')
+          break
+        case 'Z':
+          typePay = () => import('./paymentTypeChange/zelle/index.vue')
           break
         default:
           typePay = () => import('./paymentTypeChange/empty.vue')
