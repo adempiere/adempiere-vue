@@ -479,7 +479,8 @@ export default {
           adjustDocument: 'Desea Ajustar Documento',
           dailyLimit: 'Limite Diario',
           customerLimit: 'Limite Order',
-          available: 'Disponible'
+          available: 'Disponible',
+          emptyPayment: 'Método de pago no soportado'
         }
       },
       keyLayout: {

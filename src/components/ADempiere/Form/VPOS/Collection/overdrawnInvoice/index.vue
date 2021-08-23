@@ -228,6 +228,9 @@ export default {
         case 'Z':
           typePay = () => import('./paymentTypeChange/Zelle/index.vue')
           break
+        default:
+          typePay = () => import('./paymentTypeChange/empty.vue')
+          break
       }
       return typePay
     },
