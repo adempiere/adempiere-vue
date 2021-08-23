@@ -66,8 +66,8 @@
             </span>
           </div>
           <div v-if="optionTypePay === 0" class="text item">
-            <el-row :gutter="12">
-              <el-col v-for="(payment, index) in paymentTypeList" :key="index" :span="8">
+            <el-row :gutter="24">
+              <el-col v-for="(payment, index) in paymentTypeList" :key="index" :span="6">
                 <div @click="optionTypePay = payment.key">
                   <el-card shadow="hover">
                     <div slot="header" class="clearfix" style="text-align: center;">
@@ -75,11 +75,13 @@
                         {{ payment.name }}
                       </span>
                     </div>
-                    <p style="text-align: center;"> Nombre </p>
-                    <p style="text-align: center;"> Cedula </p>
-                    <p style="text-align: center;"> Telefono </p>
-                    <p style="text-align: center;"> Banco </p>
-                    <p style="text-align: center;"> Descripcion </p>
+                    <div class="text item">
+                      <el-image
+                        :src="imageCard(payment.key)"
+                        tyle="width: 100px; height: 100px"
+                        fit="contain"
+                      />
+                    </div>
                   </el-card>
                 </div>
               </el-col>
@@ -206,9 +208,6 @@ export default {
         case 'Z':
           typePay = () => import('./paymentTypeChange/zelle/index.vue')
           break
-        default:
-          typePay = () => import('./paymentTypeChange/empty.vue')
-          break
       }
       return typePay
     },
@@ -268,6 +267,39 @@ export default {
   },
   methods: {
     formatPrice,
+    imageCard(typeRefund) {
+      let image
+      switch (typeRefund) {
+        case 'P':
+          image = 'MobilePayment.jpg'
+          break
+        case 'X':
+          image = 'Cash.jpg'
+          break
+        case 'A':
+          image = 'ACH.jpg'
+          break
+        case 'M':
+          image = 'GiftCard.jpg'
+          break
+        case 'Z':
+          image = 'Zelle.jpg'
+          break
+        default:
+          image = 'Default.jpg'
+          break
+      }
+      return require('@/image/ADempiere/pos/typePayment/' + image)
+    },
+    addRefund() {
+      const values = this.$store.getters.getValuesView({
+        containerUuid: this.renderComponentContainer,
+        format: 'object'
+      })
+      values.tenderType = this.selectionTypeRefund.name
+      this.$store.dispatch('addRefundLoaded', values)
+      this.selectionTypeRefund = {}
+    },
     success() {
       const customerDetails = []
       this.fieldsList.forEach(element => {
