@@ -90,6 +90,9 @@ export default {
         })
       }
     }
+  },
+  created() {
+    this.$store.dispatch('clearStorePointOfSales')
   }
 }
 </script>

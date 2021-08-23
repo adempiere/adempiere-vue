@@ -127,6 +127,10 @@ export default {
         })
       })
   },
+  clearStorePointOfSales({ state, dispatch }) {
+    state.pointOfSalesList = []
+    dispatch('listPointOfSalesFromServer')
+  },
   listTenderTypesFromServer({ commit }, posUuid) {
     listTenderTypes({
       posUuid
