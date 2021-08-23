@@ -477,7 +477,7 @@ export default {
           coupon: 'Generar una Tarjeta de Regalo o Vale',
           returnMoney: 'Devolver dinero en otra forma de pago',
           adjustDocument: 'Desea Ajustar Documento',
-          dailyLimit: 'Limite Diario',
+          dailyLimit: 'Limite de Orden',
           customerLimit: 'Limite Cliente',
           available: 'Disponible'
         }
