@@ -200,6 +200,9 @@ export default {
         case 'A':
           typePay = () => import('./paymentTypeChange/ACH/index.vue')
           break
+        default:
+          typePay = () => import('./paymentTypeChange/empty.vue')
+          break
       }
       return typePay
     },
