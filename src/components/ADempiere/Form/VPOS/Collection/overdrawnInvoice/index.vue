@@ -70,10 +70,10 @@
               </span>
             </template>
           </div>
-          <div v-if="optionTypePay === 0" class="text item">
+          <div v-if="isEmptyValue(selectionTypeRefund)" class="text item">
             <el-row :gutter="24">
               <el-col v-for="(payment, index) in paymentTypeList" :key="index" :span="6">
-                <div @click="optionTypePay = payment.key">
+                <div @click="selectionTypeRefund = payment">
                   <el-card shadow="hover">
                     <div slot="header" class="clearfix" style="text-align: center;">
                       <span>
@@ -140,6 +140,7 @@
           @click="close"
         />
         <el-button
+          v-if="caseOrder === 1 && !isEmptyValue(selectionTypeRefund)"
           type="primary"
           class="custom-button-create-bp"
           icon="el-icon-plus"
