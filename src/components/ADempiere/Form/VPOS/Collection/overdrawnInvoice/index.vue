@@ -61,31 +61,26 @@
           <div slot="header" class="clearfix">
             <span>{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <span style="float: right;text-align: end">
-              <b>{{ $t('form.pos.collect.overdrawnInvoice.dailyLimit') }}: {{ formatPrice(maximumDailyRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }} | {{ $t('form.pos.collect.overdrawnInvoice.available') }}: {{ formatPrice(maximumDailyRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }}</b> <br>
-              <b>{{ $t('form.pos.collect.overdrawnInvoice.customerLimit') }}: {{ formatPrice(maximumRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }} </b>
+              <!-- <b>{{ $t('form.pos.collect.overdrawnInvoice.dailyLimit') }}: {{ formatPrice(maximumDailyRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }} | {{ $t('form.pos.collect.overdrawnInvoice.available') }}: {{ formatPrice(maximumDailyRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }}</b> <br>
+              <b>{{ $t('form.pos.collect.overdrawnInvoice.customerLimit') }}: {{ formatPrice(maximumRefundAllowed, currency.iSOCode) }} | {{ formatPrice(0, isoCode) }} </b> -->
             </span>
           </div>
-          <div v-if="optionTypePay === 0" class="text item">
+          <div v-if="isEmptyValue(selectionTypeRefund)" class="text item">
             <el-row :gutter="12">
               <el-col v-for="(payment, index) in paymentTypeList" :key="index" :span="8">
-                <div @click="optionTypePay = payment.key">
+                <div @click="selectionTypeRefund = payment">
                   <el-card shadow="hover">
                     <div slot="header" class="clearfix" style="text-align: center;">
                       <span>
-                        {{ payment.name }}
+                        <b>{{ payment.name }}</b> <br>
                       </span>
                     </div>
-                    <p style="text-align: center;"> Nombre </p>
-                    <p style="text-align: center;"> Cedula </p>
-                    <p style="text-align: center;"> Telefono </p>
-                    <p style="text-align: center;"> Banco </p>
-                    <p style="text-align: center;"> Descripcion </p>
                   </el-card>
                 </div>
               </el-col>
             </el-row>
           </div>
-          <div v-if="optionTypePay !== 0" class="text item">
+          <div v-if="!isEmptyValue(selectionTypeRefund)" class="text item">
             <component
               :is="componentRender"
               :change="change"
@@ -93,6 +88,13 @@
           </div>
         </el-card>
       </div>
+      <el-card v-if="option === 3" class="box-card">
+        <div class="text item">
+          <type-refund
+            :is-add-type-pay="refundLoaded"
+          />
+        </div>
+      </el-card>
       <div v-if="caseOrder === 2">
         <el-card>
           <div slot="header" class="clearfix">
@@ -113,11 +115,11 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button
-          v-if="optionTypePay !== 0"
+          v-if="!isEmptyValue(selectionTypeRefund)"
           type="info"
           class="custom-button-create-bp"
           icon="el-icon-back"
-          @click="optionTypePay = 0"
+          @click="selectionTypeRefund = {}"
         />
         <el-button
           type="danger"
@@ -127,6 +129,12 @@
         />
         <el-button
           type="primary"
+          class="custom-button-create-bp"
+          icon="el-icon-plus"
+          @click="addRefund"
+        />
+        <el-button
+          type="success"
           class="custom-button-create-bp"
           icon="el-icon-check"
           @click="success"
@@ -143,9 +151,13 @@ import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOverdrawnInvoice from './fieldsListOverdrawnInvoice.js'
 import { overdrawnInvoice } from '@/api/ADempiere/form/point-of-sales.js'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
+import typeRefund from './typeRefund/index.vue'
 
 export default {
   name: 'OverdrawnInvoice',
+  components: {
+    typeRefund
+  },
   mixins: [
     formMixin,
     posMixin
@@ -185,6 +197,7 @@ export default {
     return {
       option: 1,
       optionTypePay: 0,
+      selectionTypeRefund: {},
       fieldsList: fieldsListOverdrawnInvoice,
       currentFieldCurrency: '',
       currentPaymentType: ''
@@ -193,21 +206,33 @@ export default {
   computed: {
     componentRender() {
       let typePay
-      switch (this.optionTypePay) {
+      switch (this.selectionTypeRefund.key) {
         case 'P':
-          typePay = () => import('./paymentTypeChange/MobilePayment.vue')
+          typePay = () => import('./paymentTypeChange/MobilePayment/index')
           break
         case 'X':
           typePay = () => import('./paymentTypeChange/cash/index.vue')
           break
         case 'A':
-          typePay = () => import('./paymentTypeChange/ACH/index.vue')
+          typePay = () => import('./paymentTypeChange/ACH/index')
           break
         case 'Z':
           typePay = () => import('./paymentTypeChange/zelle/index.vue')
           break
       }
       return typePay
+    },
+    renderComponentContainer() {
+      let container
+      switch (this.selectionTypeRefund.key) {
+        case 'P':
+          container = 'MobilePayment'
+          break
+        case 'A':
+          container = 'ACH'
+          break
+      }
+      return container
     },
     showDialogo() {
       return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.show
@@ -260,11 +285,23 @@ export default {
       return this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', formatReturn: 'name' })
     },
     paymentTypeList() {
-      return this.$store.getters.getPaymentTypeList
+      return this.$store.getters.getPaymentTypeList.filter(type => type.is_allowed_to_refund)
+    },
+    refundLoaded() {
+      return this.$store.getters.getRefundLoaded
     }
   },
   methods: {
     formatPrice,
+    addRefund() {
+      const values = this.$store.getters.getValuesView({
+        containerUuid: this.renderComponentContainer,
+        format: 'object'
+      })
+      values.tenderType = this.selectionTypeRefund.name
+      this.$store.dispatch('addRefundLoaded', values)
+      this.selectionTypeRefund = {}
+    },
     success() {
       const customerDetails = []
       this.fieldsList.forEach(element => {

@@ -23,7 +23,7 @@
     >
       <el-row :gutter="12">
         <el-col
-          v-for="field in primaryFieldsList"
+          v-for="field in fieldsList"
           :key="field.sequence"
           :span="8"
         >
@@ -41,7 +41,7 @@
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
-import fieldsListOverdrawnInvoice from '../fieldsListOverdrawnInvoice.js'
+import fieldsListMobilePayment from './fieldsListMobilePayment.js'
 
 export default {
   name: 'MobilePayment',
@@ -74,8 +74,8 @@ export default {
       type: Object,
       default: () => {
         return {
-          uuid: 'OverdrawnInvoice',
-          containerUuid: 'OverdrawnInvoice'
+          uuid: 'MobilePayment',
+          containerUuid: 'MobilePayment'
         }
       }
     }
@@ -84,7 +84,7 @@ export default {
     return {
       option: 1,
       typePay: 0,
-      fieldsList: fieldsListOverdrawnInvoice,
+      fieldsList: fieldsListMobilePayment,
       currentFieldCurrency: '',
       currentPaymentType: ''
     }
