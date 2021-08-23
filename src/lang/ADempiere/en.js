@@ -501,8 +501,8 @@ export default {
           coupon: 'Generate a Gift Card or Vale',
           returnMoney: 'Return money in another form of payment',
           adjustDocument: 'You want to Adjust Document',
-          dailyLimit: 'Order Limit',
-          customerLimit: 'Customer Limit',
+          dailyLimit: 'Daily Limit',
+          customerLimit: 'Order Limit',
           available: 'Available'
         }
       },
