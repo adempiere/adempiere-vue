@@ -136,6 +136,7 @@
           type="primary"
           class="custom-button-create-bp"
           icon="el-icon-plus"
+          :disabled="!isEmptyValue(refundLoaded)"
           @click="addRefund"
         />
         <el-button

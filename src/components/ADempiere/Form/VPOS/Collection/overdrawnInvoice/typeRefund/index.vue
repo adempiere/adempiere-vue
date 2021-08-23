@@ -216,12 +216,8 @@ export default {
       return require('@/image/' + image + '.jpg')
     },
     deleteCollect(key) {
-      const orderUuid = key.orderUuid
-      const paymentUuid = key.uuid
-      this.$store.dispatch('deletetPayments', {
-        orderUuid,
-        paymentUuid
-      })
+      const itemRemove = this.isAddTypePay.findIndex(item => item.Value === key.Value)
+      this.$store.state['pointOfSales/payments/index'].refundLoaded.splice(itemRemove, 1)
     },
     // Payment card label
     tenderTypeDisplaye({

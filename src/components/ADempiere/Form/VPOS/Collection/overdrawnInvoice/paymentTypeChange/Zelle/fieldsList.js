@@ -52,7 +52,7 @@ export default [
     columnName: 'PayAmt',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 0,
+      sequence: 1,
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
