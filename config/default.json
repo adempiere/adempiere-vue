@@ -5,7 +5,7 @@
   },
   "adempiere": {
     "api": {
-      "url": "https://api.erpya.com/api/adempiere/",
+      "url": "https://proxy.cid.spin-suite.com/api/adempiere/",
       "timeout": 10000
     },
     "images": {
