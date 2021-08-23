@@ -177,7 +177,7 @@
                         <el-col :span="8">
                           <div style="float: right">
                             {{ $t('form.productInfo.price') }}:
-                            <b>{{ formatPrice(scope.row.product.priceActual, pointOfSalesCurrency.iSOCode) }}</b>
+                            <b>{{ formatPrice(scope.row.product.priceStandard, pointOfSalesCurrency.iSOCode) }}</b>
                             <br>
                             {{ $t('form.productInfo.taxAmount') }}:
                             <b>{{ scope.row.taxIndicator }}</b>
