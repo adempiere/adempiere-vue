@@ -28,6 +28,7 @@
           :actions-manager="actionsManager"
           :relations-manager="relationsManager"
         />
+
         <component
           :is="renderWindowComponent"
           :container-manager="containerManagerWindow"
@@ -99,9 +100,19 @@ export default defineComponent({
         ...props.containerManager
       }
     }
-    const actionsManager = ref({})
-    const referencesManager = ref({})
-    const relationsManager = ref({})
+
+    const actionsManager = ref({
+      // overwrite logic or add actions
+      ...props.containerManager.actionsManager
+    })
+    const referencesManager = ref({
+      // overwrite logic
+      ...props.containerManager.referencesManager
+    })
+    const relationsManager = ref({
+      // overwrite logic
+      ...props.containerManager.relationsManager
+    })
 
     const isLoaded = ref(false)
     const windowMetadata = ref({})
@@ -160,8 +171,6 @@ export default defineComponent({
     })
 
     // load metadata and generate window
-    // getWindow()
-    // setTimeout(getWindow, 1000)
     getWindow()
 
     return {

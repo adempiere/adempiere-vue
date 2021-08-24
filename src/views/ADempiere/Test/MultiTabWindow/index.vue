@@ -86,37 +86,36 @@ export default defineComponent({
         console.info('setSelectionAll callback', containerUuid, recordsSelected)
       },
 
-      loadActionMenu: (currentTab) => {
-        // current tab properties
-        const { tableName, uuid } = currentTab
+      // action menu
+      relationsManager: {
+        menuParentUuid: root.$route.meta.parentUuid
+      },
 
-        return {
-          // action menu
-          relationsManager: {
-            menuParentUuid: root.$route.meta.parentUuid
-          },
-          actionsManager: {
-            tableName,
-            actionsList: [
-              createNewRecord,
-              {
-                ...refreshRecords,
-                callBack: () => {
-                  console.log('call getEntities')
-                  root.$store.dispatch('dataManager/getEntities', {
-                    parentUuid: props.parentUuid,
-                    containerUuid: uuid,
-                    tableName
-                  })
-                }
-              },
-              deleteRecord,
-              sharedLink
-            ]
-          },
-          referencesManager: {
-            tableName
-          }
+      referencesManager: (tableName) => {
+        return tableName
+      },
+
+      // current tab properties
+      actionsManager: {
+        actionsList: ({ tableName, uuid }) => {
+          const actionsList = [
+            createNewRecord,
+            {
+              ...refreshRecords,
+              callBack: () => {
+                console.log('call getEntities')
+                root.$store.dispatch('dataManager/getEntities', {
+                  parentUuid: props.parentUuid,
+                  containerUuid: uuid,
+                  tableName
+                })
+              }
+            },
+            deleteRecord,
+            sharedLink
+          ]
+
+          return actionsList
         }
       }
     }
