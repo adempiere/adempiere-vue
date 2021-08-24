@@ -40,18 +40,6 @@
                 />
               </template>
             </el-col>
-            <el-col :span="isEmptyValue(currentOrder) ? 5 : 5" :style="styleTab">
-              <business-partner
-                id="BusinessPartner"
-                :parent-metadata="{
-                  name: panelMetadata.name,
-                  containerUuid: panelMetadata.containerUuid,
-                  uuid: panelMetadata.uuid,
-                  panelType: panelMetadata.panelType
-                }"
-                :is-disabled="isDisabled"
-              />
-            </el-col>
             <el-col :span="3" :style="styleTab">
               <fast-ordes-list />
             </el-col>
@@ -253,8 +241,19 @@
                 >
                   {{ labelButtonCollections }}
                 </el-button>
+                <el-form label-position="top" label-width="500px" style="display: inline-block;" @submit.native.prevent="notSubmitForm">
+                  <business-partner
+                    id="BusinessPartner"
+                    :parent-metadata="{
+                      name: panelMetadata.name,
+                      containerUuid: panelMetadata.containerUuid,
+                      uuid: panelMetadata.uuid,
+                      panelType: panelMetadata.panelType
+                    }"
+                    :is-disabled="isDisabled"
+                  />
+                </el-form>
               </span>
-              <br>
               <p id="point" style="margin-bottom: 5%;margin-top: 3%;">
                 <el-dropdown
                   v-if="!isEmptyValue(currentPointOfSales)"
@@ -320,7 +319,7 @@
                 </el-dropdown>
               </p>
             </div>
-            <span v-if="isMobile" style="float: right;padding-right: 3%;">
+            <span v-if="isMobile" style="float: right;padding-right: 3%;padding-top: 3%;">
               <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.date') }}:
@@ -341,7 +340,7 @@
                   {{ numberOfLines }}
                 </b></p>
             </span>
-            <span style="float: right;">
+            <span style="float: right;padding-top: 3%;">
               <p class="total">{{ $t('form.pos.order.seller') }}:<b style="float: right;">
                 {{ currentOrder.salesRepresentative.name }}
               </b></p>
