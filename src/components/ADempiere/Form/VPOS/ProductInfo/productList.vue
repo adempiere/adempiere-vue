@@ -60,7 +60,7 @@
         align="right"
       />
       <el-table-column
-        :label="$t('form.productInfo.codeProduct')"
+        :label="$t('form.pos.collect.convertedAmount')"
         align="right"
       >
         <template slot-scope="scope">
