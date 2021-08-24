@@ -290,7 +290,6 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency.iso_code
     },
     isoCode() {
-      console.log(this.$store.getters.posAttributes.currentPointOfSales, this.selectionTypeRefund)
       return this.$store.getters.posAttributes.currentPointOfSales.displayCurrency.iso_code
     },
     displayeCurrency() {
