@@ -97,7 +97,14 @@ export default defineComponent({
       containerManagerWindow = {
         ...containerManagerWindow,
         // overwirte methods
-        ...props.containerManager
+        ...props.containerManager,
+
+        isDisplayedColumn: ({ isDisplayedGrid, isDisplayedFromLogic, isKey }) => {
+          // window (table) result
+          return isDisplayedGrid &&
+            isDisplayedFromLogic &&
+            !isKey
+        }
       }
     }
 

@@ -74,7 +74,7 @@
           :parent-uuid="parentUuid"
           :container-uuid="tabAttributes.uuid"
           :container-manager="containerManagerTab"
-          :header="tableheaders"
+          :header="tableHeaders"
           :data-table="recordsList"
           :panel-metadata="generatePanelAndFields({
             parentUuid: parentUuid,
@@ -185,10 +185,17 @@ export default defineComponent({
     })
 
     // create the table header
-    const tableheaders = computed(() => {
+    const tableHeaders = computed(() => {
       const panel = props.tabsList[tabNo]
-      if (panel && panel.fieldsList) {
-        return panel.fieldsList
+      if (panel && panel.fields) {
+        // TODO: Change to stored generated panel
+        const panelGenerated = generatePanelAndFields({
+          parentUuid: props.parentUuid,
+          containerUuid: panel.uuid,
+          panelMetadata: panel
+        })
+        return panelGenerated.fieldsList
+        // panel.fields
       }
       return []
     })
@@ -224,7 +231,7 @@ export default defineComponent({
       }, () => {})
       const containerManager = props.containerManager
       if (containerManager !== undefined) {
-        console.log(containerManager)
+        // console.log(containerManager)
         // containerManager.seekTab({
         //   tabNumber,
         //   currentTab
@@ -245,6 +252,10 @@ export default defineComponent({
     })
 
     const getData = () => {
+      // TODO: Add support to load data in dependent childs
+      if (!props.isParentTabs) {
+        return
+      }
       // TODO: Add store get data from tab
       root.$store.dispatch('dataManager/getEntities', {
         parentUuid: props.parentUuid,
@@ -289,7 +300,7 @@ export default defineComponent({
       tabUuid,
       currentTab,
       isShowMultiRecords,
-      tableheaders,
+      tableHeaders,
       recordsList,
       // computed
       containerManagerTab,

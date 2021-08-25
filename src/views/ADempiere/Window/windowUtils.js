@@ -22,6 +22,7 @@ export function generateWindow(responseWindow) {
     tabs: responseWindow.tabs,
     parentUuid: responseWindow.uuid
   })
+
   const newWindow = {
     ...responseWindow,
     tabsList,
@@ -50,6 +51,7 @@ export function generateTabs({
 }) {
   const firstTabTableName = tabs[0].tableName
   const firstTabUuid = tabs[0].uuid
+
   // indexes related to visualization
   const tabsList = tabs.filter((itemTab) => {
     return !(
@@ -73,6 +75,7 @@ export function generateTabs({
     }
     return tab
   })
+
   const tabsListParent = tabsList.filter(tabItem => {
     return tabItem.isParentTab
   }).map((itemTab, tabParentIndex) => {
@@ -81,10 +84,22 @@ export function generateTabs({
       tabParentIndex
     }
   })
+
+  // generate tabs childs
+  const tabsListChild = tabsList.filter(tabItem => {
+    return !tabItem.isParentTab
+  }).map((itemTab, tabChildIndex) => {
+    return {
+      ...itemTab,
+      tabChildIndex
+    }
+  })
+
   return {
     firstTabUuid,
     firstTab: tabsList[0],
     tabsListParent,
+    tabsListChild,
     tabsList
   }
 }

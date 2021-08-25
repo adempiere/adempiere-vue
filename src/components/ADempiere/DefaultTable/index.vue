@@ -190,6 +190,12 @@ export default defineComponent({
      * Verify is displayed column/field in table
      */
     const isDisplayed = (field) => {
+      // validate with container manager
+      if (!root.isEmptyValue(props.containerManager) &&
+        props.containerManager.isDisplayedColumn) {
+        return props.containerManager.isDisplayedColumn(field)
+      }
+
       return fieldIsDisplayed(field, true)
     }
 
