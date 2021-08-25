@@ -55,6 +55,7 @@ export default {
     }
   },
   created() {
+    console.log('pos')
     this.getPanel()
   },
   methods: {

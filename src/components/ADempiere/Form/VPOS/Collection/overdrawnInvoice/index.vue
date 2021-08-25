@@ -260,7 +260,7 @@ export default {
         case 'X':
           typePay = () => import('./paymentTypeChange/Cash/index.vue')
           break
-        case 'A':
+        case 'D':
           typePay = () => import('./paymentTypeChange/ACH/index')
           break
         case 'M':
@@ -270,6 +270,7 @@ export default {
           typePay = () => import('./paymentTypeChange/Zelle/index.vue')
           break
       }
+      console.log(this.selectionTypeRefund.tender_type, typePay, this.selectionTypeRefund)
       return typePay
     },
     renderComponentContainer() {
@@ -278,7 +279,7 @@ export default {
         case 'P':
           container = 'MobilePayment'
           break
-        case 'A':
+        case 'D':
           container = 'ACH'
           break
         case 'X':
