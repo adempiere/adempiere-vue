@@ -270,7 +270,6 @@ export default {
           typePay = () => import('./paymentTypeChange/Zelle/index.vue')
           break
       }
-      console.log(this.selectionTypeRefund.tender_type, typePay, this.selectionTypeRefund)
       return typePay
     },
     renderComponentContainer() {
