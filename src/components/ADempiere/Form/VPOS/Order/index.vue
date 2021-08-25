@@ -28,7 +28,7 @@
       >
         <el-form label-position="top" label-width="500px" @submit.native.prevent="notSubmitForm">
           <el-row :gutter="24" style="display: flex;">
-            <el-col :span="colFieldProductCode" style="padding-left: 0px; padding-right: 0px;">
+            <el-col :span="!isShowedPOSKeyLayout ? 12 : colFieldProductCode" style="padding-left: 0px; padding-right: 0px;">
               <template
                 v-for="(field) in fieldsList"
               >
@@ -40,55 +40,39 @@
                 />
               </template>
             </el-col>
-            <el-col :span="3" :style="styleTab">
-              <fast-ordes-list />
+            <el-col :span="isShowedPOSKeyLayout ? 5 : 6" :style="styleTab">
+              <business-partner
+                id="BusinessPartner"
+                :parent-metadata="{
+                  name: panelMetadata.name,
+                  containerUuid: panelMetadata.containerUuid,
+                  uuid: panelMetadata.uuid,
+                  panelType: panelMetadata.panelType
+                }"
+                :is-disabled="isDisabled"
+              />
             </el-col>
-            <el-col :span="4" :style="styleTab">
-              <el-form-item>
-                <template slot="label" />
-                <el-dropdown
-                  v-if="!isEmptyValue(currentDocumentType)"
-                  trigger="click"
-                  style="padding-top: 15%;font-size: 15px;color: black;"
-                  @command="changeDocumentType"
-                >
-                  <span>
-                    <el-icon class="el-icon-document" />
-                    <b style="cursor: pointer"> {{ currentDocumentType.name }} </b>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item
-                      v-for="item in listDocumentTypes"
-                      :key="item.uuid"
-                      :command="item"
-                      :disabled="isDisabled"
-                    >
-                      {{ item.name }}
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </el-form-item>
-            </el-col>
-            <el-col :span="isEmptyValue(currentOrder) ? 3 : 4" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
-              <el-form-item>
-                <el-row :gutter="24">
-                  <el-col :span="10" style="padding-left: 0px; padding-right: 0px;">
-                    <el-tag
-                      v-if="!isEmptyValue(currentOrder.documentStatus.value)"
-                      :type="tagStatus(currentOrder.documentStatus.value)"
-                    >
-                      <span v-if="!isEmptyValue(currentOrder.documentStatus.value)">
-                        {{ currentOrder.documentStatus.name }}
-                      </span>
-                    </el-tag>
-                  </el-col>
-                  <el-col :span="14" style="padding-left: 0px; padding-right: 0px;">
-                    <el-button type="primary" :disabled="!allowsCreateOrder" plain @click="newOrder">
-                      {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
-                    </el-button>
-                  </el-col>
-                </el-row>
-              </el-form-item>
+            <el-col :span="isShowedPOSKeyLayout ? 9 : 9" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
+              <el-row :gutter="4">
+                <el-col :span="isShowedPOSKeyLayout ? 5 : 8" style="padding-left: 0px; padding-right: 0px;">
+                  <el-tag
+                    v-if="!isEmptyValue(currentOrder.documentStatus.value)"
+                    :type="tagStatus(currentOrder.documentStatus.value)"
+                  >
+                    <span v-if="!isEmptyValue(currentOrder.documentStatus.value)">
+                      {{ currentOrder.documentStatus.name }}
+                    </span>
+                  </el-tag>
+                </el-col>
+                <el-col :span="isShowedPOSKeyLayout ? 10 : 8" style="padding-left: 0px; padding-right: 0px;">
+                  <fast-ordes-list />
+                </el-col>
+                <el-col :span="8" style="padding-left: 0px; padding-right: 0px;text-align: end;">
+                  <el-button type="primary" :disabled="!allowsCreateOrder" plain @click="newOrder">
+                    {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
+                  </el-button>
+                </el-col>
+              </el-row>
             </el-col>
           </el-row>
         </el-form>
@@ -265,6 +249,28 @@
                 </el-dropdown>
                 <br>
                 <el-dropdown
+                  v-if="!isEmptyValue(currentDocumentType)"
+                  trigger="click"
+                  class="info-pos"
+                  @command="changeDocumentType"
+                >
+                  <span>
+                    <el-icon class="el-icon-document" />
+                    Tipo de Documento: <b style="cursor: pointer"> {{ currentDocumentType.name }} </b>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      v-for="item in listDocumentTypes"
+                      :key="item.uuid"
+                      :command="item"
+                      :disabled="isDisabled"
+                    >
+                      {{ item.name }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+                <br>
+                <el-dropdown
                   v-if="!isEmptyValue(currentWarehouse)"
                   trigger="click"
                   class="info-pos"
@@ -329,12 +335,6 @@
                 </b></p>
             </span>
             <span style="float: right;">
-              <p class="total">
-                {{ $t('form.pos.order.numberLines') }}:
-                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
-                  {{ numberOfLines }}
-                </b>
-              </p>
               <p class="total">{{ $t('form.pos.order.seller') }}:<b style="float: right;">
                 {{ currentOrder.salesRepresentative.name }}
               </b></p>
@@ -367,33 +367,27 @@
               </p>
               <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
             </span>
-            <span v-if="!isMobile" style="float: right;padding-right: 3%">
-              <p class="total" style="margin-bottom: 9px;">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
-              <p class="total" style="margin-bottom: 9px;">
+            <span v-if="!isMobile" style="float: right;padding-right: 3%;">
+              <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
+              <p class="total">
                 {{ $t('form.pos.order.date') }}:
                 <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ orderDate }}
                 </b>
               </p>
-              <p class="total" style="margin-bottom: 5px; margin-top: 0px;">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
-              <p class="total" style="margin-bottom: 0px; margin-top: 3px;">
+              <p class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
+              <p class="total">
                 {{ $t('form.pos.order.itemQuantity') }}:
                 <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ getItemQuantity }}
                 </b>
               </p>
-              <el-form label-position="top" label-width="500px" style="display: inline-block;" @submit.native.prevent="notSubmitForm">
-                <business-partner
-                  id="BusinessPartner"
-                  :parent-metadata="{
-                    name: panelMetadata.name,
-                    containerUuid: panelMetadata.containerUuid,
-                    uuid: panelMetadata.uuid,
-                    panelType: panelMetadata.panelType
-                  }"
-                  :is-disabled="isDisabled"
-                />
-              </el-form>
+              <p class="total">
+                {{ $t('form.pos.order.numberLines') }}:
+                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
+                  {{ numberOfLines }}
+                </b>
+              </p>
             </span>
           </el-footer>
         </el-container>
@@ -506,7 +500,7 @@ export default {
       if (this.isEmptyValue(this.currentOrder)) {
         return 14
       }
-      return 11
+      return 10
     },
     shortsKey() {
       return {
