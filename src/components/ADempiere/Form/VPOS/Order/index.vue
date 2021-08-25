@@ -241,18 +241,6 @@
                 >
                   {{ labelButtonCollections }}
                 </el-button>
-                <el-form label-position="top" label-width="500px" style="display: inline-block;" @submit.native.prevent="notSubmitForm">
-                  <business-partner
-                    id="BusinessPartner"
-                    :parent-metadata="{
-                      name: panelMetadata.name,
-                      containerUuid: panelMetadata.containerUuid,
-                      uuid: panelMetadata.uuid,
-                      panelType: panelMetadata.panelType
-                    }"
-                    :is-disabled="isDisabled"
-                  />
-                </el-form>
               </span>
               <p id="point" style="margin-bottom: 5%;margin-top: 3%;">
                 <el-dropdown
@@ -319,7 +307,7 @@
                 </el-dropdown>
               </p>
             </div>
-            <span v-if="isMobile" style="float: right;padding-right: 3%;padding-top: 3%;">
+            <span v-if="isMobile" style="float: right;padding-right: 3%;">
               <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.date') }}:
@@ -340,7 +328,13 @@
                   {{ numberOfLines }}
                 </b></p>
             </span>
-            <span style="float: right;padding-top: 3%;">
+            <span style="float: right;">
+              <p class="total">
+                {{ $t('form.pos.order.numberLines') }}:
+                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
+                  {{ numberOfLines }}
+                </b>
+              </p>
               <p class="total">{{ $t('form.pos.order.seller') }}:<b style="float: right;">
                 {{ currentOrder.salesRepresentative.name }}
               </b></p>
@@ -373,27 +367,33 @@
               </p>
               <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
             </span>
-            <span v-if="!isMobile" style="float: right;padding-right: 3%;">
-              <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
-              <p class="total">
+            <span v-if="!isMobile" style="float: right;padding-right: 3%">
+              <p class="total" style="margin-bottom: 9px;">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
+              <p class="total" style="margin-bottom: 9px;">
                 {{ $t('form.pos.order.date') }}:
                 <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ orderDate }}
                 </b>
               </p>
-              <p class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
-              <p class="total">
+              <p class="total" style="margin-bottom: 5px; margin-top: 0px;">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
+              <p class="total" style="margin-bottom: 0px; margin-top: 3px;">
                 {{ $t('form.pos.order.itemQuantity') }}:
                 <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ getItemQuantity }}
                 </b>
               </p>
-              <p class="total">
-                {{ $t('form.pos.order.numberLines') }}:
-                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
-                  {{ numberOfLines }}
-                </b>
-              </p>
+              <el-form label-position="top" label-width="500px" style="display: inline-block;" @submit.native.prevent="notSubmitForm">
+                <business-partner
+                  id="BusinessPartner"
+                  :parent-metadata="{
+                    name: panelMetadata.name,
+                    containerUuid: panelMetadata.containerUuid,
+                    uuid: panelMetadata.uuid,
+                    panelType: panelMetadata.panelType
+                  }"
+                  :is-disabled="isDisabled"
+                />
+              </el-form>
             </span>
           </el-footer>
         </el-container>

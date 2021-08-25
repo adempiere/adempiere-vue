@@ -21,7 +21,7 @@
       {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}
       <el-popover
         v-model="showCreate"
-        placement="right"
+        placement="top-start"
         width="400"
         trigger="click"
         @hide="popoverClose"
@@ -42,7 +42,7 @@
         </el-button>
       </el-popover>
       <el-popover
-        placement="right"
+        placement="top-start"
         width="800"
         trigger="click"
         :disabled="isDisabled"
