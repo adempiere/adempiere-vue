@@ -126,8 +126,8 @@
                         <el-option
                           v-for="item in listCurrency"
                           :key="item.id"
-                          :label="item.name"
-                          :value="item.key"
+                          :label="item.iso_code + '(' + item.currency_symbol + ')'"
+                          :value="item.iso_code"
                         />
                       </el-select>
                     </el-form-item>
@@ -565,7 +565,7 @@ export default {
       return {}
     },
     dayRate() {
-      const currency = this.listCurrency.find(currency => currency.key === this.currentFieldCurrency)
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
       const convert = this.convertionsList.find(convert => {
         if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
           return convert
@@ -606,6 +606,13 @@ export default {
         return converted.divideRate
       }
       return 1
+    },
+    standardPrecision() {
+      const precision = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+      if (precision) {
+        return precision.standard_precision
+      }
+      return this.pointOfSalesCurrency.standardPrecision
     }
   },
   watch: {
@@ -613,7 +620,7 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: this.round(value)
+        value: this.round(value / this.standardPrecision)
       })
     },
     convertAllPayment(value) {
@@ -627,7 +634,7 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending)
+          value: this.round(this.pending, this.standardPrecision)
         })
       }
     },
@@ -636,13 +643,13 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending / value.divideRate)
+          value: this.round(this.pending / value.divideRate, this.standardPrecision)
         })
       } else {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending)
+          value: this.round(this.pending, this.standardPrecision)
         })
       }
     },
@@ -759,7 +766,7 @@ export default {
           orderUuid,
           bankUuid,
           referenceNo,
-          amount: this.round(this.amontSend, this.precision),
+          amount: this.round(this.amontSend, this.standardPrecision),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
@@ -771,7 +778,7 @@ export default {
           orderUuid,
           bankUuid,
           referenceNo,
-          amount: this.round(this.amontSend, this.precision),
+          amount: this.round(this.amontSend, this.standardPrecision),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
@@ -1010,7 +1017,7 @@ export default {
     },
     changeCurrency(value) {
       this.currentFieldCurrency = value
-      const currency = this.listCurrency.find(currency => currency.key === value)
+      const currency = this.listCurrency.find(currency => currency.iso_code === value)
       const convert = this.convertionsList.find(convert => {
         if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
           return convert
