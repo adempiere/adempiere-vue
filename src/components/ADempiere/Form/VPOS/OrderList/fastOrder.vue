@@ -115,7 +115,7 @@
         />
       </el-footer>
     </el-container>
-    <el-button slot="reference" type="primary" plain style="margin-left: 5%;margin-top: 15%;font-size: 15px;">
+    <el-button slot="reference" type="primary" plain>
       <svg-icon icon-class="tree-table" />
       <b> {{ $t('form.byInvoice.label') }} </b>
     </el-button>
