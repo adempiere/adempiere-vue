@@ -129,7 +129,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="printOrder"
+                @click="printTicket"
               >
                 <i class="el-icon-printer" />
                 <br>
@@ -563,7 +563,7 @@ export default {
           this.withdrawal()
           break
         case this.$t('form.pos.optionsPoinSales.salesOrder.print'):
-          this.printOrder()
+          this.printTicket()
           break
         case this.$t('form.pos.optionsPoinSales.salesOrder.copyOrder'):
           this.copyOrder()
@@ -580,10 +580,10 @@ export default {
       event.preventDefault()
       return false
     },
-    printOrder() {
+    printTicket() {
       const orderUuid = this.currentOrder.uuid
       const posUuid = this.currentPointOfSales.uuid
-      this.$store.dispatch('printOrder', { posUuid, orderUuid })
+      this.$store.dispatch('printTicket', { posUuid, orderUuid })
     },
     generateImmediateInvoice() {
       // TODO: Add BPartner
@@ -619,7 +619,7 @@ export default {
             message: this.$t('notifications.completed'),
             showClose: true
           })
-          this.$store.dispatch('printOrder', { posUuid, orderUuid })
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
         })
         .catch(error => {
           this.$message({

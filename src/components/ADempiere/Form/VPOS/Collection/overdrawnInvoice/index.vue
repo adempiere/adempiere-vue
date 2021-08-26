@@ -563,7 +563,7 @@ export default {
             message: this.$t('notifications.completed'),
             showClose: true
           })
-          this.$store.dispatch('printOrder', { posUuid, orderUuid })
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
         })
         .catch(error => {
           this.$message({
