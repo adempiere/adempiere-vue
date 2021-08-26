@@ -380,6 +380,9 @@ export default {
   },
   mounted() {
     this.selectionTypeRefund = {}
+    if (this.paymentTypeListRefund.length === 1) {
+      this.selectPayment(this.paymentTypeListRefund[this.paymentTypeListRefund.length - 1])
+    }
   },
   methods: {
     formatPrice,
