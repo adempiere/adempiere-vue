@@ -37,13 +37,14 @@
             <el-select
               v-model="currentFieldCurrency"
               style="width: -webkit-fill-available;"
+              disabled
               @change="changeCurrency"
             >
               <el-option
                 v-for="item in listCurrency"
                 :key="item.id"
-                :label="item.name"
-                :value="item.key"
+                :label="item.iso_code + '(' + item.currency_symbol + ')'"
+                :value="item.iso_code"
               />
             </el-select>
           </el-form-item>
@@ -82,9 +83,17 @@ export default {
       type: Number,
       default: 0
     },
-    currency: {
+    typeRefund: {
       type: Object,
-      default: undefined
+      default: () => {
+        return {}
+      }
+    },
+    defaultCurrency: {
+      type: Object,
+      default: () => {
+        return {}
+      }
     },
     metadata: {
       type: Object,
@@ -106,6 +115,15 @@ export default {
     }
   },
   computed: {
+    currencyReference() {
+      const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency.id) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
+      const currency = this.listCurrency.find(currency => {
+        if (currency.id === reference) {
+          return currency
+        }
+      })
+      return currency
+    },
     showDialogo() {
       return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.show
     },
@@ -158,7 +176,30 @@ export default {
     },
     paymentTypeList() {
       return this.$store.getters.getPaymentTypeList
+    },
+    dayRate() {
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.currencyReference.key)
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+          return convert
+        }
+      })
+      if (!this.isEmptyValue(convert)) {
+        return convert
+      }
+      return {
+        currencyTo: this.currentPointOfSales.currentPriceList.currency,
+        divideRate: 1,
+        iSOCode: this.currentPointOfSales.currentPriceList.currency.iSOCode
+      }
     }
+  },
+  mounted() {
+    this.$store.commit('updateValueOfField', {
+      containerUuid: this.metadata.containerUuid,
+      columnName: 'PayAmt',
+      value: this.change / this.dayRate.divideRate
+    })
   },
   methods: {
     formatPrice,

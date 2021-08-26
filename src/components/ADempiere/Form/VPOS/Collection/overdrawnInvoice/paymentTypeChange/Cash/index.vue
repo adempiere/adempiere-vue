@@ -21,37 +21,14 @@
       label-position="top"
       label-width="10px"
     >
-      <el-row :gutter="12">
-        <el-col
-          v-for="field in fieldsList"
-          :key="field.sequence"
-          :span="6"
-        >
-          <field-definition
-            :key="field.columnName"
-            :metadata-field="{
-              ...field,
-              labelCurrency: dayRate.currencyTo
-            }"
-          />
-        </el-col>
-        <el-col :span="8">
-          <el-form-item :label="$t('form.pos.collect.Currency')">
-            <el-select
-              v-model="currentFieldCurrency"
-              style="width: -webkit-fill-available;"
-              @change="changeCurrency"
-            >
-              <el-option
-                v-for="item in listCurrency"
-                :key="item.id"
-                :label="item.name"
-                :value="item.key"
-              />
-            </el-select>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <p class="total" style="padding-left: 2%;">
+        <b class="order-info">
+          {{ $t('form.pos.collect.change') }}  : {{ amountRefund }}
+        </b>
+        <b class="order-info" style="padding-left: 2%;">
+          {{ $t('form.pos.collect.Currency') }}  : {{ currencyReference.name }}
+        </b>
+      </p>
     </el-form>
   </div>
 </template>
@@ -73,21 +50,17 @@ export default {
       type: Number,
       default: 0
     },
-    pay: {
-      type: Number,
-      default: 0
-    },
-    pending: {
-      type: Number,
-      default: 0
-    },
-    totalOrder: {
-      type: Number,
-      default: 0
-    },
-    currency: {
+    typeRefund: {
       type: Object,
-      default: undefined
+      default: () => {
+        return {}
+      }
+    },
+    defaultCurrency: {
+      type: Object,
+      default: () => {
+        return {}
+      }
     },
     metadata: {
       type: Object,
@@ -109,6 +82,18 @@ export default {
     }
   },
   computed: {
+    amountRefund() {
+      return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.key)
+    },
+    currencyReference() {
+      const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency.id) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
+      const currency = this.listCurrency.find(currency => {
+        if (currency.id === reference) {
+          return currency
+        }
+      })
+      return currency
+    },
     showDialogo() {
       return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.show
     },
@@ -180,7 +165,7 @@ export default {
       return {}
     },
     dayRate() {
-      const currency = this.listCurrency.find(currency => currency.key === this.currentFieldCurrency)
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.currencyReference.key)
       const convert = this.convertionsList.find(convert => {
         if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
           return convert
@@ -196,6 +181,13 @@ export default {
       }
     }
   },
+  mounted() {
+    this.$store.commit('updateValueOfField', {
+      containerUuid: this.metadata.containerUuid,
+      columnName: 'PayAmt',
+      value: this.change / this.dayRate.divideRate
+    })
+  },
   methods: {
     formatPrice,
     close() {
@@ -203,7 +195,7 @@ export default {
     },
     changeCurrency(value) {
       this.currentFieldCurrency = value
-      const currency = this.listCurrency.find(currency => currency.key === value)
+      const currency = this.listCurrency.find(currency => currency.iso_code === value)
       this.$store.dispatch('currencyRedund', currency)
     },
     changePaymentType(value) {

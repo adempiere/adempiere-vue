@@ -28,7 +28,7 @@
       >
         <el-form label-position="top" label-width="500px" @submit.native.prevent="notSubmitForm">
           <el-row :gutter="24" style="display: flex;">
-            <el-col :span="!isShowedPOSKeyLayout ? 12 : colFieldProductCode" style="padding-left: 0px; padding-right: 0px;">
+            <el-col :span="colFieldProductCode" style="padding-left: 0px; padding-right: 0px;">
               <template
                 v-for="(field) in fieldsList"
               >
@@ -40,7 +40,7 @@
                 />
               </template>
             </el-col>
-            <el-col :span="isShowedPOSKeyLayout ? 5 : 6" :style="styleTab">
+            <el-col :span="isEmptyValue(currentOrder) ? 5 : 5" :style="styleTab">
               <business-partner
                 id="BusinessPartner"
                 :parent-metadata="{
@@ -52,9 +52,38 @@
                 :is-disabled="isDisabled"
               />
             </el-col>
-            <el-col :span="isShowedPOSKeyLayout ? 9 : 9" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
+            <!-- <el-col :span="3" :style="styleTab">
+              <fast-ordes-list />
+            </el-col>
+            <el-col :span="4" :style="styleTab">
+              <el-form-item>
+                <template slot="label" />
+                <el-dropdown
+                  v-if="!isEmptyValue(currentDocumentType)"
+                  trigger="click"
+                  style="padding-top: 15%;font-size: 15px;color: black;"
+                  @command="changeDocumentType"
+                >
+                  <span>
+                    <el-icon class="el-icon-document" />
+                    <b style="cursor: pointer"> {{ currentDocumentType.name }} </b>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      v-for="item in listDocumentTypes"
+                      :key="item.uuid"
+                      :command="item"
+                      :disabled="isDisabled"
+                    >
+                      {{ item.name }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </el-form-item>
+            </el-col> -->
+            <el-col :span="isEmptyValue(currentOrder) ? 4 : 8" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
               <el-row :gutter="4">
-                <el-col :span="isShowedPOSKeyLayout ? 5 : 8" style="padding-left: 0px; padding-right: 0px;">
+                <el-col :span="4" style="padding-left: 0px; padding-right: 0px;">
                   <el-tag
                     v-if="!isEmptyValue(currentOrder.documentStatus.value)"
                     :type="tagStatus(currentOrder.documentStatus.value)"
@@ -64,10 +93,10 @@
                     </span>
                   </el-tag>
                 </el-col>
-                <el-col :span="isShowedPOSKeyLayout ? 10 : 8" style="padding-left: 0px; padding-right: 0px;">
+                <el-col :span="8" style="padding-left: 0px; padding-right: 0px;">
                   <fast-ordes-list />
                 </el-col>
-                <el-col :span="8" style="padding-left: 0px; padding-right: 0px;text-align: end;">
+                <el-col :span="12" style="padding-left: 0px; padding-right: 0px;">
                   <el-button type="primary" :disabled="!allowsCreateOrder" plain @click="newOrder">
                     {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
                   </el-button>
@@ -499,7 +528,7 @@ export default {
       if (this.isEmptyValue(this.currentOrder)) {
         return 14
       }
-      return 10
+      return 11
     },
     shortsKey() {
       return {

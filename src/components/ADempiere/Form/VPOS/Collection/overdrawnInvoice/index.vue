@@ -51,7 +51,12 @@
             <el-row :gutter="24">
               <el-col v-for="(payment, index) in paymentTypeListRefund" :key="index" :span="6">
                 <div @click="selectPayment(payment)">
-                  <el-card shadow="hover">
+                  <el-card
+                    shadow="never"
+                    class="custom-card"
+                    :body-style="{ padding: '10px' }"
+                    :style="selectionTypeRefund.name == payment.name ? 'background-color: #eaf5fe;border: 1px solid #36a3f7;' : ''"
+                  >
                     <div slot="header" class="clearfix" style="text-align: center;">
                       <span>
                         <b>{{ payment.name }}</b> <br>
@@ -73,6 +78,8 @@
             <component
               :is="componentRender"
               :change="change"
+              :type-refund="selectionTypeRefund"
+              :default-currency="defaultReferenceCurrency"
             />
           </div>
         </el-card>
@@ -122,7 +129,12 @@
             <el-row :gutter="24">
               <el-col v-for="(payment, index) in paymentTypeList" :key="index" :span="6">
                 <div @click="selectPayment(payment)">
-                  <el-card shadow="hover">
+                  <el-card
+                    shadow="never"
+                    class="custom-card"
+                    :style="selectionTypeRefund.name == payment.name ? 'background-color: #eaf5fe;border: 1px solid #36a3f7;' : ''"
+                    :body-style="{ padding: '10px' }"
+                  >
                     <div slot="header" class="clearfix" style="text-align: center;">
                       <span>
                         <b>{{ payment.name }}</b> <br>
@@ -144,6 +156,8 @@
             <component
               :is="componentRender"
               :change="change"
+              :type-refund="selectionTypeRefund"
+              :default-currency="defaultReferenceCurrency"
             />
           </div>
         </el-card>
@@ -260,7 +274,7 @@ export default {
         case 'X':
           typePay = () => import('./paymentTypeChange/Cash/index.vue')
           break
-        case 'D':
+        case 'A':
           typePay = () => import('./paymentTypeChange/ACH/index')
           break
         case 'M':
@@ -278,7 +292,7 @@ export default {
         case 'P':
           container = 'MobilePayment'
           break
-        case 'D':
+        case 'A':
           container = 'ACH'
           break
         case 'X':
@@ -319,6 +333,15 @@ export default {
         return ''
       }
       return this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency.iso_code
+    },
+    defaultReferenceCurrency() {
+      if (!this.isEmptyValue(this.selectionTypeRefund) && !this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
+        return this.selectionTypeRefund.refund_reference_currency
+      }
+      if (this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency.iso_code)) {
+        return ''
+      }
+      return this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency
     },
     isoCode() {
       return this.$store.getters.posAttributes.currentPointOfSales.displayCurrency.iso_code
@@ -362,13 +385,39 @@ export default {
       return this.$store.getters.getPaymentTypeList.filter(type => type.is_allowed_to_refund_open)
     },
     paymentTypeListRefund() {
-      return this.$store.getters.getPaymentTypeList.filter(type => type.is_allowed_to_refund)
+      return this.$store.getters.getPaymentTypeList.filter(type => {
+        if (type.is_allowed_to_refund) {
+          return type
+        }
+      })
+    },
+    searchRefundCurrency() {
+      if (this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
+        return {}
+      }
+      const currency = this.convertionsList.filter(type => {
+        if (type.currencyTo.id === this.selectionTypeRefund.refund_reference_currency.id || this.selectionTypeRefund.refund_reference_currency.id === this.currentPointOfSales.priceList.currency.id) {
+          return type
+        }
+      })
+      if (!this.isEmptyValue(currency)) {
+        return currency
+      }
+      return {}
+    },
+    convertionsList() {
+      return this.$store.state['pointOfSales/point/index'].conversionsList
     },
     refundLoaded() {
       return this.$store.getters.getRefundLoaded
     }
   },
   watch: {
+    searchRefundCurrency(value) {
+      if (this.isEmptyValue(value)) {
+        this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
+      }
+    },
     option(value) {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.renderComponentContainer,
@@ -431,7 +480,8 @@ export default {
         tenderTypeCode: this.selectionTypeRefund.tender_type
       }
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: this.renderComponentContainer, formatReturn: 'name' })
-      if (!this.isEmptyValue(emptyMandatoryFields) && this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid)) {
+      if (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid)) {
+        this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
         this.$message({
           type: 'warning',
           message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
@@ -563,7 +613,6 @@ export default {
             message: this.$t('notifications.completed'),
             showClose: true
           })
-          this.$store.dispatch('printTicket', { posUuid, orderUuid })
         })
         .catch(error => {
           this.$message({
@@ -579,6 +628,15 @@ export default {
           this.$store.dispatch('updateOrderPos', false)
           this.$store.dispatch('updatePaymentPos', false)
         })
+    },
+    findRefundCurrencyConversion(currency) {
+      if (!this.isEmptyValue(currency)) {
+        this.$store.dispatch('searchConversion', {
+          conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
+          currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
+          currencyToUuid: currency.uuid
+        })
+      }
     }
   }
 }
