@@ -30,24 +30,8 @@ export default [
       size: 24,
       isNumericField: true,
       isActiveLogics: true,
-      isMandatory: true
-    }
-  },
-  // TenderType
-  {
-    tableName,
-    elementColumnName: 'TenderType',
-    columnName: 'TenderType',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      defaultValue: 'X',
-      sequence: 1,
-      handleActionKeyPerformed: true,
-      handleContentSelection: true,
-      handleActionPerformed: true,
-      size: 24,
-      isActiveLogics: true,
-      isMandatory: true
+      isMandatory: true,
+      displayLogicPayment: 'X'
     }
   },
   // Currency
@@ -61,24 +45,10 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       handleContentSelection: true,
-      displayLogic: `@TenderType@<>'X'&@TenderType@<>'Z'`,
+      displayLogicPayment: 'D,K,T,A,P,C',
       size: 24,
       isActiveLogics: true,
       isMandatory: true
-    }
-  },
-  // Code
-  {
-    elementColumnName: 'Value',
-    columnName: 'Value',
-    isFromDictionary: true,
-    tabindex: '0',
-    overwriteDefinition: {
-      sequence: 3,
-      isCustomField: true,
-      size: 24,
-      isMandatory: true,
-      displayLogic: `@TenderType@=='P'&@TenderType@=='C'&@TenderType@=='D'`
     }
   },
   // Date
@@ -95,7 +65,7 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='K'`,
+      displayLogicPayment: 'K',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -111,7 +81,7 @@ export default [
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='Z'`,
+      displayLogicPayment: 'Z',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -127,7 +97,7 @@ export default [
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
-      displayLogic: `@TenderType@<>'X'&@TenderType@<>'C' `,
+      displayLogicPayment: 'K,Z,P,D,K,T,A',
       size: 24,
       isActiveLogics: true,
       isMandatory: true
@@ -146,7 +116,7 @@ export default [
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='C'`,
+      displayLogicPayment: 'C',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -163,7 +133,7 @@ export default [
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='C'`,
+      displayLogicPayment: 'C',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -180,7 +150,7 @@ export default [
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='M'`,
+      displayLogicPayment: 'M,A',
       isActiveLogics: true,
       isMandatory: true
     }

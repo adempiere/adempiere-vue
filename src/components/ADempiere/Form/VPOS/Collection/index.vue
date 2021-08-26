@@ -118,6 +118,21 @@
                     />
                   </el-col>
                   <el-col :span="8">
+                    <el-form-item label="Métodos de pago">
+                      <el-select
+                        v-model="currentFieldPaymentMethods"
+                        @change="changePaymentMethods"
+                      >
+                        <el-option
+                          v-for="item in availablePaymentMethods"
+                          :key="item.id"
+                          :label="item.name"
+                          :value="item.uuid"
+                        />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="8">
                     <el-form-item :label="$t('form.pos.collect.Currency')">
                       <el-select
                         v-model="currentFieldCurrency"
@@ -148,7 +163,7 @@
           <samp id="buttonCollection" style="float: right;padding-right: 10px;">
             <el-button type="danger" icon="el-icon-close" @click="exit" />
             <el-button type="info" icon="el-icon-minus" :disabled="isDisabled" @click="undoPatment" />
-            <el-button type="primary" :disabled="validPay || addPay || isDisabled" icon="el-icon-plus" @click="addCollectToList(paymentBox)" />
+            <el-button type="primary" icon="el-icon-plus" @click="addCollectToList(paymentBox)" />
             <el-button type="success" :disabled="isDisabled || isDisabled" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
           </samp>
         </el-header>
@@ -319,7 +334,8 @@ export default {
       sendToServer: false,
       value: '',
       amontSend: 0,
-      currentFieldCurrency: ''
+      currentFieldCurrency: '',
+      currentFieldPaymentMethods: ''
     }
   },
   computed: {
@@ -489,7 +505,7 @@ export default {
     validPay() {
       const containerUuid = this.containerUuid
       // filter by visible fields
-      const fieldLogic = this.fieldsList.filter(field => field.isDisplayedFromLogic === true)
+      const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
       const fieldsEmpty = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid,
         fieldsList: fieldLogic,
@@ -584,10 +600,14 @@ export default {
       return this.fieldsList[1]
     },
     primaryFieldsList() {
-      return this.fieldsList.filter(field => field.sequence <= 1)
+      return this.fieldsList.filter(field => field.sequence < 1)
     },
     hiddenFieldsList() {
-      return this.fieldsList.filter(field => field.sequence > 1)
+      return this.fieldsList.filter(field => {
+        if (field.sequence > 1 && field.displayLogicPayment.includes(this.currentAvailablePaymentMethods.tender_type)) {
+          return field
+        }
+      })
     },
     overUnderPayment() {
       return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.success
@@ -613,6 +633,27 @@ export default {
         return precision.standard_precision
       }
       return this.pointOfSalesCurrency.standardPrecision
+    },
+    availablePaymentMethods() {
+      return this.$store.getters.getPaymentTypeList
+    },
+    currentAvailablePaymentMethods() {
+      if (this.isEmptyValue(this.availablePaymentMethods)) {
+        return {
+          name: ''
+        }
+      }
+      const payment = this.availablePaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+      if (!this.isEmptyValue(payment)) {
+        return payment
+      }
+      const defaultPayment = this.availablePaymentMethods.find(payment => payment.tender_type === 'X')
+      if (!this.isEmptyValue(defaultPayment)) {
+        return defaultPayment
+      }
+      return {
+        name: ''
+      }
     }
   },
   watch: {
@@ -751,10 +792,7 @@ export default {
         containerUuid,
         columnName: 'DateTrx'
       })
-      const tenderTypeCode = this.$store.getters.getValueOfField({
-        containerUuid,
-        columnName: 'TenderType'
-      })
+      const tenderTypeCode = this.currentAvailablePaymentMethods.tender_type
       const referenceNo = this.$store.getters.getValueOfField({
         containerUuid,
         columnName: 'ReferenceNo'
@@ -1015,6 +1053,9 @@ export default {
           }
         }
       })
+    },
+    changePaymentMethods(value) {
+      this.currentFieldPaymentMethods = value
     },
     changeCurrency(value) {
       this.currentFieldCurrency = value

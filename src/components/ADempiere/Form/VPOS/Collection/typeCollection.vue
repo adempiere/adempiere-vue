@@ -37,10 +37,7 @@
                     <div class="top clearfix">
                       <span>
                         {{
-                          tenderTypeFind({
-                            currentPayment: value.tenderTypeCode,
-                            listTypePayment: labelTypesPayment
-                          })
+                          labelTenderType(value.tenderTypeCode)
                         }}
                       </span>
                     </div>
@@ -157,6 +154,9 @@ export default {
     },
     convertionsList() {
       return this.$store.state['pointOfSales/point/index'].conversionsList
+    },
+    availablePaymentMethods() {
+      return this.$store.getters.getPaymentTypeList
     }
   },
   watch: {
@@ -183,6 +183,13 @@ export default {
   methods: {
     formatDate,
     formatPrice,
+    labelTenderType(tenderType) {
+      const currentTenderType = this.availablePaymentMethods.find(label => label.tender_type === tenderType)
+      if (currentTenderType) {
+        return currentTenderType.name
+      }
+      return tenderType
+    },
     iSOCode(value) {
       const currencyPay = this.convertionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === value.currencyUuid)
       if (!currencyPay) {
