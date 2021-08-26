@@ -74,6 +74,7 @@
 import { getFavoritesFromServer } from '@/api/ADempiere/dashboard/user.js'
 import { convertAction } from '@/utils/ADempiere/dictionaryUtils.js'
 import mixinDashboard from '@/components/ADempiere/Dashboard/mixinDashboard.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 export default {
   name: 'Favorites',
@@ -135,28 +136,13 @@ export default {
       })
     },
     windowAction(row, param) {
-      const viewSearch = this.recursiveTreeSearch({
-        treeData: this.permissionRoutes,
-        attributeValue: row.referenceUuid,
-        attributeName: 'meta',
-        secondAttribute: 'uuid',
-        attributeChilds: 'children'
+      zoomIn({
+        uuid: row.referenceUuid,
+        query: {
+          tabParent: 0,
+          action: param
+        }
       })
-
-      if (viewSearch) {
-        this.$router.push({
-          name: viewSearch.name,
-          query: {
-            action: param,
-            tabParent: 0
-          }
-        }, () => {})
-      } else {
-        this.$message({
-          type: 'error',
-          message: this.$t('notifications.noRoleAccess')
-        })
-      }
     }
   }
 }

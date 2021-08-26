@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 export default {
   name: 'MixinDashboard',
@@ -30,45 +30,26 @@ export default {
       unsubscribe: () => {}
     }
   },
-  computed: {
-    permissionRoutes() {
-      return this.$store.getters.permission_routes
-    }
-  },
+
   methods: {
-    recursiveTreeSearch,
     handleClick(row) {
-      const viewSearch = this.recursiveTreeSearch({
-        treeData: this.permissionRoutes,
-        attributeValue: row.referenceUuid,
-        attributeName: 'meta',
-        secondAttribute: 'uuid',
-        attributeChilds: 'children'
+      let recordUuid
+      if (!this.isEmptyValue(row.uuidRecord)) {
+        recordUuid = row.uuidRecord
+      }
+      let tabParent
+      if (row.action === 'window') {
+        tabParent = 0
+      }
+
+      zoomIn({
+        uuid: row.referenceUuid,
+        query: {
+          tabParent,
+          action: recordUuid
+        }
       })
 
-      if (viewSearch) {
-        let recordUuid
-        if (!this.isEmptyValue(row.uuidRecord)) {
-          recordUuid = row.uuidRecord
-        }
-        let tabParent
-        if (row.action === 'window') {
-          tabParent = 0
-        }
-
-        this.$router.push({
-          name: viewSearch.name,
-          query: {
-            action: recordUuid,
-            tabParent
-          }
-        }, () => {})
-      } else {
-        this.$message({
-          type: 'error',
-          message: this.$t('notifications.noRoleAccess')
-        })
-      }
       // conditions for the registration amount (operador: row.criteria.whereClause)
     },
     filterResult(search, list) {

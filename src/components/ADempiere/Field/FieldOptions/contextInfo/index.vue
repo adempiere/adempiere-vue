@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 import { parseContext } from '@/utils/ADempiere/contextUtils'
 
 export default {
@@ -73,9 +73,6 @@ export default {
     }
   },
   computed: {
-    permissionRoutes() {
-      return this.$store.getters.permission_routes
-    },
     messageText() {
       if (!this.isEmptyValue(this.fieldAttributes.contextInfo.sqlStatement)) {
         const contextInfo = this.$store.getters.getContextInfoField(this.fieldAttributes.contextInfo.uuid, this.fieldAttributes.contextInfo.sqlStatement)
@@ -113,30 +110,17 @@ export default {
       return false
     },
     redirect({ window }) {
-      const viewSearch = recursiveTreeSearch({
-        treeData: this.permissionRoutes,
-        attributeValue: window.uuid,
-        attributeName: 'meta',
-        secondAttribute: 'uuid',
-        attributeChilds: 'children'
+      const { columnName } = this.fieldAttributes
+
+      zoomIn({
+        uuid: window.uuid,
+        query: {
+          action: 'advancedQuery',
+          tabParent: 0,
+          [columnName]: this.value
+        }
       })
 
-      if (viewSearch) {
-        this.$router.push({
-          name: viewSearch.name,
-          query: {
-            action: 'advancedQuery',
-            tabParent: 0,
-            [this.fieldAttributes.columnName]: this.value
-          }
-        }, () => {})
-      } else {
-        this.$message({
-          type: 'error',
-          showClose: true,
-          message: this.$t('notifications.noRoleAccess')
-        })
-      }
       this.$store.commit('changeShowRigthPanel', false)
       if (!this.isEmptyValue(this.$route.query.fieldColumnName)) {
         this.$router.push({
