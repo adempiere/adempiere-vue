@@ -93,7 +93,6 @@ export default {
         currencyUuid: payment.currencyUuid
       })
         .then(response => {
-          console.log(response)
           const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
         })
@@ -215,7 +214,7 @@ export default {
         currencyUuid
       })
         .then(response => {
-          const orderUuid = response.order_uuid
+          const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
           return {
             ...response,
