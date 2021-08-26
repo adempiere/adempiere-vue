@@ -18,7 +18,7 @@
 import { request } from '@/utils/ADempiere/request'
 import { config } from '@/utils/ADempiere/config'
 import { isEmptyValue } from '@/utils/ADempiere'
-
+import { camelizeObjectKeys } from '@/utils/ADempiere/transformObject.js'
 /**
  * method in api/price-checking.js as getProductPrice
  * @author elsiosanchez <elsiosanches@gmail.com>
@@ -305,48 +305,6 @@ export function listOrders({
   pageSize,
   pageToken
 }) {
-  /*
-  const Criteria = require('@/utils/ADempiere/criteria.js')
-  const criteria = new Criteria({
-    tableName: 'C_Order'
-  })
-
-  criteria.addCondition({
-    columnName: 'DocumentNo',
-    value: documentNo
-  }).addCondition({
-    columnName: 'C_BPartner_ID_UUID',
-    value: businessPartnerUuid
-  }).addCondition({
-    columnName: 'GrandTotal',
-    value: grandTotal
-  }).addCondition({
-    columnName: 'OpenAmt',
-    value: openAmount
-  }).addCondition({
-    columnName: 'IsPaid',
-    value: isPaid
-  }).addCondition({
-    columnName: 'Processed',
-    value: isProcessed
-  }).addCondition({
-    columnName: 'IsAisleSeller',
-    value: isAisleSeller
-  }).addCondition({
-    columnName: 'IsInvoiced',
-    value: isInvoiced
-  }).addCondition({
-    columnName: 'DateOrderedFrom',
-    value: dateOrderedFrom
-  }).addCondition({
-    columnName: 'DateOrderedTo',
-    value: dateOrderedTo
-  }).addCondition({
-    columnName: 'SalesRep_ID_UUID',
-    value: salesRepresentativeId
-  })
-  */
-
   return request({
     url: `${config.pointOfSales.endpoint}/orders`,
     method: 'get',
@@ -529,10 +487,21 @@ export function getProductPriceList({
     })
 }
 
-export function printOrder({
+export function printTicket({
+  posUuid,
   orderUuid
 }) {
-  console.info(`Print order ${orderUuid}`)
+  return request({
+    url: `${config.pointOfSales.endpoint}/print-ticket`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      order_uuid: orderUuid
+    }
+  })
+    .then(printTicketResponse => {
+      return camelizeObjectKeys(printTicketResponse)
+    })
 }
 
 export function generateImmediateInvoice({
@@ -605,7 +574,7 @@ export function createPayment({
     }
   })
     .then(createPaymentResponse => {
-      return createPaymentResponse
+      return camelizeObjectKeys(createPaymentResponse)
     })
 }
 

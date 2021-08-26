@@ -19,7 +19,8 @@ import {
   getOrder,
   updateOrder,
   createOrderLine,
-  listOrders
+  listOrders,
+  printTicket
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { isEmptyValue, extractPagingToken, convertValuesToSend } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
@@ -280,5 +281,22 @@ export default {
         })
     }
     commit('findOrder', {})
+  },
+  printOrder({ commit, dispatch }, { posUuid, orderUuid }) {
+    printTicket({
+      posUuid,
+      orderUuid
+    })
+      .then(response => {
+        console.log(response)
+      })
+      .catch(error => {
+        console.warn(error.message)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+      })
   }
 }
