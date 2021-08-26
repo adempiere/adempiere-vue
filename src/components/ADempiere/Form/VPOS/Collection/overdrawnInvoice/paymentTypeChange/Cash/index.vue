@@ -26,7 +26,7 @@
           {{ $t('form.pos.collect.change') }}  : {{ amountRefund }}
         </b>
         <b class="order-info" style="padding-left: 2%;">
-          {{ $t('form.pos.collect.Currency') }}  : {{ currencyReference.name }}
+          {{ $t('form.pos.collect.Currency') }}  : {{ currencyReference.iso_code + '(' + currencyReference.currency_symbol + ')' }}
         </b>
       </p>
     </el-form>
@@ -86,7 +86,7 @@ export default {
       return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.key)
     },
     currencyReference() {
-      const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency.id) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
+      const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
       const currency = this.listCurrency.find(currency => {
         if (currency.id === reference) {
           return currency

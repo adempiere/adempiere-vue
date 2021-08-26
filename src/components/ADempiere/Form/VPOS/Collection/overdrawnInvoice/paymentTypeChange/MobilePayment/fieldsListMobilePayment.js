@@ -73,21 +73,5 @@ export default [
       isActiveLogics: true,
       isMandatory: true
     }
-  },
-  {
-    tableName,
-    elementColumnName: 'PayAmt',
-    columnName: 'PayAmt',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      sequence: 4,
-      handleContentSelection: true,
-      handleActionPerformed: true,
-      size: 24,
-      isNumericField: true,
-      isActiveLogics: true,
-      isMandatory: true,
-      isReadOnly: true
-    }
   }
 ]

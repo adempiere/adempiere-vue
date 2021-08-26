@@ -555,6 +555,7 @@ export function createPayment({
   amount,
   paymentDate,
   tenderTypeCode,
+  isRefund,
   currencyUuid
 }) {
   return request({
@@ -570,6 +571,7 @@ export function createPayment({
       amount: amount,
       payment_date: paymentDate,
       tender_type_code: tenderTypeCode,
+      is_refund: isRefund,
       currency_uuid: currencyUuid
     }
   })

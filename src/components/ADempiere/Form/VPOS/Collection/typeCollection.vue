@@ -20,7 +20,7 @@
     <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;">
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
-          <el-col :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
+          <el-col v-if="!value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
             <el-card :body-style="{ padding: '0px' }">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
@@ -84,6 +84,74 @@
         </template>
       </el-row>
     </el-main>
+    <el-divider content-position="center"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
+    <el-footer style="height: 200px;padding: 0px;">
+      <el-row :gutter="24">
+        <template v-for="(value, key) in listRefunds">
+          <el-col v-if="value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
+            <el-card :body-style="{ padding: '0px' }">
+              <el-row>
+                <el-col :span="6" style="padding: 10px">
+                  <img src="@/image/ADempiere/pos/no-image.jpg" fit="contain" class="image">
+                </el-col>
+                <el-col :span="18">
+                  <el-button
+                    type="text"
+                    icon="el-icon-close"
+                    style="float: right; margin-right: 10px; color: red; padding-top: 10px;"
+                    @click="deleteCollect(value)"
+                  />
+                  <div style="padding-right: 10px; padding-top: 10%;">
+                    <div class="top clearfix">
+                      <span>
+                        {{
+                          labelTenderType(value.tenderTypeCode)
+                        }}
+                      </span>
+                    </div>
+                    <div class="bottom clearfix" style="margin-top: 0px !important!">
+                      <el-button
+                        type="text"
+                        class="button"
+                        style="color: rgb(50, 54, 58); font-size: 13px; text-align: left; float: unset; padding-top: 5px;"
+                      >
+                        {{ value.documentNo }}
+                      </el-button>
+
+                      <el-button
+                        v-if="!isEmptyValue(value.paymentDate)"
+                        type="text"
+                        class="button"
+                        style="color: rgb(50, 54, 58); font-size: 13px; text-align: left; float: unset; padding-top: 5px;"
+                      >
+                        {{ formatDate(value.paymentDate) }}
+                      </el-button>
+                      <div
+                        slot="header"
+                        class="clearfix"
+                        style="padding-bottom: 20px;"
+                      >
+                        <p v-if="!isEmptyValue(value.currencyConvertion)" class="total">
+                          <b style="float: right;color: red;">
+                            {{ amountConvertion(value) }}
+                          </b>
+                        </p>
+                        <br>
+                        <p class="total">
+                          <b style="float: right;color: red;">
+                            {{ labelCurrency(value.currencyUuid) }} - {{ round(value.amount, 2) }}
+                          </b>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </el-col>
+              </el-row>
+            </el-card>
+          </el-col>
+        </template>
+      </el-row>
+    </el-footer>
   </el-container>
 </template>
 
@@ -136,11 +204,14 @@ export default {
     }
   },
   computed: {
+    listRefunds() {
+      return this.currentPointOfSales.currentOrder.listPayments.payments
+    },
     typesPayment() {
       return this.$store.getters.getListsPaymentTypes
     },
     listCurrency() {
-      return this.$store.getters.getListCurrency
+      return this.$store.getters.getCurrenciesList
     },
     conevertionAmount() {
       return this.$store.getters.getConvertionPayment
@@ -183,6 +254,13 @@ export default {
   methods: {
     formatDate,
     formatPrice,
+    labelCurrency(refunds) {
+      const label = this.listCurrency.find(label => label.uuid === refunds)
+      if (this.isEmptyValue(label)) {
+        return ''
+      }
+      return label.currency_symbol
+    },
     labelTenderType(tenderType) {
       const currentTenderType = this.availablePaymentMethods.find(label => label.tender_type === tenderType)
       if (currentTenderType) {

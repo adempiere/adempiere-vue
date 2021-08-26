@@ -19,8 +19,7 @@ import {
   createPayment,
   deletePayment,
   updatePayment,
-  getPaymentsList,
-  createCustomerAccount
+  getPaymentsList
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
@@ -90,6 +89,7 @@ export default {
         amount: payment.amount,
         paymentDate: payment.paymentDate,
         tenderTypeCode: payment.tenderTypeCode,
+        isRefund: false,
         currencyUuid: payment.currencyUuid
       })
         .then(response => {
@@ -211,6 +211,7 @@ export default {
         convertedAmount,
         paymentDate,
         tenderTypeCode,
+        isRefund: false,
         currencyUuid
       })
         .then(response => {
@@ -321,22 +322,38 @@ export default {
   currencyRedund({ commit }, currency) {
     commit('setCurrencyRedund', currency)
   },
-  sendCreateCustomerAccount({ commit }, {
+  sendCreateCustomerAccount({ commit, dispatch }, {
+    customerAccount,
     posUuid,
     orderUuid,
-    customerAccount,
+    invoiceUuid,
+    bankUuid,
+    referenceNo,
+    description,
+    amount,
+    convertedAmount,
+    paymentDate,
     tenderTypeCode,
     currencyUuid
   }) {
-    createCustomerAccount({
+    return createPayment({
+      customerAccount,
       posUuid,
       orderUuid,
-      customerAccount,
+      invoiceUuid,
+      bankUuid,
+      referenceNo,
+      description,
+      amount,
+      convertedAmount,
+      paymentDate,
       tenderTypeCode,
       currencyUuid
     })
       .then(response => {
-        console.log(response)
+        const orderUuid = response.orderUuid
+        dispatch('listPayments', { orderUuid })
+        return response
       })
   }
 }

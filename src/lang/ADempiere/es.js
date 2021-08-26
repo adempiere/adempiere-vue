@@ -459,6 +459,7 @@ export default {
         Currency: 'Moneda',
         dayRate: 'Tasa del Día',
         noDayRate: 'No se a generado una tasa del día para la moneda',
+        refund: 'Reembolso',
         TenderType: {
           directDeposit: 'Depósito Directo',
           creditCard: 'Tarjeta de Crédito',

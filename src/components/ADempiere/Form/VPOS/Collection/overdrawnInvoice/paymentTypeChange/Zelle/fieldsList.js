@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const tableName = 'C_Payment'
-
 export default [
   // Name
   {
@@ -44,22 +42,6 @@ export default [
       size: 24,
       isActiveLogics: true,
       isMandatory: true
-    }
-  },
-  {
-    tableName,
-    elementColumnName: 'PayAmt',
-    columnName: 'PayAmt',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      sequence: 1,
-      handleContentSelection: true,
-      handleActionPerformed: true,
-      size: 24,
-      isNumericField: true,
-      isActiveLogics: true,
-      isMandatory: true,
-      isReadOnly: true
     }
   }
 ]

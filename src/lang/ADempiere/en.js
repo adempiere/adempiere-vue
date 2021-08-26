@@ -482,6 +482,7 @@ export default {
         fullPayment: 'Full Payment',
         dayRate: 'Day Rate',
         noDayRate: 'No daily rate has been generated for the currency.',
+        refund: 'Refund',
         Currency: 'Currency',
         TenderType: {
           directDeposit: 'Direct Deposit',

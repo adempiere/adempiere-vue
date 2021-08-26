@@ -33,9 +33,14 @@
           />
         </el-col>
         <el-col :span="6">
+          <el-form-item :label="$t('form.pos.collect.change')">
+            <el-input v-model="amountRefund" disabled />
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
           <el-form-item :label="$t('form.pos.collect.Currency')">
             <el-select
-              v-model="currencyReference.name"
+              v-model="currencyReference.iso_code"
               style="width: -webkit-fill-available;"
               disabled
               @change="changeCurrency"
@@ -115,8 +120,11 @@ export default {
     }
   },
   computed: {
+    amountRefund() {
+      return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.key)
+    },
     currencyReference() {
-      const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency.id) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
+      const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
       const currency = this.listCurrency.find(currency => {
         if (currency.id === reference) {
           return currency
@@ -177,13 +185,17 @@ export default {
     paymentTypeList() {
       return this.$store.getters.getPaymentTypeList
     },
+    convertionsList() {
+      return this.$store.state['pointOfSales/point/index'].conversionsList
+    },
     dayRate() {
-      const currency = this.listCurrency.find(currency => currency.iso_code === this.currencyReference.key)
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.currencyReference.iso_code)
       const convert = this.convertionsList.find(convert => {
         if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
           return convert
         }
       })
+      console.log(convert)
       if (!this.isEmptyValue(convert)) {
         return convert
       }
@@ -193,13 +205,6 @@ export default {
         iSOCode: this.currentPointOfSales.currentPriceList.currency.iSOCode
       }
     }
-  },
-  mounted() {
-    this.$store.commit('updateValueOfField', {
-      containerUuid: this.metadata.containerUuid,
-      columnName: 'PayAmt',
-      value: this.change / this.dayRate.divideRate
-    })
   },
   methods: {
     formatPrice,
