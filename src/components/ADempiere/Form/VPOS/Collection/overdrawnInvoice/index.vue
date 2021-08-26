@@ -162,13 +162,6 @@
           </div>
         </el-card>
       </div>
-      <el-card v-if="option === 3" class="box-card">
-        <div class="text item">
-          <type-refund
-            :is-add-type-pay="refundLoaded"
-          />
-        </div>
-      </el-card>
       <div v-if="caseOrder === 2">
         <el-card>
           <div slot="header" class="clearfix">
