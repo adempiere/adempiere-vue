@@ -219,13 +219,15 @@ export default {
     formatPrice,
     formatQuantity,
     theAction(event) {
-      switch (event.srcKey) {
-        case 'enter':
-          this.openPin(this.pin)
-          break
-        case 'close':
-          this.closePin()
-          break
+      if (this.visible) {
+        switch (event.srcKey) {
+          case 'enter':
+            this.openPin(this.pin)
+            break
+          case 'close':
+            this.closePin()
+            break
+        }
       }
     },
     openPin(pin) {

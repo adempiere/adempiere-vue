@@ -186,15 +186,17 @@
               </el-table-column>
             </el-table>
           </el-main>
-          <el-dialog ref="dialog" v-shortkey="{close: ['esc'], enter: ['enter']}" :title="$t('form.pos.pinMessage.pin') + infowOverdrawnInvoice.label" width="40%" :visible.sync="visible" @shortkey.native="theAction">
+          <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + infowOverdrawnInvoice.label" width="40%" :visible.sync="visible">
             <el-input
               id="pin"
               ref="pin"
               v-model="pin"
+              v-shortkey="visible ? {close: ['esc'], enter: ['enter']} : {}"
               autofocus
               type="password"
               :placeholder="$t('form.pos.tableProduct.pin')"
               :focus="true"
+              @shortkey.native="theAction"
             />
             <span style="float: right;">
               <el-button

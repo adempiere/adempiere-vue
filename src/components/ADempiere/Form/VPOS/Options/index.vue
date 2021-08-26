@@ -311,15 +311,17 @@
         </el-row>
       </el-collapse-item>
     </el-collapse>
-    <el-dialog ref="dialog" v-shortkey="{close: ['esc'], enter: ['enter']}" :title="$t('form.pos.pinMessage.pin') + attributePin.label" width="40%" :visible.sync="visible" @shortkey.native="theAction">
+    <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + attributePin.label" width="40%" :visible.sync="visible">
       <el-input
         id="pin"
         ref="pin"
         v-model="pin"
+        v-shortkey="visible ? {close: ['esc'], enter: ['enter']} : {}"
         autofocus
         type="password"
         :placeholder="$t('form.pos.tableProduct.pin')"
         :focus="true"
+        @shortkey.native="theAction"
       />
       <span style="float: right;">
         <el-button
@@ -490,13 +492,15 @@ export default {
   },
   methods: {
     theAction(event) {
-      switch (event.srcKey) {
-        case 'enter':
-          this.openPin(this.pin)
-          break
-        case 'close':
-          this.closePin()
-          break
+      if (this.visible) {
+        switch (event.srcKey) {
+          case 'enter':
+            this.openPin(this.pin)
+            break
+          case 'close':
+            this.closePin()
+            break
+        }
       }
     },
     closePin() {
