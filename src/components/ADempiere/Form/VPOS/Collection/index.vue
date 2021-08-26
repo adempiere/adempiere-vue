@@ -34,37 +34,13 @@
               <p class="total">
                 <b>{{ $t('form.pos.collect.orderTotal') }}:</b>
                 <b style="float: right;">
-                  <el-popover
-                    placement="top-start"
-                    trigger="click"
-                  >
-                    <convert-amount
-                      :convert="multiplyRate"
-                      :amount="currentOrder.grandTotal"
-                      :currency="pointOfSalesCurrency"
-                    />
-                    <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                      {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                    </el-button>
-                  </el-popover>
+                  {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
               <p class="total">
                 <b> {{ $t('form.pos.collect.pending') }}: </b>
                 <b style="float: right;">
-                  <el-popover
-                    placement="top-start"
-                    trigger="click"
-                  >
-                    <convert-amount
-                      :convert="multiplyRate"
-                      :amount="pending"
-                      :currency="pointOfSalesCurrency"
-                    />
-                    <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                      {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
-                    </el-button>
-                  </el-popover>
+                  {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
               <p class="total">
@@ -183,19 +159,7 @@
                     {{ $t('form.pos.collect.orderTotal') }}:
                   </b>
                   <b style="float: right;">
-                    <el-popover
-                      placement="top-start"
-                      trigger="click"
-                    >
-                      <convert-amount
-                        :convert="multiplyRate"
-                        :amount="currentOrder.grandTotal"
-                        :currency="pointOfSalesCurrency"
-                      />
-                      <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                        {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                      </el-button>
-                    </el-popover>
+                    {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
 
@@ -204,56 +168,20 @@
                 <p class="total">
                   {{ $t('form.pos.collect.pending') }}:
                   <b style="float: right;">
-                    <el-popover
-                      placement="top-start"
-                      trigger="click"
-                    >
-                      <convert-amount
-                        :convert="multiplyRate"
-                        :amount="pending"
-                        :currency="pointOfSalesCurrency"
-                      />
-                      <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                        {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
-                      </el-button>
-                    </el-popover>
+                    {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
 
                 <p class="total">
                   {{ $t('form.pos.collect.payment') }}:
                   <b style="float: right;">
-                    <el-popover
-                      placement="top-start"
-                      trigger="click"
-                    >
-                      <convert-amount
-                        :convert="multiplyRate"
-                        :amount="pay"
-                        :currency="pointOfSalesCurrency"
-                      />
-                      <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                        {{ formatPrice(pay, pointOfSalesCurrency.iSOCode) }}
-                      </el-button>
-                    </el-popover>
+                    {{ formatPrice(pay, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
                 <p class="total">
                   {{ $t('form.pos.collect.change') }}:
                   <b style="float: right;">
-                    <el-popover
-                      placement="top-start"
-                      trigger="click"
-                    >
-                      <convert-amount
-                        :convert="multiplyRate"
-                        :amount="change"
-                        :currency="pointOfSalesCurrency"
-                      />
-                      <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                        {{ formatPrice(change, pointOfSalesCurrency.iSOCode) }}
-                      </el-button>
-                    </el-popover>
+                    {{ formatPrice(change, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
               </span>
@@ -270,7 +198,6 @@ import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListCollection from './fieldsListCollection.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
-import convertAmount from '@/components/ADempiere/Form/VPOS/Collection/convertAmount/index'
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
@@ -280,7 +207,6 @@ export default {
   name: 'Collection',
   components: {
     typeCollection,
-    convertAmount,
     overdrawnInvoice
   },
   mixins: [

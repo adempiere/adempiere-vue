@@ -344,24 +344,7 @@
                   {{ $t('form.pos.order.total') }}:
                 </b>
                 <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">
-                  <el-popover
-                    v-if="!isEmptyValue(currentOrder.uuid)"
-                    :v-model="seeConversion"
-                    placement="top-start"
-                    trigger="click"
-                    @hide="closeConvertion"
-                  >
-                    <convert-amount
-                      v-show="seeConversion"
-                      :convert="multiplyRate"
-                      :amount="currentOrder.grandTotal"
-                      :currency="pointOfSalesCurrency"
-                      :is-open="seeConversion"
-                    />
-                    <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;" @click="seeConversion = !seeConversion">
-                      {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                    </el-button>
-                  </el-popover>
+                  {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
               <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
@@ -429,7 +412,6 @@ import fieldsListOrder from './fieldsListOrder.js'
 import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner'
 import fieldLine from '@/components/ADempiere/Form/VPOS/Order/line/index'
 import ProductInfo from '@/components/ADempiere/Form/VPOS/ProductInfo'
-import convertAmount from '@/components/ADempiere/Form/VPOS/Collection/convertAmount/index'
 import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
 // Format of values ( Date, Price, Quantity )
 import {
@@ -444,7 +426,6 @@ export default {
   components: {
     BusinessPartner,
     ProductInfo,
-    convertAmount,
     FastOrdesList,
     fieldLine
   },
