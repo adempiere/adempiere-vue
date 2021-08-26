@@ -654,6 +654,13 @@ export default {
       return {
         name: ''
       }
+    },
+    defaulValuePaymentMethods() {
+      const defaultPayment = this.availablePaymentMethods.find(payment => payment.tender_type === 'X')
+      if (!this.isEmptyValue(defaultPayment)) {
+        return defaultPayment
+      }
+      return {}
     }
   },
   watch: {
@@ -868,6 +875,7 @@ export default {
       this.defaultValueCurrency()
       this.$store.commit('currencyDivideRateCollection', 1)
       this.$store.commit('currencyMultiplyRate', 1)
+      this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
       this.cancel()
     },
     cancel() {
