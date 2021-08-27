@@ -16,10 +16,11 @@
 
 import { showNotification } from '@/utils/ADempiere/notification.js'
 import ItemsRelations from './itemsRelations'
-import { clientDateTime, convertFieldsListToShareLink, recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
+import { clientDateTime, convertFieldsListToShareLink } from '@/utils/ADempiere/valueUtils.js'
 import { supportedTypes, exportFileFromJson } from '@/utils/ADempiere/exportUtil.js'
 import ROUTES from '@/utils/ADempiere/constants/zoomWindow'
 import relationsMixin from './relationsMixin.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 export default {
   name: 'MixinContextMenu',
@@ -116,9 +117,7 @@ export default {
       }
       return []
     },
-    permissionRoutes() {
-      return this.$store.getters.permission_routes
-    },
+
     valuesPanelToShare() {
       let containerUuid = this.containerUuid
       if (this.$route.query.action === 'advancedQuery') {
@@ -649,35 +648,22 @@ export default {
           })
         })
     },
+
     openReference(referenceElement) {
       if (referenceElement.windowUuid && referenceElement.recordUuid) {
-        const viewSearch = recursiveTreeSearch({
-          treeData: this.permissionRoutes,
-          attributeValue: referenceElement.windowUuid,
-          attributeName: 'meta',
-          secondAttribute: 'uuid',
-          attributeChilds: 'children'
+        zoomIn({
+          uuid: referenceElement.windowUuid,
+          query: {
+            action: referenceElement.type,
+            referenceUuid: referenceElement.uuid,
+            recordUuid: referenceElement.recordUuid,
+            // windowUuid: this.parentUuid,
+            tabParent: 0
+          }
         })
-        if (viewSearch) {
-          this.$router.push({
-            name: viewSearch.name,
-            query: {
-              action: referenceElement.type,
-              referenceUuid: referenceElement.uuid,
-              recordUuid: referenceElement.recordUuid,
-              // windowUuid: this.parentUuid,
-              tabParent: 0
-            }
-          }, () => {})
-        } else {
-          this.$message({
-            type: 'error',
-            message: this.$t('notifications.noRoleAccess'),
-            showClose: true
-          })
-        }
       }
     },
+
     setShareLink() {
       let shareLink = this.isWindow || window.location.href.includes('?') ? `${window.location.href}&` : `${window.location.href}?`
       if (this.$route.name === 'Report Viewer') {

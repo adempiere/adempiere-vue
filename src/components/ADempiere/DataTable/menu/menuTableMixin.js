@@ -15,7 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { supportedTypes, exportFileFromJson, exportZipFile } from '@/utils/ADempiere/exportUtil.js'
-import { clientDateTime, recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
+import { clientDateTime } from '@/utils/ADempiere/valueUtils.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 import { FIELDS_QUANTITY } from '@/utils/ADempiere/references'
 import TableMixin from '@/components/ADempiere/DataTable/mixin/tableMixin.js'
 
@@ -95,9 +96,6 @@ export default {
         }
         return fieldItem.columnName
       })
-    },
-    permissionRoutes() {
-      return this.$store.getters.permission_routes
     }
   },
   methods: {
@@ -276,22 +274,13 @@ export default {
         records.push(record)
       })
 
-      const viewSearch = recursiveTreeSearch({
-        treeData: this.permissionRoutes,
-        attributeValue: browserMetadata.window.uuid,
-        attributeName: 'meta',
-        secondAttribute: 'uuid',
-        attributeChilds: 'children'
+      zoomIn({
+        uuid: browserMetadata.window.uuid,
+        query: {
+          action: 'advancedQuery',
+          [elementName]: records
+        }
       })
-      if (viewSearch) {
-        this.$router.push({
-          name: viewSearch.name,
-          query: {
-            action: 'advancedQuery',
-            [elementName]: records
-          }
-        }, () => {})
-      }
     }
   }
 }

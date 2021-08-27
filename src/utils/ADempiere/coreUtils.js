@@ -25,7 +25,7 @@ export function zoomIn({
   params = {},
   query = {}
 }) {
-  const menuTree = store.getters.permissionRoutes
+  const menuTree = store.getters.permission_routes
 
   const viewSearch = recursiveTreeSearch({
     treeData: menuTree,

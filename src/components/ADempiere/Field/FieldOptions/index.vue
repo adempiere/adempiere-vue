@@ -102,7 +102,7 @@ import {
 } from '@/components/ADempiere/Field/FieldOptions/fieldOptionsList.js'
 import LabelField from './LabelField.vue'
 import LabelPopoverOption from './LabelPopoverOption.vue'
-import { recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 export default defineComponent({
   name: 'FieldOptions',
@@ -166,35 +166,15 @@ export default defineComponent({
       return '110'
     })
 
-    const permissionRoutes = computed(() => {
-      return root.$store.getters.permission_routes
-    })
-
-    const redirect = ({ window }) => {
-      const viewSearch = recursiveTreeSearch({
-        treeData: permissionRoutes.value,
-        attributeValue: window.uuid,
-        attributeName: 'meta',
-        secondAttribute: 'uuid',
-        attributeChilds: 'children'
+    function redirect({ window }) {
+      zoomIn({
+        uuid: window.uuid,
+        query: {
+          tabParent: 0,
+          action: 'advancedQuery',
+          [props.metadata.columnName]: valueField
+        }
       })
-
-      if (viewSearch) {
-        root.$router.push({
-          name: viewSearch.name,
-          query: {
-            action: 'advancedQuery',
-            tabParent: 0,
-            [props.metadata.columnName]: valueField
-          }
-        }, () => {})
-      } else {
-        root.$message({
-          type: 'error',
-          showClose: true,
-          message: root.$t('notifications.noRoleAccess')
-        })
-      }
     }
 
     const handleCommand = (command) => {
@@ -249,6 +229,7 @@ export default defineComponent({
       }
       return false
     })
+
     const optionsList = computed(() => {
       const menuOptions = []
       if (props.metadata.isNumericField) {
@@ -309,6 +290,7 @@ export default defineComponent({
         }
       }, () => {})
     }
+
     const handleOpen = (key, keyPath) => {
       triggerMenu.value = 'hover'
     }
