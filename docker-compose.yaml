@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   grpc-backend:
-    image: erpya/adempiere-grpc-all-in-one
+    image: erpya/adempiere-grpc-server:master
     container_name: adempiere-backend
     stdin_open: true
     tty: true
@@ -10,6 +10,7 @@ services:
       - SERVER_PORT=50059
       - SERVICES_ENABLED=access; business; core; dashboarding; dictionary; enrollment; log; ui; workflow; store; pos; updater;
       - SERVER_LOG_LEVEL=WARNING
+      # Consider the host and network where the docker server is located
       - DB_HOST=postgres_host
       - DB_PORT=5432
       - DB_NAME=adempiere
@@ -35,7 +36,7 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ports:
       - '9200:9200'
       - '9300:9300'
@@ -46,7 +47,7 @@ services:
       - ES_JAVA_OPTS=-Xmx512m -Xms512m
 
   api-rest:
-    image: erpya/proxy-adempiere-api
+    image: erpya/proxy-adempiere-api:master
     container_name: adempiere-proxy
     depends_on:
       - es7
@@ -57,9 +58,10 @@ services:
       - SERVER_PORT=8085
       - AD_DEFAULT_HOST=adempiere-backend
       - AD_DEFAULT_PORT=50059
+      - AD_TOKEN="adempiere_token"
+      - AD_STORE_TOKEN="adempiere_store_token"
       - ES_HOST=adempiere-eslastic-search
       - ES_PORT=9200
-      - VS_ENV=dev
       - INDEX=vue_storefront_catalog
       - RESTORE_DB=N
       - REDIS_HOST=adempiere-redis
@@ -69,7 +71,7 @@ services:
       - 8085:8085
 
   vue-app:
-    image: erpya/adempiere-vue
+    image: erpya/adempiere-vue:develop
     container_name: adempiere-frontend
     depends_on:
       - api-rest
@@ -77,7 +79,8 @@ services:
     stdin_open: true
     tty: true
     environment:
-      - API_URL=http://adempiere-proxy:8085
+      # Set the ip or dns of the server (not the dns of the container) to access from other client hosts
+      - API_URL=http://localhost:8085
     ports:
       - 9526:80
 
@@ -91,7 +94,8 @@ services:
     tty: true
     environment:
       - SERVER_PORT=3000
-      - API_URL=http://adempiere-proxy:8085
+      # Set the ip or dns of the server (not the dns of the container) to access from other client hosts
+      - API_URL=http://localhost:8085
       - STORE_INDEX=vue_storefront_catalog
       - VS_ENV=dev
     ports:
