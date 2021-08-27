@@ -32,6 +32,7 @@ const initStateUtils = {
   updatePayment: false,
   createBusinessPartner: false,
   step: 0,
+  updateCustomer: false,
   overdrawnInvoice: {
     visible: false
   }
@@ -115,6 +116,9 @@ export default {
     },
     popoverOverdrawnInvoice(state, payload) {
       state.overdrawnInvoice = payload
+    },
+    showUpdateCustomer(state, show) {
+      state.updateCustomer = show
     }
   },
   actions: {
@@ -191,6 +195,9 @@ export default {
         visible
       }
       commit('popoverOverdrawnInvoice', overdrawn)
+    },
+    changeShowUpdateCustomer({ commit }, show) {
+      commit('showUpdateCustomer', show)
     }
   },
   getters: {
@@ -272,6 +279,9 @@ export default {
     },
     getOverdrawnInvoice: (state) => {
       return state.overdrawnInvoice
+    },
+    getShowUpdateCustomer: (state) => {
+      return state.updateCustomer
     }
   }
 }

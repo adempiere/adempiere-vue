@@ -188,18 +188,18 @@ export function createCustomer({
 }
 // Update Customer
 export function updateCustomer({
+  uuid,
   value,
   taxId,
   duns,
   naics,
   name,
-  name2,
+  lastName,
   description,
   contactName,
-  eMail,
+  email,
   phone,
-  businessPartnerGroupUuid,
-  // Location
+  addressUuid,
   address1,
   address2,
   address3,
@@ -216,18 +216,18 @@ export function updateCustomer({
     url: 'form/addons/point-of-sales/update-customer',
     method: 'post',
     data: {
+      uuid,
       value,
-      tax_id: taxId,
+      taxId,
       duns,
       naics,
       name,
-      last_name: name2,
+      last_name: lastName,
       description,
       contact_name: contactName,
-      e_mail: eMail,
+      email,
       phone,
-      business_partner_group_uid: businessPartnerGroupUuid,
-      // Location
+      address_uuid: addressUuid,
       address1,
       address2,
       address3,
@@ -239,6 +239,35 @@ export function updateCustomer({
       region_name: regionName,
       country_uuid: countryUuid,
       pos_uuid: posUuid
+    }
+  })
+    .then(businessPartnerResponse => {
+      const { convertBusinessPartner } = require('@/utils/ADempiere/apiConverts/core.js')
+
+      return convertBusinessPartner(businessPartnerResponse)
+    })
+}
+
+export function customer({
+  searchValue,
+  value,
+  name,
+  contactName,
+  eMail,
+  phone,
+  postalCode
+}) {
+  return request({
+    url: 'form/addons/point-of-sales/customer',
+    method: 'get',
+    params: {
+      search_value: searchValue,
+      value,
+      name,
+      contact_name: contactName,
+      e_mail: eMail,
+      phone,
+      postal_code: postalCode
     }
   })
     .then(businessPartnerResponse => {
@@ -658,10 +687,10 @@ export function getPaymentsList({
  *
  * req.query.token - user token
  * Body:
- * req.body.pos_uuid - POS UUID reference
- * req.body.order_uuid - Order UUID reference
- * req.body.create_payments - Optional create payments (if is true then hope payments array)
- * req.body.payments
+ *.pos_uuid - POS UUID reference
+ *.order_uuid - Order UUID reference
+ *.create_payments - Optional create payments (if is true then hope payments array)
+ *.payments
  * [
  * invoice_uuid - Invoice UUID reference
  * bank_uuid - Bank UUID reference
@@ -714,10 +743,10 @@ export function processOrder({
  *
  * req.query.token - user token
  * Body:
- * req.body.pos_uuid - POS UUID reference
- * req.body.order_uuid - Order UUID reference
- * req.body.create_payments - Optional create payments (if is true then hope payments array)
- * req.body.payments
+ *.pos_uuid - POS UUID reference
+ *.order_uuid - Order UUID reference
+ *.create_payments - Optional create payments (if is true then hope payments array)
+ *.payments
  * [
  * invoice_uuid - Invoice UUID reference
  * bank_uuid - Bank UUID reference
@@ -728,11 +757,11 @@ export function processOrder({
  * payment_date - Payment Date (default now)
  * currency_uuid - Currency UUID reference
  * ]
- * req.body.customer_details [
+ *.customer_details [
  * key - columnName
  * value - value
  * ] - customer data in case of refund or voucher card
- * req.body.option - reimbursement rate
+ *.option - reimbursement rate
  */
 
 export function overdrawnInvoice({
