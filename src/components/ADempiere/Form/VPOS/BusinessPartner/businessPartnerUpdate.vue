@@ -94,6 +94,7 @@ export default {
       fieldsList,
       isCustomForm: true,
       loading: true,
+      index: 0,
       currentCustomer: {},
       unsubscribe: () => {}
     }
@@ -143,7 +144,7 @@ export default {
         lastName: values.Name2,
         email: values.EMail,
         phone: values.Phone,
-        addressUuid: this.currentCustomer.addresses[this.currentCustomer.addresses.length - 1].uuid,
+        addressUuid: this.currentCustomer.addresses[this.index].uuid,
         address1: values.Address1,
         address2: values.Address2,
         address3: values.Address3,
@@ -165,17 +166,18 @@ export default {
         searchValue: this.currentBusinessPartner.value
       })
         .then(response => {
+          const { name, value, lastName, addresses } = response
           this.$store.commit('updateValuesOfContainer', {
             containerUuid: this.containerUuid,
             attributes: [{
               columnName: 'Name',
-              value: response.name
+              value: name
             }, {
               columnName: 'Value',
-              value: response.value
+              value: value
             }, {
               columnName: 'Name2',
-              value: response.lastName
+              value: lastName
             }, {
               columnName: 'C_Country_ID_UUID',
               value: undefined
@@ -184,34 +186,34 @@ export default {
               value: undefined
             }, {
               columnName: 'C_Region_ID',
-              value: response.addresses[response.addresses.length - 1].region.id
+              value: addresses[this.index].region.id
             }, {
               columnName: 'C_Region_ID_UUID',
-              value: response.addresses[response.addresses.length - 1].region.uuid
+              value: addresses[this.index].region.uuid
             }, {
               columnName: 'DisplayColumn_C_Region_ID',
-              value: response.addresses[response.addresses.length - 1].region.name
+              value: addresses[this.index].region.name
             }, {
               columnName: 'C_City_ID',
-              value: response.addresses[response.addresses.length - 1].city.id
+              value: addresses[this.index].city.id
             }, {
               columnName: 'C_City_ID_UUID',
-              value: response.addresses[response.addresses.length - 1].city.uuid
+              value: addresses[this.index].city.uuid
             }, {
               columnName: 'DisplayColumn_C_City_ID',
-              value: response.addresses[response.addresses.length - 1].city.name
+              value: addresses[this.index].city.name
             }, {
               columnName: 'Address1',
-              value: response.addresses[response.addresses.length - 1].address_1
+              value: addresses[this.index].address_1
             }, {
               columnName: 'Address2',
-              value: response.addresses[response.addresses.length - 1].address_2
+              value: addresses[this.index].address_2
             }, {
               columnName: 'Address3',
-              value: response.addresses[response.addresses.length - 1].address_3
+              value: addresses[this.index].address_3
             }, {
               columnName: 'Address4',
-              value: response.addresses[response.addresses.length - 1].address_4
+              value: addresses[this.index].address_4
             }]
           })
           this.currentCustomer = response
