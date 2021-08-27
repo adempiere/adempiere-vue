@@ -63,6 +63,17 @@
           />
         </el-button>
       </el-popover>
+      <el-popover
+        v-model="visible"
+        placement="right"
+        width="600"
+        trigger="click"
+      >
+        <business-partner-update
+          :shows-popovers="visible"
+        />
+        <el-button v-if="!isEmptyValue(currentOrder.businessPartner.uuid)" slot="reference" type="text" icon="el-icon-edit" />
+      </el-popover>
     </template>
     <el-autocomplete
       v-model="displayedValue"
@@ -106,6 +117,7 @@
  */
 import { requestGetBusinessPartner } from '@/api/ADempiere/system-core.js'
 import BusinessPartnerCreate from './businessPartnerCreate'
+import BusinessPartnerUpdate from './businessPartnerUpdate'
 // import FieldListBusinessPartner from './fieldBusinessPartners/index'
 import BusinessPartnersList from './businessPartnersList'
 import BParterMixin from './mixinBusinessPartner.js'
@@ -117,7 +129,8 @@ export default {
   name: 'FieldBusinessPartner',
   components: {
     BusinessPartnerCreate,
-    BusinessPartnersList
+    BusinessPartnersList,
+    BusinessPartnerUpdate
     // FieldListBusinessPartner
   },
   props: {
@@ -145,7 +158,8 @@ export default {
       timeOut: null,
       showFieldCreate: false,
       showFieldList: false,
-      showCreate: false
+      showCreate: false,
+      visible: false
     }
   },
   computed: {
@@ -191,13 +205,24 @@ export default {
         name: undefined
       }
     },
+    currentOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+    },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
+    },
+    showUpdateCustomer() {
+      return this.$store.getters.getShowUpdateCustomer
     }
   },
   watch: {
     popoverCreateBusinessParnet(value) {
       this.showCreate = value
+    },
+    showUpdateCustomer(value) {
+      if (!value) {
+        this.visible = value
+      }
     }
   },
   methods: {
