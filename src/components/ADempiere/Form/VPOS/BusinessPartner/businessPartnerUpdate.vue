@@ -143,7 +143,7 @@ export default {
         lastName: values.Name2,
         email: values.EMail,
         phone: values.Phone,
-        addressUuid: this.currentCustomer.addresses[0].uuid,
+        addressUuid: this.currentCustomer.addresses[this.currentCustomer.addresses.length - 1].uuid,
         address1: values.Address1,
         address2: values.Address2,
         address3: values.Address3,
@@ -184,34 +184,34 @@ export default {
               value: undefined
             }, {
               columnName: 'C_Region_ID',
-              value: response.addresses[0].region.id
+              value: response.addresses[response.addresses.length - 1].region.id
             }, {
               columnName: 'C_Region_ID_UUID',
-              value: response.addresses[0].region.uuid
+              value: response.addresses[response.addresses.length - 1].region.uuid
             }, {
               columnName: 'DisplayColumn_C_Region_ID',
-              value: response.addresses[0].region.name
+              value: response.addresses[response.addresses.length - 1].region.name
             }, {
               columnName: 'C_City_ID',
-              value: response.addresses[0].city.id
+              value: response.addresses[response.addresses.length - 1].city.id
             }, {
               columnName: 'C_City_ID_UUID',
-              value: response.addresses[0].city.uuid
+              value: response.addresses[response.addresses.length - 1].city.uuid
             }, {
               columnName: 'DisplayColumn_C_City_ID',
-              value: response.addresses[0].city.name
+              value: response.addresses[response.addresses.length - 1].city.name
             }, {
               columnName: 'Address1',
-              value: response.addresses[0].address_1
+              value: response.addresses[response.addresses.length - 1].address_1
             }, {
               columnName: 'Address2',
-              value: response.addresses[0].address_2
+              value: response.addresses[response.addresses.length - 1].address_2
             }, {
               columnName: 'Address3',
-              value: response.addresses[0].address_3
+              value: response.addresses[response.addresses.length - 1].address_3
             }, {
               columnName: 'Address4',
-              value: response.addresses[0].address_4
+              value: response.addresses[response.addresses.length - 1].address_4
             }]
           })
           this.currentCustomer = response
