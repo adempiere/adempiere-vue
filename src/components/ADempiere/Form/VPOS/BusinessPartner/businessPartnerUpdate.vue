@@ -221,7 +221,7 @@ export default {
         })
     },
     clearValues() {
-      this.$store.dispatch('changePopover', false)
+      this.$store.dispatch('changeShowUpdateCustomer', false)
       this.showsPopovers.isShowCreate = false
 
       this.$store.dispatch('setDefaultValues', {
