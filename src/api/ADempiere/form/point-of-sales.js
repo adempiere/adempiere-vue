@@ -218,7 +218,7 @@ export function updateCustomer({
     data: {
       uuid,
       value,
-      taxId,
+      tax_id: taxId,
       duns,
       naics,
       name,

@@ -492,7 +492,7 @@ export default {
       pinMessage: {
         pin: 'Ingrese pin para ',
         documentType: 'cambiar tipo de documento',
-        warehouse: 'cambiar almacen',
+        warehouse: 'cambiar almacén',
         price: 'cambiar precio',
         qtyEntered: 'cambiar cantidad',
         priceList: 'cambiar lista de precio',

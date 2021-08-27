@@ -52,35 +52,6 @@
                 :is-disabled="isDisabled"
               />
             </el-col>
-            <!-- <el-col :span="3" :style="styleTab">
-              <fast-ordes-list />
-            </el-col>
-            <el-col :span="4" :style="styleTab">
-              <el-form-item>
-                <template slot="label" />
-                <el-dropdown
-                  v-if="!isEmptyValue(currentDocumentType)"
-                  trigger="click"
-                  style="padding-top: 15%;font-size: 15px;color: black;"
-                  @command="changeDocumentType"
-                >
-                  <span>
-                    <el-icon class="el-icon-document" />
-                    <b style="cursor: pointer"> {{ currentDocumentType.name }} </b>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item
-                      v-for="item in listDocumentTypes"
-                      :key="item.uuid"
-                      :command="item"
-                      :disabled="isDisabled"
-                    >
-                      {{ item.name }}
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </el-form-item>
-            </el-col> -->
             <el-col :span="isEmptyValue(currentOrder) ? 4 : 8" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
               <el-row :gutter="4">
                 <el-col :span="4" style="padding-left: 0px; padding-right: 0px;">

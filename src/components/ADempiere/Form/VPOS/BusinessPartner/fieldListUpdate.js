@@ -20,7 +20,7 @@ const fieldBase = {
   tableName: 'C_Location',
   isFromDictionary: true,
   overwriteDefinition: {
-    size: 12,
+    size: 24,
     index: 0
   }
 }
@@ -30,11 +30,23 @@ export default [
     elementColumnName: 'Value',
     columnName: 'Value',
     isFromDictionary: true,
-    tabindex: '0',
     overwriteDefinition: {
       isCustomField: true,
+      tabindex: 0,
       sequence: 0,
-      size: 12,
+      size: 24,
+      isMandatory: true
+    }
+  },
+  {
+    elementColumnName: 'TaxID',
+    columnName: 'TaxID',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      isCustomField: true,
+      tabindex: 0,
+      sequence: 0,
+      size: 24,
       isMandatory: true
     }
   },
@@ -42,11 +54,11 @@ export default [
     elementColumnName: 'Name',
     columnName: 'Name',
     tableName,
-    tabindex: '1',
     isFromDictionary: true,
     overwriteDefinition: {
+      tabindex: 1,
       isCustomField: true,
-      size: 12,
+      size: 24,
       sequence: 1,
       isMandatory: true
     }
@@ -55,36 +67,60 @@ export default [
     elementColumnName: 'Name2',
     columnName: 'Name2',
     tableName,
-    tabindex: '2',
     isFromDictionary: true,
     overwriteDefinition: {
+      tabindex: 2,
       isCustomField: true,
       sequence: 2,
-      size: 12
+      size: 24
+    }
+  },
+  {
+    elementColumnName: 'ContactName',
+    columnName: 'ContactName',
+    tableName,
+    isFromDictionary: true,
+    overwriteDefinition: {
+      tabindex: 2,
+      isCustomField: true,
+      sequence: 2,
+      size: 24
+    }
+  },
+  {
+    elementColumnName: 'Description',
+    columnName: 'Description',
+    tableName,
+    isFromDictionary: true,
+    overwriteDefinition: {
+      tabindex: 2,
+      isCustomField: true,
+      sequence: 2,
+      size: 24
     }
   },
   {
     elementColumnName: 'EMail',
     columnName: 'EMail',
     tableName: 'AD_user',
-    tabindex: '3',
     isFromDictionary: true,
     overwriteDefinition: {
+      tabindex: 3,
       isCustomField: true,
       sequence: 3,
-      size: 12
+      size: 24
     }
   },
   {
     elementColumnName: 'Phone',
     columnName: 'Phone',
     tableName: 'AD_user',
-    tabindex: '4',
     isFromDictionary: true,
     overwriteDefinition: {
+      tabindex: 4,
       isCustomField: true,
       sequence: 4,
-      size: 12
+      size: 24
     }
   },
   {
@@ -96,7 +132,7 @@ export default [
       isActiveLogics: true, // enable logics
       defaultValue: '@#C_Country_ID@',
       tabindex: 5,
-      size: 12,
+      size: 24,
       sequenceFields: 'CO',
       isMandatory: true
     }
@@ -108,7 +144,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 6,
-      size: 12,
+      size: 24,
       sequenceFields: 'R',
       isMandatory: true
     }
@@ -120,7 +156,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 7,
-      size: 12,
+      size: 24,
       sequenceFields: 'C',
       isMandatory: true
     }
@@ -132,7 +168,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 8,
-      size: 12,
+      size: 24,
       sequenceFields: 'A1'
     }
   },
@@ -143,7 +179,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 9,
-      size: 12,
+      size: 24,
       sequenceFields: 'A2'
     }
   },
@@ -154,8 +190,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 10,
-      size: 12,
-      sequence: 11,
+      size: 24,
       sequenceFields: 'A3'
     }
   },
@@ -166,7 +201,7 @@ export default [
     overwriteDefinition: {
       tabindex: 11,
       isCustomField: true,
-      size: 12,
+      size: 24,
       sequenceFields: 'A4'
     }
   },
@@ -177,7 +212,7 @@ export default [
     overwriteDefinition: {
       tabindex: 12,
       isCustomField: true,
-      size: 12,
+      size: 24,
       sequenceFields: 'P'
     }
   }

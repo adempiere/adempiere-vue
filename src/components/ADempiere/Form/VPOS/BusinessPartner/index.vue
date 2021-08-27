@@ -22,7 +22,7 @@
       <el-popover
         v-model="showCreate"
         placement="top-start"
-        width="400"
+        width="600"
         trigger="click"
         @hide="popoverClose"
       >
@@ -64,15 +64,23 @@
         </el-button>
       </el-popover>
       <el-popover
-        v-model="visible"
+        v-if="!isEmptyValue(currentOrder.businessPartner.uuid)"
+        v-model="showUpdate"
         placement="right"
         width="600"
         trigger="click"
       >
         <business-partner-update
-          :shows-popovers="visible"
+          :shows-popovers="showUpdate"
         />
-        <el-button v-if="!isEmptyValue(currentOrder.businessPartner.uuid)" slot="reference" type="text" icon="el-icon-edit" />
+        <el-button
+          slot="reference"
+          type="text"
+        >
+          <i
+            class="el-icon-edit"
+          />
+        </el-button>
       </el-popover>
     </template>
     <el-autocomplete
@@ -213,6 +221,15 @@ export default {
     },
     showUpdateCustomer() {
       return this.$store.getters.getShowUpdateCustomer
+    },
+    showUpdate: {
+      get() {
+        return this.$store.getters.getShowUpdateCustomer
+      },
+      set(value) {
+        this.$store.dispatch('changeShowUpdateCustomer', value)
+        return value
+      }
     }
   },
   watch: {
@@ -220,9 +237,7 @@ export default {
       this.showCreate = value
     },
     showUpdateCustomer(value) {
-      if (!value) {
-        this.visible = value
-      }
+      this.visible = value
     }
   },
   methods: {

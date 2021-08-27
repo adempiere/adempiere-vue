@@ -27,9 +27,17 @@
       class="create-bp"
     >
       <el-row>
-        <el-col :span="24">
+        <el-col :span="12">
           <field-definition
-            v-for="(field) in fieldsList"
+            v-for="(field) in datos"
+            :ref="field.columnName"
+            :key="field.columnName"
+            :metadata-field="field"
+          />
+        </el-col>
+        <el-col :span="12">
+          <field-definition
+            v-for="(field) in fieldsListLocation"
             :ref="field.columnName"
             :key="field.columnName"
             :metadata-field="field"
@@ -96,6 +104,11 @@ export default {
       loading: true,
       index: 0,
       currentCustomer: {},
+      region: {
+        id: '',
+        uuid: '',
+        name: ''
+      },
       unsubscribe: () => {}
     }
   },
@@ -104,24 +117,22 @@ export default {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
       }
-      return this.fieldsList.filter(datos => datos.tabindex >= 5)
+      return this.fieldsList.filter(field => field.tabindex > 4)
     },
     datos() {
-      return this.fieldsList.filter(datos => datos.sequence <= 4)
+      return this.fieldsList.filter(field => field.tabindex <= 4)
     },
     currentBusinessPartner() {
       return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
+    },
+    showCustomer() {
+      return this.$store.getters.getShowUpdateCustomer
     }
   },
   watch: {
-    showsPopovers(value) {
-      if (value) {
-        this.$store.dispatch('changeShowUpdateCustomer', value)
-        setTimeout(() => {
-          this.getCustomer()
-          this.focusValue()
-        }, 500)
-      }
+    showCustomer(value) {
+      console.log(value)
+      this.getCustomer()
     }
   },
   beforeDestroy() {
@@ -140,8 +151,11 @@ export default {
       updateCustomer({
         uuid: this.currentBusinessPartner.uuid,
         value: values.Value,
+        taxId: values.TaxID,
         name: values.Name,
         lastName: values.Name2,
+        description: values.Description,
+        contactName: values.ContactName,
         email: values.EMail,
         phone: values.Phone,
         addressUuid: this.currentCustomer.addresses[this.index].uuid,
@@ -166,15 +180,29 @@ export default {
         searchValue: this.currentBusinessPartner.value
       })
         .then(response => {
-          const { name, value, lastName, addresses } = response
+          const { name, value, taxId, description, lastName, addresses } = response
+          let region = { id: '', uuid: '', name: '' }
+          let postal
+          if (!this.isEmptyValue(addresses[this.index].region)) {
+            region = addresses[this.index].region
+          }
+          if (!this.isEmptyValue(addresses[this.index].postal_code)) {
+            postal = addresses[this.index].postal_code
+          }
           this.$store.commit('updateValuesOfContainer', {
             containerUuid: this.containerUuid,
             attributes: [{
-              columnName: 'Name',
-              value: name
+              columnName: 'TaxID',
+              value: taxId
             }, {
               columnName: 'Value',
               value: value
+            }, {
+              columnName: 'Name',
+              value: name
+            }, {
+              columnName: 'Description',
+              value: description
             }, {
               columnName: 'Name2',
               value: lastName
@@ -182,17 +210,17 @@ export default {
               columnName: 'C_Country_ID_UUID',
               value: undefined
             }, {
-              columnName: 'DisplayColumn_C_Country_ID',
-              value: undefined
+              columnName: 'Postal',
+              value: postal
             }, {
               columnName: 'C_Region_ID',
-              value: addresses[this.index].region.id
+              value: region.id
             }, {
               columnName: 'C_Region_ID_UUID',
-              value: addresses[this.index].region.uuid
+              value: region.uuid
             }, {
               columnName: 'DisplayColumn_C_Region_ID',
-              value: addresses[this.index].region.name
+              value: region.name
             }, {
               columnName: 'C_City_ID',
               value: addresses[this.index].city.id
@@ -221,9 +249,9 @@ export default {
         })
     },
     clearValues() {
-      this.$store.dispatch('changeShowUpdateCustomer', false)
-      this.showsPopovers.isShowCreate = false
-
+      if (this.showsPopovers) {
+        this.$store.dispatch('changeShowUpdateCustomer', false)
+      }
       this.$store.dispatch('setDefaultValues', {
         containerUuid: this.containerUuid,
         panelType: this.panelType
@@ -282,43 +310,6 @@ export default {
       })
       this.$store.dispatch('changeShowUpdateCustomer', false)
     }
-    // TODO:Sort fields
-    // subscribeChanges() {
-    //   return this.$store.subscribe((mutation, state) => {
-    //     if (mutation.type === 'updateValueOfField' &&
-    //       mutation.payload.containerUuid === 'Business-Partner-Update' &&
-    //       mutation.payload.columnName === 'C_Country_ID') {
-    //       this.requestGetCountryDefinition({
-    //         id: mutation.payload.value
-    //       })
-    //         .then(responseCountry => {
-    //           const newSequence = getSequenceAsList(responseCountry.captureSequence)
-    //           const newFieldsList = this.fieldsList.map(item => {
-    //             if (newSequence.includes(item.sequenceFields)) {
-    //               return {
-    //                 ...item,
-    //                 isDisplayed: true,
-    //                 index: newSequence.indexOf(item.sequenceFields)
-    //               }
-    //             }
-    //             return {
-    //               ...item,
-    //               isDisplayed: false
-    //             }
-    //           })
-    //           this.$store.dispatch('changeSequence', newFieldsList.sort(this.sortSequence))
-    //         })
-    //         .catch(error => {
-    //           this.$message({
-    //             message: error.message,
-    //             isShowClose: true,
-    //             type: 'error'
-    //           })
-    //           console.warn(`Error getting Country Definition: ${error.message}. Code: ${error.code}.`)
-    //         })
-    //     }
-    //   })
-    // }
   }
 }
 </script>
