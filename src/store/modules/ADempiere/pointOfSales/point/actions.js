@@ -17,7 +17,9 @@
 import router from '@/router'
 import {
   listPointOfSales,
-  listWarehouse,
+  listWarehouses,
+  listDocumentTypes,
+  listTenderTypes,
   listPrices,
   listCurrencies
 } from '@/api/ADempiere/form/point-of-sales.js'
@@ -61,15 +63,31 @@ export default {
         })
       })
   },
-  listWarehouseFromServer({ commit }, posUuid) {
-    listWarehouse({
+  listWarehousesFromServer({ commit }, posUuid) {
+    listWarehouses({
       posUuid
     })
       .then(response => {
         commit('setWarehousesList', response.records)
       })
       .catch(error => {
-        console.warn(`listWarehouseFromServer: ${error.message}. Code: ${error.code}.`)
+        console.warn(`listWarehousesFromServer: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+      })
+  },
+  listDocumentTypesFromServer({ commit }, posUuid) {
+    listDocumentTypes({
+      posUuid
+    })
+      .then(response => {
+        commit('setDocumentTypesList', response.records)
+      })
+      .catch(error => {
+        console.warn(`listDocumentTypesFromServer: ${error.message}. Code: ${error.code}.`)
         showMessage({
           type: 'error',
           message: error.message,
@@ -109,7 +127,23 @@ export default {
         })
       })
   },
-  setCurrentPOS({ commit, dispatch, rootGetters }, posToSet) {
+  listTenderTypesFromServer({ commit }, posUuid) {
+    listTenderTypes({
+      posUuid
+    })
+      .then(response => {
+        commit('setTenderTypesList', response.records)
+      })
+      .catch(error => {
+        console.warn(`listTenderTypesFromServer: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+      })
+  },
+  setCurrentPOS({ commit, dispatch, state, rootGetters }, posToSet) {
     commit('setCurrentPointOfSales', posToSet)
     const oldRoute = router.app._route
     router.push({
@@ -122,11 +156,15 @@ export default {
         pos: posToSet.id
       }
     }, () => {})
-    dispatch('listWarehouseFromServer', posToSet.uuid)
+    state.currenciesList = []
+    dispatch('listWarehousesFromServer', posToSet.uuid)
+    dispatch('listDocumentTypesFromServer', posToSet.uuid)
     dispatch('listCurrenciesFromServer', posToSet.uuid)
+    dispatch('listTenderTypesFromServer', posToSet.uuid)
     dispatch('listPricesFromServer', posToSet)
     commit('setCurrentPriceList', posToSet.priceList)
-    commit('setCurrentWarehouse', rootGetters['user/getWarehouse'])
+    commit('setCurrentDocumentTypePos', posToSet.documentType)
+    commit('setCurrentWarehousePos', posToSet.warehouse)
     commit('resetConversionRate', [])
     commit('setIsReloadKeyLayout')
     commit('setIsReloadProductPrice')

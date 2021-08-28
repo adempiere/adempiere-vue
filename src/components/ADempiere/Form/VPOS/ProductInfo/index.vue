@@ -21,10 +21,15 @@
       <template slot="label">
         {{ $t('form.productInfo.codeProduct') }}
         <el-popover
-          placement="right"
+          v-model="visible"
+          v-shortkey="keyShortcuts"
+          placement="bottom-start"
           trigger="click"
-          width="800"
+          width="1250"
+          @shortkey.native="close"
         >
+          <el-button icon="el-icon-close" type="text" style="float: right;padding: 1% 1% 0px 0px;font-size: 20px;" @click="close" />
+          <br>
           <product-info-list />
           <el-button
             slot="reference"
@@ -42,8 +47,10 @@
         clearable
         style="width: 100%;"
         popper-class="custom-field-prodcut-info"
+        :trigger-on-focus="true"
         :fetch-suggestions="localSearch"
         :select-when-unmatched="true"
+        :highlight-first-item="true"
         @shortkey.native="shortcutKeyMethod"
         @select="handleSelect"
       >
@@ -106,6 +113,7 @@ export default {
   },
   data() {
     return {
+      visible: false,
       timeOut: null
     }
   },
@@ -156,12 +164,6 @@ export default {
       }
     },
     localSearch(stringToMatch, callBack) {
-      if (this.isEmptyValue(stringToMatch)) {
-        // not show list
-        callBack([])
-        return
-      }
-
       let results = this.listWithPrice
       if (!this.isEmptyValue(stringToMatch)) {
         const parsedValue = stringToMatch.toLowerCase().trim()
@@ -206,6 +208,9 @@ export default {
 
       // call callback function to return suggestions
       callBack(results)
+    },
+    close() {
+      this.visible = false
     },
     handleSelect(elementSelected) {
       const valueProduct = this.isEmptyValue(elementSelected.product) ? elementSelected.value : elementSelected.product.value

@@ -52,40 +52,27 @@
                 :is-disabled="isDisabled"
               />
             </el-col>
-            <el-col :span="5" :style="styleTab">
-              <el-form-item>
-                <template
-                  v-for="(field) in fieldsList"
-                >
-                  <field
-                    v-if="field.columnName === 'C_DocTypeTarget_ID'"
-                    :key="field.columnName"
-                    :metadata-field="field"
-                    :v-model="field.value"
-                  />
-                </template>
-              </el-form-item>
-            </el-col>
-            <el-col :span="isEmptyValue(currentOrder) ? 1 : 4" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
-              <el-form-item>
-                <el-row :gutter="24">
-                  <el-col :span="10" style="padding-left: 0px; padding-right: 0px;">
-                    <el-tag
-                      v-if="!isEmptyValue(currentOrder.documentStatus.value)"
-                      :type="tagStatus(currentOrder.documentStatus.value)"
-                    >
-                      <span v-if="!isEmptyValue(currentOrder.documentStatus.value)">
-                        {{ currentOrder.documentStatus.name }}
-                      </span>
-                    </el-tag>
-                  </el-col>
-                  <el-col :span="14" style="padding-left: 0px; padding-right: 0px;">
-                    <el-button type="primary" plain :disabled="isEmptyValue(this.$route.query.action)" @click="newOrder">
-                      {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
-                    </el-button>
-                  </el-col>
-                </el-row>
-              </el-form-item>
+            <el-col :span="isEmptyValue(currentOrder) ? 4 : 8" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
+              <el-row :gutter="4">
+                <el-col :span="4" style="padding-left: 0px; padding-right: 0px;">
+                  <el-tag
+                    v-if="!isEmptyValue(currentOrder.documentStatus.value)"
+                    :type="tagStatus(currentOrder.documentStatus.value)"
+                  >
+                    <span v-if="!isEmptyValue(currentOrder.documentStatus.value)">
+                      {{ currentOrder.documentStatus.name }}
+                    </span>
+                  </el-tag>
+                </el-col>
+                <el-col :span="8" style="padding-left: 0px; padding-right: 0px;">
+                  <fast-ordes-list />
+                </el-col>
+                <el-col :span="12" style="padding-left: 0px; padding-right: 0px;">
+                  <el-button type="primary" :disabled="!allowsCreateOrder" plain @click="newOrder">
+                    {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
+                  </el-button>
+                </el-col>
+              </el-row>
             </el-col>
           </el-row>
         </el-form>
@@ -105,20 +92,22 @@
               @current-change="handleCurrentLineChange"
               @shortkey.native="shortcutKeyMethod"
             >
-              <el-table-column
-                v-for="(valueOrder, item, key) in orderLineDefinition"
-                :key="key"
-                :column-key="valueOrder.columnName"
-                :label="valueOrder.label"
-                :width="!valueOrder.isNumeric ? valueOrder.size : valueOrder.size"
-                :align="valueOrder.isNumeric ? 'right' : 'left'"
-              >
-                <template slot-scope="scope">
-                  <span>
-                    {{ displayValue(scope.row, valueOrder) }}
-                  </span>
-                </template>
-              </el-table-column>
+              <template v-for="(valueOrder, item, key) in orderLineDefinition">
+                <el-table-column
+                  v-if="(valueOrder.columnName === 'ConvertedAmount' && !isEmptyValue(currentPointOfSales.displayCurrency)) || valueOrder.columnName !== 'ConvertedAmount'"
+                  :key="key"
+                  :column-key="valueOrder.columnName"
+                  :label="valueOrder.label"
+                  :width="!valueOrder.isNumeric ? valueOrder.size : valueOrder.size"
+                  :align="valueOrder.isNumeric ? 'right' : 'left'"
+                >
+                  <template slot-scope="scope">
+                    <span>
+                      {{ displayValue(scope.row, valueOrder) }}
+                    </span>
+                  </template>
+                </el-table-column>
+              </template>
               <el-table-column
                 :label="$t('form.pos.tableProduct.options')"
                 width="180"
@@ -126,16 +115,18 @@
                 <template slot-scope="scope">
                   <el-popover
                     v-if="!isEmptyValue(listOrderLine)"
-                    placement="top-start"
+                    popper-class="el-popper-info"
+                    placement="right-start"
                     trigger="click"
+                    width="300"
                     :title="$t('form.productInfo.productInformation')"
                   >
                     <el-form
                       label-position="top"
-                      style="float: right; display: flex; line-height: 30px;"
+                      style="float: right;display: contents;line-height: 30px;"
                     >
-                      <el-row :gutter="24">
-                        <el-col :span="3">
+                      <el-row style="margin: 10px!important;">
+                        <el-col :span="4">
                           <div>
                             <el-avatar v-if="isEmptyValue(scope.row.product.imageUrl)" shape="square" :size="100" src="https://#" @error="true">
                               <el-image>
@@ -152,18 +143,21 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="16">
+                        <el-col :span="12">
                           {{ $t('form.productInfo.code') }}: <b>{{ scope.row.product.value }}</b><br>
                           {{ $t('form.productInfo.name') }}: <b>{{ scope.row.product.name }}</b><br>
                           {{ $t('form.productInfo.description') }}: <b>{{ scope.row.product.description }}</b><br>
+                          {{ $t('form.productInfo.UM') }}: <b>{{ scope.row.product.uomName }}</b><br>
                         </el-col>
-                        <el-col :span="5">
-                          <div style="float: right">
+                        <el-col :span="8">
+                          <div style="float: right; text-align: end;">
                             {{ $t('form.productInfo.price') }}:
-                            <b>{{ formatPrice(scope.row.product.priceStandard, pointOfSalesCurrency.iSOCode) }}</b>
+                            <b>{{ formatPrice(scope.row.priceList, pointOfSalesCurrency.iSOCode) }}</b>
                             <br>
-                            {{ $t('form.productInfo.taxAmount') }}:
-                            <b>{{ scope.row.taxIndicator }}</b>
+                            <b>{{ scope.row.taxRate.name }}</b>
+                            <br>
+                            {{ $t('form.productInfo.grandTotal') }}:
+                            <b>{{ formatPrice((scope.row.priceList * scope.row.taxRate.rate / 100) + scope.row.priceList, pointOfSalesCurrency.iSOCode) }}</b>
                             <br>
                             {{ $t('form.productInfo.quantityAvailable') }}:
                             <b>{{ formatQuantity(scope.row.quantityOrdered) }}</b>
@@ -185,13 +179,38 @@
                       :show-field="showFieldLine"
                       :current-line="currentLineOrder"
                     />
-                    <el-button slot="reference" type="success" icon="el-icon-edit" size="mini" style="margin-right: 3%;" @click="showEditLine(scope.row)" />
+                    <el-button slot="reference" type="success" icon="el-icon-edit" size="mini" style="margin-right: 3%;" :disabled="isDisabled" @click="showEditLine(scope.row)" />
                   </el-popover>
-                  <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteOrderLine(scope.row)" />
+                  <el-button type="danger" icon="el-icon-delete" size="mini" :disabled="isDisabled" @click="deleteOrderLine(scope.row)" />
                 </template>
               </el-table-column>
             </el-table>
           </el-main>
+          <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + infowOverdrawnInvoice.label" width="40%" :visible.sync="visible">
+            <el-input
+              id="pin"
+              ref="pin"
+              v-model="pin"
+              v-shortkey="visible ? {close: ['esc'], enter: ['enter']} : {}"
+              autofocus
+              type="password"
+              :placeholder="$t('form.pos.tableProduct.pin')"
+              :focus="true"
+              @shortkey.native="theAction"
+            />
+            <span style="float: right;">
+              <el-button
+                type="danger"
+                icon="el-icon-close"
+                @click="closePin"
+              />
+              <el-button
+                type="primary"
+                icon="el-icon-check"
+                @click="openPin(pin)"
+              />
+            </span>
+          </el-dialog>
           <el-footer :class="classOrderFooter">
             <div class="keypad">
               <span id="toolPoint">
@@ -202,12 +221,12 @@
                   v-show="isValidForDeleteLine(listOrderLine)"
                   type="success"
                   icon="el-icon-bank-card"
+                  :disabled="!allowsCollectOrder"
                   @click="openCollectionPanel"
                 >
                   {{ labelButtonCollections }}
                 </el-button>
               </span>
-              <br>
               <p id="point" style="margin-bottom: 5%;margin-top: 3%;">
                 <el-dropdown
                   v-if="!isEmptyValue(currentPointOfSales)"
@@ -231,6 +250,28 @@
                 </el-dropdown>
                 <br>
                 <el-dropdown
+                  v-if="!isEmptyValue(currentDocumentType)"
+                  trigger="click"
+                  class="info-pos"
+                  @command="changeDocumentType"
+                >
+                  <span>
+                    <el-icon class="el-icon-document" />
+                    Tipo de Documento: <b style="cursor: pointer"> {{ currentDocumentType.name }} </b>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      v-for="item in listDocumentTypes"
+                      :key="item.uuid"
+                      :command="item"
+                      :disabled="isDisabled"
+                    >
+                      {{ item.name }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+                <br>
+                <el-dropdown
                   v-if="!isEmptyValue(currentWarehouse)"
                   trigger="click"
                   class="info-pos"
@@ -242,7 +283,7 @@
                   </span>
                   <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item
-                      v-for="item in listWarehouse"
+                      v-for="item in listWarehouses"
                       :key="item.uuid"
                       :command="item"
                     >
@@ -277,20 +318,20 @@
               <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.date') }}:
-                <b class="order-info">
+                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ orderDate }}
                 </b>
               </p>
               <p class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.itemQuantity') }}
-                <b class="order-info">
+                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ getItemQuantity }}
                 </b>
               </p>
               <p class="total">
                 {{ $t('form.pos.order.numberLines') }}
-                <b class="order-info">
+                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ numberOfLines }}
                 </b></p>
             </span>
@@ -298,54 +339,39 @@
               <p class="total">{{ $t('form.pos.order.seller') }}:<b style="float: right;">
                 {{ currentOrder.salesRepresentative.name }}
               </b></p>
-              <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
-              <p class="total"> {{ $t('form.pos.order.discount') }}:<b class="order-info">{{ formatPrice(0, pointOfSalesCurrency.iSOCode) }}</b> </p>
-              <p class="total"> {{ $t('form.pos.order.tax') }}:<b style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
+              <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
+              <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
               <p class="total">
                 <b>
                   {{ $t('form.pos.order.total') }}:
                 </b>
-                <b style="float: right;">
-                  <el-popover
-                    :v-model="seeConversion"
-                    placement="top-start"
-                    trigger="click"
-                    @hide="closeConvertion"
-                  >
-                    <convert-amount
-                      v-show="seeConversion"
-                      :convert="multiplyRate"
-                      :amount="currentOrder.grandTotal"
-                      :currency="pointOfSalesCurrency"
-                      :is-open="seeConversion"
-                    />
-                    <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;" @click="seeConversion = !seeConversion">
-                      {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                    </el-button>
-                  </el-popover>
+                <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">
+                  {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
+              <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
             </span>
             <span v-if="!isMobile" style="float: right;padding-right: 3%;">
               <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.date') }}:
-                <b class="order-info">
+                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ orderDate }}
                 </b>
               </p>
               <p class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
               <p class="total">
-                {{ $t('form.pos.order.itemQuantity') }}
-                <b class="order-info">
+                {{ $t('form.pos.order.itemQuantity') }}:
+                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ getItemQuantity }}
                 </b>
               </p>
               <p class="total">
-                {{ $t('form.pos.order.numberLines') }}
-                <b class="order-info">
+                {{ $t('form.pos.order.numberLines') }}:
+                <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
                   {{ numberOfLines }}
-                </b></p>
+                </b>
+              </p>
             </span>
           </el-footer>
         </el-container>
@@ -383,35 +409,42 @@
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import orderLineMixin from './orderLineMixin.js'
+import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOrder from './fieldsListOrder.js'
 import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner'
 import fieldLine from '@/components/ADempiere/Form/VPOS/Order/line/index'
 import ProductInfo from '@/components/ADempiere/Form/VPOS/ProductInfo'
-import convertAmount from '@/components/ADempiere/Form/VPOS/Collection/convertAmount/index'
+import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
 // Format of values ( Date, Price, Quantity )
 import {
   formatDate,
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
+// import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'Order',
   components: {
     BusinessPartner,
     ProductInfo,
-    convertAmount,
+    FastOrdesList,
     fieldLine
   },
   mixins: [
     formMixin,
-    orderLineMixin
+    orderLineMixin,
+    posMixin
   ],
   data() {
     return {
       fieldsList: fieldsListOrder,
       seeConversion: false,
-      showFieldLine: false
+      showFieldLine: false,
+      pin: '',
+      attributePin: {},
+      validatePin: true,
+      visible: false
     }
   },
   computed: {
@@ -547,7 +580,6 @@ export default {
     currentOrder() {
       if (this.isEmptyValue(this.currentPointOfSales)) {
         return {
-          documentType: {},
           documentStatus: {
             value: ''
           },
@@ -592,27 +624,88 @@ export default {
       return list
     },
     currentWarehouse() {
-      if (!this.isEmptyValue(this.$store.getters['user/getWarehouse'])) {
-        return this.$store.getters['user/getWarehouse']
+      if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.warehouse)) {
+        return this.$store.getters.getCurrentWarehousePos
       }
       return {}
     },
-    listWarehouse() {
+    currentDocumentType() {
+      if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.documentType)) {
+        return this.$store.getters.getCurrentDocumentTypePos
+      }
+      return {}
+    },
+    listWarehouses() {
       if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.warehousesList)) {
         return this.$store.getters.posAttributes.currentPointOfSales.warehousesList
       }
       return []
+    },
+    listDocumentTypes() {
+      if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.documentTypesList)) {
+        return this.$store.getters.posAttributes.currentPointOfSales.documentTypesList
+      }
+      return []
+    },
+    showOverdrawnInvoice() {
+      return this.$store.getters.getOverdrawnInvoice.visible
+    },
+    infowOverdrawnInvoice() {
+      if (this.$store.getters.getOverdrawnInvoice.attributePin) {
+        return this.$store.getters.getOverdrawnInvoice.attributePin
+      }
+      return ''
+    }
+  },
+  watch: {
+    showOverdrawnInvoice(value) {
+      this.visible = value
+    },
+    numberOfLines(value) {
+      if (value > 0) {
+        this.convertedAmount()
+      }
+    },
+    currentOrder(value) {
+      this.validatePin = true
+    },
+    visible(value) {
+      if (value && !this.isEmptyValue(this.$refs)) {
+        setTimeout(() => {
+          this.focusPin()
+        }, 500)
+      } else {
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: value })
+      }
     }
   },
   mounted() {
     if (!this.isEmptyValue(this.$route.query.action)) {
       this.$store.dispatch('reloadOrder', { orderUuid: this.$route.query.action })
     }
+    if (this.isEmptyValue(this.$route.query.action) && !this.isEmptyValue(this.currentOrder.uuid)) {
+      this.$router.push({
+        params: {
+          ...this.$route.params
+        },
+        query: {
+          ...this.$route.query,
+          action: this.currentOrder.uuid
+        }
+      })
+    }
   },
   methods: {
     formatDate,
     formatPrice,
     formatQuantity,
+    keyActionClosePin(event) {
+      this.visible = false
+      this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
+    },
+    focusPin() {
+      this.$refs.pin.focus()
+    },
     closeConvertion() {
       this.seeConversion = false
     },
@@ -632,66 +725,60 @@ export default {
       return this.formatPrice(this.currentOrder.grandTotal - this.currentOrder.totalLines, currency)
     },
     newOrder() {
-      this.$router.push({
-        params: {
-          ...this.$route.params
-        },
-        query: {
-          pos: this.currentPointOfSales.id
-        }
-      }).catch(() => {
-      }).finally(() => {
-        this.$store.commit('setListPayments', [])
-        const { templateBusinessPartner } = this.currentPointOfSales
-        this.$store.commit('updateValuesOfContainer', {
-          containerUuid: this.metadata.containerUuid,
-          attributes: [{
-            columnName: 'UUID',
-            value: undefined
-          },
-          {
-            columnName: 'ProductValue',
-            value: undefined
-          },
-          {
-            columnName: 'C_BPartner_ID',
-            value: templateBusinessPartner.id
-          },
-          {
-            columnName: 'DisplayColumn_C_BPartner_ID',
-            value: templateBusinessPartner.name
-          },
-          {
-            columnName: ' C_BPartner_ID_UUID',
-            value: templateBusinessPartner.uuid
-          }]
-        })
-        this.$store.dispatch('setOrder', {
-          documentType: {},
-          documentStatus: {
-            value: ''
-          },
-          totalLines: 0,
-          grandTotal: 0,
-          salesRepresentative: {},
-          businessPartner: {
-            value: '',
-            uuid: ''
-          }
-        })
-        this.$store.commit('setShowPOSCollection', false)
-        this.$store.dispatch('listOrderLine', [])
-      })
+      this.clearOrder()
+      this.$store.commit('setShowPOSCollection', false)
+      this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateBusinessPartner.uuid })
     },
     changePos(pointOfSales) {
       this.$store.dispatch('setCurrentPOS', pointOfSales)
-      this.newOrder()
+      this.clearOrder()
     },
     changeWarehouse(warehouse) {
-      this.$store.commit('setCurrentWarehouse', warehouse)
+      if (warehouse.is_pos_required_pin) {
+        const attributePin = {
+          ...warehouse,
+          action: 'changeWarehouse',
+          type: 'actionPos',
+          label: this.$t('form.pos.pinMessage.warehouse')
+        }
+        const visible = true
+        this.visible = visible
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+      } else {
+        this.$store.commit('setCurrentWarehousePos', warehouse)
+      }
+    },
+    changeDocumentType(documentType) {
+      if (!documentType.is_pos_required_pin) {
+        this.$store.dispatch('updateOrder', {
+          orderUuid: this.currentOrder.uuid,
+          posUuid: this.currentPointOfSales.uuid,
+          documentTypeUuid: documentType.uuid
+        })
+      } else {
+        const attributePin = {
+          ...documentType,
+          action: 'changeDocumentType',
+          type: 'actionPos',
+          label: this.$t('form.pos.pinMessage.documentType')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+      }
     },
     changePriceList(priceList) {
-      this.$store.commit('setCurrentPriceList', priceList)
+      if (priceList.is_pos_required_pin) {
+        const attributePin = {
+          ...priceList,
+          action: 'changePriceList',
+          type: 'actionPos',
+          label: this.$t('form.pos.pinMessage.priceList')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+      } else {
+        this.$store.commit('setCurrentPriceList', priceList)
+      }
     },
     arrowTop() {
       if (this.currentTable > 0) {
@@ -881,5 +968,13 @@ export default {
     position: fixed;
     bottom: 5%;
     right: 5%;
+  }
+</style>
+
+<style>
+  .el-popper-info {
+    margin-left: 12px;
+    max-width: 75%;
+    min-width: 60%;
   }
 </style>

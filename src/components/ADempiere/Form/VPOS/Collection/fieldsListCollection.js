@@ -24,54 +24,28 @@ export default [
     columnName: 'PayAmt',
     isFromDictionary: true,
     overwriteDefinition: {
+      sequence: 0,
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
       isNumericField: true,
       isActiveLogics: true,
-      isMandatory: true
+      isMandatory: true,
+      displayLogicPayment: 'X'
     }
   },
   // Currency
-  {
-    tableName: 'C_Order',
-    columnName: 'C_Currency_ID',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      size: 24,
-      handleActionKeyPerformed: true,
-      handleActionPerformed: true,
-      validationCode: 'C_Currency.C_Currency_ID = 100 OR C_Currency.C_Currency_ID = 50001',
-      isActiveLogics: true,
-      isMandatory: true
-    }
-  },
-  // TenderType
-  {
-    tableName,
-    elementColumnName: 'TenderType',
-    columnName: 'TenderType',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      defaultValue: 'X',
-      handleActionKeyPerformed: true,
-      handleContentSelection: true,
-      handleActionPerformed: true,
-      size: 24,
-      isActiveLogics: true,
-      isMandatory: true
-    }
-  },
   // Bank
   {
     tableName,
     columnName: 'C_Bank_ID',
     isFromDictionary: true,
     overwriteDefinition: {
+      sequence: 2,
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       handleContentSelection: true,
-      displayLogic: `@TenderType@=='D'`,
+      displayLogicPayment: 'D,K,T,A,P,C',
       size: 24,
       isActiveLogics: true,
       isMandatory: true
@@ -83,6 +57,7 @@ export default [
     elementColumnName: 'DateTrx',
     isFromDictionary: true,
     overwriteDefinition: {
+      sequence: 4,
       handleFocusGained: true,
       handleFocusLost: true,
       handleKeyPressed: true,
@@ -90,7 +65,23 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='K'`,
+      displayLogicPayment: 'K',
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  {
+    elementColumnName: 'EMail',
+    columnName: 'EMail',
+    tableName: 'AD_user',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 5,
+      handleActionKeyPerformed: true,
+      handleContentSelection: true,
+      handleActionPerformed: true,
+      size: 24,
+      displayLogicPayment: 'Z',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -102,10 +93,11 @@ export default [
     columnName: 'ReferenceNo',
     isFromDictionary: true,
     overwriteDefinition: {
+      sequence: 6,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
-      displayLogic: `@TenderType@<>'X'&@TenderType@<>'C' `,
+      displayLogicPayment: 'K,Z,P,D,K,T,A',
       size: 24,
       isActiveLogics: true,
       isMandatory: true
@@ -118,12 +110,13 @@ export default [
     columnName: 'CreditCardType',
     isFromDictionary: true,
     overwriteDefinition: {
+      sequence: 7,
       defaultValue: 'M',
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='C'`,
+      displayLogicPayment: 'C',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -135,11 +128,12 @@ export default [
     columnName: 'CreditCardNumber',
     isFromDictionary: true,
     overwriteDefinition: {
+      sequence: 8,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='C'`,
+      displayLogicPayment: 'C',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -151,11 +145,12 @@ export default [
     columnName: 'AccountNo',
     isFromDictionary: true,
     overwriteDefinition: {
+      sequence: 9,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='M'`,
+      displayLogicPayment: 'M,A',
       isActiveLogics: true,
       isMandatory: true
     }

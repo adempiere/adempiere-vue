@@ -2,6 +2,8 @@
 import actionMenu from './actionMenu'
 
 export default {
+  actionMenu,
+
   language: 'Idioma',
   route: {
     dashboard: 'Panel de control',
@@ -60,6 +62,7 @@ export default {
   navbar: {
     badge: {
       Notifications: 'Notificaciones',
+      activity: 'Flujos de Trabajos por Aprobar',
       link: 'Ir a Histórico de Procesos'
     },
     logOut: 'Salir',
@@ -316,6 +319,7 @@ export default {
     deleteRecord: 'Eliminar Registro',
     undoNew: 'Descartar Nuevo Registro',
     containerInfo: {
+      attachment: 'Anexo',
       notes: 'Listado de Notas',
       changeLog: 'Actividad',
       workflowLog: 'Histórico de Flujo de Trabajo',
@@ -429,7 +433,8 @@ export default {
           print: 'Imprimir Documento',
           cancelOrder: 'Cancelar Orden',
           orderRemoved: 'Orden Borrada',
-          copyOrder: 'Copiar Orden'
+          copyOrder: 'Copiar Orden',
+          createNewReturnOrder: 'Crear una nueva orden de devolución'
         },
         cashManagement: {
           title: 'Gestión de Caja',
@@ -451,7 +456,8 @@ export default {
         options: 'Opciones',
         editQuantities: 'Editar Cantidades',
         pin: 'Ingrese Pin',
-        remove: 'Eliminar'
+        remove: 'Eliminar',
+        empty: 'Ingrese el nombre del producto, código o UPC'
       },
       order: {
         order: 'Orden',
@@ -462,8 +468,8 @@ export default {
         discount: 'Descuento',
         tax: 'Impuesto',
         total: 'Total',
-        itemQuantity: 'Cantidad de Árticulo',
-        numberLines: 'Cantidad de Lineas',
+        itemQuantity: 'Cantidad de Artículos',
+        numberLines: 'Número de Líneas',
         pointSale: 'Punto de Venta',
         collect: 'Cobrar',
         collections: 'Cobros',
@@ -478,11 +484,14 @@ export default {
         pending: 'Pendiente',
         payment: 'Pago',
         change: 'Cambio',
+        totalInvoiced: 'Total Facturado',
         convertAmount: 'Convertir Cantidad',
         convertedAmount: 'Monto Convertido',
         fullPayment: 'Cobro Completo',
+        Currency: 'Moneda',
         dayRate: 'Tasa del Día',
         noDayRate: 'No se a generado una tasa del día para la moneda',
+        refund: 'Reembolso',
         TenderType: {
           directDeposit: 'Depósito Directo',
           creditCard: 'Tarjeta de Crédito',
@@ -493,15 +502,48 @@ export default {
           account: 'Cuenta',
           cash: 'Efectivo',
           zelle: 'Zelle'
+        },
+        overdrawnInvoice: {
+          title: 'Factura Sobregirada',
+          below: 'Factura quedará con un saldo abierto',
+          above: 'Datos del Cliente',
+          returned: 'Su vuelto es',
+          coupon: 'Generar una Tarjeta de Regalo o Vale',
+          returnMoney: 'Devolver dinero en otra forma de pago',
+          adjustDocument: 'Desea Ajustar Documento',
+          dailyLimit: 'Limite Diario',
+          customerLimit: 'Limite Order',
+          available: 'Disponible',
+          emptyPayment: 'Método de pago no soportado',
+          addPayment: 'Debe agregar un tipo de vuelto para completar la operación'
         }
       },
       keyLayout: {
         noProducto: 'No hay producto disponible Regresar al Principio'
+      },
+      pinMessage: {
+        pin: 'Ingrese pin para ',
+        documentType: 'cambiar tipo de documento',
+        warehouse: 'cambiar almacén',
+        price: 'cambiar precio',
+        qtyEntered: 'cambiar cantidad',
+        priceList: 'cambiar lista de precio',
+        discount: 'agregar descuento',
+        delete: 'eliminar producto',
+        addProduct: 'agregar producto',
+        invoiceOpen: 'generar factura con un saldo abierto'
       }
     },
     priceChecking: {
       productNotFound: 'Producto No Disponible',
       basePrice: 'Precio Base'
+    },
+    byInvoice: {
+      title: 'Pedidos Vendedor de Pasillo por Facturar',
+      label: 'Por Facturar',
+      salesRepresentative: 'Agente Comercial',
+      businessPartner: 'Socio de Negocio',
+      documentNo: 'Nro. Documento'
     },
     productInfo: {
       product: 'Producto',
@@ -512,13 +554,15 @@ export default {
       id: 'ID',
       lastName: 'Nombre2',
       description: 'Descripción',
+      convertedPrice: 'Precio Convertido',
       quantityOnHand: 'Existencia',
       price: 'Precio',
       taxAmount: 'Monto de Impuesto',
       grandTotal: 'Total General',
       grandTotalConverted: 'Gran Total Convertido',
-      quantityAvailable: 'Cantidad Disponible',
-      upc: 'Código de Barras'
+      quantityAvailable: 'Disponible',
+      upc: 'Código de Barras',
+      UM: 'UM'
     },
     guideSteps: {
       productValue: {
@@ -561,8 +605,56 @@ export default {
       toolsPoint: {
         title: 'Herramientas del Punto de Venta'
       }
-    }
-  },
-
-  actionMenu
+    },
+    activity: {
+      title: 'Sus Actividades de Flujo de Trabajo',
+      filtersSearch: {
+        history: 'Registros históricos',
+        forward: 'Re-enviar'
+      },
+      table: {
+        priority: 'Prioridad',
+        node: 'Nodo'
+      },
+      guide: {
+        table: {
+          title: 'Lista de Flujos de trabajos por aprobar',
+          description: 'Seleccione al menos uno para ver el detalle y responsable de aprobación. De igual manera puede decidir si aprueba, rechaza o redirecciona el mismo'
+        },
+        workflow: {
+          title: 'Flujo de Trabajo',
+          description: 'Diagrama del ciclo de vida del flijo de trabajo. El Nodo resaltado es el que se encuentra actualmente a la espera de verificación.'
+        },
+        workflowLogs: {
+          title: 'Bitacora de Cambios',
+          description: 'Linea de tiempo del flujo de trabajo'
+        }
+      }
+    },
+    match: {
+      title: {
+        invoice: 'Factura',
+        deliveryReceipt: 'Entrega / Recibo'
+      },
+      description: {
+        searchCriteria: 'Seleccione un Socio de Negocio para verificar los documentos pendientes por asignar',
+        invoice: 'Seleccione una Factura para asignar las Entrega/Recibo correspondiente',
+        deliveryReceipt: 'Seleccione al menos una Entrega/Recibo a la cual requiere asignar la factura seleccionada'
+      },
+      field: {
+        toAssigned: 'Para ser Asignadas',
+        assigning: 'Asignando',
+        difference: 'Diferencia'
+      },
+      filtersSearch: {
+        sameBusinessPartner: 'Mismo Socio del Negocio',
+        sameProduct: 'Mismo Producto ',
+        sameQuantity: 'Misma Cantidad '
+      },
+      table: {
+        nrDocument: 'Nr Docuemnto'
+      }
+    },
+    weight: 'Peso'
+  }
 }

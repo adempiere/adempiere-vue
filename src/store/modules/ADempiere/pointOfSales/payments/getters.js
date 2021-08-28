@@ -48,5 +48,11 @@ export default {
   },
   getConvertionRate: (state) => {
     return state.convertionRate
+  },
+  getRefundLoaded: (state) => {
+    return state.refundLoaded
+  },
+  getCurrencyRedund: (state) => {
+    return state.currentFieldCurrencyRedund
   }
 }

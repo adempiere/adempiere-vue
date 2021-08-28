@@ -19,6 +19,14 @@
   <el-container style="background: white; height: 100% !important;">
     <el-main style="background: white; padding: 0px; height: 100% !important; overflow: hidden">
       <el-container style="background: white; padding: 0px; height: 100% !important;">
+        <!-- Invoice Overdrawn at time of collection -->
+        <overdrawn-invoice
+          :change="change"
+          :pay="pay"
+          :pending="pending"
+          :total-order="currentOrder.grandTotal"
+          :currency="pointOfSalesCurrency"
+        />
         <!-- Collection container top panel -->
         <el-header style="height: auto; padding-bottom: 10px; padding-right: 0px; padding-left: 0px">
           <el-card class="box-card" style="padding-left: 0px; padding-right: 0px">
@@ -26,61 +34,37 @@
               <p class="total">
                 <b>{{ $t('form.pos.collect.orderTotal') }}:</b>
                 <b style="float: right;">
-                  <el-popover
-                    placement="top-start"
-                    trigger="click"
-                  >
-                    <convert-amount
-                      :convert="multiplyRate"
-                      :amount="currentOrder.grandTotal"
-                      :currency="pointOfSalesCurrency"
-                    />
-                    <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                      {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                    </el-button>
-                  </el-popover>
+                  {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
               <p class="total">
                 <b> {{ $t('form.pos.collect.pending') }}: </b>
                 <b style="float: right;">
-                  <el-popover
-                    placement="top-start"
-                    trigger="click"
-                  >
-                    <convert-amount
-                      :convert="multiplyRate"
-                      :amount="pending"
-                      :currency="pointOfSalesCurrency"
-                    />
-                    <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                      {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
-                    </el-button>
-                  </el-popover>
+                  {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
               <p class="total">
                 <b>{{ $t('form.pos.collect.dayRate') }}:</b>
                 <!-- Conversion rate to date -->
-                <b v-if="!isEmptyValue(dateRate)" style="float: right;">
-                  <span v-if="!isEmptyValue(dateRate.divideRate)">
-                    <span v-if="formatConversionCurrenty(dateRate.divideRate) > 1">
+                <b v-if="!isEmptyValue(dayRate)" style="float: right;">
+                  <span v-if="!isEmptyValue(dayRate.divideRate)">
+                    <span v-if="formatConversionCurrenty(dayRate.divideRate) > 1">
                       {{
-                        formatPrice(formatConversionCurrenty(dateRate.divideRate), dateRate.currencyTo.iSOCode)
+                        formatPrice(formatConversionCurrenty(dayRate.divideRate), dayRate.currencyTo.iSOCode)
                       }}
                     </span>
                     <span v-else>
                       {{
-                        dateRate.currencyTo.iSOCode
+                        dayRate.currencyTo.iSOCode
                       }}
                       {{
-                        formatConversionCurrenty(dateRate.divideRate)
+                        formatConversionCurrenty(dayRate.divideRate)
                       }}
                     </span>
                   </span>
                   <span v-else>
                     {{
-                      formatPrice(1, dateRate.iSOCode)
+                      formatPrice(1, dayRate.iSOCode)
                     }}
                   </span>
                 </b>
@@ -97,42 +81,55 @@
                 :disabled="isDisabled"
               >
                 <el-row id="fieldListCollection">
-                  <el-col v-for="(field, index) in fieldsList" :key="index" :span="8">
-                    <!-- Add selected currency symbol -->
+                  <el-col
+                    v-for="field in primaryFieldsList"
+                    :key="field.sequence"
+                    :span="8"
+                  >
                     <field-definition
-                      v-if="field.columnName === 'PayAmt' || field.columnName === 'TenderType'"
-                      :key="field.columnName"
                       :metadata-field="field.columnName === 'PayAmt' ? {
                         ...field,
-                        labelCurrency: isEmptyValue(dateRate.divideRate) ? dateRate : dateRate.currencyTo
+                        labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
                       } : field"
                     />
                   </el-col>
                   <el-col :span="8">
-                    <el-form-item :label="fieldsList[1].name">
+                    <el-form-item label="Métodos de pago">
+                      <el-select
+                        v-model="currentFieldPaymentMethods"
+                        @change="changePaymentMethods"
+                      >
+                        <el-option
+                          v-for="item in availablePaymentMethods"
+                          :key="item.id"
+                          :label="item.name"
+                          :value="item.uuid"
+                        />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="8">
+                    <el-form-item :label="$t('form.pos.collect.Currency')">
                       <el-select
                         v-model="currentFieldCurrency"
-                        :placeholder="fieldsList[1].help"
                         @change="changeCurrency"
                       >
                         <el-option
                           v-for="item in listCurrency"
                           :key="item.id"
-                          :label="item.name"
-                          :value="item.key"
+                          :label="item.iso_code + '(' + item.currency_symbol + ')'"
+                          :value="item.iso_code"
                         />
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col v-for="(field, index) in fieldsList" :key="index" :span="8">
-                    <!-- Add selected currency symbol -->
+                  <el-col
+                    v-for="field in hiddenFieldsList"
+                    :key="field.sequence"
+                    :span="8"
+                  >
                     <field-definition
-                      v-if="field.columnName !== 'PayAmt' && field.columnName !== 'TenderType' && field.columnName !== 'C_Currency_ID'"
-                      :key="field.columnName"
-                      :metadata-field="field.columnName === 'PayAmt' ? {
-                        ...field,
-                        labelCurrency: isEmptyValue(dateRate.divideRate) ? dateRate : dateRate.currencyTo
-                      } : field"
+                      :metadata-field="field"
                     />
                   </el-col>
                 </el-row>
@@ -142,8 +139,8 @@
           <samp id="buttonCollection" style="float: right;padding-right: 10px;">
             <el-button type="danger" icon="el-icon-close" @click="exit" />
             <el-button type="info" icon="el-icon-minus" :disabled="isDisabled" @click="undoPatment" />
-            <el-button type="primary" :disabled="validPay || addPay || isDisabled" icon="el-icon-plus" @click="addCollectToList(paymentBox)" />
-            <el-button type="success" :disabled="validateCompleteCollection || isDisabled" icon="el-icon-shopping-cart-full" @click="completePreparedOrder(listPayments)" />
+            <el-button type="primary" icon="el-icon-plus" :disabled="validPay || addPay || isDisabled" @click="addCollectToList(paymentBox)" />
+            <el-button type="success" :disabled="isDisabled || isDisabled" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
           </samp>
         </el-header>
         <!-- Panel where they show the payments registered from the collection container -->
@@ -169,7 +166,7 @@
         </el-main>
         <!-- Collection container bottom panel -->
         <el-footer id="infoInvoce" height="auto" style="padding-left: 0px; padding-right: 0px;">
-          <el-row :gutter="24" style="background-color: rgb(245, 247, 250);">
+          <el-row :gutter="24">
             <el-col :span="24">
               <span>
                 <p class="total">
@@ -177,75 +174,29 @@
                     {{ $t('form.pos.collect.orderTotal') }}:
                   </b>
                   <b style="float: right;">
-                    <el-popover
-                      placement="top-start"
-                      trigger="click"
-                    >
-                      <convert-amount
-                        :convert="multiplyRate"
-                        :amount="currentOrder.grandTotal"
-                        :currency="pointOfSalesCurrency"
-                      />
-                      <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                        {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                      </el-button>
-                    </el-popover>
+                    {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
+
+                <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
 
                 <p class="total">
                   {{ $t('form.pos.collect.pending') }}:
                   <b style="float: right;">
-                    <el-popover
-                      placement="top-start"
-                      trigger="click"
-                    >
-                      <convert-amount
-                        :convert="multiplyRate"
-                        :amount="pending"
-                        :currency="pointOfSalesCurrency"
-                      />
-                      <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                        {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
-                      </el-button>
-                    </el-popover>
+                    {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
 
                 <p class="total">
                   {{ $t('form.pos.collect.payment') }}:
                   <b style="float: right;">
-                    <el-popover
-                      placement="top-start"
-                      trigger="click"
-                    >
-                      <convert-amount
-                        :convert="multiplyRate"
-                        :amount="pay"
-                        :currency="pointOfSalesCurrency"
-                      />
-                      <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                        {{ formatPrice(pay, pointOfSalesCurrency.iSOCode) }}
-                      </el-button>
-                    </el-popover>
+                    {{ formatPrice(pay, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
                 <p class="total">
                   {{ $t('form.pos.collect.change') }}:
                   <b style="float: right;">
-                    <el-popover
-                      placement="top-start"
-                      trigger="click"
-                    >
-                      <convert-amount
-                        :convert="multiplyRate"
-                        :amount="change"
-                        :currency="pointOfSalesCurrency"
-                      />
-                      <el-button slot="reference" type="text" style="color: #000000;font-weight: 604!important;font-size: 100%;">
-                        {{ formatPrice(change, pointOfSalesCurrency.iSOCode) }}
-                      </el-button>
-                    </el-popover>
+                    {{ formatPrice(change, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
               </span>
@@ -262,16 +213,16 @@ import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListCollection from './fieldsListCollection.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
-import convertAmount from '@/components/ADempiere/Form/VPOS/Collection/convertAmount/index'
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
+import overdrawnInvoice from '@/components/ADempiere/Form/VPOS/Collection/overdrawnInvoice'
 
 export default {
   name: 'Collection',
   components: {
     typeCollection,
-    convertAmount
+    overdrawnInvoice
   },
   mixins: [
     formMixin,
@@ -309,12 +260,13 @@ export default {
       sendToServer: false,
       value: '',
       amontSend: 0,
-      currentFieldCurrency: ''
+      currentFieldCurrency: '',
+      currentFieldPaymentMethods: ''
     }
   },
   computed: {
     listCurrency() {
-      return this.$store.state['pointOfSales/point/index'].listCurrency
+      return this.$store.getters.getCurrenciesList
     },
     convertionList() {
       return this.$store.state['pointOfSales/point/index'].conversionsList
@@ -355,7 +307,7 @@ export default {
       const listLocal = this.$store.getters.getPaymentBox
       const listServer = this.currentOrder.listPayments
       if (!this.sendToServer) {
-        return listServer.payments
+        return listServer.payments.filter(payment => !payment.isRefund)
       }
       return listLocal
     },
@@ -469,16 +421,29 @@ export default {
       }
       return true
     },
+    isPosRequiredPin() {
+      const pos = this.$store.getters.posAttributes.currentPointOfSales
+      if (!this.isEmptyValue(pos.isPosRequiredPin)) {
+        return pos.isPosRequiredPin
+      }
+      return false
+    },
     validPay() {
       const containerUuid = this.containerUuid
       // filter by visible fields
-      const fieldLogic = this.fieldsList.filter(field => field.isDisplayedFromLogic === true)
+      const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
       const fieldsEmpty = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid,
         fieldsList: fieldLogic,
         isValidate: true
       })
-      return !this.isEmptyValue(fieldsEmpty)
+      if (this.defaulValuePaymentMethods.tender_type === 'X' && this.currentFieldPaymentMethods === this.defaulValuePaymentMethods.uuid) {
+        return false
+      }
+      if (this.isEmptyValue(fieldsEmpty)) {
+        return false
+      }
+      return true
     },
     change() {
       const missing = this.pay - this.currentOrder.grandTotal
@@ -530,19 +495,104 @@ export default {
     updateOrderPaymentPos() {
       return this.$store.getters.getUpdatePaymentPos
     },
-    dateRate() {
-      const convertion = this.convertionList.find(currency => {
-        if ((currency.currencyTo.iSOCode === this.currentFieldCurrency) && (this.pointOfSalesCurrency.iSOCode !== currency.currencyTo.iSOCode)) {
-          return currency
+    convertionsList() {
+      return this.$store.state['pointOfSales/point/index'].conversionsList
+    },
+    currentConvertion() {
+      if (this.isEmptyValue(this.currentPointOfSales.displayCurrency)) {
+        return {}
+      }
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(convert.currencyTo) && !this.isEmptyValue(this.currentPointOfSales.displayCurrency) && convert.currencyTo.id === this.currentPointOfSales.displayCurrency.id) {
+          return convert
         }
       })
-      if (!this.isEmptyValue(convertion)) {
-        return convertion
+      if (convert) {
+        return convert
       }
-      return this.pointOfSalesCurrency
+      return {}
+    },
+    dayRate() {
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+          return convert
+        }
+      })
+      if (!this.isEmptyValue(convert)) {
+        return convert
+      }
+      return {
+        currencyTo: this.currentPointOfSales.currentPriceList.currency,
+        divideRate: 1,
+        iSOCode: this.currentPointOfSales.currentPriceList.currency.iSOCode
+      }
     },
     fieldsPaymentType() {
-      return this.fieldsList[2]
+      return this.fieldsList[1]
+    },
+    primaryFieldsList() {
+      return this.fieldsList.filter(field => field.sequence < 1)
+    },
+    hiddenFieldsList() {
+      return this.fieldsList.filter(field => {
+        if (field.sequence > 1 && field.displayLogicPayment.includes(this.currentAvailablePaymentMethods.tender_type)) {
+          return field
+        }
+      })
+    },
+    overUnderPayment() {
+      return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.success
+    },
+    totalAmountConverted() {
+      const conversionsList = this.$store.state['pointOfSales/point/index'].conversionsList
+      if (this.isEmptyValue(conversionsList) && !this.isEmptyValue(this.currentPointOfSales.conversionTypeUuid)) {
+        return 1
+      }
+      const converted = conversionsList.find(converted => {
+        if (converted.conversionTypeUuid === this.currentPointOfSales.conversionTypeUuid) {
+          return converted
+        }
+      })
+      if (!this.isEmptyValue(converted)) {
+        return converted.divideRate
+      }
+      return 1
+    },
+    standardPrecision() {
+      const precision = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+      if (precision) {
+        return precision.standard_precision
+      }
+      return this.pointOfSalesCurrency.standardPrecision
+    },
+    availablePaymentMethods() {
+      return this.$store.getters.getPaymentTypeList
+    },
+    currentAvailablePaymentMethods() {
+      if (this.isEmptyValue(this.availablePaymentMethods)) {
+        return {
+          name: ''
+        }
+      }
+      const payment = this.availablePaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+      if (!this.isEmptyValue(payment)) {
+        return payment
+      }
+      const defaultPayment = this.availablePaymentMethods.find(payment => payment.tender_type === 'X')
+      if (!this.isEmptyValue(defaultPayment)) {
+        return defaultPayment
+      }
+      return {
+        name: ''
+      }
+    },
+    defaulValuePaymentMethods() {
+      const defaultPayment = this.availablePaymentMethods.find(payment => payment.tender_type === 'X')
+      if (!this.isEmptyValue(defaultPayment)) {
+        return defaultPayment
+      }
+      return {}
     }
   },
   watch: {
@@ -550,24 +600,9 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: value
+        value: this.round(value / this.standardPrecision)
       })
     },
-    // currencyUuid(value) {
-    //   const listCurrency = this.$store.getters.getConvertionRate.find(currency => {
-    //     if (currency.uuid === value) {
-    //       return currency
-    //     }
-    //   })
-    //   if (listCurrency === undefined) {
-    //     this.$store.dispatch('conversionDivideRate', {
-    //       conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
-    //       currencyFromUuid: this.pointOfSalesCurrency.uuid,
-    //       conversionDate: this.formatDate(new Date()),
-    //       currencyToUuid: value
-    //     })
-    //   }
-    // },
     convertAllPayment(value) {
       if (!this.isEmptyValue(value)) {
         this.allPayCurrency = this.pay / value
@@ -579,22 +614,22 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.pending
+          value: this.round(this.pending, this.standardPrecision)
         })
       }
     },
-    dateRate(value) {
+    dayRate(value) {
       if (!this.isEmptyValue(value.divideRate)) {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.pending / value.divideRate
+          value: this.round(this.pending / value.divideRate, this.standardPrecision)
         })
       } else {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.pending
+          value: this.round(this.pending, this.standardPrecision)
         })
       }
     },
@@ -609,6 +644,22 @@ export default {
           query: value.reference.query
         })
       }
+    },
+    listPayments(payment) {
+      if (!this.isEmptyValue(this.convertionsList)) {
+        let rate
+        payment.forEach((pay) => {
+          rate = this.convertionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === pay.currencyUuid)
+          if (!rate) {
+            if (this.currentPointOfSales.priceList.currency.uuid !== pay.currencyUuid) {
+              this.searchConversion(pay.currencyUuid)
+            }
+          }
+        })
+      }
+    },
+    precision() {
+      return this.$store.getters.getCurrency.standardPrecision
     }
   },
   created() {
@@ -616,8 +667,16 @@ export default {
     this.$store.dispatch('addRateConvertion', this.pointOfSalesCurrency)
     this.unsubscribe = this.subscribeChanges()
     this.defaultValueCurrency()
+    this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
   },
   methods: {
+    amountConvert(currency) {
+      this.$store.dispatch('searchConversion', {
+        conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
+        currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
+        currencyToUuid: currency.uuid
+      })
+    },
     formatNumber({ displayType, number }) {
       let fixed = 0
       // Amount, Costs+Prices, Number
@@ -631,14 +690,27 @@ export default {
       let sum = 0
       if (cash) {
         cash.forEach((pay) => {
+          const amount = this.convertAmount(pay.currencyUuid)
           if (!this.isEmptyValue(pay.divideRate)) {
-            sum += pay.amountConvertion / pay.divideRate
+            sum += amount * pay.amount
           } else {
             sum += pay.amount
           }
         })
       }
       return sum
+    },
+    convertAmount(currencyUuid) {
+      const currencyPay = this.convertionsList.find(currency => {
+        if (!this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === currencyUuid) {
+          return currency
+        }
+      })
+      if (!currencyPay) {
+        return 0
+      }
+      const rate = (currencyPay.divideRate > currencyPay.multiplyRate) ? currencyPay.divideRate : currencyPay.multiplyRate
+      return rate
     },
     notSubmitForm(event) {
       event.preventDefault()
@@ -647,7 +719,7 @@ export default {
     addCollectToList() {
       const containerUuid = this.containerUuid
       const posUuid = this.currentPointOfSales.uuid
-      const orderUuid = this.$route.query.action
+      const orderUuid = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid
       const bankUuid = this.$store.getters.getValueOfField({
         containerUuid,
         columnName: 'C_Bank_ID_UUID'
@@ -660,36 +732,23 @@ export default {
         containerUuid,
         columnName: 'DateTrx'
       })
-      const tenderTypeCode = this.$store.getters.getValueOfField({
-        containerUuid,
-        columnName: 'TenderType'
-      })
+      const tenderTypeCode = this.currentAvailablePaymentMethods.tender_type
       const referenceNo = this.$store.getters.getValueOfField({
         containerUuid,
         columnName: 'ReferenceNo'
       })
-      const currencyUuid = this.$store.getters.getValueOfField({
-        containerUuid,
-        columnName: 'C_Currency_ID_UUID'
-      })
-      const currencyId = this.$store.getters.getValueOfField({
-        containerUuid,
-        columnName: 'C_Currency_ID'
-      })
-      const currencyToPay = this.isEmptyValue(currencyUuid) ? currencyId : currencyUuid
-      if (this.isEmptyValue(this.currencyDisplay(currencyToPay)) && this.currencyDisplay(currencyToPay).currencyUuid !== this.pointOfSalesCurrency.uuid) {
-        this.amontSend = this.convert.divideRate * this.amontSend
-      }
+
       if (this.sendToServer) {
         this.$store.dispatch('setPaymentBox', {
           posUuid,
           orderUuid,
           bankUuid,
           referenceNo,
-          amount: this.amontSend * this.convertion,
+          amount: this.round(this.amontSend, this.standardPrecision),
+          convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
-          currencyUuid
+          currencyUuid: this.dayRate.currencyTo.uuid
         })
       } else {
         this.$store.dispatch('createPayments', {
@@ -697,13 +756,18 @@ export default {
           orderUuid,
           bankUuid,
           referenceNo,
-          amount: this.amontSend * this.convertion,
+          amount: this.round(this.amontSend, this.standardPrecision),
+          convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
-          currencyUuid: this.currencyDisplay(currencyToPay)
+          currencyUuid: this.dayRate.currencyTo.uuid
         })
+          .then((response) => {
+            if (response.type !== 'error') {
+              this.addCollect()
+            }
+          })
       }
-      this.addCollect()
     },
     updateServer(listPaymentsLocal) {
       const posUuid = this.currentPointOfSales.uuid
@@ -738,12 +802,13 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.pending
+          value: this.round(this.pending)
         })
       })
       this.defaultValueCurrency()
       this.$store.commit('currencyDivideRateCollection', 1)
       this.$store.commit('currencyMultiplyRate', 1)
+      this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
       this.cancel()
     },
     cancel() {
@@ -767,7 +832,7 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: this.pending
+        value: this.round(this.pending)
       })
       this.defaultValueCurrency()
       this.$store.commit('currencyDivideRateCollection', 1)
@@ -775,6 +840,7 @@ export default {
       this.currentFieldCurrency = this.pointOfSalesCurrency.iSOCode
     },
     exit() {
+      this.cancel()
       this.$store.commit('setShowPOSCollection', false)
     },
     getPriceApplyingDiscount(price, discount) {
@@ -838,14 +904,6 @@ export default {
       }
       return currency
     },
-    convertCurrency() {
-      const convertCurrency = this.currencyDisplay(100)
-      this.$store.dispatch('convertionPayment', {
-        conversionTypeUuid: this.currentPointOfSales,
-        currencyFromUuid: this.pointOfSalesCurrency.uuid,
-        currencyToUuid: convertCurrency.currencyUuid
-      })
-    },
     undoPatment() {
       const list = this.listPayments[this.listPayments.length - 1]
       const orderUuid = list.orderUuid
@@ -854,6 +912,27 @@ export default {
         orderUuid,
         paymentUuid
       })
+    },
+    validateOrder(payment) {
+      this.porcessInvoce = true
+      if (this.pay > this.currentOrder.grandTotal) {
+        this.$store.commit('dialogoInvoce', { show: true, type: 1 })
+      } else if (this.pay < this.currentOrder.grandTotal) {
+        if (this.isPosRequiredPin) {
+          const attributePin = {
+            ...payment,
+            action: 'openBalanceInvoice',
+            type: 'actionPos',
+            label: this.$t('form.pos.pinMessage.invoiceOpen')
+          }
+          this.visible = true
+          this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+          return
+        }
+        this.$store.commit('dialogoInvoce', { show: true, type: 2 })
+      } else {
+        this.completePreparedOrder(payment)
+      }
     },
     completePreparedOrder(payment) {
       const posUuid = this.currentPointOfSales.uuid
@@ -878,6 +957,7 @@ export default {
             message: this.$t('notifications.completed'),
             showClose: true
           })
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
         })
         .catch(error => {
           this.$message({
@@ -915,18 +995,27 @@ export default {
         }
       })
     },
+    changePaymentMethods(value) {
+      this.currentFieldPaymentMethods = value
+    },
     changeCurrency(value) {
       this.currentFieldCurrency = value
-      const currency = this.listCurrency.find(currency => currency.key === value)
-      const findCoventionList = this.convertionList.find(convertion => convertion.currencyTo.iSOCode === value)
-      if (!this.isEmptyValue(currency) && this.isEmptyValue(findCoventionList) && (value !== this.pointOfSalesCurrency.iSOCode)) {
-        this.$store.dispatch('searchConversion', {
-          conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
-          currencyFromUuid: this.pointOfSalesCurrency.uuid,
-          conversionDate: this.formatDate(new Date()),
-          currencyToUuid: currency.uuid
-        })
+      const currency = this.listCurrency.find(currency => currency.iso_code === value)
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+          return convert
+        }
+      })
+      if (!this.isEmptyValue(currency) && this.isEmptyValue(convert) && currency.uuid !== this.currentPointOfSales.currentPriceList.currency.uuid) {
+        this.amountConvert(currency)
       }
+    },
+    searchConversion(value) {
+      this.$store.dispatch('searchConversion', {
+        conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
+        currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
+        currencyToUuid: value
+      })
     }
   }
 }

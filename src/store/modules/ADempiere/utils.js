@@ -31,7 +31,15 @@ const initStateUtils = {
   updateOrder: false,
   updatePayment: false,
   createBusinessPartner: false,
-  showContainer: false
+
+  // TODO: Change to tab
+  showContainer: false,
+
+  step: 0,
+  updateCustomer: false,
+  overdrawnInvoice: {
+    visible: false
+  }
 }
 
 export default {
@@ -104,11 +112,20 @@ export default {
     setUpdatePayment(state, payment) {
       state.updatePayment = payment
     },
+    setStepCurrent(state, step) {
+      state.step = step
+    },
     popoverCreateBusinessPartner(state, createBusinessPartner) {
       state.createBusinessPartner = createBusinessPartner
     },
     setExternalContainer(state, show) {
       state.showContainer = show
+    },
+    popoverOverdrawnInvoice(state, payload) {
+      state.overdrawnInvoice = payload
+    },
+    showUpdateCustomer(state, show) {
+      state.updateCustomer = show
     }
   },
   actions: {
@@ -178,6 +195,16 @@ export default {
     },
     changePopover({ commit }, params) {
       commit('popoverCreateBusinessPartner', params)
+    },
+    changePopoverOverdrawnInvoice({ commit }, { attributePin, visible }) {
+      const overdrawn = {
+        attributePin,
+        visible
+      }
+      commit('popoverOverdrawnInvoice', overdrawn)
+    },
+    changeShowUpdateCustomer({ commit }, show) {
+      commit('showUpdateCustomer', show)
     }
   },
   getters: {
@@ -254,8 +281,20 @@ export default {
     getPopoverCreateBusinessParnet: (state) => {
       return state.createBusinessPartner
     },
+
+    // TODO: Change to tab
     getExternalContainer: (state) => {
       return state.showContainer
+    },
+
+    getStepCurrent: (state) => {
+      return state.step
+    },
+    getOverdrawnInvoice: (state) => {
+      return state.overdrawnInvoice
+    },
+    getShowUpdateCustomer: (state) => {
+      return state.updateCustomer
     }
   }
 }

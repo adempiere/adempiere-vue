@@ -54,8 +54,21 @@ export default {
         case 'ProductInfo':
           form = import('@/components/ADempiere/Form/ProductInfo')
           break
+        case 'WFActivity':
+          form = import('@/components/ADempiere/Form/WorkflowActivity')
+          break
+        case 'VMatch':
+          form = import('@/components/ADempiere/Form/VMatch')
+          break
         case 'VPOS':
+          this.$store.dispatch('settings/changeSetting', {
+            key: 'showContextMenu',
+            value: false
+          })
           form = import('@/components/ADempiere/Form/VPOS')
+          break
+        case 'VGetWeight':
+          form = import('@/components/ADempiere/Form/VGetWeight')
           break
         default:
           form = import('@/views/ADempiere/Unsupported')

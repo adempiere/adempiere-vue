@@ -92,3 +92,54 @@ export function requestListDocumentActions({
       }
     })
 }
+
+// Request a list of Activities from the user's Workflows
+export function workflowActivities({
+  userUuid,
+  pageSize,
+  pageToken
+}) {
+  return request({
+    url: '/workflow/workflow-activities',
+    method: 'get',
+    params: {
+      user_uuid: userUuid,
+      // Page Data
+      pageToken,
+      pageSize
+    }
+  })
+    .then(listWorkflowActivities => {
+      return {
+        nextPageToken: listWorkflowActivities.next_page_token,
+        recordCount: listWorkflowActivities.record_count,
+        listWorkflowActivities: listWorkflowActivities.records
+      }
+    })
+}
+// GET Workflows
+/**
+ * Request Document Status List
+ * @param {string} tableName
+ * @param {number} pageSize
+ * @param {string} pageToken
+ */
+export function getWorkflow({
+  tableName,
+  pageSize,
+  pageToken
+}) {
+  return request({
+    url: '/workflow/workflows',
+    method: 'get',
+    params: {
+      table_name: tableName,
+      // Page Data
+      pageToken,
+      pageSize
+    }
+  })
+    .then(listWorkflowActivities => {
+      return listWorkflowActivities
+    })
+}
