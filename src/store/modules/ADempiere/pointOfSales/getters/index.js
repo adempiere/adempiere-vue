@@ -67,6 +67,9 @@ export default {
       }
     }
   },
+  getListRefund: (state) => {
+    return state.listRefund
+  },
   /**
    * Product Price Getters
    * List Product

@@ -268,6 +268,7 @@ export default {
           typePay = () => import('./paymentTypeChange/Cash/index.vue')
           break
         case 'A':
+        case 'D':
           typePay = () => import('./paymentTypeChange/ACH/index')
           break
         case 'M':
@@ -403,6 +404,22 @@ export default {
     },
     refundLoaded() {
       return this.$store.getters.getRefundLoaded
+    },
+    dayRate() {
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.defaultReferenceCurrency.iso_code)
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+          return convert
+        }
+      })
+      if (!this.isEmptyValue(convert)) {
+        return convert
+      }
+      return {
+        currencyTo: this.currentPointOfSales.currentPriceList.currency,
+        divideRate: 1,
+        iSOCode: this.currentPointOfSales.currentPriceList.currency.iSOCode
+      }
     }
   },
   watch: {
@@ -494,11 +511,11 @@ export default {
         })
       })
       this.$store.dispatch('addRefundLoaded', values)
-      this.$store.dispatch('sendCreateCustomerAccount', {
+      this.$store.dispatch('addCreateCustomerAccount', {
         posUuid: this.currentPointOfSales.uuid,
         orderUuid: this.currentOrder.uuid,
         bankUuid: customer.C_Bank_ID_UUID,
-        amount: this.change,
+        amount: this.change / this.dayRate.divideRate,
         tenderTypeCode: this.selectionTypeRefund.tender_type,
         currencyUuid: this.defaultReferenceCurrency.uuid
       })

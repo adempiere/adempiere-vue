@@ -292,6 +292,7 @@ export default {
       orderUuid
     })
       .then(response => {
+        commit('listRefund', response.listPayments)
         commit('setListPayments', {
           payments: response.listPayments.reverse(),
           isLoaded: true
@@ -322,6 +323,35 @@ export default {
   currencyRedund({ commit }, currency) {
     commit('setCurrencyRedund', currency)
   },
+  addCreateCustomerAccount({ commit }, {
+    customerAccount,
+    posUuid,
+    orderUuid,
+    invoiceUuid,
+    bankUuid,
+    referenceNo,
+    description,
+    amount,
+    convertedAmount,
+    paymentDate,
+    tenderTypeCode,
+    currencyUuid
+  }) {
+    commit('setAddRefund', {
+      customerAccount,
+      posUuid,
+      orderUuid,
+      invoiceUuid,
+      bankUuid,
+      referenceNo,
+      description,
+      amount,
+      convertedAmount,
+      paymentDate,
+      tenderTypeCode,
+      currencyUuid
+    })
+  },
   sendCreateCustomerAccount({ commit, dispatch }, {
     customerAccount,
     posUuid,
@@ -348,7 +378,8 @@ export default {
       convertedAmount,
       paymentDate,
       tenderTypeCode,
-      currencyUuid
+      currencyUuid,
+      isRefund: true
     })
       .then(response => {
         const orderUuid = response.orderUuid

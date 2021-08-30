@@ -313,9 +313,12 @@ export default {
             this.$store.commit('setCurrentPriceList', action)
             break
           case 'openBalanceInvoice':
+            this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
+              .then(response => {
+                this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
+              })
             this.$store.commit('dialogoInvoce', { show: true, type: 2 })
             this.$store.commit('dialogoInvoce', { show: false })
-            this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
             break
         }
       }

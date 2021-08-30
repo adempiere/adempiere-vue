@@ -84,10 +84,10 @@
         </template>
       </el-row>
     </el-main>
-    <el-divider v-if="!isEmptyValue(listRefunds)" content-position="center"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
-    <el-footer style="height: 200px;padding: 0px;">
+    <el-divider v-if="!isEmptyValue(listRefund)" content-position="center"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
+    <el-footer v-if="!isEmptyValue(listRefund)" style="height: 200px;padding: 0px;">
       <el-row :gutter="24">
-        <template v-for="(value, key) in listRefunds">
+        <template v-for="(value, key) in listRefund">
           <el-col v-if="value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
             <el-card :body-style="{ padding: '0px' }">
               <el-row>
@@ -204,9 +204,6 @@ export default {
     }
   },
   computed: {
-    listRefunds() {
-      return this.currentPointOfSales.currentOrder.listPayments.payments.filter(payments => payments.isRefund)
-    },
     typesPayment() {
       return this.$store.getters.getListsPaymentTypes
     },
@@ -228,6 +225,9 @@ export default {
     },
     availablePaymentMethods() {
       return this.$store.getters.getPaymentTypeList
+    },
+    listRefund() {
+      return this.$store.getters.getListRefund.filter(refund => refund.isRefund)
     }
   },
   watch: {

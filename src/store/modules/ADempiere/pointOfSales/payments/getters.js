@@ -54,5 +54,8 @@ export default {
   },
   getCurrencyRedund: (state) => {
     return state.currentFieldCurrencyRedund
+  },
+  getAddRefund: (state) => {
+    return state.addRefund
   }
 }

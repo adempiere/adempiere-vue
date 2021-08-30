@@ -83,7 +83,7 @@ export default {
   },
   computed: {
     amountRefund() {
-      return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.key)
+      return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.iso_code)
     },
     currencyReference() {
       const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
@@ -165,7 +165,7 @@ export default {
       return {}
     },
     dayRate() {
-      const currency = this.listCurrency.find(currency => currency.iso_code === this.currencyReference.key)
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.currencyReference.iso_code)
       const convert = this.convertionsList.find(convert => {
         if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
           return convert

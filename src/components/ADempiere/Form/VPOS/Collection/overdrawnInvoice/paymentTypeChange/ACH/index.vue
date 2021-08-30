@@ -121,7 +121,7 @@ export default {
   },
   computed: {
     amountRefund() {
-      return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.key)
+      return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.iso_code)
     },
     currencyReference() {
       const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
@@ -195,7 +195,6 @@ export default {
           return convert
         }
       })
-      console.log(convert)
       if (!this.isEmptyValue(convert)) {
         return convert
       }
