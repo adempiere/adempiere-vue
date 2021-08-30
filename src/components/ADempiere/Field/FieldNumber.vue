@@ -42,6 +42,7 @@
       @focus="focusGained"
       @keydown.native="keyPressed"
       @keyup.native="keyReleased"
+      @keyup.native.enter="select"
     />
     <el-input
       v-else
@@ -61,7 +62,6 @@
 <script>
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 import { FIELDS_CURRENCY, FIELDS_DECIMALS } from '@/utils/ADempiere/references'
-
 export default {
   name: 'FieldNumber',
   mixins: [fieldMixin],
@@ -134,7 +134,6 @@ export default {
       if (!this.isDecimal) {
         return value
       }
-
       let options = {
         useGrouping: true,
         minimumIntegerDigits: 1,
@@ -150,7 +149,6 @@ export default {
           currency: this.currencyCode
         }
       }
-
       // TODO: Check the grouping of thousands
       const formatterInstance = new Intl.NumberFormat(lang, options)
       return formatterInstance.format(value)
@@ -180,6 +178,14 @@ export default {
     },
     customFocusGained(event) {
       this.isFocus = true
+      // this.focusGained(event)
+      this.$nextTick(() => {
+        this.$refs[this.metadata.columnName].focus()
+      })
+    },
+    select() {
+      this.$refs[this.metadata.columnName].select()
+      // this.keyPressed()
     },
     customFocusLost(event) {
       this.isFocus = false
@@ -239,7 +245,6 @@ export default {
   }
 }
 </script>
-
 <style lang="scss" scoped>
   /* Show input width 100% in container */
   .el-input-number, .el-input {
