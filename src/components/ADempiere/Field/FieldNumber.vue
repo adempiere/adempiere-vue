@@ -184,8 +184,9 @@ export default {
       })
     },
     select() {
-      this.$refs[this.metadata.columnName].select()
-      // this.keyPressed()
+      this.$nextTick(() => {
+        this.$refs[this.metadata.columnName].select()
+      })
     },
     customFocusLost(event) {
       this.isFocus = false
