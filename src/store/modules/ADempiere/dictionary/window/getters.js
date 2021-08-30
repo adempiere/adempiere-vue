@@ -22,10 +22,12 @@ export default {
   getStoredWindows: (state) => {
     return state.storedWindows
   },
+
   getStoredWindow: (state) => (windowUuid) => {
-    return state.storedWindows.find(window => window.uuid === windowUuid)
+    return state.storedWindows[windowUuid]
   },
+
   getStoredTabs: (state) => (windowUuid) => {
-    return state.storedWindows.find(window => window.uuid === windowUuid).tabs
+    return state.storedWindows[windowUuid].tabs
   }
 }

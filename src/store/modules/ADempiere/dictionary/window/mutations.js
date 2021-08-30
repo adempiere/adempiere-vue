@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Vue from 'vue'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
@@ -22,10 +23,20 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  */
 export default {
   addWindowToList(state, window) {
-    if (!isEmptyValue(window)) {
-      if (!state.storedWindows.find(windowToFind => windowToFind.uuid === window.uuid)) {
-        state.storedWindows.push(window)
-      }
+    Vue.set(state.storedWindows, window.uuid, window)
+  },
+
+  changeWindowAttribute(state, {
+    uuid,
+    attributeName,
+    attributeValue,
+    attributeNameControl
+  }) {
+    let value = attributeValue
+    if (!isEmptyValue(attributeNameControl)) {
+      value = state.storedWindows[uuid][attributeNameControl]
     }
+
+    state.storedWindows[uuid][attributeName] = value
   }
 }

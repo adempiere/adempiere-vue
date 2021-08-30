@@ -20,18 +20,9 @@
   <div v-if="isLoaded" key="window-loaded" class="view-base">
     <el-container style="min-height: calc(100vh - 84px)">
       <el-aside style="width: 100%; margin-bottom: 0px; padding-right: 10px; padding-left: 10px;">
-
-        <!-- // TODO: Add header window component for auxiliary menu and worflow status -->
-        <action-menu
-          :parent-uuid="windowUuid"
-          :references-manager="referencesManager"
-          :actions-manager="actionsManager"
-          :relations-manager="relationsManager"
-        />
-
         <component
           :is="renderWindowComponent"
-          :container-manager="containerManagerWindow"
+          :window-manager="containerManagerWindow"
           :window-metadata="windowMetadata"
         />
       </el-aside>
@@ -47,16 +38,16 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import ActionMenu from '@/components/ADempiere/ActionMenu'
 import LoadingView from '@/components/ADempiere/LoadingView'
+
 import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import { generateWindow as generateWindowDictionary } from './windowUtils'
+import { BUTTON } from '@/utils/ADempiere/references'
 
 export default defineComponent({
   name: 'Window',
 
   components: {
-    ActionMenu,
     LoadingView
   },
 
@@ -91,35 +82,45 @@ export default defineComponent({
       seekTab: function(eventInfo) {
         console.log('seekTab: ', eventInfo)
         return new Promise()
+      },
+
+      isDisplayedColumn: ({ isDisplayedGrid, isDisplayedFromLogic, isActive, isKey, displayType }) => {
+        // button field not showed
+        if (displayType === BUTTON.id) {
+          return false
+        }
+
+        // verify if field is active
+        if (!isActive) {
+          return false
+        }
+
+        // window (table) result
+        return isDisplayedGrid && isDisplayedFromLogic && !isKey
+      },
+
+      isDisplayedField: ({ isDisplayed, isDisplayedFromLogic, isActive, displayType }) => {
+        // button field not showed
+        if (displayType === BUTTON.id) {
+          return false
+        }
+
+        // verify if field is active
+        if (!isActive) {
+          return false
+        }
+
+        return isDisplayed && isDisplayedFromLogic
       }
     }
+
     if (!root.isEmptyValue(props.containerManager)) {
       containerManagerWindow = {
         ...containerManagerWindow,
         // overwirte methods
-        ...props.containerManager,
-
-        isDisplayedColumn: ({ isDisplayedGrid, isDisplayedFromLogic, isKey }) => {
-          // window (table) result
-          return isDisplayedGrid &&
-            isDisplayedFromLogic &&
-            !isKey
-        }
+        ...props.containerManager
       }
     }
-
-    const actionsManager = ref({
-      // overwrite logic or add actions
-      ...props.containerManager.actionsManager
-    })
-    const referencesManager = ref({
-      // overwrite logic
-      ...props.containerManager.referencesManager
-    })
-    const relationsManager = ref({
-      // overwrite logic
-      ...props.containerManager.relationsManager
-    })
 
     const isLoaded = ref(false)
     const windowMetadata = ref({})
@@ -172,7 +173,7 @@ export default defineComponent({
     }
 
     const renderWindowComponent = computed(() => {
-      const windowComponent = () => import('@/views/ADempiere/Window/StandardWindow')
+      const windowComponent = () => import('@/views/ADempiere/Window/MultiTabWindow.vue')
 
       return windowComponent
     })
@@ -184,9 +185,6 @@ export default defineComponent({
       windowUuid,
       containerManagerWindow,
       windowMetadata,
-      actionsManager,
-      referencesManager,
-      relationsManager,
       // computed
       renderWindowComponent,
       isLoaded
