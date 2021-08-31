@@ -188,7 +188,7 @@
           @click="close"
         />
         <el-button
-          type="success"
+          type="primary"
           class="custom-button-create-bp"
           icon="el-icon-check"
           @click="addRefund"
