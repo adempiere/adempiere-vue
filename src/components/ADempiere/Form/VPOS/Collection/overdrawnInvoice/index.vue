@@ -286,8 +286,8 @@ export default {
         case 'P':
           container = 'MobilePayment'
           break
-        case 'D':
         case 'A':
+        case 'D':
           container = 'ACH'
           break
         case 'X':
@@ -436,17 +436,18 @@ export default {
         value: this.change
       })
       this.selectionTypeRefund = {}
-      if (value === 1) {
-        if (this.paymentTypeListRefund.length === 1) {
-          this.selectPayment(this.paymentTypeListRefund[this.paymentTypeListRefund.length - 1])
-        }
+      if (value === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
+        this.selectPayment(this.paymentTypeListRefund[0])
+      }
+      if (value === 3 && !this.isEmptyValue(this.paymentTypeList)) {
+        this.selectPayment(this.paymentTypeList[0])
       }
     }
   },
   mounted() {
     this.selectionTypeRefund = {}
     if (this.paymentTypeListRefund.length === 1) {
-      this.selectPayment(this.paymentTypeListRefund[this.paymentTypeListRefund.length - 1])
+      this.selectPayment(this.paymentTypeListRefund[0])
     }
   },
   methods: {
