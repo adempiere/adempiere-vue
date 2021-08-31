@@ -947,3 +947,72 @@ export function createCustomerAccount({
       return responseCustomerAccount
     })
 }
+/**
+ * Refund payment at a later time
+ * customer_uuid - Customer UUID
+ * pos_uuid - Value
+ * city - City
+ * country - Country
+ * email - EMail
+ * driver_license - Driver Licence
+ * social_security_number - Social Security Number (SSN)
+ * name - Name
+ * state - State
+ * street - Strert
+ * zip - ZIP
+ * bank_account_type - Bank Accoubnt Type
+ * bank_uuid - Bank UUID
+ * is_ach - ACH
+ * address_verified - Address Verified
+ * zip_verified - ZIP Verified
+ * routing_no - Routing No
+ * iban - IBAN
+ */
+export function createCustomerBankAccount({
+  posUuid,
+  customerUuid,
+  city,
+  country,
+  email,
+  driverLicense,
+  socialSecurityNumber,
+  name,
+  state,
+  street,
+  zip,
+  bankAccountType,
+  bankUuid,
+  isAch,
+  addressVerified,
+  zipVerified,
+  routingNo,
+  iban
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/create-customer-bank-account`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      customer_uuid: customerUuid,
+      city,
+      country,
+      email,
+      driver_license: driverLicense,
+      social_security_number: socialSecurityNumber,
+      name,
+      state,
+      street,
+      zip,
+      bank_account_type: bankAccountType,
+      bank_uuid: bankUuid,
+      is_ach: isAch,
+      address_verified: addressVerified,
+      zip_verified: zipVerified,
+      routing_no: routingNo,
+      iban
+    }
+  })
+    .then(responseCreateCustomerBankAccount => {
+      return responseCreateCustomerBankAccount
+    })
+}
