@@ -115,6 +115,7 @@
                 <template slot-scope="scope">
                   <el-popover
                     v-if="!isEmptyValue(listOrderLine)"
+                    v-model="showInfo"
                     popper-class="el-popper-info"
                     placement="right-start"
                     trigger="click"
@@ -128,18 +129,9 @@
                       <el-row style="margin: 10px!important;">
                         <el-col :span="4">
                           <div>
-                            <el-avatar v-if="isEmptyValue(scope.row.product.imageUrl)" shape="square" :size="100" src="https://#" @error="true">
-                              <el-image>
-                                <div slot="error" class="image-slot">
-                                  <i class="el-icon-picture-outline" />
-                                </div>
-                              </el-image>
-                            </el-avatar>
-                            <el-image
-                              v-else
-                              style="width: 100px; height: 100px"
-                              :src="scope.row.product.imageUrl"
-                              fit="contain"
+                            <image-product
+                              :show="showInfo"
+                              :metadata-line="scope.row"
                             />
                           </div>
                         </el-col>
@@ -415,6 +407,7 @@ import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner'
 import fieldLine from '@/components/ADempiere/Form/VPOS/Order/line/index'
 import ProductInfo from '@/components/ADempiere/Form/VPOS/ProductInfo'
 import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
+import ImageProduct from '@/components/ADempiere/Form/VPOS/Order/ImageProduct/index.vue'
 // Format of values ( Date, Price, Quantity )
 import {
   formatDate,
@@ -429,7 +422,8 @@ export default {
     BusinessPartner,
     ProductInfo,
     FastOrdesList,
-    fieldLine
+    fieldLine,
+    ImageProduct
   },
   mixins: [
     formMixin,
@@ -444,7 +438,8 @@ export default {
       pin: '',
       attributePin: {},
       validatePin: true,
-      visible: false
+      visible: false,
+      showInfo: false
     }
   },
   computed: {

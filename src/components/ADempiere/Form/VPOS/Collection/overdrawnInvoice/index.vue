@@ -21,7 +21,7 @@
       :title="$t('form.pos.collect.overdrawnInvoice.title')"
       :visible.sync="showDialogo"
       :before-close="close"
-      width="80%"
+      width="85%"
       @close="close"
     >
       <div v-if="caseOrder === 1">
@@ -286,6 +286,7 @@ export default {
         case 'P':
           container = 'MobilePayment'
           break
+        case 'D':
         case 'A':
           container = 'ACH'
           break
@@ -435,6 +436,11 @@ export default {
         value: this.change
       })
       this.selectionTypeRefund = {}
+      if (value === 1) {
+        if (this.paymentTypeListRefund.length === 1) {
+          this.selectPayment(this.paymentTypeListRefund[this.paymentTypeListRefund.length - 1])
+        }
+      }
     }
   },
   mounted() {
@@ -513,6 +519,7 @@ export default {
       this.$store.dispatch('addRefundLoaded', values)
       this.$store.dispatch('addCreateCustomerAccount', {
         posUuid: this.currentPointOfSales.uuid,
+        customer,
         orderUuid: this.currentOrder.uuid,
         bankUuid: customer.C_Bank_ID_UUID,
         amount: this.change / this.dayRate.divideRate,
@@ -568,24 +575,50 @@ export default {
           break
         case 3:
           if (!this.isEmptyValue(this.refundLoaded)) {
-            this.completePreparedOrder(posUuid, orderUuid, payments)
-            overdrawnInvoice({
-              posUuid,
-              orderUuid,
-              createPayments: !this.isEmptyValue(this.currentOrder.listPayments.payments),
-              payments: this.currentOrder.listPayments.payments,
-              customerDetails,
-              option: this.option
+            const values = this.$store.getters.getValuesView({
+              containerUuid: this.renderComponentContainer,
+              format: 'object'
             })
-              .then(response => {
-                this.$store.dispatch('reloadOrder', response.uuid)
-                this.$message({
-                  type: 'success',
-                  message: this.$t('notifications.completed'),
-                  showClose: true
-                })
+            const customer = {
+              customerAccount: values,
+              currencyUuid: this.$store.getters.getCurrencyRedund.uuid,
+              orderUuid: this.currentOrder.uuid,
+              posUuid: this.currentPointOfSales.uuid,
+              tenderTypeCode: this.selectionTypeRefund.tender_type
+            }
+            if (this.$store.getters.posAttributes.currentPointOfSales.isPosRequiredPin) {
+              const attributePin = {
+                posUuid,
+                orderUuid,
+                customer,
+                payments,
+                typeRefund: this.option,
+                action: 'openBalanceInvoice',
+                type: 'actionPos',
+                label: this.$t('form.pos.pinMessage.invoiceOpen')
+              }
+              this.visible = true
+              this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+            } else {
+              this.completePreparedOrder(posUuid, orderUuid, payments)
+              overdrawnInvoice({
+                posUuid,
+                orderUuid,
+                createPayments: !this.isEmptyValue(this.currentOrder.listPayments.payments),
+                payments: this.currentOrder.listPayments.payments,
+                customerDetails,
+                option: this.option
               })
-            this.$store.commit('dialogoInvoce', { show: false, success: true })
+                .then(response => {
+                  this.$store.dispatch('reloadOrder', response.uuid)
+                  this.$message({
+                    type: 'success',
+                    message: this.$t('notifications.completed'),
+                    showClose: true
+                  })
+                })
+              this.$store.commit('dialogoInvoce', { show: false, success: true })
+            }
           } else {
             this.$message({
               type: 'warning',
@@ -601,6 +634,7 @@ export default {
               posUuid,
               orderUuid,
               payments,
+              typeRefund: this.option,
               action: 'openBalanceInvoice',
               type: 'actionPos',
               label: this.$t('form.pos.pinMessage.invoiceOpen')

@@ -59,6 +59,51 @@ export default [
       isMandatory: true
     }
   },
+  // bank_account_type
+  {
+    tableName: 'C_BP_BankAccount',
+    columnName: 'BankAccountType',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 3,
+      handleActionKeyPerformed: true,
+      handleActionPerformed: true,
+      handleContentSelection: true,
+      size: 24,
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // A_Ident_SSN
+  {
+    tableName: 'C_BP_BankAccount',
+    columnName: 'A_Ident_SSN',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 3,
+      handleActionKeyPerformed: true,
+      handleActionPerformed: true,
+      handleContentSelection: true,
+      size: 24,
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // IsACH
+  {
+    tableName: 'C_BP_BankAccount',
+    columnName: 'IsACH',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 3,
+      handleActionKeyPerformed: true,
+      handleActionPerformed: true,
+      handleContentSelection: true,
+      size: 24,
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
   // accountno
   {
     tableName,

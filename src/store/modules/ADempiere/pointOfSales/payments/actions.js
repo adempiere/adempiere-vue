@@ -19,7 +19,9 @@ import {
   createPayment,
   deletePayment,
   updatePayment,
-  getPaymentsList
+  getPaymentsList,
+  // Customer Bank Account
+  createCustomerBankAccount
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
@@ -325,6 +327,7 @@ export default {
   },
   addCreateCustomerAccount({ commit }, {
     customerAccount,
+    customer,
     posUuid,
     orderUuid,
     invoiceUuid,
@@ -339,6 +342,7 @@ export default {
   }) {
     commit('setAddRefund', {
       customerAccount,
+      customer,
       posUuid,
       orderUuid,
       invoiceUuid,
@@ -386,5 +390,79 @@ export default {
         dispatch('listPayments', { orderUuid })
         return response
       })
+  },
+  /**
+  * Refund payment at a later time
+  * customer_uuid - Customer UUID
+  * pos_uuid - Value
+  * city - City
+  * country - Country
+  * email - EMail
+  * driver_license - Driver Licence
+  * social_security_number - Social Security Number (SSN)
+  * name - Name
+  * state - State
+  * street - Strert
+  * zip - ZIP
+  * bank_account_type - Bank Accoubnt Type
+  * bank_uuid - Bank UUID
+  * is_ach - ACH
+  * address_verified - Address Verified
+  * zip_verified - ZIP Verified
+  * routing_no - Routing No
+  * iban - IBAN
+  */
+  customerBankAccount({ commit, dispatch }, {
+    customerUuid,
+    posUuid,
+    city,
+    country,
+    email,
+    driverLicense,
+    socialSecurityNumber,
+    name,
+    state,
+    street,
+    zip,
+    bankAccountType,
+    bankUuid,
+    isAch,
+    addressVerified,
+    zipVerified,
+    routingNo,
+    iban
+  }) {
+    createCustomerBankAccount({
+      customerUuid,
+      posUuid,
+      city,
+      country,
+      email,
+      driverLicense,
+      socialSecurityNumber,
+      name,
+      state,
+      street,
+      zip,
+      bankAccountType,
+      bankUuid,
+      isAch,
+      addressVerified,
+      zipVerified,
+      routingNo,
+      iban
+    })
+      .then(response => {
+        console.log(response)
+      })
+      .catch(error => {
+        console.warn(`conversionDivideRate: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+      })
   }
+
 }
