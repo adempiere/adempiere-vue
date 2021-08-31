@@ -449,6 +449,8 @@ export default {
         editQuantities: 'Edit Quantities',
         pin: 'Insert Pin',
         remove: 'Remove',
+        displayTaxAmount: 'Tax Amount',
+        displayDiscountAmount: 'Amount of Discount',
         empty: 'Enter the product name, code or UPC'
       },
       order: {

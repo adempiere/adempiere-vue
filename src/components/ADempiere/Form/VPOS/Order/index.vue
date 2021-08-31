@@ -94,7 +94,7 @@
             >
               <template v-for="(valueOrder, item, key) in orderLineDefinition">
                 <el-table-column
-                  v-if="(valueOrder.columnName === 'ConvertedAmount' && !isEmptyValue(currentPointOfSales.displayCurrency)) || valueOrder.columnName !== 'ConvertedAmount'"
+                  v-if="displayLabel(valueOrder)"
                   :key="key"
                   :column-key="valueOrder.columnName"
                   :label="valueOrder.label"

@@ -50,10 +50,23 @@ export default {
           isNumeric: true,
           size: '110px'
         },
+        discountTotal: {
+          columnName: 'DiscountTotal',
+          label: this.$t('form.pos.tableProduct.displayDiscuentAmount'),
+          isNumeric: true,
+          size: 'auto'
+        },
+        discounDisplayTaxAmounttTotal: {
+          columnName: 'DisplayTaxAmount',
+          label: this.$t('form.pos.tableProduct.displayTaxAmount'),
+          isNumeric: true,
+          size: 'auto'
+        },
         grandTotal: {
           columnName: 'GrandTotal',
           label: 'Total',
           isNumeric: true,
+          isVisible: true,
           size: 'auto'
         },
         convertedAmount: {
@@ -225,6 +238,16 @@ export default {
         })
       }
     },
+    displayLabel(row) {
+      if (row.columnName === 'ConvertedAmount') {
+        return !this.isEmptyValue(this.currentPointOfSales.displayCurrency)
+      } else if (row.columnName === 'DiscountTotal') {
+        return this.currentPointOfSales.isDisplayDiscount
+      } else if (row.columnName === 'DisplayTaxAmount') {
+        return this.currentPointOfSales.isDisplayTaxAmount
+      }
+      return true
+    },
     /**
      * Show the correct display format
      * @param {object} row record
@@ -242,11 +265,15 @@ export default {
       } else if (columnName === 'QtyOrdered') {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {
-        return this.formatPercent(row.discount / 100)
+        return this.formatQuantity(row.discount) + '%'
       } else if (columnName === 'GrandTotal') {
         return this.formatPrice(row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {
         return this.formatPrice(row.grandTotal / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
+      } else if (columnName === 'DiscountTotal') {
+        return this.formatPrice(row.priceList * (row.discountRate / 100))
+      } else if (columnName === 'DisplayTaxAmount') {
+        return this.formatPrice((row.priceList * row.taxRate.rate / 100))
       }
     },
     productPrice(price, discount) {
