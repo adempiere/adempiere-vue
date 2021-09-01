@@ -214,7 +214,8 @@ export default {
       this.$store.dispatch('searchConversion', {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
         currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
-        currencyToUuid: currency.uuid
+        currencyToUuid: currency.uuid,
+        conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
       })
     },
     changeCurrency(value) {
@@ -230,7 +231,8 @@ export default {
         this.$store.dispatch('searchConversion', {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
-          currencyToUuid: currency.uuid
+          currencyToUuid: currency.uuid,
+          conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
         })
       }
     }

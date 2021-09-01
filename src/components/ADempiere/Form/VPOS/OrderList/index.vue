@@ -263,6 +263,7 @@ export default {
       })
     },
     handleCurrentChange(row) {
+      this.$store.state['pointOfSales/point/index'].conversionsList = []
       // close popover
       this.$store.commit('showListOrders', false)
       this.$store.dispatch('currentOrder', row)

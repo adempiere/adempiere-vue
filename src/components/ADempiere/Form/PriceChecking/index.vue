@@ -220,7 +220,8 @@ export default {
         this.$store.dispatch('searchConversion', {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
-          currencyToUuid: this.currentPointOfSales.displayCurrency.uuid
+          currencyToUuid: this.currentPointOfSales.displayCurrency.uuid,
+          conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
         })
       }
     },

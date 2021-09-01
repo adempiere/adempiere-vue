@@ -281,7 +281,8 @@ export default {
         this.$store.dispatch('searchConversion', {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currency.uuid,
-          currencyToUuid: value.currencyUuid
+          currencyToUuid: value.currencyUuid,
+          conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
         })
         return this.formatPrice(0)
       }

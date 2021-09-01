@@ -261,7 +261,7 @@ export default {
         })
     },
     pinAction(action) {
-      const { BankAccountType, A_Ident_SSN, C_Bank_ID_UUID, EMail, IsACH } = !this.isEmptyValue(this.$store.getters.getAddRefund.customer.customerAccount) ? this.$store.getters.getAddRefund.customer.customerAccount : ''
+      const { BankAccountType, A_Ident_SSN, C_Bank_ID_UUID, EMail, IsACH } = !this.isEmptyValue(this.$store.getters.getAddRefund) ? this.$store.getters.getAddRefund.customer.customerAccount : ''
       action = this.isEmptyValue(action) ? this.$store.getters.getOverdrawnInvoice.attributePin : action
       if (action.type === 'updateOrder') {
         switch (action.columnName) {

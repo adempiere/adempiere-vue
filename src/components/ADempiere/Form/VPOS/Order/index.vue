@@ -680,6 +680,15 @@ export default {
       } else {
         this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: value })
       }
+    },
+    orderDate(value) {
+      this.$store.state['pointOfSales/point/index'].conversionsList = []
+      this.$store.dispatch('searchConversion', {
+        conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
+        currencyFromUuid: this.currentPointOfSales.currentPriceList.currency.uuid,
+        currencyToUuid: this.currentPointOfSales.displayCurrency.uuid,
+        conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
+      })
     }
   },
   mounted() {
