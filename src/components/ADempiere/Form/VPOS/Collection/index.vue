@@ -213,7 +213,7 @@ import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListCollection from './fieldsListCollection.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
-import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
+import { formatPrice, formSendDate } from '@/utils/ADempiere/valueFormat.js'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
 import overdrawnInvoice from '@/components/ADempiere/Form/VPOS/Collection/overdrawnInvoice'
@@ -670,12 +670,13 @@ export default {
     this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
   },
   methods: {
+    formSendDate,
     amountConvert(currency) {
       this.$store.dispatch('searchConversion', {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
         currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
         currencyToUuid: currency.uuid,
-        conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
+        conversionDate: this.formSendDate(this.currentPointOfSales.currentOrder.dateOrdered)
       })
     },
     formatNumber({ displayType, number }) {
@@ -1016,7 +1017,7 @@ export default {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
         currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
         currencyToUuid: value,
-        conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
+        conversionDate: this.formSendDate(this.currentPointOfSales.currentOrder.dateOrdered)
       })
     }
   }

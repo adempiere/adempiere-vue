@@ -419,6 +419,7 @@ import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
 // Format of values ( Date, Price, Quantity )
 import {
   formatDate,
+  formSendDate,
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
@@ -687,7 +688,7 @@ export default {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
         currencyFromUuid: this.currentPointOfSales.currentPriceList.currency.uuid,
         currencyToUuid: this.currentPointOfSales.displayCurrency.uuid,
-        conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
+        conversionDate: this.formSendDate(this.currentPointOfSales.currentOrder.dateOrdered)
       })
     }
   },
@@ -709,6 +710,7 @@ export default {
   },
   methods: {
     formatDate,
+    formSendDate,
     formatPrice,
     formatQuantity,
     keyActionClosePin(event) {

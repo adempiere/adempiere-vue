@@ -19,7 +19,7 @@ import {
   updateOrderLine,
   deleteOrderLine
 } from '@/api/ADempiere/form/point-of-sales.js'
-import { formatPercent } from '@/utils/ADempiere/valueFormat.js'
+import { formatPercent, formSendDate } from '@/utils/ADempiere/valueFormat.js'
 
 export default {
   name: 'OrderLineMixin',
@@ -116,6 +116,7 @@ export default {
   },
   methods: {
     formatPercent,
+    formSendDate,
     changeLine(command) {
       switch (command.option) {
         case 'Eliminar':
@@ -235,7 +236,7 @@ export default {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.currentPriceList.currency.uuid,
           currencyToUuid: this.currentPointOfSales.displayCurrency.uuid,
-          conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
+          conversionDate: this.formSendDate(this.currentPointOfSales.currentOrder.dateOrdered)
         })
       }
     },

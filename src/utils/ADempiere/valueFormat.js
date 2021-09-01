@@ -299,3 +299,9 @@ export function trimPercentage(stringToParsed) {
   }
   return stringToParsed
 }
+export function formSendDate(date) {
+  if (isEmptyValue(date)) {
+    return undefined
+  }
+  return date.slice(0, 10)
+}

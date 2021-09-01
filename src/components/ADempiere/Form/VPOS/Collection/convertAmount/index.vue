@@ -55,7 +55,7 @@
 </template>
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin'
-import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
+import { formatPrice, formSendDate } from '@/utils/ADempiere/valueFormat.js'
 import fieldsListConvertAmountCollection from './fieldsListConvertAmountCollection.js'
 
 export default {
@@ -186,6 +186,7 @@ export default {
   },
   methods: {
     formatPrice,
+    formSendDate,
     formatDate(date) {
       let month = '' + (date.getMonth() + 1)
       let day = '' + date.getDate()
@@ -215,7 +216,7 @@ export default {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
         currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
         currencyToUuid: currency.uuid,
-        conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
+        conversionDate: this.formSendDate(this.currentPointOfSales.currentOrder.dateOrdered)
       })
     },
     changeCurrency(value) {
@@ -232,7 +233,7 @@ export default {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
           currencyToUuid: currency.uuid,
-          conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
+          conversionDate: this.formSendDate(this.currentPointOfSales.currentOrder.dateOrdered)
         })
       }
     }

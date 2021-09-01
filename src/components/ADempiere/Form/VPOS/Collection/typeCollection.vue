@@ -158,6 +158,7 @@
 <script>
 import {
   formatDate,
+  formSendDate,
   formatPrice
 } from '@/utils/ADempiere/valueFormat.js'
 import {
@@ -253,6 +254,7 @@ export default {
   },
   methods: {
     formatDate,
+    formSendDate,
     formatPrice,
     labelCurrency(refunds) {
       const label = this.listCurrency.find(label => label.uuid === refunds)
@@ -282,7 +284,7 @@ export default {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currency.uuid,
           currencyToUuid: value.currencyUuid,
-          conversionDate: this.currentPointOfSales.currentOrder.dateOrdered.slice(0, 10)
+          conversionDate: this.formSendDate(this.currentPointOfSales.currentOrder.dateOrdered)
         })
         return this.formatPrice(0)
       }
