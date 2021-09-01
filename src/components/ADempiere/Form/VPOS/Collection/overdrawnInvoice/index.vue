@@ -442,11 +442,18 @@ export default {
       if (value === 3 && !this.isEmptyValue(this.paymentTypeList)) {
         this.selectPayment(this.paymentTypeList[0])
       }
+    },
+    showDialogo(value) {
+      if (value) {
+        if (this.option === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
+          this.selectPayment(this.paymentTypeListRefund[0])
+        }
+      }
     }
   },
   mounted() {
     this.selectionTypeRefund = {}
-    if (this.paymentTypeListRefund.length === 1) {
+    if (this.option === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
       this.selectPayment(this.paymentTypeListRefund[0])
     }
   },
@@ -499,6 +506,9 @@ export default {
         posUuid: this.currentPointOfSales.uuid,
         tenderTypeCode: this.selectionTypeRefund.tender_type
       }
+      const posUuid = this.currentPointOfSales.uuid
+      const orderUuid = this.currentOrder.uuid
+      const payments = this.currentOrder.listPayments.payments
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: this.renderComponentContainer, formatReturn: 'name' })
       if (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.defaultReferenceCurrency.uuid)) {
         this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
@@ -517,11 +527,16 @@ export default {
           value: undefined
         })
       })
+      if (this.option === 4) {
+        this.completePreparedOrder(posUuid, orderUuid, payments)
+        this.$store.commit('dialogoInvoce', { show: false, success: true })
+        return
+      }
       this.$store.dispatch('addRefundLoaded', values)
       this.$store.dispatch('addCreateCustomerAccount', {
-        posUuid: this.currentPointOfSales.uuid,
+        posUuid,
         customer,
-        orderUuid: this.currentOrder.uuid,
+        orderUuid,
         bankUuid: customer.C_Bank_ID_UUID,
         amount: this.change / this.dayRate.divideRate,
         tenderTypeCode: this.selectionTypeRefund.tender_type,
@@ -530,7 +545,6 @@ export default {
         .then(response => {
           this.success()
         })
-      this.selectionTypeRefund = {}
     },
     success() {
       const customerDetails = []
@@ -550,7 +564,6 @@ export default {
         customerDetails,
         payments: this.currentOrder.listPayments.payments
       })
-      this.selectionTypeRefund = {}
     },
     close() {
       this.selectionTypeRefund = {}
@@ -587,7 +600,7 @@ export default {
               posUuid: this.currentPointOfSales.uuid,
               tenderTypeCode: this.selectionTypeRefund.tender_type
             }
-            if (this.$store.getters.posAttributes.currentPointOfSales.isPosRequiredPin) {
+            if (this.selectionTypeRefund.is_pos_required_pin || this.maximumRefundAllowed <= (this.change / this.dayRate.divideRate)) {
               const attributePin = {
                 posUuid,
                 orderUuid,
@@ -629,8 +642,12 @@ export default {
             return
           }
           break
+        case 4:
+          this.completePreparedOrder(posUuid, orderUuid, payments)
+          this.$store.commit('dialogoInvoce', { show: false, success: true })
+          break
         default:
-          if (this.$store.getters.posAttributes.currentPointOfSales.isPosRequiredPin) {
+          if (this.selectionTypeRefund.is_pos_required_pin || this.maximumRefundAllowed <= (this.change / this.dayRate.divideRate)) {
             const attributePin = {
               posUuid,
               orderUuid,
@@ -648,6 +665,7 @@ export default {
           }
           break
       }
+      this.selectionTypeRefund = {}
     },
     completePreparedOrder(posUuid, orderUuid, payments) {
       this.$store.dispatch('updateOrderPos', true)
