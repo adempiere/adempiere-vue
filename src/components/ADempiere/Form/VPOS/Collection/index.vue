@@ -922,7 +922,8 @@ export default {
       } else if (this.pay < this.currentOrder.grandTotal) {
         if (this.isPosRequiredPin) {
           const attributePin = {
-            ...payment,
+            payment: payment,
+            typeRefund: 0,
             action: 'openBalanceInvoice',
             type: 'actionPos',
             label: this.$t('form.pos.pinMessage.invoiceOpen')

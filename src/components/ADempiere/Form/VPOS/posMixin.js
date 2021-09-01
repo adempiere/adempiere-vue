@@ -315,6 +315,9 @@ export default {
             break
           case 'openBalanceInvoice':
             switch (action.typeRefund) {
+              case 0:
+                this.refundAllowed(this.currentPointOfSales.uuid, this.currentOrder.uuid, action.payment)
+                break
               case 1:
                 this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
                   .then(response => {

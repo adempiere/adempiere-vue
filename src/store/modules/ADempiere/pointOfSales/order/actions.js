@@ -282,7 +282,7 @@ export default {
     }
     commit('findOrder', {})
   },
-  printOrder({ commit, dispatch }, { posUuid, orderUuid }) {
+  printTicket({ commit, dispatch }, { posUuid, orderUuid }) {
     printTicket({
       posUuid,
       orderUuid
