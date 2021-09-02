@@ -54,7 +54,7 @@
             </el-col>
             <el-col :span="isEmptyValue(currentOrder) ? 4 : 8" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
               <el-row :gutter="4">
-                <el-col :span="4" style="padding-left: 0px; padding-right: 0px;">
+                <el-col :span="5" style="padding-left: 0px; padding-right: 0px;">
                   <el-tag
                     v-if="!isEmptyValue(currentOrder.documentStatus.value)"
                     :type="tagStatus(currentOrder.documentStatus.value)"
@@ -64,11 +64,11 @@
                     </span>
                   </el-tag>
                 </el-col>
-                <el-col :span="8" style="padding-left: 0px; padding-right: 0px;">
+                <el-col :span="10" style="padding-left: 0px; padding-right: 0px;">
                   <fast-ordes-list />
                 </el-col>
-                <el-col :span="12" style="padding-left: 0px; padding-right: 0px;">
-                  <el-button type="primary" :disabled="!allowsCreateOrder" plain @click="newOrder">
+                <el-col :span="9" style="padding-left: 0px; padding-right: 0px;">
+                  <el-button type="primary" :disabled="!allowsCreateOrder" plain :style="isShowedPOSKeyLayout ? 'float: right;' : ''" @click="newOrder">
                     {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
                   </el-button>
                 </el-col>
