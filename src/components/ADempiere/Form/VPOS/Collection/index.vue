@@ -64,7 +64,7 @@
                   </span>
                   <span v-else>
                     {{
-                      formatPrice(1, dayRate.iSOCode)
+                      formatPrice(1, currentPointOfSales.currentPriceList.currency.iSOCode)
                     }}
                   </span>
                 </b>
@@ -513,19 +513,21 @@ export default {
       return {}
     },
     dayRate() {
-      const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
-      const convert = this.convertionsList.find(convert => {
-        if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+      if (!this.isEmptyValue(this.currentFieldCurrency)) {
+        const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+        const convert = this.convertionsList.find(convert => {
+          if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+            return convert
+          }
+        })
+        if (!this.isEmptyValue(convert)) {
           return convert
         }
-      })
-      if (!this.isEmptyValue(convert)) {
-        return convert
       }
       return {
-        currencyTo: this.currentPointOfSales.currentPriceList.currency,
+        currencyTo: this.currentPointOfSales.priceList.currency,
         divideRate: 1,
-        iSOCode: this.currentPointOfSales.currentPriceList.currency.iSOCode
+        iSOCode: this.currentPointOfSales.priceList.currency.iSOCode
       }
     },
     fieldsPaymentType() {
@@ -656,6 +658,12 @@ export default {
             }
           }
         })
+      }
+    },
+    currentFieldPaymentMethods(value) {
+      const payment = this.availablePaymentMethods.find(payment => payment.uuid === value)
+      if (!this.isEmptyValue(payment.refund_reference_currency)) {
+        this.currentFieldCurrency = payment.refund_reference_currency.iso_code
       }
     },
     precision() {

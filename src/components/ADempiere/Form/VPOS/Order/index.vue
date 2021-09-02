@@ -287,6 +287,7 @@
                       v-for="item in listWarehouses"
                       :key="item.uuid"
                       :command="item"
+                      :disabled="isDisabled"
                     >
                       {{ item.name }}
                     </el-dropdown-item>
@@ -308,6 +309,7 @@
                       v-for="item in pointPriceList"
                       :key="item.uuid"
                       :command="item"
+                      :disabled="isDisabled"
                     >
                       {{ item.name }}
                     </el-dropdown-item>
