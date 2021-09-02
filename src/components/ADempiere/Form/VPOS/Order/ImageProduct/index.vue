@@ -15,10 +15,6 @@
 -->
 <template>
   <div style="width: 140px">
-    <p>
-      <label style="margin-right: 16px;">Switch Loading</label>
-      <el-switch v-model="loading" />
-    </p>
     <el-skeleton style="width: 140px" :loading="loading" animated>
       <template slot="template">
         <el-skeleton-item
@@ -29,10 +25,21 @@
       <template>
         <el-card :body-style="{ padding: '0px', marginBottom: '1px' }">
           <el-image
-            src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+            :src="image"
             class="image"
             style="width: 140px; height: 140px;"
-          />
+          >
+            <div slot="error" class="image-slot">
+              <el-skeleton style="width: 140px" :loading="true" animated>
+                <template slot="template">
+                  <el-skeleton-item
+                    variant="image"
+                    style="width: 140px; height: 140px;"
+                  />
+                </template>
+              </el-skeleton>
+            </div>
+          </el-image>
         </el-card>
       </template>
     </el-skeleton>
@@ -40,6 +47,9 @@
 </template>
 
 <script>
+import { requestAttachment } from '@/api/ADempiere/user-interface.js'
+import { getImagePath } from '@/utils/ADempiere/resource.js'
+
 export default {
   name: 'ImageProduct',
   props: {
@@ -67,7 +77,13 @@ export default {
   data() {
     return {
       loading: true,
+      image: '',
       currentDate: '2021-06-01'
+    }
+  },
+  computed: {
+    product() {
+      return this.$store.state['pointOfSales/orderLine/index'].line.product
     }
   },
   watch: {
@@ -75,14 +91,33 @@ export default {
       this.$refs[this.stepReference].activeIndex = value
     },
     show(value) {
-      if (value && !this.isEmptyValue(this.metadataLine)) {
+      if (value && !this.isEmptyValue(this.metadataLine) && this.metadataLine.uuid === this.$store.state['pointOfSales/orderLine/index'].line.uuid) {
         this.getListImageProduct(this.metadataLine)
       }
     }
   },
   methods: {
-    getListImageProduct(product) {
-      console.log(product)
+    getListImageProduct(line) {
+      requestAttachment({
+        tableName: 'M_Product',
+        recordId: line.product.id,
+        recordUuid: line.product.uuid
+      })
+        .then(response => {
+          if (!this.isEmptyValue(response.resource_references_list)) {
+            const image = response.resource_references_list[0].file_name
+            this.image = this.getImageFromSource(image)
+          }
+        })
+    },
+    getImageFromSource(fileName) {
+      const image = getImagePath({
+        file: fileName,
+        width: 300,
+        height: 300
+      })
+      this.loading = false
+      return image.uri
     }
   }
 }

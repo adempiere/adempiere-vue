@@ -115,12 +115,12 @@
                 <template slot-scope="scope">
                   <el-popover
                     v-if="!isEmptyValue(listOrderLine)"
-                    v-model="showInfo"
                     popper-class="el-popper-info"
                     placement="right-start"
                     trigger="click"
                     width="300"
                     :title="$t('form.productInfo.productInformation')"
+                    @hide="showInfo = false"
                   >
                     <el-form
                       label-position="top"
@@ -129,18 +129,9 @@
                       <el-row style="margin: 10px!important;">
                         <el-col :span="4">
                           <div>
-                            <el-avatar v-if="isEmptyValue(scope.row.product.imageUrl)" shape="square" :size="100" src="https://#" @error="true">
-                              <el-image>
-                                <div slot="error" class="image-slot">
-                                  <i class="el-icon-picture-outline" />
-                                </div>
-                              </el-image>
-                            </el-avatar>
-                            <el-image
-                              v-else
-                              style="width: 100px; height: 100px"
-                              :src="scope.row.product.imageUrl"
-                              fit="contain"
+                            <image-product
+                              :show="showInfo"
+                              :metadata-line="scope.row"
                             />
                           </div>
                         </el-col>
@@ -166,7 +157,7 @@
                         </el-col>
                       </el-row>
                     </el-form>
-                    <el-button slot="reference" type="primary" icon="el-icon-info" size="mini" style="margin-right: 3%;" />
+                    <el-button slot="reference" type="primary" icon="el-icon-info" size="mini" style="margin-right: 3%;" @click="showInfoLine(scope.row)" />
                   </el-popover>
                   <el-popover
                     placement="right"
@@ -416,6 +407,8 @@ import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOrder from './fieldsListOrder.js'
 import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner'
 import fieldLine from '@/components/ADempiere/Form/VPOS/Order/line/index'
+import ImageProduct from '@/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
+// src/components/ADempiere/Form/VPOS/Order/ImageProduct/index.vue
 import ProductInfo from '@/components/ADempiere/Form/VPOS/ProductInfo'
 import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
 // Format of values ( Date, Price, Quantity )
@@ -433,8 +426,8 @@ export default {
     BusinessPartner,
     ProductInfo,
     FastOrdesList,
-    fieldLine
-    // ImageProduct
+    fieldLine,
+    ImageProduct
   },
   mixins: [
     formMixin,
@@ -805,6 +798,10 @@ export default {
         this.$refs.linesTable.setCurrentRow(this.listOrderLine[this.currentTable])
         this.currentOrderLine = this.listOrderLine[this.currentTable]
       }
+    },
+    showInfoLine(line) {
+      this.$store.commit('setLine', line)
+      this.showInfo = !this.showInfo
     },
     showEditLine(line) {
       this.$store.commit('setLine', line)
