@@ -32,10 +32,7 @@
             v-for="(field) in datos"
             :ref="field.columnName"
             :key="field.columnName"
-            :metadata-field="{
-              ...field,
-              isReadOnly: isDisplayeCustomer
-            }"
+            :metadata-field="field"
           />
         </el-col>
         <el-col :span="12">
@@ -43,10 +40,7 @@
             v-for="(field) in fieldsListLocation"
             :ref="field.columnName"
             :key="field.columnName"
-            :metadata-field="{
-              ...field,
-              isReadOnly: isDisplayeCustomer
-            }"
+            :metadata-field="field"
           />
         </el-col>
 
@@ -130,9 +124,6 @@ export default {
     },
     currentBusinessPartner() {
       return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
-    },
-    isDisplayeCustomer() {
-      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner.id
     },
     showCustomer() {
       return this.$store.getters.getShowUpdateCustomer

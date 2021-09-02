@@ -43,7 +43,7 @@
                   {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
-              <p v-if="!isEmptyValue(dayRate) && dayRate.currencyTo.iSOCode !== currentPointOfSales.priceList.currency.iSOCode" class="total">
+              <p v-if="!isEmptyValue(dayRate)" class="total">
                 <b>{{ $t('form.pos.collect.dayRate') }}:</b>
                 <!-- Conversion rate to date -->
                 <b style="float: right;">
@@ -683,6 +683,19 @@ export default {
     formatDateToSend,
     showDayRate(rate) {
       const amount = rate.divideRate > rate.multiplyRate ? rate.divideRate : rate.multiplyRate
+      const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+      if (!this.isEmptyValue(rate.currencyTo.iSOCode) && rate.currencyTo.iSOCode !== currency.iso_code) {
+        return this.$t('form.pos.collect.emptyRate')
+      }
+      if (!this.isEmptyValue(rate.currencyTo.iSOCode) && rate.currencyTo.iSOCode === this.currentPointOfSales.priceList.currency.iSOCode) {
+        const convert = this.convertionsList.find(convert => {
+          if (!this.isEmptyValue(convert.currencyTo) && this.currentPointOfSales.displayCurrency.iso_code === convert.currencyTo.iSOCode) {
+            return convert
+          }
+        })
+        const convertAmount = !this.isEmptyValue(convert) ? (convert.divideRate > convert.multiplyRate ? convert.divideRate : convert.multiplyRate) : ''
+        return this.formatPrice(1, this.currentPointOfSales.displayCurrency.iso_code) + ' ~ ' + this.formatPrice(convertAmount, this.currentPointOfSales.priceList.currency.iSOCode)
+      }
       return this.formatPrice(1, rate.currencyTo.iSOCode) + ' ~ ' + this.formatPrice(amount, this.currentPointOfSales.priceList.currency.iSOCode)
     },
     amountConvert(currency) {
