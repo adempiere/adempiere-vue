@@ -689,12 +689,6 @@ export default {
     },
     orderDate(value) {
       this.$store.state['pointOfSales/point/index'].conversionsList = []
-      this.$store.dispatch('searchConversion', {
-        conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
-        currencyFromUuid: this.currentPointOfSales.currentPriceList.currency.uuid,
-        currencyToUuid: this.currentPointOfSales.displayCurrency.uuid,
-        conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
-      })
     }
   },
   mounted() {

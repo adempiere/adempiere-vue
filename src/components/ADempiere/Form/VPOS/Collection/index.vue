@@ -43,11 +43,12 @@
                   {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
                 </b>
               </p>
-              <p class="total">
+              <p v-if="!isEmptyValue(dayRate) && dayRate.currencyTo.iSOCode !== currentPointOfSales.priceList.currency.iSOCode" class="total">
                 <b>{{ $t('form.pos.collect.dayRate') }}:</b>
                 <!-- Conversion rate to date -->
-                <b v-if="!isEmptyValue(dayRate)" style="float: right;">
-                  <span v-if="!isEmptyValue(dayRate.divideRate)">
+                <b style="float: right;">
+                  {{ showDayRate(dayRate) }}
+                  <!-- <span v-if="!isEmptyValue(dayRate.divideRate)">
                     <span v-if="formatConversionCurrenty(dayRate.divideRate) > 1">
                       {{
                         formatPrice(formatConversionCurrenty(dayRate.divideRate), dayRate.currencyTo.iSOCode)
@@ -66,7 +67,7 @@
                     {{
                       formatPrice(1, currentPointOfSales.currentPriceList.currency.iSOCode)
                     }}
-                  </span>
+                  </span> -->
                 </b>
               </p>
             </div>
@@ -527,6 +528,7 @@ export default {
       return {
         currencyTo: this.currentPointOfSales.priceList.currency,
         divideRate: 1,
+        multiplyRate: 1,
         iSOCode: this.currentPointOfSales.priceList.currency.iSOCode
       }
     },
@@ -663,7 +665,7 @@ export default {
     currentFieldPaymentMethods(value) {
       const payment = this.availablePaymentMethods.find(payment => payment.uuid === value)
       if (!this.isEmptyValue(payment.refund_reference_currency)) {
-        this.currentFieldCurrency = payment.refund_reference_currency.iso_code
+        this.changeCurrency(payment.refund_reference_currency.iso_code)
       }
     },
     precision() {
@@ -679,6 +681,10 @@ export default {
   },
   methods: {
     formatDateToSend,
+    showDayRate(rate) {
+      const amount = rate.divideRate > rate.multiplyRate ? rate.divideRate : rate.multiplyRate
+      return this.formatPrice(1, rate.currencyTo.iSOCode) + ' ~ ' + this.formatPrice(amount, this.currentPointOfSales.priceList.currency.iSOCode)
+    },
     amountConvert(currency) {
       this.$store.dispatch('searchConversion', {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,

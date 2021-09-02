@@ -37,7 +37,7 @@
                     <div class="top clearfix">
                       <span>
                         {{
-                          labelTenderType(value.tenderTypeCode)
+                          labelTenderType(value)
                         }}
                       </span>
                     </div>
@@ -105,7 +105,7 @@
                     <div class="top clearfix">
                       <span>
                         {{
-                          labelTenderType(value.tenderTypeCode)
+                          labelTenderType(value)
                         }}
                       </span>
                     </div>
@@ -264,7 +264,11 @@ export default {
       return label.currency_symbol
     },
     labelTenderType(tenderType) {
-      const currentTenderType = this.availablePaymentMethods.find(label => label.tender_type === tenderType)
+      const currentTenderType = this.availablePaymentMethods.find(label => {
+        if (label.tender_type === tenderType.tenderTypeCode && ((!this.isEmptyValue(label.refund_reference_currency) && label.refund_reference_currency.uuid === tenderType.currencyUuid) || this.isEmptyValue(label.refund_reference_currency))) {
+          return label
+        }
+      })
       if (currentTenderType) {
         return currentTenderType.name
       }
