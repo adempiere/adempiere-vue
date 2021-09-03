@@ -112,7 +112,7 @@
         width="120"
       >
         <template slot-scope="scope">
-          {{ formatQuantity(scope.row.grandTotal) }}
+          {{ formatPrice(scope.row.grandTotal) }}
         </template>
       </el-table-column>
     </el-table>
