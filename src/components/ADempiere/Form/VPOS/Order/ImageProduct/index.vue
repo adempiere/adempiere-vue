@@ -14,32 +14,35 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <div style="width: 140px">
-    <el-skeleton style="width: 140px" :loading="loading" animated>
+  <div>
+    <el-skeleton :loading="loading" animated>
       <template slot="template">
         <el-skeleton-item
           variant="image"
-          style="width: 140px; height: 140px;"
         />
       </template>
       <template>
         <el-card :body-style="{ padding: '0px', marginBottom: '1px' }">
-          <el-image
-            :src="image"
-            class="image"
-            style="width: 140px; height: 140px;"
-          >
-            <div slot="error" class="image-slot">
-              <el-skeleton style="width: 140px" :loading="true" animated>
-                <template slot="template">
-                  <el-skeleton-item
-                    variant="image"
-                    style="width: 140px; height: 140px;"
-                  />
-                </template>
-              </el-skeleton>
-            </div>
-          </el-image>
+          <el-carousel trigger="click" height="150px">
+            <el-carousel-item v-for="item in listImage.length" :key="item">
+              <el-image
+                :src="getImageFromSource(listImage[item - 1])"
+                class="image"
+                style="width: auto; height: 140px;"
+              >
+                <div slot="error" class="image-slot">
+                  <el-skeleton :loading="true" animated>
+                    <template slot="template">
+                      <el-skeleton-item
+                        variant="image"
+                        style="width: auto; height: 140px;"
+                      />
+                    </template>
+                  </el-skeleton>
+                </div>
+              </el-image>
+            </el-carousel-item>
+          </el-carousel>
         </el-card>
       </template>
     </el-skeleton>
@@ -77,7 +80,7 @@ export default {
   data() {
     return {
       loading: true,
-      image: '',
+      listImage: [],
       currentDate: '2021-06-01'
     }
   },
@@ -94,6 +97,11 @@ export default {
       if (value && !this.isEmptyValue(this.metadataLine) && this.metadataLine.uuid === this.$store.state['pointOfSales/orderLine/index'].line.uuid) {
         this.getListImageProduct(this.metadataLine)
       }
+    },
+    product(value) {
+      if (this.show && !this.isEmptyValue(this.metadataLine) && this.metadataLine.uuid === this.$store.state['pointOfSales/orderLine/index'].line.uuid) {
+        this.getListImageProduct(this.metadataLine)
+      }
     }
   },
   methods: {
@@ -105,18 +113,17 @@ export default {
       })
         .then(response => {
           if (!this.isEmptyValue(response.resource_references_list)) {
-            const image = response.resource_references_list[0].file_name
-            this.image = this.getImageFromSource(image)
+            this.loading = false
+            this.listImage = response.resource_references_list
           }
         })
     },
-    getImageFromSource(fileName) {
+    getImageFromSource(file) {
       const image = getImagePath({
-        file: fileName,
+        file: file.file_name,
         width: 300,
         height: 300
       })
-      this.loading = false
       return image.uri
     }
   }

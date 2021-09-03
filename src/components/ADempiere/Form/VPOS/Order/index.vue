@@ -120,7 +120,7 @@
                     trigger="click"
                     width="300"
                     :title="$t('form.productInfo.productInformation')"
-                    @hide="showInfo = false"
+                    :hide="closeInfo"
                   >
                     <el-form
                       label-position="top"
@@ -801,7 +801,10 @@ export default {
     },
     showInfoLine(line) {
       this.$store.commit('setLine', line)
-      this.showInfo = !this.showInfo
+      this.showInfo = true
+    },
+    closeInfo(line) {
+      this.showInfo = false
     },
     showEditLine(line) {
       this.$store.commit('setLine', line)
