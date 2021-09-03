@@ -155,7 +155,7 @@
                             {{ $t('form.productInfo.price') }}:
                             <b>{{ formatPrice(scope.row.priceList, pointOfSalesCurrency.iSOCode) }}</b>
                             <br>
-                            <b>{{ scope.row.taxRate.name }}</b>
+                            <b>{{ scope.row.taxRate.name }}</b> {{ tax }}
                             <br>
                             {{ $t('form.productInfo.grandTotal') }}:
                             <b>{{ formatPrice((scope.row.priceList * scope.row.taxRate.rate / 100) + scope.row.priceList, pointOfSalesCurrency.iSOCode) }}</b>
@@ -343,7 +343,7 @@
                 {{ currentOrder.salesRepresentative.name }}
               </b></p>
               <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
-              <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
+              <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(tax, pointOfSalesCurrency.iSOCode) }}</b> </p>
               <p class="total">
                 <b>
                   {{ $t('form.pos.order.total') }}:
@@ -600,6 +600,13 @@ export default {
       }
       return this.currentPointOfSales.currentOrder
     },
+    tax() {
+      if (!this.isEmptyValue(this.currentOrder.lineOrder)) {
+        const taxRate = this.currentOrder.lineOrder.filter(tax => tax.taxRate.rate > 0)
+        return this.sumTax(taxRate)
+      }
+      return 0
+    },
     isDisabled() {
       return this.currentPointOfSales.currentOrder.isProcessed
     },
@@ -712,6 +719,15 @@ export default {
     formatDateToSend,
     formatPrice,
     formatQuantity,
+    sumTax(tax) {
+      let sum = 0
+      if (tax) {
+        tax.forEach((line) => {
+          sum += line.priceList * line.taxRate.rate / 100
+        })
+      }
+      return sum
+    },
     keyActionClosePin(event) {
       this.visible = false
       this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
