@@ -664,7 +664,10 @@ export default {
     showDayRate(rate) {
       const amount = rate.divideRate > rate.multiplyRate ? rate.divideRate : rate.multiplyRate
       const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
-      if (!this.isEmptyValue(rate.currencyTo.iSOCode) && rate.currencyTo.iSOCode !== currency.iso_code) {
+      if (this.isEmptyValue(currency)) {
+        return this.$t('form.pos.collect.emptyRate')
+      }
+      if (!this.isEmptyValue(currency) && !this.isEmptyValue(rate.currencyTo.iSOCode) && rate.currencyTo.iSOCode !== currency.iso_code) {
         return this.$t('form.pos.collect.emptyRate')
       }
       if (!this.isEmptyValue(rate.currencyTo.iSOCode) && rate.currencyTo.iSOCode === this.currentPointOfSales.priceList.currency.iSOCode) {

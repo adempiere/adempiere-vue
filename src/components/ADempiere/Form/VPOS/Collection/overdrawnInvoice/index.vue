@@ -425,7 +425,7 @@ export default {
   },
   watch: {
     searchRefundCurrency(value) {
-      if (this.isEmptyValue(value)) {
+      if (this.isEmptyValue(value) && this.showDialogo) {
         this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
       }
     },
@@ -661,6 +661,10 @@ export default {
             this.visible = true
             this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
           } else {
+            this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
+              .then(response => {
+                this.completePreparedOrder(posUuid, orderUuid, payments)
+              })
             this.completePreparedOrder(posUuid, orderUuid, payments)
             this.$store.commit('dialogoInvoce', { show: false, success: true })
           }

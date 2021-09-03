@@ -17,7 +17,7 @@
 -->
 <template>
   <el-container style="background: white; height: 100% !important;">
-    <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;">
+    <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; overflow: auto; padding-left: 0px;">
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
           <el-col v-if="!value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
@@ -28,6 +28,7 @@
                 </el-col>
                 <el-col :span="18">
                   <el-button
+                    v-if="!isDisabled"
                     type="text"
                     icon="el-icon-close"
                     style="float: right; margin-right: 10px; color: red; padding-top: 10px;"
@@ -84,8 +85,8 @@
         </template>
       </el-row>
     </el-main>
-    <el-divider v-if="!isEmptyValue(listRefund)" content-position="center"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
-    <el-footer v-if="!isEmptyValue(listRefund)" style="height: 200px;padding: 0px;">
+    <el-divider v-if="!isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
+    <el-footer v-if="!isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
       <el-row :gutter="24">
         <template v-for="(value, key) in listRefund">
           <el-col v-if="value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
@@ -96,6 +97,7 @@
                 </el-col>
                 <el-col :span="18">
                   <el-button
+                    v-if="!isDisabled"
                     type="text"
                     icon="el-icon-close"
                     style="float: right; margin-right: 10px; color: red; padding-top: 10px;"
@@ -139,7 +141,7 @@
                         <br>
                         <p class="total">
                           <b style="float: right;color: red;">
-                            {{ labelCurrency(value.currencyUuid) }} - {{ round(value.amount, 2) }}
+                            {{ formatPrice(value.amount, labelCurrency(value.currencyUuid)) }}
                           </b>
                         </p>
                       </div>
@@ -261,7 +263,7 @@ export default {
       if (this.isEmptyValue(label)) {
         return ''
       }
-      return label.currency_symbol
+      return label.iso_code
     },
     labelTenderType(tenderType) {
       const currentTenderType = this.availablePaymentMethods.find(label => {
