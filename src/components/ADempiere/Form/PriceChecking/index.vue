@@ -49,9 +49,10 @@
           />
         </el-form>
 
-        <div class="inquiry-product" style="z-index: 4;">
+        <div v-if="!isEmptyValue(productPrice)" class="inquiry-product" style="z-index: 4;">
           <div class="product-description">
-            <b> {{ productPrice.productName }} </b> <br> {{ productPrice.productDescription }}
+            <b> {{ productPrice.product.value }} {{ productPrice.productName }}</b>
+            <br> {{ productPrice.productDescription }}
           </div>
           <el-row v-if="!isEmptyValue(productPrice)" :gutter="20">
             <el-col :span="24" style="padding-left: 0px; padding-right: 0%;">
@@ -251,6 +252,7 @@ export default {
                   productName: product.name,
                   productDescription: product.help,
                   priceBase,
+                  product,
                   priceStandard: productPrice.priceStandard,
                   priceList: productPrice.priceList,
                   priceLimit: productPrice.priceLimit,
@@ -303,6 +305,7 @@ export default {
                   productName: product.name,
                   productDescription: product.description,
                   priceBase,
+                  product,
                   priceStandard: productPrice.priceStandard,
                   priceList: productPrice.priceList,
                   priceLimit: productPrice.priceLimit,
