@@ -48,26 +48,6 @@
                 <!-- Conversion rate to date -->
                 <b style="float: right;">
                   {{ showDayRate(dayRate) }}
-                  <!-- <span v-if="!isEmptyValue(dayRate.divideRate)">
-                    <span v-if="formatConversionCurrenty(dayRate.divideRate) > 1">
-                      {{
-                        formatPrice(formatConversionCurrenty(dayRate.divideRate), dayRate.currencyTo.iSOCode)
-                      }}
-                    </span>
-                    <span v-else>
-                      {{
-                        dayRate.currencyTo.iSOCode
-                      }}
-                      {{
-                        formatConversionCurrenty(dayRate.divideRate)
-                      }}
-                    </span>
-                  </span>
-                  <span v-else>
-                    {{
-                      formatPrice(1, currentPointOfSales.currentPriceList.currency.iSOCode)
-                    }}
-                  </span> -->
                 </b>
               </p>
             </div>
