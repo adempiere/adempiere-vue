@@ -34,7 +34,7 @@
             :key="field.columnName"
             :metadata-field="{
               ...field,
-              isReadOnly: isDisplayeCustomer
+              isReadOnly: isTemplateOfCustomer
             }"
           />
         </el-col>
@@ -45,7 +45,7 @@
             :key="field.columnName"
             :metadata-field="{
               ...field,
-              isReadOnly: isDisplayeCustomer
+              isReadOnly: isTemplateOfCustomer
             }"
           />
         </el-col>
@@ -131,7 +131,7 @@ export default {
     currentBusinessPartner() {
       return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
     },
-    isDisplayeCustomer() {
+    isTemplateOfCustomer() {
       return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner.id
     },
     showCustomer() {
