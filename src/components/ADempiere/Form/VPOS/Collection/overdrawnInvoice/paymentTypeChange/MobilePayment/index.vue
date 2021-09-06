@@ -34,24 +34,12 @@
         </el-col>
         <el-col :span="8">
           <el-form-item :label="$t('form.pos.collect.change')">
-            <el-input v-model="amountRefund" disabled />
+            <b> {{ amountRefund }} </b>
           </el-form-item>
         </el-col>
         <el-col :span="8">
           <el-form-item :label="$t('form.pos.collect.Currency')">
-            <el-select
-              v-model="currencyReference.iso_code"
-              style="width: -webkit-fill-available;"
-              disabled
-              @change="changeCurrency"
-            >
-              <el-option
-                v-for="item in listCurrency"
-                :key="item.id"
-                :label="item.iso_code + '(' + item.currency_symbol + ')'"
-                :value="item.iso_code"
-              />
-            </el-select>
+            <b> {{ currencyReference.iso_code + '(' + currencyReference.currency_symbol + ')' }} </b>
           </el-form-item>
         </el-col>
       </el-row>

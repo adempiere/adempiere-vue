@@ -16,7 +16,7 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <div>
+  <div v-if="fieldsList.length > 2">
     <el-form
       label-position="top"
       label-width="10px"

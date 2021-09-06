@@ -69,6 +69,16 @@
                         fit="contain"
                       />
                     </div>
+                    <div v-if="selectionTypeRefund.uuid === payment.uuid" class="text item">
+                      <p class="total" style="padding-left: 2%;">
+                        <b class="order-info">
+                          {{ $t('form.pos.collect.change') }} : {{ formatPrice(change / dayRate.divideRate, refundReferenceCurrency) }}
+                        </b>
+                        <b class="order-info" style="float: right;padding-right: 2%;">
+                          {{ $t('form.pos.collect.Currency') }}  : {{ refundReferenceCurrency }}
+                        </b>
+                      </p>
+                    </div>
                   </el-card>
                 </div>
               </el-col>
@@ -146,6 +156,16 @@
                         tyle="width: 100px; height: 100px"
                         fit="contain"
                       />
+                    </div>
+                    <div v-if="selectionTypeRefund.uuid === payment.uuid" class="text item">
+                      <p class="total" style="padding-left: 2%;">
+                        <b class="order-info">
+                          {{ $t('form.pos.collect.change') }} : {{ formatPrice(change / dayRate.divideRate, refundReferenceCurrency) }}
+                        </b>
+                        <b class="order-info" style="float: right;padding-right: 2%;">
+                          {{ $t('form.pos.collect.Currency') }}  : {{ refundReferenceCurrency }}
+                        </b>
+                      </p>
                     </div>
                   </el-card>
                 </div>
