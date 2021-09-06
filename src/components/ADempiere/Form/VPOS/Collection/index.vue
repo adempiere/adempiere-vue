@@ -75,7 +75,7 @@
                     />
                   </el-col>
                   <el-col :span="8">
-                    <el-form-item label="Métodos de pago">
+                    <el-form-item :label="$t('form.pos.collect.paymentMethods')">
                       <el-select
                         v-model="currentFieldPaymentMethods"
                         @change="changePaymentMethods"
@@ -93,6 +93,7 @@
                     <el-form-item :label="$t('form.pos.collect.Currency')">
                       <el-select
                         v-model="currentFieldCurrency"
+                        :disabled="!isEmptyValue(currentAvailablePaymentMethods.reference_currency)"
                         @change="changeCurrency"
                       >
                         <el-option
@@ -644,8 +645,10 @@ export default {
     },
     currentFieldPaymentMethods(value) {
       const payment = this.availablePaymentMethods.find(payment => payment.uuid === value)
-      if (!this.isEmptyValue(payment.refund_reference_currency)) {
-        this.changeCurrency(payment.refund_reference_currency.iso_code)
+      if (!this.isEmptyValue(payment.reference_currency)) {
+        this.changeCurrency(payment.reference_currency.iso_code)
+      } else {
+        this.changeCurrency(this.pointOfSalesCurrency.iSOCode)
       }
     },
     precision() {
