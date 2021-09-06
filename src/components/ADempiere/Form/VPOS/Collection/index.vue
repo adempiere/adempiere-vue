@@ -650,6 +650,9 @@ export default {
       } else {
         this.changeCurrency(this.pointOfSalesCurrency.iSOCode)
       }
+      if (!this.isEmptyValue(this.dayRate)) {
+        this.showDayRate(this.dayRate)
+      }
     },
     precision() {
       return this.$store.getters.getCurrency.standardPrecision
@@ -660,6 +663,9 @@ export default {
     this.$store.dispatch('addRateConvertion', this.pointOfSalesCurrency)
     this.unsubscribe = this.subscribeChanges()
     this.defaultValueCurrency()
+    if (!this.isEmptyValue(this.dayRate)) {
+      this.showDayRate(this.dayRate)
+    }
     this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
   },
   methods: {
