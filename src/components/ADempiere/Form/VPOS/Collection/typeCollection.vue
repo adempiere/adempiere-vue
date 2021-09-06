@@ -370,6 +370,7 @@ export default {
       const orderUuid = key.orderUuid
       const paymentUuid = key.uuid
       this.$store.dispatch('deletetPayments', {
+        posUuid: this.currentPointOfSales.uuid,
         orderUuid,
         paymentUuid
       })

@@ -97,6 +97,7 @@ export default {
         .then(response => {
           const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
+          dispatch('updateOrder', { posUuid, orderUuid })
         })
         .catch(error => {
           console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -219,6 +220,7 @@ export default {
         .then(response => {
           const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
+          dispatch('updateOrder', { posUuid, orderUuid })
           return {
             ...response,
             type: 'Success'
@@ -249,6 +251,7 @@ export default {
         .then(response => {
           const orderUuid = response.order_uuid
           dispatch('listPayments', { orderUuid })
+          dispatch('updateOrder', { posUuid, orderUuid })
           return {
             ...response,
             type: 'Success'
@@ -269,6 +272,7 @@ export default {
     }
   },
   deletetPayments({ dispatch }, {
+    posUuid,
     orderUuid,
     paymentUuid
   }) {
@@ -277,6 +281,7 @@ export default {
     })
       .then(response => {
         dispatch('listPayments', { orderUuid })
+        dispatch('updateOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)

@@ -921,6 +921,7 @@ export default {
       const orderUuid = list.orderUuid
       const paymentUuid = list.uuid
       this.$store.dispatch('deletetPayments', {
+        posUuid: this.currentPointOfSales.uuid,
         orderUuid,
         paymentUuid
       })
