@@ -22,7 +22,7 @@ import {
   listOrders,
   printTicket
 } from '@/api/ADempiere/form/point-of-sales.js'
-import { isEmptyValue, extractPagingToken, convertValuesToSend } from '@/utils/ADempiere/valueUtils.js'
+import { isEmptyValue, extractPagingToken, convertValuesToSendListOrders } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 
 /**
@@ -209,16 +209,17 @@ export default {
 
     let { pageNumber, token } = state.listOrder
     if (isEmptyValue(pageNumber)) {
-      pageNumber = 1
+      pageNumber = 0
     }
     let pageToken
     if (!isEmptyValue(token)) {
-      pageToken = token + '-' + pageNumber
+      const page = pageNumber - 1
+      pageToken = token + '-' + page
     }
     let values = getters.getValuesView({
       containerUuid: 'Orders-List'
     })
-    values = convertValuesToSend(values)
+    values = convertValuesToSendListOrders(values)
     const { documentNo, businessPartnerUuid, grandTotal, openAmount, isPaid, isProcessed, isAisleSeller, isInvoiced, dateOrderedFrom, dateOrderedTo, salesRepresentativeUuid } = values
     listOrders({
       posUuid,

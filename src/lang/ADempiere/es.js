@@ -483,7 +483,7 @@ export default {
           returnMoney: 'Devolver dinero en otra forma de pago',
           adjustDocument: 'Desea Ajustar Documento',
           dailyLimit: 'Limite Diario',
-          customerLimit: 'Limite Order',
+          customerLimit: 'Limite Orden',
           available: 'Disponible',
           emptyPayment: 'Método de pago no soportado',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación'
