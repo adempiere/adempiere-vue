@@ -181,7 +181,6 @@ export default {
           break
         case 'Discount':
           discountRate = line.value
-          price = currentLine.price
           quantity = currentLine.quantity
           break
       }
