@@ -194,10 +194,11 @@ export default {
     convertedAmount,
     paymentDate,
     tenderTypeCode,
+    paymentMethodUuid,
     currencyUuid
   }) {
     const listPayments = getters.getListPayments.payments.find(payment => {
-      if ((payment.tenderTypeCode === tenderTypeCode) && (payment.tenderTypeCode === 'X') && (currencyUuid === payment.currencyUuid)) {
+      if ((payment.paymentMethodUuid === paymentMethodUuid) && (payment.tenderTypeCode === 'X') && (currencyUuid === payment.currencyUuid)) {
         return payment
       }
       return undefined
@@ -214,6 +215,7 @@ export default {
         convertedAmount,
         paymentDate,
         tenderTypeCode,
+        paymentMethodUuid,
         isRefund: false,
         currencyUuid
       })
@@ -246,6 +248,7 @@ export default {
         description,
         amount: listPayments.amount + amount,
         paymentDate,
+        paymentMethodUuid,
         tenderTypeCode
       })
         .then(response => {
@@ -373,6 +376,7 @@ export default {
     convertedAmount,
     paymentDate,
     tenderTypeCode,
+    paymentMethodUuid,
     currencyUuid
   }) {
     return createPayment({
@@ -387,6 +391,7 @@ export default {
       convertedAmount,
       paymentDate,
       tenderTypeCode,
+      paymentMethodUuid,
       currencyUuid,
       isRefund: true
     })

@@ -745,11 +745,11 @@ export default {
         columnName: 'DateTrx'
       })
       const tenderTypeCode = this.currentAvailablePaymentMethods.tender_type
+      const paymentMethodUuid = this.currentAvailablePaymentMethods.uuid
       const referenceNo = this.$store.getters.getValueOfField({
         containerUuid,
         columnName: 'ReferenceNo'
       })
-
       if (this.sendToServer) {
         this.$store.dispatch('setPaymentBox', {
           posUuid,
@@ -760,6 +760,7 @@ export default {
           convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
           tenderTypeCode,
+          paymentMethodUuid,
           currencyUuid: this.dayRate.currencyTo.uuid
         })
       } else {
@@ -771,6 +772,7 @@ export default {
           amount: this.round(this.amontSend, this.standardPrecision),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
           paymentDate,
+          paymentMethodUuid,
           tenderTypeCode,
           currencyUuid: this.dayRate.currencyTo.uuid
         })

@@ -584,6 +584,7 @@ export function createPayment({
   amount,
   paymentDate,
   tenderTypeCode,
+  paymentMethodUuid,
   isRefund,
   currencyUuid
 }) {
@@ -600,6 +601,7 @@ export function createPayment({
       amount: amount,
       payment_date: paymentDate,
       tender_type_code: tenderTypeCode,
+      payment_method_uuid: paymentMethodUuid,
       is_refund: isRefund,
       currency_uuid: currencyUuid
     }

@@ -230,7 +230,11 @@ export default {
       return this.$store.getters.getPaymentTypeList
     },
     listRefund() {
-      return this.$store.getters.getListRefund.filter(refund => refund.isRefund)
+      const refund = this.$store.getters.getListRefund
+      if (this.isEmptyValue(refund)) {
+        return []
+      }
+      return refund.filter(refund => refund.isRefund)
     }
   },
   watch: {
@@ -267,7 +271,7 @@ export default {
     },
     labelTenderType(tenderType) {
       const currentTenderType = this.availablePaymentMethods.find(label => {
-        if (label.tender_type === tenderType.tenderTypeCode && ((!this.isEmptyValue(label.refund_reference_currency) && label.refund_reference_currency.uuid === tenderType.currencyUuid) || this.isEmptyValue(label.refund_reference_currency))) {
+        if (label.uuid === tenderType.paymentMethodUuid) {
           return label
         }
       })
