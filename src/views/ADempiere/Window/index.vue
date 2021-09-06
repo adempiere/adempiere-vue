@@ -111,6 +111,40 @@ export default defineComponent({
         }
 
         return isDisplayed && isDisplayedFromLogic
+      },
+
+      validateReadOnly({
+        field,
+        // preferenceClientId,
+        // clientId,
+        isActive,
+        isProcessing,
+        isProcessed,
+        isWithRecord
+      }) {
+        // TODO: Fix client and org with server
+        // evaluate context
+        // if (preferenceClientId !== clientId && isWithRecord) {
+        //   return true
+        // }
+        // record is inactive
+        if (!isActive && field.columnName !== 'IsActive') {
+          return true
+        }
+        if (field.isAlwaysUpdateable) {
+          return false
+        }
+        if (isWithRecord && (isProcessing || isProcessed)) {
+          return true
+        }
+
+        // not updateable and record saved
+        if (!field.isUpdateable && isWithRecord) {
+          return true
+        }
+        return (
+          field.isReadOnly || field.isReadOnlyFromLogic || field.isReadOnlyFromForm
+        )
       }
     }
 

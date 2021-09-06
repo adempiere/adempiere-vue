@@ -66,6 +66,9 @@
 
 <script>
 import { evalutateTypeField, fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
+import {
+  ACTIVE, CLIENT, PROCESSING, PROCESSED
+} from '@/utils/ADempiere/constants/systemColumns'
 import FieldOptions from '@/components/ADempiere/Field/FieldOptions'
 
 /**
@@ -240,11 +243,49 @@ export default {
     isPanelWindow() {
       return this.field.panelType === 'window'
     },
+
+    recordUuid() {
+      // is active record
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: 'UUID'
+      })
+    },
+    containerIsActive() {
+      // panel processing value
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: ACTIVE
+      })
+    },
+    containerIsProcessing() {
+      // panel processing value
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: PROCESSING
+      })
+    },
+    containerIsProcessed() {
+      // panel processed value
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: PROCESSED
+      })
+    },
+    containerClientId() {
+      // panel client value
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: CLIENT
+      })
+    },
     preferenceClientId() {
-      if (this.isPanelWindow) {
-        return this.$store.getters.getPreferenceClientId
-      }
-      return undefined
+      return this.$store.getters.getPreferenceClientId
     },
 
     /**
@@ -259,14 +300,23 @@ export default {
         return false
       }
 
-      if (!this.field.isActive) {
-        return true
-      }
-
       // validate with container manager
       if (!this.isEmptyValue(this.containerManager) &&
         this.containerManager.validateReadOnly) {
-        return this.containerManager.validateReadOnly(this.field)
+        // TODO: Add validate method to record uuid uuid without route.action
+        // edit mode is diferent to create new
+        const isWithRecord = this.recordUuid !== 'create-new' &&
+          !this.isEmptyValue(this.recordUuid)
+        return this.containerManager.validateReadOnly({
+          field: this.field,
+          preferenceClientId: this.preferenceClientId,
+          // record values
+          clientId: this.containerClientId,
+          isActive: this.containerIsActive,
+          isProcessing: this.containerIsProcessing,
+          isProcessed: this.containerIsProcessed,
+          isWithRecord
+        })
       }
 
       const isUpdateableAllFields = this.field.isReadOnly || this.field.isReadOnlyFromLogic
@@ -275,9 +325,8 @@ export default {
         // TODO: Evaluate record uuid without route.action
         // edit mode is diferent to create new
         let isWithRecord = this.field.recordUuid !== 'create-new'
-        // TODO: Remove false condition to production
         // evaluate context
-        if ((this.preferenceClientId !== this.metadataField.clientId && 1 === 2) && isWithRecord) {
+        if ((this.preferenceClientId !== this.metadataField.clientId) && isWithRecord) {
           return true
         }
 

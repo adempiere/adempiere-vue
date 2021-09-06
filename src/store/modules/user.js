@@ -29,6 +29,7 @@ import {
 import { resetRouter } from '@/router'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
 import language from '@/lang'
 
 const state = {
@@ -173,7 +174,7 @@ const actions = {
           commit('SET_ROLE', role)
           setCurrentRole(role.uuid)
           const currentOrganizationSession = sessionInfo.defaultContext.find(context => {
-            if (context.key === '#AD_Org_ID') {
+            if (context.key === '#' + ORGANIZATION) {
               return context
             }
           })
@@ -367,7 +368,7 @@ const actions = {
         }
         commit('SET_ORGANIZATION', organization)
         commit('setPreferenceContext', {
-          columnName: '#AD_Org_ID',
+          columnName: '#' + ORGANIZATION,
           value: organization.id
         }, {
           root: true
@@ -409,7 +410,7 @@ const actions = {
         commit('SET_ORGANIZATION', organization)
 
         // commit('setPreferenceContext', {
-        //   columnName: '#AD_Org_ID',
+        //   columnName: '#' + ORGANIZATION,
         //   value: organizationId
         // }, {
         //   root: true
