@@ -485,7 +485,7 @@ export default {
         dayRate: 'Day Rate',
         noDayRate: 'No daily rate has been generated for the currency.',
         refund: 'Refund',
-        paymentMethods: 'Methods of payment',
+        paymentMethods: 'Methods Payment',
         emptyRate: 'No conversion rate to date',
         Currency: 'Currency',
         TenderType: {
