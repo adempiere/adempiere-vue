@@ -115,18 +115,18 @@ export default defineComponent({
 
       validateReadOnly({
         field,
-        // preferenceClientId,
-        // clientId,
+        // records values
+        preferenceClientId,
+        clientId,
         isActive,
         isProcessing,
         isProcessed,
         isWithRecord
       }) {
-        // TODO: Fix client and org with server
         // evaluate context
-        // if (preferenceClientId !== clientId && isWithRecord) {
-        //   return true
-        // }
+        if (preferenceClientId !== clientId && isWithRecord) {
+          return true
+        }
         // record is inactive
         if (!isActive && field.columnName !== 'IsActive') {
           return true
