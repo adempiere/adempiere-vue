@@ -278,7 +278,7 @@ export default {
       if (currentTenderType) {
         return currentTenderType.name
       }
-      return tenderType
+      return ''
     },
     iSOCode(value) {
       const currencyPay = this.convertionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === value.currencyUuid)

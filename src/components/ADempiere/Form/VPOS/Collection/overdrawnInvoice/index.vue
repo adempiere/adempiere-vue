@@ -561,6 +561,7 @@ export default {
         bankUuid: customer.C_Bank_ID_UUID,
         amount: this.change / this.dayRate.divideRate,
         tenderTypeCode: this.selectionTypeRefund.tender_type,
+        paymentMethodUuid: this.selectionTypeRefund.uuid,
         currencyUuid: this.defaultReferenceCurrency.uuid
       })
         .then(response => {

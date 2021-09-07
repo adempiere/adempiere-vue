@@ -346,6 +346,7 @@ export default {
     convertedAmount,
     paymentDate,
     tenderTypeCode,
+    paymentMethodUuid,
     currencyUuid
   }) {
     commit('setAddRefund', {
@@ -361,6 +362,7 @@ export default {
       convertedAmount,
       paymentDate,
       tenderTypeCode,
+      paymentMethodUuid,
       currencyUuid
     })
   },
@@ -400,6 +402,15 @@ export default {
         dispatch('listPayments', { orderUuid })
         return response
       })
+      .catch(error => {
+        console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+        return
+      })
   },
   /**
   * Refund payment at a later time
@@ -436,6 +447,7 @@ export default {
     zip,
     bankAccountType,
     bankUuid,
+    paymentMethodUuid,
     isAch,
     addressVerified,
     zipVerified,
@@ -455,6 +467,7 @@ export default {
       street,
       zip,
       bankAccountType,
+      paymentMethodUuid,
       bankUuid,
       isAch,
       addressVerified,

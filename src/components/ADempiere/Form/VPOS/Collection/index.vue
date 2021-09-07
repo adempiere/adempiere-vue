@@ -663,9 +663,16 @@ export default {
     this.$store.dispatch('addRateConvertion', this.pointOfSalesCurrency)
     this.unsubscribe = this.subscribeChanges()
     this.defaultValueCurrency()
-    if (!this.isEmptyValue(this.dayRate)) {
-      this.showDayRate(this.dayRate)
-    }
+    setTimeout(() => {
+      if (!this.isEmptyValue(this.dayRate.divideRate)) {
+        this.showDayRate(this.dayRate, this.dayRate.divideRate)
+        this.$store.commit('updateValueOfField', {
+          containerUuid: this.containerUuid,
+          columnName: 'PayAmt',
+          value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
+        })
+      }
+    }, 1500)
     this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
   },
   methods: {
@@ -825,7 +832,7 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending)
+          value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
         })
       })
       this.defaultValueCurrency()
@@ -855,12 +862,11 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: this.round(this.pending)
+        value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
       })
       this.defaultValueCurrency()
       this.$store.commit('currencyDivideRateCollection', 1)
       this.$store.commit('currencyMultiplyRate', 1)
-      this.currentFieldCurrency = this.pointOfSalesCurrency.iSOCode
     },
     exit() {
       this.cancel()
