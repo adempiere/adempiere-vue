@@ -17,7 +17,6 @@
 /**
  * Dictionary Window Getters
  */
-
 export default {
   getStoredWindows: (state) => {
     return state.storedWindows
@@ -29,5 +28,11 @@ export default {
 
   getStoredTabs: (state) => (windowUuid) => {
     return state.storedWindows[windowUuid].tabs
+  },
+
+  getStoredTab: (state) => (windowUuid, tabUuid) => {
+    return state.storedWindows[windowUuid].tabs.find(tab => {
+      return tab.uuid === tabUuid
+    })
   }
 }

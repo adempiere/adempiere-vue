@@ -73,7 +73,6 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    console.log(props.windowMetadata)
     const isWithChildsTab = computed(() => {
       return !root.isEmptyValue(props.windowMetadata.tabsListChild)
     })
@@ -127,43 +126,23 @@ export default defineComponent({
     }
 
     const actionsManager = ref({
-      // overwrite logic or add actions
-      ...props.windowManager.actionsManager,
-
-      actionsList: ({ tableName, uuid }) => {
-        const actionsList = [
-          createNewRecord,
-          {
-            ...refreshRecords,
-            callBack: () => {
-              console.log('call getEntities')
-              root.$store.dispatch('dataManager/getEntities', {
-                parentUuid: props.parentUuid,
-                containerUuid: uuid,
-                tableName
-              })
-            }
-          },
-          deleteRecord,
-          sharedLink
-        ]
-
-        return actionsList
-      }
+      parentUuid: props.windowMetadata.uuid,
+      containerUuid: props.windowMetadata.currentTabUuid,
+      getActionList: () => [
+        createNewRecord,
+        refreshRecords,
+        deleteRecord,
+        sharedLink
+      ]
     })
-    const referencesManager = ref({
-      // overwrite logic
-      ...props.windowManager.referencesManager,
 
+    const referencesManager = ref({
       tableName: (tableName) => {
         return tableName
       }
     })
 
     const relationsManager = ref({
-      // overwrite logic
-      ...props.windowManager.relationsManager,
-
       menuParentUuid: root.$route.meta.parentUuid
     })
 

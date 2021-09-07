@@ -138,7 +138,9 @@ export function rollbackEntity({
     })
 }
 
-// Get entity from table name and record id or record uuid
+/**
+ * Get entity from table name and record id or record uuid
+ */
 export function getEntity({
   tableName,
   recordId,
@@ -162,6 +164,7 @@ export function getEntity({
 
 /**
  * Object List from window
+ * @deprecated replace with /user-interface/persistence/entities
  * @param {string} tableName
  * @param {string} query
  * @param {string} whereClause

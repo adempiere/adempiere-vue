@@ -1,6 +1,10 @@
 import {
   getEntities
 } from '@/api/ADempiere/user-interface/persistence'
+import {
+  createEntity,
+  deleteEntity
+} from '@/api/ADempiere/common/persistence'
 
 const dataManager = {
   namespaced: true,
@@ -24,6 +28,25 @@ const dataManager = {
   },
 
   actions: {
+    createEntity({
+      dispatch,
+      rootGetters
+    }, {
+      parentUuid,
+      containerUuid
+    }) {
+      return new Promise(resolve => {
+        const tab = rootGetters.getStoredTab(parentUuid, containerUuid)
+
+        createEntity({
+          tableName: tab.tableName
+        })
+          .then(createResponse => {
+            resolve(createResponse)
+          })
+      })
+    },
+
     getEntities({
       commit
     }, {
@@ -32,8 +55,7 @@ const dataManager = {
       pageToken,
       pageSize
     }) {
-      // TODO: Parsed query and where clause
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         getEntities({
           windowUuid: parentUuid,
           tabUuid: containerUuid,
@@ -52,6 +74,34 @@ const dataManager = {
             })
 
             resolve(dataToStored)
+          })
+      })
+    },
+
+    deleteEntity({
+      dispatch,
+      rootGetters
+    }, {
+      parentUuid,
+      containerUuid,
+      recordId,
+      recordUuid
+    }) {
+      return new Promise(resolve => {
+        const tab = rootGetters.getStoredTab(parentUuid, containerUuid)
+
+        deleteEntity({
+          tableName: tab.tableName,
+          recordId,
+          recordUuid
+        })
+          .then(responseDeleteEntity => {
+            dispatch('getEntities', {
+              parentUuid,
+              containerUuid
+            })
+
+            resolve(responseDeleteEntity)
           })
       })
     }

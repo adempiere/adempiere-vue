@@ -33,6 +33,8 @@ export default {
         uuid
       })
         .then(async windowResponse => {
+          dispatch('addWindow', windowResponse)
+
           resolve(windowResponse)
         })
     })

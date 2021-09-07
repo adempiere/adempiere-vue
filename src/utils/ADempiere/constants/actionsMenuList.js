@@ -14,7 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import clipboard from '@/directive/clipboard'
 import language from '@/lang'
+function generateLink() {}
 
 /**
  * Create new record
@@ -22,10 +24,27 @@ import language from '@/lang'
 export const createNewRecord = {
   sequence: 0,
   name: language.t('actionMenu.createNewRecord'),
+  type: 'setDefaultValues',
   enabled: true,
   svg: false,
   icon: 'el-icon-circle-plus-outline',
-  callBack: () => {}
+  callBack: ({ root, parentUuid, containerUuid }) => {
+    root.$store.dispatch('setDefaultValues', {
+      parentUuid,
+      containerUuid
+    })
+  }
+}
+
+export const undoChange = {
+  sequence: 0,
+  name: language.t('actionMenu.createNewRecord'),
+  type: 'undoModifyData',
+  enabled: false,
+  svg: false,
+  icon: 'el-icon-circle-plus-outline',
+  callBack: ({ root, parentUuid, containerUuid }) => {
+  }
 }
 
 /**
@@ -36,7 +55,10 @@ export const sharedLink = {
   enabled: true,
   svg: false,
   icon: 'el-icon-share',
-  callBack: () => {}
+  callBack: ({ root }) => {
+    const link = generateLink(root.router)
+    clipboard(link)
+  }
 }
 
 export const deleteRecord = {
@@ -44,7 +66,15 @@ export const deleteRecord = {
   enabled: true,
   svg: false,
   icon: 'el-icon-delete',
-  callBack: () => {}
+  type: 'deleteEntity',
+  callBack: ({ root, parentUuid, containerUuid, recordId, recordUuid }) => {
+    root.$store.dispatch('dataManager/deleteEntity', {
+      parentUuid,
+      containerUuid,
+      recordId,
+      recordUuid
+    })
+  }
 }
 
 export const refreshRecords = {
@@ -52,7 +82,43 @@ export const refreshRecords = {
   enabled: true,
   svg: false,
   icon: 'el-icon-refresh',
-  callBack: () => {}
+  callBack: ({ root, parentUuid, containerUuid, tableName }) => {
+    // used to window
+    // TODO: implement to browser
+    root.$store.dispatch('dataManager/getEntities', {
+      parentUuid,
+      containerUuid
+    })
+  }
+}
+
+export const lockRecord = {
+  name: language.t('actionMenu.refreshRecords'),
+  type: 'lockRecord',
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-lock',
+  callBack: ({ root, parentUuid, containerUuid, tableName }) => {
+  }
+}
+
+export const unlockRecord = {
+  name: language.t('actionMenu.refreshRecords'),
+  type: 'unlockRecord',
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-unlock',
+  callBack: ({ root, parentUuid, containerUuid, tableName }) => {
+  }
+}
+
+export const recordAccess = {
+  name: language.t('actionMenu.refreshRecords'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-c-scale-to-original',
+  callBack: ({ root, parentUuid, containerUuid, tableName }) => {
+  }
 }
 
 export const windowActions = [

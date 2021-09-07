@@ -26,8 +26,8 @@
     type="primary"
     trigger="click"
     class="menu-actions"
-    @command="clickRunAction"
-    @click="runAction(defaultActionToRun)"
+    @command="runAction"
+    @click="runDefaultAction"
   >
     {{ defaultActionName }}
 
@@ -135,15 +135,17 @@ export default defineComponent({
 
   setup(props, { root }) {
     const {
+      parentUuid,
       containerUuid,
       tableName
     } = props.actionsManager
 
     const actionsList = ref(
-      props.actionsManager.actionsList({ uuid: containerUuid, tableName })
+      props.actionsManager.getActionList()
     )
 
     const recordUuid = computed(() => {
+      // TODO: Change query name 'action'
       const { action } = root.$route.query
       return action
     })
@@ -178,56 +180,35 @@ export default defineComponent({
       return actionsList.value[0]
     })
 
-    const clickRunAction = (action) => {
-      console.log('clickRunAction', action)
-    }
-
-    const runAction = (action) => {
-      console.log('runAction', action)
-      action.callBack()
+    /**
+     * Run default action with last parameters
+     */
+    function runDefaultAction() {
+      runAction(defaultActionToRun.value)
     } // end runAction
 
     /**
-     * Get element-ui icon from action
+     * Run selected action
+     * @param action
      */
-    const iconAction = ({ type, action }) => {
-      let icon = 'el-icon-setting'
-      if (type === 'dataAction') {
-        switch (action) {
-          case 'setDefaultValues':
-            icon = 'el-icon-circle-plus-outline'
-            break
-          case 'deleteEntity':
-            icon = 'el-icon-delete'
-            break
-          case 'undoModifyData':
-            icon = 'el-icon-refresh-left'
-            break
-          case 'lockRecord':
-            icon = 'el-icon-lock'
-            break
-          case 'unlockRecord':
-            icon = 'el-icon-unlock'
-            break
-          case 'recordAccess':
-            icon = 'el-icon-c-scale-to-original'
-            break
-        }
-      }
-
-      return icon
+    const runAction = (action) => {
+      action.callBack({
+        root,
+        parentUuid,
+        containerUuid,
+        tableName,
+        recordUuid: recordUuid.value,
+        uuid: action.uuid
+      })
     }
 
     return {
-      // size: pro,
       actionsList,
       // computeds
       defaultActionName,
-      defaultActionToRun,
       // methods
       runAction,
-      clickRunAction,
-      iconAction
+      runDefaultAction
     }
   }
 })
