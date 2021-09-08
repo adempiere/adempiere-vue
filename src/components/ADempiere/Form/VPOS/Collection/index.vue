@@ -419,7 +419,7 @@ export default {
         fieldsList: fieldLogic,
         isValidate: true
       })
-      if (this.defaulValuePaymentMethods.tender_type === 'X' || this.currentFieldPaymentMethods === this.defaulValuePaymentMethods.uuid) {
+      if (this.defaulValuePaymentMethods.tender_type === 'X' && this.currentFieldPaymentMethods === this.defaulValuePaymentMethods.uuid) {
         return false
       }
       if (this.isEmptyValue(fieldsEmpty)) {
