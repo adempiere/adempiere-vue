@@ -487,7 +487,13 @@ export default {
           customerLimit: 'Limite Orden',
           available: 'Disponible',
           emptyPayment: 'Método de pago no soportado',
-          addPayment: 'Debe agregar un tipo de vuelto para completar la operación'
+          addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
+          fieldList: {
+            code: 'Cedula',
+            name: 'Nombre del Titular',
+            accountType: 'Tipo de Cuenta',
+            bank: 'Banco'
+          }
         }
       },
       keyLayout: {

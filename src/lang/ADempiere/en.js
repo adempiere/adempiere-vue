@@ -511,7 +511,13 @@ export default {
           customerLimit: 'Order Limit',
           available: 'Available',
           emptyPayment: 'Unsupported payment method',
-          addPayment: 'You must add a change type to complete the operation'
+          addPayment: 'You must add a change type to complete the operation',
+          fieldList: {
+            code: 'Cedula',
+            name: 'Holder Name',
+            accountType: 'Account Type',
+            bank: 'Bank'
+          }
         }
       },
       keyLayout: {

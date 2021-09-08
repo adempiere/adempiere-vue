@@ -32,12 +32,12 @@
             :metadata-field="field"
           />
         </el-col>
-        <el-col :span="8">
+        <el-col :span="4">
           <el-form-item :label="$t('form.pos.collect.change')">
             <b> {{ amountRefund }} </b>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="4">
           <el-form-item :label="$t('form.pos.collect.Currency')">
             <b> {{ currencyReference.iso_code + '(' + currencyReference.currency_symbol + ')' }} </b>
           </el-form-item>

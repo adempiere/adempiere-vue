@@ -469,6 +469,15 @@ export default {
           this.selectPayment(this.paymentTypeListRefund[0])
         }
       }
+    },
+    selectionTypeRefund(value) {
+      if (value.tender_type === 'D') {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'ACH',
+          columnName: 'IsACH', // this.parentMetadata.columnName,
+          value: true
+        })
+      }
     }
   },
   mounted() {

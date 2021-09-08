@@ -13,7 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import language from '@/lang'
 const tableName = 'C_Payment'
 
 export default [
@@ -28,6 +28,7 @@ export default [
       sequence: 1,
       isCustomField: true,
       size: 24,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.name'),
       isMandatory: true
     }
   },
@@ -41,6 +42,7 @@ export default [
       sequence: 0,
       isCustomField: true,
       size: 24,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.code'),
       isMandatory: true
     }
   },
@@ -70,6 +72,7 @@ export default [
       handleContentSelection: true,
       displayLogic: `@TenderType@<>'X'|| @TenderType@<>'Z'`,
       size: 24,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.bank'),
       isActiveLogics: true,
       isMandatory: true
     }
