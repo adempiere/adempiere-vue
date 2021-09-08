@@ -578,6 +578,17 @@ export default {
         return defaultPayment
       }
       return {}
+    },
+    validateReturn() {
+      const refund = this.$store.getters.getListRefund
+      if (this.isEmptyValue(refund)) {
+        return this.change
+      }
+      const allRefund = refund.filter(refund => refund.isRefund)
+      if (!this.isEmptyValue(allRefund)) {
+        return allRefund[0].amount
+      }
+      return this.change
     }
   },
   watch: {
@@ -585,7 +596,7 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: this.round(value / this.standardPrecision)
+        value: this.round(value, this.standardPrecision)
       })
     },
     convertAllPayment(value) {
@@ -945,6 +956,10 @@ export default {
     },
     validateOrder(payment) {
       this.porcessInvoce = true
+      if (this.validateReturn !== this.change) {
+        this.completePreparedOrder(payment)
+        return
+      }
       if (this.pay > this.currentOrder.grandTotal) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
       } else if (this.pay < this.currentOrder.grandTotal) {

@@ -559,7 +559,7 @@ export default {
         customer,
         orderUuid,
         bankUuid: customer.C_Bank_ID_UUID,
-        amount: this.change / this.dayRate.divideRate,
+        amount: this.round(this.change / this.dayRate.divideRate, this.defaultReferenceCurrency.standard_precision),
         tenderTypeCode: this.selectionTypeRefund.tender_type,
         paymentMethodUuid: this.selectionTypeRefund.uuid,
         currencyUuid: this.defaultReferenceCurrency.uuid
