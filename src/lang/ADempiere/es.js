@@ -415,7 +415,9 @@ export default {
           changePos: 'Cambiar Punto de Venta',
           listProducts: 'Lista de Productos y Precios',
           changeWarehouseList: 'Cambiar de Almacén',
-          changePriceList: 'Cambiar Lista de Precio'
+          changePriceList: 'Cambiar Lista de Precio',
+          dateTo: 'Fecha Hasta',
+          dateFrom: 'Fecha Desde'
         }
       },
       tableProduct: {

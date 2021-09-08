@@ -439,7 +439,9 @@ export default {
           changePos: 'Change Point of Sale',
           listProducts: 'Change Point of Sale',
           changeWarehouseList: 'Change Warehouse',
-          changePriceList: 'Change Price List'
+          changePriceList: 'Change Price List',
+          dateTo: 'Date To',
+          dateFrom: 'Date From'
         }
       },
       tableProduct: {
