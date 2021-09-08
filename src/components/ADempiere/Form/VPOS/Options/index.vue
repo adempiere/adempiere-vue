@@ -34,7 +34,7 @@
             <el-card shadow="hover">
               <p
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
-                @click="!allowsCreateOrder ? '' : newOrder"
+                @click="!allowsCreateOrder ? validateOption($t('form.pos.pinMessage.newOrder')) : newOrder"
               >
                 <i class="el-icon-news" />
                 <br>
@@ -395,6 +395,7 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsReturnOrder
     },
     allowsCreateOrder() {
+      console.log(this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder)
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
     },
     isShowProductsPriceList: {
@@ -577,6 +578,9 @@ export default {
           break
         case this.$t('form.pos.optionsPoinSales.generalOptions.changePos'):
           this.changePos()
+          break
+        case this.$t('form.pos.pinMessage.newOrder'):
+          this.newOrder()
           break
       }
     },

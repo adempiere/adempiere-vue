@@ -503,7 +503,8 @@ export default {
         discount: 'agregar descuento',
         delete: 'eliminar producto',
         addProduct: 'agregar producto',
-        invoiceOpen: 'generar factura con un saldo abierto'
+        invoiceOpen: 'generar factura con un saldo abierto',
+        newOrder: 'crear nueva orden'
       }
     },
     priceChecking: {

@@ -310,6 +310,9 @@ export default {
           case 'changeDocumentType':
             this.$store.commit('setCurrentDocumentTypePos', action)
             break
+          case 'newOrder':
+            this.createOrder({ withLine: action.withLine, newOrder: action.newOrder, customer: action.customer })
+            break
           case 'changePriceList':
             this.$store.commit('setCurrentPriceList', action)
             break

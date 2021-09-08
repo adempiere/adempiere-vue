@@ -527,7 +527,8 @@ export default {
         discount: 'add discount',
         delete: 'delete product',
         addProduct: 'add product',
-        invoiceOpen: 'generate invoice with an open balance'
+        invoiceOpen: 'generate invoice with an open balance',
+        newOrder: 'create new order'
       }
     },
     priceChecking: {

@@ -68,7 +68,7 @@
                   <fast-ordes-list />
                 </el-col>
                 <el-col :span="9" style="padding-left: 0px; padding-right: 0px;">
-                  <el-button type="primary" :disabled="!allowsCreateOrder" plain :style="isShowedPOSKeyLayout ? 'float: right;' : ''" @click="newOrder">
+                  <el-button type="primary" plain :style="isShowedPOSKeyLayout ? 'float: right;' : ''" @click="newOrder">
                     {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
                   </el-button>
                 </el-col>
@@ -731,6 +731,19 @@ export default {
       return this.formatPrice(this.currentOrder.grandTotal - this.currentOrder.totalLines, currency)
     },
     newOrder() {
+      if (!this.allowsCreateOrder) {
+        const attributePin = {
+          withLine: false,
+          newOrder: true,
+          customer: this.currentPointOfSales.templateBusinessPartner.uuid,
+          action: 'newOrder',
+          type: 'actionPos',
+          label: this.$t('form.pos.pinMessage.newOrder')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+        return
+      }
       this.clearOrder()
       this.$store.commit('setShowPOSCollection', false)
       this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateBusinessPartner.uuid })
