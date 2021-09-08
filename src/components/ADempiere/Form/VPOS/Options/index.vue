@@ -47,7 +47,7 @@
             <el-card shadow="hover">
               <el-popover
                 placement="right"
-                width="800"
+                width="900"
                 trigger="click"
                 @show="seeOrderList"
                 @hide="showFieldListOrder = !showFieldListOrder"

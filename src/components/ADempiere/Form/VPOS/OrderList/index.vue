@@ -176,9 +176,9 @@ export default {
   computed: {
     heightTable() {
       if (this.isEmptyValue(this.activeAccordion)) {
-        return 500
+        return 600
       }
-      return 250
+      return 350
     },
     highlightRow() {
       if (!this.isEmptyValue(this.selectOrder)) {
