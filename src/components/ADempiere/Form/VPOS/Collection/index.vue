@@ -288,15 +288,21 @@ export default {
     listPayments() {
       const listLocal = this.$store.getters.getPaymentBox
       const listServer = this.currentOrder.listPayments
-      if (!this.sendToServer) {
+      if (!this.sendToServer && !this.isEmptyValue(listServer)) {
         return listServer.payments.filter(payment => !payment.isRefund)
       }
-      return listLocal
+      return listLocal.paymentBox
     },
     isLoadedPayments() {
+      if (this.isEmptyValue(this.currentOrder.listPayments)) {
+        return false
+      }
       return this.currentOrder.listPayments.isLoaded
     },
     paymentBox() {
+      if (this.isEmptyValue(this.listPayments)) {
+        return []
+      }
       const payment = this.listPayments.filter(pay => {
         return pay.isVisible
       })
@@ -716,7 +722,7 @@ export default {
     formatPrice,
     sumCash(cash) {
       let sum = 0
-      if (cash) {
+      if (!this.isEmptyValue(cash)) {
         cash.forEach((pay) => {
           const amount = this.convertAmount(pay.currencyUuid)
           if (!this.isEmptyValue(pay.divideRate)) {
