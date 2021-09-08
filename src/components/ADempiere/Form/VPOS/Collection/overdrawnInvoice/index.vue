@@ -18,10 +18,12 @@
 <template>
   <div>
     <el-dialog
+      v-shortkey="showDialogo ? {close: ['esc']} : {}"
       :title="$t('form.pos.collect.overdrawnInvoice.title')"
       :visible.sync="showDialogo"
       :before-close="close"
       width="85%"
+      @shortkey.native="actionOverdrawnInvoice"
       @close="close"
     >
       <div v-if="caseOrder === 1">
@@ -52,6 +54,7 @@
               <el-col v-for="(payment, index) in paymentTypeListRefund" :key="index" :span="6">
                 <div @click="selectPayment(payment)">
                   <el-card
+                    v-if="isEmptyValue(selectionTypeRefund) || selectionTypeRefund.tender_type === 'X'"
                     shadow="never"
                     class="custom-card"
                     :body-style="{ padding: '10px' }"
@@ -140,6 +143,7 @@
               <el-col v-for="(payment, index) in paymentTypeList" :key="index" :span="6">
                 <div @click="selectPayment(payment)">
                   <el-card
+                    v-if="isEmptyValue(selectionTypeRefund) || selectionTypeRefund.tender_type === 'X'"
                     shadow="never"
                     class="custom-card"
                     :style="selectionTypeRefund.name == payment.name ? 'background-color: #eaf5fe;border: 1px solid #36a3f7;' : ''"
@@ -201,6 +205,12 @@
         </el-card>
       </div>
       <span slot="footer" class="dialog-footer">
+        <el-button
+          type="info"
+          class="custom-button-create-bp"
+          icon="el-icon-back"
+          @click="selectionTypeRefund = {}"
+        />
         <el-button
           type="danger"
           class="custom-button-create-bp"
@@ -480,6 +490,11 @@ export default {
   methods: {
     formatPrice,
     formatDateToSend,
+    actionOverdrawnInvoice(commands) {
+      if (commands.srcKey === 'close') {
+        this.close()
+      }
+    },
     imageCard(typeRefund) {
       let image
       switch (typeRefund) {
