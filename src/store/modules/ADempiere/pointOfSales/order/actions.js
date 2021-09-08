@@ -94,6 +94,7 @@ export default {
           showClose: true
         })
       })
+    this.$store.dispatch('changeFocusNewOrder', false)
   },
 
   /**

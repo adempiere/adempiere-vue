@@ -172,6 +172,9 @@ export default {
     },
     showOverdrawnInvoice() {
       return this.$store.getters.getOverdrawnInvoice.visible
+    },
+    isNewOrder() {
+      return this.$store.getters.getFocusNewOrder
     }
   },
   watch: {
@@ -559,6 +562,7 @@ export default {
       } else {
         this.createOrderLine(orderUuid)
       }
+      this.$store.dispatch('changeFocusNewOrder', true)
     },
     reloadOrder(requery, orderUuid) {
       if (requery) {

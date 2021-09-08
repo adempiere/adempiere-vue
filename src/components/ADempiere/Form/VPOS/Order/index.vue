@@ -35,6 +35,7 @@
                 <product-info
                   v-if="field.columnName === 'ProductValue'"
                   id="ProductValue"
+                  ref="ProductValue"
                   :key="field.columnName"
                   :metadata="field"
                 />
@@ -698,6 +699,9 @@ export default {
           action: this.currentOrder.uuid
         }
       })
+    }
+    if (this.isNewOrder) {
+      this.$refs.ProductValue[0].$refs.product.focus()
     }
   },
   methods: {

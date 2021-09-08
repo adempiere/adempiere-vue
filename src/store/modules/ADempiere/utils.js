@@ -35,7 +35,8 @@ const initStateUtils = {
   updateCustomer: false,
   overdrawnInvoice: {
     visible: false
-  }
+  },
+  isNewOrder: false
 }
 
 export default {
@@ -119,6 +120,9 @@ export default {
     },
     showUpdateCustomer(state, show) {
       state.updateCustomer = show
+    },
+    focusNewOrder(state, payload) {
+      state.isNewOrder = payload
     }
   },
   actions: {
@@ -198,6 +202,9 @@ export default {
     },
     changeShowUpdateCustomer({ commit }, show) {
       commit('showUpdateCustomer', show)
+    },
+    changeFocusNewOrder({ commit }, params) {
+      commit('focusNewOrder', params)
     }
   },
   getters: {
@@ -282,6 +289,9 @@ export default {
     },
     getShowUpdateCustomer: (state) => {
       return state.updateCustomer
+    },
+    getFocusNewOrder: (state) => {
+      return state.isNewOrder
     }
   }
 }
