@@ -140,7 +140,6 @@ export default {
   },
   watch: {
     showCustomer(value) {
-      console.log(value)
       this.getCustomer()
     }
   },
