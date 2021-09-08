@@ -41,13 +41,14 @@
       </template>
 
       <el-autocomplete
+        ref="product"
         v-model="value"
         v-shortkey="keyShortcuts"
         :placeholder="$t('quickAccess.searchWithEnter')"
         clearable
         style="width: 100%;"
         popper-class="custom-field-prodcut-info"
-        :trigger-on-focus="true"
+        :trigger-on-focus="false"
         :fetch-suggestions="localSearch"
         :select-when-unmatched="true"
         :highlight-first-item="true"
@@ -220,6 +221,7 @@ export default {
         // TODO: Verify with 'value' or 'searchValue' attribute
         value: valueProduct
       })
+      this.$refs.product.focus()
     }
   }
 }
