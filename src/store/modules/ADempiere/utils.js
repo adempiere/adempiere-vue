@@ -31,6 +31,7 @@ const initStateUtils = {
   updateOrder: false,
   updatePayment: false,
   createBusinessPartner: false,
+  listBusinessPartner: false,
   step: 0,
   updateCustomer: false,
   overdrawnInvoice: {
@@ -114,6 +115,9 @@ export default {
     popoverCreateBusinessPartner(state, createBusinessPartner) {
       state.createBusinessPartner = createBusinessPartner
     },
+    popoverListBusinessPartner(state, payload) {
+      state.listBusinessPartner = payload
+    },
     popoverOverdrawnInvoice(state, payload) {
       state.overdrawnInvoice = payload
     },
@@ -188,6 +192,9 @@ export default {
     },
     changePopover({ commit }, params) {
       commit('popoverCreateBusinessPartner', params)
+    },
+    changePopoverListBusinessPartner({ commit }, params) {
+      commit('popoverListBusinessPartner', params)
     },
     changePopoverOverdrawnInvoice({ commit }, { attributePin, visible }) {
       const overdrawn = {
@@ -273,6 +280,9 @@ export default {
     },
     getPopoverCreateBusinessParnet: (state) => {
       return state.createBusinessPartner
+    },
+    getPopoverListBusinessParnet: (state) => {
+      return state.listBusinessPartner
     },
     getStepCurrent: (state) => {
       return state.step

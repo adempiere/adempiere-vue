@@ -17,8 +17,8 @@
 -->
 <template>
   <el-main
-    v-shortkey="shortsKey"
-    @shortkey.native="keyAction"
+    v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+    @shortkey.native="actionCreate"
   >
     <el-form
       label-position="top"
@@ -128,6 +128,9 @@ export default {
     },
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
+    },
+    popoverCreateBusinessParnet() {
+      return this.$store.getters.getPopoverCreateBusinessParnet
     }
   },
   watch: {
@@ -143,6 +146,18 @@ export default {
     this.unsubscribe()
   },
   methods: {
+    actionCreate(commands) {
+      if (commands.srcKey) {
+        switch (commands.srcKey) {
+          case 'enter':
+            this.createBusinessParter()
+            break
+          case 'close':
+            this.clearValues()
+            break
+        }
+      }
+    },
     focusValue() {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
     },

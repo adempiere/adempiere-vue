@@ -18,8 +18,8 @@
 <template>
   <el-main
     v-loading="loading"
-    v-shortkey="shortsKey"
-    @shortkey.native="keyAction"
+    v-shortkey="showCustomer ? {close: ['esc'], enter: ['enter']} : {}"
+    @shortkey.native="actionUpdate"
   >
     <el-form
       label-position="top"
@@ -149,6 +149,18 @@ export default {
   },
   methods: {
     requestGetCountryDefinition,
+    actionUpdate(commands) {
+      if (commands.srcKey) {
+        switch (commands.srcKey) {
+          case 'enter':
+            this.update()
+            break
+          case 'close':
+            this.clearValues()
+            break
+        }
+      }
+    },
     focusValue() {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
     },

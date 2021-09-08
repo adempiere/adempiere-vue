@@ -17,8 +17,8 @@
 -->
 <template>
   <el-main
-    v-shortkey="shortsKey"
-    @shortkey.native="keyAction"
+    v-shortkey="popoverListBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+    @shortkey.native="actionList"
   >
     <el-collapse v-model="activeAccordion" accordion>
       <el-collapse-item name="query-criteria">
@@ -150,6 +150,9 @@ export default {
     isReadyFromGetData() {
       const { isLoaded, isReload } = this.businessParners
       return (!isLoaded || isReload) && this.showsPopovers.isShowList
+    },
+    popoverListBusinessParnet() {
+      return this.$store.getters.getPopoverListBusinessParnet
     }
   },
   watch: {
@@ -176,25 +179,8 @@ export default {
   },
   methods: {
     createFieldFromDictionary,
-    keyAction(event) {
-      switch (event.srcKey) {
-        case 'refreshList': {
-          const values = this.$store.getters.getValuesView({
-            containerUuid: this.metadata.containerUuid,
-            format: 'object'
-          })
-
-          this.searchBPartnerList(values)
-          break
-        }
-        case 'refreshListWithoutValues': {
-          this.searchBPartnerList({})
-          break
-        }
-        case 'closeForm':
-          this.closeForm()
-          break
-      }
+    actionList(event) {
+      this.$store.dispatch('changePopoverListBusinessPartner', false)
     },
     handleCurrentChange(row) {
       this.setBusinessPartner(row)

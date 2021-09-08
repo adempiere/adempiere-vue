@@ -42,11 +42,12 @@
         </el-button>
       </el-popover>
       <el-popover
+        v-model="showFieldList"
         placement="top-start"
         width="800"
         trigger="click"
         :disabled="isDisabled"
-        @hide="showFieldList = !showFieldList"
+        @hide="closeList"
       >
         <business-partners-list
           :parent-metadata="parentMetadata"
@@ -56,7 +57,7 @@
         <el-button
           slot="reference"
           type="text"
-          @click="showFieldList = !showFieldList"
+          @click="popoverList"
         >
           <i
             class="el-icon-search"
@@ -219,6 +220,9 @@ export default {
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
     },
+    popoverListBusinessParnet() {
+      return this.$store.getters.getPopoverListBusinessParnet
+    },
     showUpdateCustomer() {
       return this.$store.getters.getShowUpdateCustomer
     },
@@ -235,6 +239,9 @@ export default {
   watch: {
     popoverCreateBusinessParnet(value) {
       this.showCreate = value
+    },
+    popoverListBusinessParnet(value) {
+      this.showFieldList = value
     },
     showUpdateCustomer(value) {
       this.visible = value
@@ -443,6 +450,16 @@ export default {
     },
     popoverOpen(value) {
       this.$store.dispatch('changePopover', true)
+    },
+    popoverList(value) {
+      if (!this.showFieldList) {
+        this.$store.dispatch('changePopoverListBusinessPartner', true)
+      }
+    },
+    closeList() {
+      if (this.showFieldList) {
+        this.$store.dispatch('changePopoverListBusinessPartner', false)
+      }
     },
     popoverClose(value) {
       this.$store.commit('setShowedLocation', false)
