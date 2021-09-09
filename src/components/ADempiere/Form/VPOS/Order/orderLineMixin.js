@@ -274,7 +274,7 @@ export default {
       } else if (columnName === 'DiscountTotal') {
         return this.formatPrice(row.priceList * (row.discountRate / 100))
       } else if (columnName === 'DisplayTaxAmount') {
-        return this.formatPrice((row.priceList * row.taxRate.rate / 100))
+        return this.formatPrice((row.priceActual * row.taxRate.rate / 100))
       }
     },
     productPrice(price, discount) {
