@@ -24,9 +24,9 @@
             <el-card :body-style="{ padding: '0px' }">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img src="@/image/ADempiere/pos/no-image.jpg" fit="contain" class="image">
+                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
                 </el-col>
-                <el-col :span="18">
+                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
                   <el-button
                     v-if="!isDisabled"
                     type="text"
@@ -93,9 +93,9 @@
             <el-card :body-style="{ padding: '0px' }">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img src="@/image/ADempiere/pos/no-image.jpg" fit="contain" class="image">
+                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
                 </el-col>
-                <el-col :span="18">
+                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
                   <el-button
                     v-if="!isDisabled"
                     type="text"
@@ -369,6 +369,33 @@ export default {
           break
       }
       return require('@/image/' + image + '.jpg')
+    },
+    imageCard(typePayment) {
+      let image
+      switch (typePayment) {
+        case 'D':
+          image = 'MobilePayment.jpg'
+          break
+        case 'P':
+          image = 'Mobile.jpg'
+          break
+        case 'X':
+          image = 'Cash.jpg'
+          break
+        case 'A':
+          image = 'ACH.jpg'
+          break
+        case 'M':
+          image = 'GiftCard.jpg'
+          break
+        case 'Z':
+          image = 'Zelle.jpg'
+          break
+        default:
+          image = 'Default.jpg'
+          break
+      }
+      return require('@/image/ADempiere/pos/typePayment/' + image)
     },
     deleteCollect(key) {
       const orderUuid = key.orderUuid
