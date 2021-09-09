@@ -78,6 +78,7 @@ export function createOrder({
   customerUuid,
   documentTypeUuid,
   salesRepresentativeUuid,
+  priceListUuid,
   warehouseUuid
 }) {
   return request({
@@ -88,6 +89,7 @@ export function createOrder({
       customer_uuid: customerUuid,
       document_type_uuid: documentTypeUuid,
       sales_representative_uuid: salesRepresentativeUuid,
+      price_list_uuid: priceListUuid,
       warehouse_uuid: warehouseUuid
     }
   })
@@ -105,6 +107,7 @@ export function updateOrder({
   customerUuid,
   documentTypeUuid,
   description,
+  priceListUuid,
   warehouseUuid
 }) {
   return request({
@@ -116,6 +119,7 @@ export function updateOrder({
       customer_uuid: customerUuid,
       document_type_uuid: documentTypeUuid,
       description,
+      price_list_uuid: priceListUuid,
       warehouse_uuid: warehouseUuid
     }
   })
@@ -370,6 +374,7 @@ export function listOrders({
 // Create order line from order uuid and product
 export function createOrderLine({
   orderUuid,
+  priceListUuid,
   warehouseUuid,
   productUuid,
   chargeUuid,
@@ -389,6 +394,7 @@ export function createOrderLine({
       price,
       discount_rate: discountRate,
       charge_uuid: chargeUuid,
+      price_list_uuid: priceListUuid,
       warehouse_uuid: warehouseUuid
     }
   })
@@ -405,7 +411,9 @@ export function updateOrderLine({
   description,
   quantity,
   price,
-  discountRate
+  discountRate,
+  priceListUuid,
+  warehouseUuid
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/update-order-line`,
@@ -416,7 +424,9 @@ export function updateOrderLine({
       description,
       quantity,
       price,
-      discount_rate: discountRate
+      discount_rate: discountRate,
+      price_list_uuid: priceListUuid,
+      warehouse_uuid: warehouseUuid
     }
   })
     .then(createOrderLineResponse => {
@@ -490,6 +500,8 @@ export function getProductPriceList({
   businessPartnerUuid,
   posUuid,
   pageSize,
+  priceListUuid,
+  warehouseUuid,
   pageToken
 }) {
   return request({
@@ -499,6 +511,8 @@ export function getProductPriceList({
       pos_uuid: posUuid,
       search_value: searchValue,
       business_partner_uuid: businessPartnerUuid,
+      price_list_uuid: priceListUuid,
+      warehouse_uuid: warehouseUuid,
       page_size: pageSize,
       page_token: pageToken
     }

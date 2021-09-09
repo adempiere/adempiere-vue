@@ -237,7 +237,9 @@ export default {
           if (!this.isEmptyValue(this.search) && this.search.length >= 4) {
             getProductPrice({
               searchValue: mutation.payload.value,
-              posUuid: this.currentPointOfSales.uuid
+              posUuid: this.currentPointOfSales.uuid,
+              priceListUuid: this.currentPointOfSales.priceList.uuid,
+              warehouseUuid: this.currentPointOfSales.warehouse.uuid
             })
               .then(productPrice => {
                 this.messageError = true
@@ -291,7 +293,9 @@ export default {
             }
             getProductPrice({
               searchValue: mutation.payload.value,
-              posUuid: this.currentPointOfSales.uuid
+              posUuid: this.currentPointOfSales.uuid,
+              priceListUuid: this.currentPointOfSales.priceList.uuid,
+              warehouseUuid: this.currentPointOfSales.warehouse.uuid
             })
               .then(productPrice => {
                 this.messageError = true

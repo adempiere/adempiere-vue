@@ -39,12 +39,14 @@ export default {
     posUuid,
     customerUuid,
     documentTypeUuid,
+    priceListUuid,
     warehouseUuid
   }) {
     return createOrder({
       posUuid,
       customerUuid,
       documentTypeUuid,
+      priceListUuid,
       warehouseUuid
     })
       .then(order => {
@@ -74,6 +76,7 @@ export default {
     posUuid,
     customerUuid,
     documentTypeUuid,
+    priceListUuid,
     warehouseUuid
   }) {
     updateOrder({
@@ -81,6 +84,7 @@ export default {
       posUuid,
       documentTypeUuid,
       customerUuid,
+      priceListUuid,
       warehouseUuid
     })
       .then(response => {
@@ -108,6 +112,7 @@ export default {
    */
   createOrderLine({ commit, dispatch }, {
     orderUuid,
+    priceListUuid,
     warehouseUuid,
     productUuid,
     chargeUuid,
@@ -118,6 +123,7 @@ export default {
   }) {
     createOrderLine({
       orderUuid,
+      priceListUuid,
       warehouseUuid,
       productUuid,
       chargeUuid,

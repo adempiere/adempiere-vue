@@ -59,7 +59,7 @@ export default {
       }
     }
     const currentPointOfSales = rootGetters.posAttributes.currentPointOfSales
-    const { templateBusinessPartner } = currentPointOfSales
+    const { templateBusinessPartner, priceList, warehouse } = currentPointOfSales
     const { uuid: businessPartnerUuid } = templateBusinessPartner
     const { uuid: warehouseUuid } = rootGetters['user/getWarehouse']
     if (isEmptyValue(searchValue)) {
@@ -73,6 +73,8 @@ export default {
         searchValue,
         posUuid,
         businessPartnerUuid,
+        priceListUuid: priceList.uuid,
+        warehouseUuid: warehouse.uuid,
         pageToken
       }).then(responseProductPrice => {
         if (isEmptyValue(token) || isEmptyValue(pageToken)) {
@@ -130,7 +132,8 @@ export default {
       }
     }
 
-    const { templateBusinessPartner } = rootGetters.posAttributes.currentPointOfSales
+    const currentPointOfSales = rootGetters.posAttributes.currentPointOfSales
+    const { templateBusinessPartner, priceList, warehouse } = currentPointOfSales
     const { uuid: businessPartnerUuid } = templateBusinessPartner
     const { uuid: warehouseUuid } = rootGetters['user/getWarehouse']
 
@@ -145,6 +148,8 @@ export default {
         searchValue,
         posUuid: posUuid,
         businessPartnerUuid,
+        priceListUuid: priceList.uuid,
+        warehouseUuid: warehouse.uuid,
         pageToken
       }).then(responseProductPrice => {
         if (isEmptyValue(token) || isEmptyValue(pageToken)) {

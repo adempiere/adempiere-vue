@@ -395,7 +395,6 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsReturnOrder
     },
     allowsCreateOrder() {
-      console.log(this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder)
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
     },
     isShowProductsPriceList: {
@@ -710,7 +709,9 @@ export default {
       this.$store.dispatch('addParametersProcessPos', parametersList)
       createOrder({
         posUuid,
-        customerUuid: this.currentOrder.businessPartner.uuid
+        customerUuid: this.currentOrder.businessPartner.uuid,
+        priceListUuid: this.currentPointOfSales.priceList.uuid,
+        warehouseUuid: this.currentPointOfSales.warehouse.uuid
       })
         .then(order => {
           this.$store.dispatch('currentOrder', order)

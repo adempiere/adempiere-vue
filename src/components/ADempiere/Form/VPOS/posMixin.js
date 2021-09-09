@@ -281,6 +281,8 @@ export default {
             this.$store.dispatch('updateOrder', {
               orderUuid: this.$route.query.action,
               posUuid: this.currentPointOfSales.uuid,
+              priceListUuid: this.currentPointOfSales.priceList.uuid,
+              warehouseUuid: this.currentPointOfSales.warehouse.uuid,
               documentTypeUuid
             })
             break
@@ -434,6 +436,8 @@ export default {
           orderUuid: this.$route.query.action,
           posUuid: this.currentPointOfSales.uuid,
           customerUuid: update.value,
+          priceListUuid: this.currentPointOfSales.priceList.uuid,
+          warehouseUuid: this.currentPointOfSales.warehouse.uuid,
           documentTypeUuid
         })
       }
@@ -485,8 +489,9 @@ export default {
       }
       findProduct({
         searchValue: searchProduct,
-        priceListUuid: this.curretnPriceList.uuid,
-        posUuid: this.currentPointOfSales.uuid
+        posUuid: this.currentPointOfSales.uuid,
+        priceListUuid: this.currentPointOfSales.priceList.uuid,
+        warehouseUuid: this.currentPointOfSales.warehouse.uuid
       })
         .then(productPrice => {
           this.product = productPrice.product
@@ -540,6 +545,8 @@ export default {
           posUuid,
           customerUuid,
           salesRepresentativeUuid: this.currentPointOfSales.salesRepresentative.uuid,
+          priceListUuid: this.currentPointOfSales.priceList.uuid,
+          warehouseUuid: this.currentPointOfSales.warehouse.uuid,
           documentTypeUuid
         })
           .then(response => {
@@ -698,6 +705,8 @@ export default {
                 this.$store.dispatch('updateOrder', {
                   orderUuid: this.$route.query.action,
                   posUuid: this.currentPointOfSales.uuid,
+                  priceListUuid: this.currentPointOfSales.priceList.uuid,
+                  warehouseUuid: this.currentPointOfSales.warehouse.uuid,
                   documentTypeUuid
                 })
               }
@@ -741,7 +750,9 @@ export default {
         case 'plus':
           updateOrderLine({
             orderLineUuid: this.currentOrderLine.uuid,
-            quantity: this.listOrderLine[this.currentTable].quantity + 1
+            quantity: this.listOrderLine[this.currentTable].quantity + 1,
+            priceListUuid: this.currentPointOfSales.priceList.uuid,
+            warehouseUuid: this.currentPointOfSales.warehouse.uuid
           })
             .then(response => {
               this.fillOrderLine(response)
@@ -760,7 +771,9 @@ export default {
         case 'minus':
           updateOrderLine({
             orderLineUuid: this.currentOrderLine.uuid,
-            quantity: this.listOrderLine[this.currentTable].quantity - 1
+            quantity: this.listOrderLine[this.currentTable].quantity - 1,
+            priceListUuid: this.currentPointOfSales.priceList.uuid,
+            warehouseUuid: this.currentPointOfSales.warehouse.uuid
           })
             .then(response => {
               this.fillOrderLine(response)

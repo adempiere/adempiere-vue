@@ -776,7 +776,9 @@ export default {
         this.$store.dispatch('updateOrder', {
           orderUuid: this.currentOrder.uuid,
           posUuid: this.currentPointOfSales.uuid,
-          documentTypeUuid: documentType.uuid
+          documentTypeUuid: documentType.uuid,
+          priceListUuid: this.currentPointOfSales.priceList.uuid,
+          warehouseUuid: this.currentPointOfSales.warehouse.uuid
         })
       } else {
         const attributePin = {
