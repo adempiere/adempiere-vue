@@ -276,9 +276,9 @@ export default {
       } else if (columnName === 'ConvertedAmount') {
         return this.formatPrice(row.grandTotal / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       } else if (columnName === 'DiscountTotal') {
-        return this.formatPrice(row.priceList * (row.discountRate / 100))
+        return this.formatPrice(row.priceList * (row.discountRate / 100), currency)
       } else if (columnName === 'DisplayTaxAmount') {
-        return this.formatPrice((row.priceActual * row.taxRate.rate / 100))
+        return this.formatPrice((row.priceActual * row.taxRate.rate / 100), currency)
       }
     },
     productPrice(price, discount) {

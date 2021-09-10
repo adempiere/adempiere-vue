@@ -150,9 +150,9 @@
                             <b>{{ scope.row.taxRate.name }}</b>
                             <br>
                             {{ $t('form.productInfo.grandTotal') }}:
-                            <b>{{ formatPrice((scope.row.priceList * scope.row.taxRate.rate / 100) + scope.row.priceList, pointOfSalesCurrency.iSOCode) }}</b>
+                            <b>{{ formatPrice((scope.row.priceActual * scope.row.taxRate.rate / 100) + scope.row.priceList, pointOfSalesCurrency.iSOCode) }}</b>
                             <br>
-                            {{ $t('form.productInfo.quantityAvailable') }}:
+                            {{ $t('form.pos.tableProduct.quantity') }}:
                             <b>{{ formatQuantity(scope.row.quantityOrdered) }}</b>
                           </div>
                         </el-col>
