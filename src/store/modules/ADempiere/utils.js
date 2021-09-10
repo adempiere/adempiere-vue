@@ -32,6 +32,7 @@ const initStateUtils = {
   updatePayment: false,
   createBusinessPartner: false,
   listBusinessPartner: false,
+  copyShippingAddress: true,
   step: 0,
   updateCustomer: false,
   overdrawnInvoice: {
@@ -127,6 +128,9 @@ export default {
     },
     focusNewOrder(state, payload) {
       state.isNewOrder = payload
+    },
+    setCopyShippingAddress(state, payload) {
+      state.copyShippingAddress = payload
     }
   },
   actions: {
@@ -212,6 +216,9 @@ export default {
     },
     changeFocusNewOrder({ commit }, params) {
       commit('focusNewOrder', params)
+    },
+    changeCopyShippingAddress({ commit }, params) {
+      commit('setCopyShippingAddress', params)
     }
   },
   getters: {
@@ -290,6 +297,9 @@ export default {
     },
     getPopoverListBusinessParnet: (state) => {
       return state.listBusinessPartner
+    },
+    getCopyShippingAddress: (state) => {
+      return state.copyShippingAddress
     },
     getStepCurrent: (state) => {
       return state.step

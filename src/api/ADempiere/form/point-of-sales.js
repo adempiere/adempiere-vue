@@ -143,16 +143,7 @@ export function createCustomer({
   phone,
   businessPartnerGroupUuid,
   // Location
-  address1,
-  address2,
-  address3,
-  address4,
-  cityUuid,
-  cityName,
-  postalCode,
-  regionUuid,
-  regionName,
-  countryUuid,
+  address,
   posUuid
 }) {
   return request({
@@ -171,16 +162,7 @@ export function createCustomer({
       phone,
       business_partner_group_uid: businessPartnerGroupUuid,
       // Location
-      address1,
-      address2,
-      address3,
-      address4,
-      city_uuid: cityUuid,
-      city_name: cityName,
-      postal_code: postalCode,
-      region_uuid: regionUuid,
-      region_name: regionName,
-      country_uuid: countryUuid,
+      address,
       pos_uuid: posUuid
     }
   })

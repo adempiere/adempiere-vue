@@ -548,6 +548,7 @@ export default {
       label: 'To be invoiced',
       salesRepresentative: 'Sales Agent',
       businessPartner: 'Business Partner',
+      copyShippingAddress: 'Copy shipping address',
       documentNo: 'Document No.'
     },
     productInfo: {

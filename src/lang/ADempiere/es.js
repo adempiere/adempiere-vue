@@ -524,6 +524,7 @@ export default {
       label: 'Por Facturar',
       salesRepresentative: 'Agente Comercial',
       businessPartner: 'Socio de Negocio',
+      copyShippingAddress: 'Copiar dirección para el envío',
       documentNo: 'Nro. Documento'
     },
     productInfo: {

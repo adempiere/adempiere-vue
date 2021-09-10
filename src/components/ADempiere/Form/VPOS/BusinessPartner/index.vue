@@ -22,7 +22,7 @@
       <el-popover
         v-model="showCreate"
         placement="top-start"
-        width="600"
+        :width="copyShippingAddress ? '600' : '800'"
         trigger="click"
         @hide="popoverClose"
       >
@@ -234,6 +234,9 @@ export default {
         this.$store.dispatch('changeShowUpdateCustomer', value)
         return value
       }
+    },
+    copyShippingAddress() {
+      return this.$store.getters.getCopyShippingAddress
     }
   },
   watch: {

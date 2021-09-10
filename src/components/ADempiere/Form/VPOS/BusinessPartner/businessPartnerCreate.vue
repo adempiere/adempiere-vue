@@ -26,23 +26,44 @@
       class="create-bp"
     >
       <el-row :gutter="24">
-        <el-col :span="12">
-          <field-definition
-            v-for="(field) in datos"
-            :ref="field.columnName"
-            :key="field.columnName"
-            :metadata-field="field"
-          />
+        <el-col :span="copyShippingAddress ? 12 : 8">
+          <el-card class="box-card" shadow="never">
+            <div slot="header" class="clearfix">
+              <span>Datos del Cliente</span>
+            </div>
+            <div class="text item">
+              <field-definition
+                v-for="(field) in datos"
+                :ref="field.columnName"
+                :key="field.columnName"
+                :metadata-field="field"
+              />
+            </div>
+          </el-card>
         </el-col>
-        <el-col :span="12">
-          <field-definition
-            v-for="(field) in fieldsListLocation"
-            :ref="field.columnName"
-            :key="field.columnName"
-            :metadata-field="field"
-          />
+        <el-col :span="copyShippingAddress ? 12 : 8">
+          <el-card class="box-card" shadow="never">
+            <div slot="header" class="clearfix">
+              <span>Direccion del Cliente</span>
+            </div>
+            <div class="text item">
+              <field-definition
+                v-for="(field) in fieldsListLocation"
+                :ref="field.columnName"
+                :key="field.columnName"
+                :metadata-field="field"
+              />
+            </div>
+          </el-card>
         </el-col>
-
+        <shipping-address v-if="!copyShippingAddress" />
+        <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
+          <samp style="float: right; padding-right: 10px;">
+            <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
+              {{ $t('form.byInvoice.copyShippingAddress') }}
+            </el-checkbox>
+          </samp>
+        </el-col>
         <el-col :span="24">
           <samp style="float: right; padding-right: 10px;">
             <el-button
@@ -68,10 +89,14 @@
 import { createCustomer } from '@/api/ADempiere/form/point-of-sales.js'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldsListCreate.js'
+import ShippingAddress from './shippingAddress.vue'
 import BParterMixin from './mixinBusinessPartner.js'
 
 export default {
   name: 'BusinessPartnerCreate',
+  components: {
+    ShippingAddress
+  },
   mixins: [
     formMixin,
     BParterMixin
@@ -97,6 +122,7 @@ export default {
       businessPartnerRecord: {},
       isLoadingRecord: false,
       fieldsList,
+      checked: true,
       isCustomForm: true,
       unsubscribe: () => {}
     }
@@ -106,7 +132,13 @@ export default {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
       }
-      return this.fieldsList.filter(field => field.tabindex > 4)
+      return this.fieldsList.filter(field => field.tabindex > 4 && field.tabindex < 13)
+    },
+    fieldsListLocationShippingAddress() {
+      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
+        return this.$store.getters.getFieldLocation
+      }
+      return this.fieldsList.filter(field => field.tabindex > 13)
     },
     datos() {
       return this.fieldsList.filter(field => field.tabindex <= 4)
@@ -131,6 +163,14 @@ export default {
     },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
+    },
+    copyShippingAddress: {
+      get() {
+        return this.$store.getters.getCopyShippingAddress
+      },
+      set(value) {
+        this.$store.dispatch('changeCopyShippingAddress', value)
+      }
     }
   },
   watch: {
@@ -140,6 +180,9 @@ export default {
           this.focusValue()
         }, 1500)
       }
+    },
+    copyShippingAddress(value) {
+      this.checked = value
     }
   },
   beforeDestroy() {
@@ -167,6 +210,11 @@ export default {
         containerUuid: this.containerUuid,
         format: 'object'
       })
+      const shippingAddress = this.addressForm(this.$store.getters.getValuesView({
+        containerUuid: 'Shipping-Address',
+        format: 'object'
+      }))
+      shippingAddress.isShipping = true
       const name2 = this.$store.getters.getValueOfField({
         containerUuid: this.containerUuid,
         columnName: 'Name2'
@@ -176,6 +224,11 @@ export default {
         containerUuid: this.containerUuid,
         formatReturn: 'name'
       })
+      const addressCustomer = this.addressForm(this.$store.getters.getValuesView({
+        containerUuid: this.containerUuid,
+        format: 'object'
+      }))
+      const address = [addressCustomer, shippingAddress]
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
         createCustomer({
@@ -187,16 +240,7 @@ export default {
           contactName: values.ContactName,
           email: values.EMail,
           phone: values.Phone,
-          address1: values.Address1,
-          address2: values.Address2,
-          address3: values.Address3,
-          address4: values.Address4,
-          cityUuid: values.C_City_ID_UUID,
-          cityName: values.DisplayColumn_C_City_ID,
-          postalCode: values.Postal,
-          regionUuid: values.C_Region_ID_UUID,
-          regionName: values.DisplayColumn_C_Region_ID,
-          countryUuid: values.C_Country_ID_UUID,
+          address,
           posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid
         })
           .then(responseBPartner => {
@@ -241,6 +285,48 @@ export default {
         panelType: this.panelType
       })
       this.clearLocationValues()
+    },
+    addressForm(values) {
+      const valuesToSend = {}
+      Object.keys(values).forEach(key => {
+        const value = values[key]
+        if (this.isEmptyValue(value)) {
+          return
+        }
+        switch (key) {
+          case 'C_Country_ID_UUID':
+            valuesToSend['countryUuid'] = value
+            break
+          case 'C_Region_ID_UUID':
+            valuesToSend['regionUuid'] = value
+            break
+          case 'DisplayColumn_C_Region_ID':
+            valuesToSend['regionName'] = value
+            break
+          case 'C_City_ID_UUID':
+            valuesToSend['cityUuid'] = value
+            break
+          case 'DisplayColumn_C_City_ID':
+            valuesToSend['cityName'] = value
+            break
+          case 'Address1':
+            valuesToSend['address1'] = value
+            break
+          case 'Address2':
+            valuesToSend['address2'] = value
+            break
+          case 'Address3':
+            valuesToSend['address3'] = value
+            break
+          case 'Address4':
+            valuesToSend['address4'] = value
+            break
+          case 'Postal':
+            valuesToSend['postalCode'] = value
+            break
+        }
+      })
+      return valuesToSend
     },
     clearLocationValues() {
       this.$store.commit('updateValuesOfContainer', {
@@ -292,6 +378,9 @@ export default {
           value: undefined
         }]
       })
+    },
+    changeShipping(value) {
+      this.$store.dispatch('changeCopyShippingAddress', value)
     }
   }
 }

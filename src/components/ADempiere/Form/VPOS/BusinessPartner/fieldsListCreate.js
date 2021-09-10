@@ -215,5 +215,98 @@ export default [
       size: 24,
       sequenceFields: 'P'
     }
+  },
+  {
+    ...fieldBase,
+    elementColumnName: 'C_Country_ID',
+    columnName: 'C_Country_ID_shipping',
+    overwriteDefinition: {
+      isCustomField: true,
+      isActiveLogics: true, // enable logics
+      defaultValue: '@#C_Country_ID@',
+      tabindex: 13,
+      size: 24,
+      sequenceFields: 'CO',
+      isMandatory: false
+    }
+  },
+  {
+    ...fieldBase,
+    elementColumnName: 'C_Region_ID',
+    columnName: 'C_Region_ID_shipping',
+    overwriteDefinition: {
+      isCustomField: true,
+      tabindex: 14,
+      size: 24,
+      sequenceFields: 'R',
+      isMandatory: false
+    }
+  },
+  {
+    ...fieldBase,
+    elementColumnName: 'C_City_ID',
+    columnName: 'C_City_ID_shipping',
+    overwriteDefinition: {
+      isCustomField: true,
+      tabindex: 15,
+      size: 24,
+      sequenceFields: 'C',
+      isMandatory: false
+    }
+  },
+  {
+    ...fieldBase,
+    elementColumnName: 'Address1',
+    columnName: 'Address1_shipping',
+    overwriteDefinition: {
+      isCustomField: true,
+      tabindex: 16,
+      size: 24,
+      sequenceFields: 'A1'
+    }
+  },
+  {
+    ...fieldBase,
+    elementColumnName: 'Address2',
+    columnName: 'Address2_shipping',
+    overwriteDefinition: {
+      isCustomField: true,
+      tabindex: 17,
+      size: 24,
+      sequenceFields: 'A2'
+    }
+  },
+  {
+    ...fieldBase,
+    elementColumnName: 'Address3',
+    columnName: 'Address3_shipping',
+    overwriteDefinition: {
+      isCustomField: true,
+      tabindex: 18,
+      size: 24,
+      sequenceFields: 'A3'
+    }
+  },
+  {
+    ...fieldBase,
+    elementColumnName: 'Address4',
+    columnName: 'Address4_shipping',
+    overwriteDefinition: {
+      tabindex: 19,
+      isCustomField: true,
+      size: 24,
+      sequenceFields: 'A4'
+    }
+  },
+  {
+    ...fieldBase,
+    elementColumnName: 'Postal',
+    columnName: 'Postal_shipping',
+    overwriteDefinition: {
+      tabindex: 20,
+      isCustomField: true,
+      size: 24,
+      sequenceFields: 'P'
+    }
   }
 ]
