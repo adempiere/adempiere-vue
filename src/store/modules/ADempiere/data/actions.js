@@ -1,7 +1,6 @@
 
 import {
-  getEntity,
-  getEntities
+  getEntity
 } from '@/api/ADempiere/common/persistence.js'
 import {
   requestDefaultValue,
@@ -12,10 +11,7 @@ import {
   lockPrivateAccess,
   unlockPrivateAccess
 } from '@/api/ADempiere/actions/private-access'
-import {
-  extractPagingToken,
-  isEmptyValue
-} from '@/utils/ADempiere/valueUtils.js'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertArrayKeyValueToObject } from '@/utils/ADempiere/valueFormat.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 import {
@@ -403,149 +399,7 @@ const actions = {
         })
     })
   },
-  /**
-   * Request list to view in table
-   * TODO: Join with getDataListTab action
-   * @param {string} parentUuid, uuid from window
-   * @param {string} containerUuid, uuid from tab
-   * @param {string} tableName, table name to search record data
-   * @param {string} query, criteria to search record data
-   * @param {string} whereClause, criteria to search record data
-   * @param {string} orderByClause, criteria to search record data
-   * @param {array}  conditionsList, conditions list to criteria
-   * @param {boolean} isShowNotification, show searching and response records
-   * @param {boolean} isParentTab, conditions list to criteria
-   * @param {boolean} isAddRecord, join store records with server records (used with sequence tab)
-   * @param {boolean} isAddDefaultValues, add default fields values
-   */
-  getObjectListFromCriteria({ dispatch, getters, rootGetters }, {
-    parentUuid, containerUuid,
-    tableName, query, whereClause, orderByClause, conditionsList = [],
-    isShowNotification = true, isParentTab = true, isAddRecord = false,
-    isAddDefaultValues = true
-  }) {
-    if (isShowNotification) {
-      showMessage({
-        title: language.t('notifications.loading'),
-        message: language.t('notifications.searching'),
-        type: 'info'
-      })
-    }
 
-    const replaceTable = (value) => {
-      return value.replace('table_', '')
-    }
-    parentUuid = replaceTable(parentUuid)
-    containerUuid = replaceTable(containerUuid)
-
-    const dataStore = getters.getDataRecordAndSelection(containerUuid)
-
-    let nextPageToken
-    if (!isEmptyValue(dataStore.nextPageToken)) {
-      nextPageToken = dataStore.nextPageToken + '-' + dataStore.pageNumber
-    }
-
-    let inEdited = []
-    if (!isParentTab) {
-      // TODO: Evaluate peformance to evaluate records to edit
-      inEdited = dataStore.record.filter(itemRecord => {
-        return itemRecord.isEdit && !itemRecord.isNew
-      })
-    }
-
-    // gets the default value of the fields (including whether it is empty or undefined)
-    let defaultValues = {}
-    if (isAddDefaultValues) {
-      defaultValues = rootGetters.getParsedDefaultValues({
-        parentUuid,
-        containerUuid,
-        formatToReturn: 'object',
-        isGetServer: false
-      })
-    }
-    return getEntities({
-      tableName,
-      query,
-      whereClause,
-      conditionsList,
-      orderByClause,
-      pageToken: nextPageToken
-    })
-      .then(dataResponse => {
-        const recordsList = dataResponse.recordsList.map(record => {
-          const values = record.attributes
-          let isEdit = false
-          if (isAddDefaultValues) {
-            if (inEdited.find(itemEdit => itemEdit.UUID === values.UUID)) {
-              isEdit = true
-            }
-          }
-
-          // overwrite default values and sets the values obtained from the
-          // server (empty fields are not brought from the server)
-          return {
-            ...defaultValues,
-            ...values,
-            // datatables attributes
-            isNew: false,
-            isEdit,
-            isReadOnlyFromRow: false
-          }
-        })
-
-        const originalNextPageToken = dataResponse.nextPageToken
-        let token = originalNextPageToken
-        if (isEmptyValue(token)) {
-          token = dataStore.nextPageToken
-        } else {
-          token = extractPagingToken(token)
-        }
-        if (isShowNotification) {
-          let searchMessage = 'searchWithOutRecords'
-          if (recordsList.length) {
-            searchMessage = 'succcessSearch'
-          }
-          showMessage({
-            title: language.t('notifications.succesful'),
-            message: language.t(`notifications.${searchMessage}`),
-            type: 'success'
-          })
-        }
-        dispatch('setRecordSelection', {
-          parentUuid,
-          containerUuid,
-          record: recordsList,
-          selection: dataStore.selection,
-          recordCount: dataResponse.recordCount,
-          nextPageToken: token,
-          originalNextPageToken,
-          isAddRecord,
-          pageNumber: dataStore.pageNumber,
-          tableName,
-          query,
-          whereClause
-        })
-
-        return recordsList
-      })
-      .catch(error => {
-        // Set default registry values so that the table does not say loading,
-        // there was already a response from the server
-        dispatch('setRecordSelection', {
-          parentUuid,
-          containerUuid
-        })
-
-        if (isShowNotification) {
-          showMessage({
-            title: language.t('notifications.error'),
-            message: error.message,
-            type: 'error'
-          })
-        }
-        console.warn(`Error Get Object List ${error.message}. Code: ${error.code}.`)
-      })
-  },
   /**
    * @param {string} parentUuid
    * @param {string} containerUuid
