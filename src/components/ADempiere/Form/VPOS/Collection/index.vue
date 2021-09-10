@@ -735,9 +735,8 @@ export default {
       let sum = 0
       if (!this.isEmptyValue(cash)) {
         cash.forEach((pay) => {
-          const amount = this.convertAmount(pay.currencyUuid)
           if (!this.isEmptyValue(pay.divideRate)) {
-            sum += amount * pay.amount
+            sum += pay.amountConvertion
           } else {
             sum += pay.amount
           }

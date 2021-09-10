@@ -298,8 +298,7 @@ export default {
         })
         return this.formatPrice(0)
       }
-      const rate = (currencyPay.divideRate > currencyPay.multiplyRate) ? currencyPay.divideRate : currencyPay.multiplyRate
-      return this.formatPrice(value.amount * rate, this.currency.iSOCode)
+      return this.formatPrice(value.amount * currencyPay.divideRate, this.currency.iSOCode)
     },
     // If there are payments in another currency, search for conversion
     convertingPaymentMethods() {
