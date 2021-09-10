@@ -16,6 +16,8 @@
 
 import clipboard from '@/directive/clipboard'
 import language from '@/lang'
+import { showMessage } from '@/utils/ADempiere/notification.js'
+
 function generateLink() {}
 
 /**
@@ -29,7 +31,7 @@ export const createNewRecord = {
   svg: false,
   icon: 'el-icon-circle-plus-outline',
   callBack: ({ root, parentUuid, containerUuid }) => {
-    root.$store.dispatch('setDefaultValues', {
+    root.$store.dispatch('dataManager/setDefaultValues', {
       parentUuid,
       containerUuid
     })
@@ -61,6 +63,9 @@ export const sharedLink = {
   }
 }
 
+/**
+ * Delete record (entity) with record
+ */
 export const deleteRecord = {
   name: language.t('actionMenu.deleteRecord'),
   enabled: true,
@@ -74,6 +79,19 @@ export const deleteRecord = {
       recordId,
       recordUuid
     })
+      .then(() => {
+        showMessage({
+          message: root.$t('recordManager.deleteRecordSuccessful'),
+          type: 'success'
+        })
+      })
+      .catch(error => {
+        showMessage({
+          message: root.$t('recordManager.deleteRecordError'),
+          type: 'error'
+        })
+        console.warn(`Delete Entity - Error ${error.message}, Code: ${error.code}.`)
+      })
   }
 }
 

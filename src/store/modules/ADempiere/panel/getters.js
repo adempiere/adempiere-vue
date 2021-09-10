@@ -18,7 +18,7 @@ import {
   isEmptyValue,
   parsedValueComponent
 } from '@/utils/ADempiere/valueUtils.js'
-import { specialColumns } from '@/utils/ADempiere/contextUtils.js'
+import { ACCOUNTING_COLUMNS } from '@/utils/ADempiere/constants/systemColumns'
 import {
   fieldIsDisplayed,
   getDefaultValue
@@ -263,7 +263,7 @@ const getters = {
         const { columnName, defaultValue } = fieldItem
         let isSQL = false
         let parsedDefaultValue = fieldItem.parsedDefaultValue
-        const isSpeciaColumn = specialColumns.includes(columnName) || specialColumns.includes(fieldItem.elementName)
+        const isSpeciaColumn = ACCOUNTING_COLUMNS.includes(columnName) || ACCOUNTING_COLUMNS.includes(fieldItem.elementName)
 
         if (String(defaultValue).includes('@') || isSpeciaColumn) {
           parsedDefaultValue = getDefaultValue({

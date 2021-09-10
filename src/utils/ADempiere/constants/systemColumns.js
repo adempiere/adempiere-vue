@@ -23,3 +23,9 @@ export const ACTIVE = 'IsActive'
 export const PROCESSING = 'Processing'
 
 export const PROCESSED = 'Processed'
+
+export const ACCOUNTING_COLUMNS = [
+  'C_AcctSchema_ID',
+  'C_Currency_ID',
+  'C_Convertion_Type_ID'
+]

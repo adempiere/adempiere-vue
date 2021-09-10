@@ -318,11 +318,11 @@ const actions = {
         return
       }
 
-      const oldRoute = router.app._route
+      const currentRoute = router.app._route
       const defaultAttributes = getters.getParsedDefaultValues({
         parentUuid,
         containerUuid,
-        isSOTrxMenu: oldRoute.meta.isSalesTransaction,
+        isSOTrxMenu: currentRoute.meta.isSalesTransaction,
         fieldsList: panel.fieldsList
       })
 

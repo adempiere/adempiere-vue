@@ -14,19 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const actionMenu = {
-  // actions
-  refreshRecords: 'Refrescar Registros',
-  deleteRecord: 'Eliminar Registro',
-  createNewRecord: 'Nuevo Registro',
-  shareLink: 'Compartir Enlace',
-  withoutActions: 'Sin Actiones',
-  // relations
-  relations: 'Relaciones',
-  withoutRelations: 'Sin Relaciones',
-  // refeerences
-  references: 'Referencias',
-  withoutReferences: 'Sin referencias para el registro'
+const recordManager = {
+  deleteRecordSuccessful: 'Record deleted successfully',
+  deleteRecordError: 'Error deleting record'
 }
 
-export default actionMenu
+export default recordManager

@@ -1,8 +1,10 @@
 
 import actionMenu from './actionMenu'
+import recordManager from './recordManager'
 
 export default {
   actionMenu,
+  recordManager,
 
   language: 'Idioma',
   route: {
