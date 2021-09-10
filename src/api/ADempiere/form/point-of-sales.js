@@ -543,7 +543,7 @@ export function printTicket({
     }
   })
     .then(printTicketResponse => {
-      return camelizeObjectKeys(printTicketResponse)
+      return printTicketResponse
     })
 }
 

@@ -296,7 +296,11 @@ export default {
       orderUuid
     })
       .then(response => {
-        console.log(response)
+        showMessage({
+          type: 'success',
+          message: response,
+          showClose: true
+        })
       })
       .catch(error => {
         console.warn(error.message)
