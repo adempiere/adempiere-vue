@@ -189,10 +189,11 @@ export default defineComponent({
 
     /**
      * Run selected action
-     * @param action
+     * @param {object} action
      */
-    const runAction = (action) => {
-      action.callBack({
+    function runAction(action) {
+      const { actionName } = action
+      action[actionName]({
         root,
         parentUuid,
         containerUuid,

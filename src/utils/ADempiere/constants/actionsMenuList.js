@@ -30,7 +30,8 @@ export const createNewRecord = {
   enabled: true,
   svg: false,
   icon: 'el-icon-circle-plus-outline',
-  callBack: ({ root, parentUuid, containerUuid }) => {
+  actionName: 'createNewRecord',
+  createNewRecord: ({ root, parentUuid, containerUuid }) => {
     root.$store.dispatch('dataManager/setDefaultValues', {
       parentUuid,
       containerUuid
@@ -45,7 +46,8 @@ export const undoChange = {
   enabled: false,
   svg: false,
   icon: 'el-icon-circle-plus-outline',
-  callBack: ({ root, parentUuid, containerUuid }) => {
+  actionName: 'undoChange',
+  undoChange: ({ root, parentUuid, containerUuid }) => {
   }
 }
 
@@ -57,7 +59,8 @@ export const sharedLink = {
   enabled: true,
   svg: false,
   icon: 'el-icon-share',
-  callBack: ({ root }) => {
+  actionName: 'sharedLink',
+  sharedLink: ({ root }) => {
     const link = generateLink(root.router)
     clipboard(link)
   }
@@ -72,7 +75,8 @@ export const deleteRecord = {
   svg: false,
   icon: 'el-icon-delete',
   type: 'deleteEntity',
-  callBack: ({ root, parentUuid, containerUuid, recordId, recordUuid }) => {
+  actionName: 'deleteRecord',
+  deleteRecord: ({ root, parentUuid, containerUuid, recordId, recordUuid }) => {
     root.$store.dispatch('dataManager/deleteEntity', {
       parentUuid,
       containerUuid,
@@ -100,7 +104,8 @@ export const refreshRecords = {
   enabled: true,
   svg: false,
   icon: 'el-icon-refresh',
-  callBack: ({ root, parentUuid, containerUuid, tableName }) => {
+  actionName: 'refreshRecords',
+  refreshRecords: ({ root, parentUuid, containerUuid, tableName }) => {
     // used to window
     // TODO: implement to browser
     root.$store.dispatch('dataManager/getEntities', {
@@ -116,7 +121,8 @@ export const lockRecord = {
   enabled: true,
   svg: false,
   icon: 'el-icon-lock',
-  callBack: ({ root, parentUuid, containerUuid, tableName }) => {
+  actionName: 'lockRecord',
+  lockRecord: ({ root, parentUuid, containerUuid, tableName }) => {
   }
 }
 
@@ -126,7 +132,8 @@ export const unlockRecord = {
   enabled: true,
   svg: false,
   icon: 'el-icon-unlock',
-  callBack: ({ root, parentUuid, containerUuid, tableName }) => {
+  actionName: 'unlockRecord',
+  unlockRecord: ({ root, parentUuid, containerUuid, tableName }) => {
   }
 }
 
@@ -135,7 +142,8 @@ export const recordAccess = {
   enabled: true,
   svg: false,
   icon: 'el-icon-c-scale-to-original',
-  callBack: ({ root, parentUuid, containerUuid, tableName }) => {
+  actionName: 'recordAccess',
+  recordAccess: ({ root, parentUuid, containerUuid, tableName }) => {
   }
 }
 
