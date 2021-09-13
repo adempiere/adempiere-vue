@@ -140,9 +140,11 @@ export default defineComponent({
       tableName
     } = props.actionsManager
 
-    const actionsList = ref(
-      props.actionsManager.getActionList()
-    )
+    // set initial value
+    const actionsList = ref([])
+    if (props.actionsManager && props.actionsManager.getActionList) {
+      actionsList.value = props.actionsManager.getActionList()
+    }
 
     const recordUuid = computed(() => {
       // TODO: Change query name 'action'

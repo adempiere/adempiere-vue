@@ -226,6 +226,13 @@ export default {
     },
 
     isDisplayedField() {
+      // validate with container manager
+      if (!this.isEmptyValue(this.containerManager) &&
+        this.containerManager.isDisplayedField) {
+        return this.containerManager.isDisplayedField(this.field) &&
+          (this.isMandatory || this.field.isShowedFromUser)
+      }
+
       if (this.isAdvancedQuery) {
         return this.field.isShowedFromUser
       }
@@ -235,6 +242,12 @@ export default {
     },
 
     isMandatory() {
+      // validate with container manager
+      if (!this.isEmptyValue(this.containerManager) &&
+        this.containerManager.validateMandatory) {
+        return this.containerManager.isMandatoryField(this.field)
+      }
+
       if (this.isAdvancedQuery) {
         return false
       }
