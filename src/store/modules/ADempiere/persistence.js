@@ -3,7 +3,7 @@ import {
   updateEntity
 } from '@/api/ADempiere/common/persistence.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/dataUtils.js'
+import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/constants/systemColumns'
 import language from '@/lang'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 

@@ -24,6 +24,45 @@ export const PROCESSING = 'Processing'
 
 export const PROCESSED = 'Processed'
 
+/**
+ * Log columns list into table
+ * Manages with user session
+ */
+export const LOG_COLUMNS_NAME_LIST = [
+  'Created',
+  'CreatedBy',
+  'Updated',
+  'UpdatedBy'
+]
+
+/**
+ * Columns list into standard table
+ */
+export const STANDARD_COLUMNS_NAME_LIST = [
+  ...LOG_COLUMNS_NAME_LIST,
+  // Table Name '_ID'
+  CLIENT,
+  ORGANIZATION,
+  ACTIVE,
+  'UUID'
+]
+
+/**
+ * Columns list into document table
+ */
+export const DOCUMENT_COLUMNS_NAME_LIST = [
+  ...STANDARD_COLUMNS_NAME_LIST,
+  'C_DocType_ID',
+  'DateDoc',
+  'Description',
+  'DocAction',
+  'DocStatus',
+  'DocumentNo',
+  'IsApproved',
+  PROCESSED,
+  PROCESSING
+]
+
 export const ACCOUNTING_COLUMNS = [
   'C_AcctSchema_ID',
   'C_Currency_ID',

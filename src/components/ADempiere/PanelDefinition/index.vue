@@ -27,7 +27,6 @@
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
-import { generatePanelAndFields } from './panelUtils'
 
 export default defineComponent({
   name: 'PanelDefinition',
@@ -64,14 +63,8 @@ export default defineComponent({
      */
     const getPanel = () => {
       // generated panel properties
-      const panel = generatePanelAndFields({
-        parentUuid: props.parentUuid,
-        containerUuid: props.containerUuid,
-        panelMetadata: props.panelMetadata
-      })
-
       // set panel genereated
-      metadata.value = panel
+      metadata.value = props.panelMetadata
     }
 
     getPanel()

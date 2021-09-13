@@ -27,11 +27,11 @@ export default {
   },
 
   getStoredTabs: (state) => (windowUuid) => {
-    return state.storedWindows[windowUuid].tabs
+    return state.storedWindows[windowUuid].tabsList
   },
 
   getStoredTab: (state) => (windowUuid, tabUuid) => {
-    return state.storedWindows[windowUuid].tabs.find(tab => {
+    return state.storedWindows[windowUuid].tabsList.find(tab => {
       return tab.uuid === tabUuid
     })
   }

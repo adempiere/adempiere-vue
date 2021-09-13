@@ -66,7 +66,6 @@
         </lock-record>
 
         <!-- records in table to multi records -->
-        <!-- // TODO: remove generatePanelAndFields metho with store -->
         <default-table
           v-if="!isParentTabs"
           v-show="!isParentTabs && isShowMultiRecords"
@@ -76,11 +75,7 @@
           :container-manager="containerManagerTab"
           :header="tableHeaders"
           :data-table="recordsList"
-          :panel-metadata="generatePanelAndFields({
-            parentUuid: parentUuid,
-            containerUuid: tabAttributes.uuid,
-            panelMetadata: tabAttributes
-          })"
+          :panel-metadata="tabAttributes"
         />
         <!-- fields in panel to single record -->
         <panel-definition
@@ -101,7 +96,6 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
 import AuxiliaryPanel from '@/components/ADempiere/AuxiliaryPanel'
 import DefaultTable from '@/components/ADempiere/DefaultTable'
 import LockRecord from '@/components/ADempiere/ContainerOptions/LockRecord'
@@ -187,15 +181,8 @@ export default defineComponent({
     // create the table header
     const tableHeaders = computed(() => {
       const panel = props.tabsList[tabNo]
-      if (panel && panel.fields) {
-        // TODO: Change to stored generated panel
-        const panelGenerated = generatePanelAndFields({
-          parentUuid: props.parentUuid,
-          containerUuid: panel.uuid,
-          panelMetadata: panel
-        })
-        return panelGenerated.fieldsList
-        // panel.fields
+      if (panel && panel.fieldsList) {
+        return panel.fieldsList
       }
       return []
     })
@@ -307,7 +294,6 @@ export default defineComponent({
       isShowRecords,
       tabStyle,
       // methods
-      generatePanelAndFields,
       handleClick,
       openContainer,
       isDisabledTab

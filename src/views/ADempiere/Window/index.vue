@@ -41,7 +41,7 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 import LoadingView from '@/components/ADempiere/LoadingView'
 
 import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
-import { generateWindow as generateWindowDictionary } from './windowUtils'
+import { generateWindow } from './windowUtils'
 import { BUTTON } from '@/utils/ADempiere/references'
 
 export default defineComponent({
@@ -169,16 +169,16 @@ export default defineComponent({
       return root.$store.getters.getStoredWindow(windowUuid)
     })
 
-    const generateWindow = (window) => {
+    function setLoadWindow(window) {
       windowMetadata.value = window
       isLoaded.value = true
     }
 
     // get window from vuex store or request from server
-    const getWindow = () => {
+    function getWindow() {
       let window = storedWindow.value
       if (!root.isEmptyValue(window)) {
-        generateWindow(window)
+        setLoadWindow(window)
         return
       }
       // metadata props use for test
@@ -186,13 +186,13 @@ export default defineComponent({
         // from server response
         window = convertWindow(props.metadata)
         // add apps properties
-        window = generateWindowDictionary(window)
+        window = generateWindow(window)
         // add into store
         return root.$store.dispatch('addWindow', window)
           .then(windowResponse => {
             // to obtain the load effect
             setTimeout(() => {
-              generateWindow(windowResponse)
+              setLoadWindow(windowResponse)
             }, 1000)
           })
       }
@@ -201,8 +201,7 @@ export default defineComponent({
       })
         .then(windowResponse => {
           // add apps properties
-          window = generateWindowDictionary(windowResponse)
-          generateWindow(window)
+          setLoadWindow(windowResponse)
         })
     }
 

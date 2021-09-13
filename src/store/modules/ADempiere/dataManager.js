@@ -21,7 +21,6 @@ import {
   createEntity,
   deleteEntity
 } from '@/api/ADempiere/common/persistence'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 import router from '@/router'
 
 const dataManager = {
@@ -59,12 +58,20 @@ const dataManager = {
     }) {
       return new Promise(resolve => {
         const tab = rootGetters.getStoredTab(parentUuid, containerUuid)
-        if (isEmptyValue(tab)) {
-          resolve()
-          return
-        }
 
         const currentRoute = router.app._route
+        // set action
+        router.push({
+          name: currentRoute.name,
+          params: {
+            ...currentRoute.params
+          },
+          query: {
+            ...currentRoute.query,
+            action: 'create-new'
+          }
+        }, () => {})
+
         const defaultAttributes = rootGetters.getParsedDefaultValues({
           parentUuid,
           containerUuid,
@@ -76,6 +83,8 @@ const dataManager = {
           commit('addChangeToPersistenceQueue', {
             ...attribute,
             containerUuid
+          }, {
+            root: true
           })
         })
 
@@ -84,6 +93,8 @@ const dataManager = {
           containerUuid,
           isOverWriteParent,
           attributes: defaultAttributes
+        }, {
+          root: true
         })
 
         resolve(defaultAttributes)
@@ -91,7 +102,6 @@ const dataManager = {
     },
 
     createEntity({
-      dispatch,
       rootGetters
     }, {
       parentUuid,

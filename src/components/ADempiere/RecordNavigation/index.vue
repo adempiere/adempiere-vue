@@ -33,7 +33,6 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
 import DefaultTable from '@/components/ADempiere/DefaultTable'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition'
 
@@ -87,11 +86,7 @@ export default defineComponent({
     })
 
     const panelMetadata = computed(() => {
-      return generatePanelAndFields({
-        parentUuid: props.parentUuid,
-        containerUuid: props.containerUuid,
-        panelMetadata: props.currentTab
-      })
+      return props.currentTab
     })
     // create the table header
     const tableheaders = computed(() => {

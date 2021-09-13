@@ -18,12 +18,14 @@ import {
   isEmptyValue,
   parsedValueComponent
 } from '@/utils/ADempiere/valueUtils.js'
-import { ACCOUNTING_COLUMNS } from '@/utils/ADempiere/constants/systemColumns'
+import {
+  ACCOUNTING_COLUMNS,
+  LOG_COLUMNS_NAME_LIST
+} from '@/utils/ADempiere/constants/systemColumns'
 import {
   fieldIsDisplayed,
   getDefaultValue
 } from '@/utils/ADempiere/dictionaryUtils.js'
-import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/dataUtils.js'
 
 const getters = {
   getPanel: (state) => (containerUuid) => {
