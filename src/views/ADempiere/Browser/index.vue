@@ -65,7 +65,7 @@
 
   <loading-view
     v-else
-    key="window-loading"
+    key="browser-loading"
   />
 </template>
 
