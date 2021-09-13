@@ -403,7 +403,7 @@ export default {
   quickAccess: {
     newRecord: 'Quick Access to Create New Record',
     listRecords: 'Quick Access to List All Records',
-    searchWithEnter: 'Press enter to search'
+    searchWithEnter: 'Press enter to search for the product by Product Code, Name or UPC.'
   },
   businessPartner: {
     notFound: 'Business partner not found.'

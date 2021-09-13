@@ -379,7 +379,7 @@ export default {
   quickAccess: {
     newRecord: 'Acceso Rápido para Crear Registro Nuevo',
     listRecords: 'Acceso Rápido para Listar los Registros',
-    searchWithEnter: 'Pulse enter para realizar la busqueda'
+    searchWithEnter: 'Pulse enter para realizar la busqueda del producto segun su Codigo, Nombre o UPC'
   },
   businessPartner: {
     notFound: 'Socio de negocio no encontrado.'

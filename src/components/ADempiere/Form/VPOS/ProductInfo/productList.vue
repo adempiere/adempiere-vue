@@ -37,8 +37,9 @@
     <el-table
       ref="listProducto"
       v-shortkey="shortsKey"
-      v-loading="isEmptyValue(listWithPrice) || isLoadedServer"
+      v-loading="isLoadedServer"
       :data="localTableSearch(listWithPrice)"
+      :empty-text="$t('quickAccess.searchWithEnter')"
       border
       fit
       height="450"
@@ -123,6 +124,7 @@ export default {
       fieldsList: fieldsListProductPrice,
       isLoadedServer: false,
       isCustomForm: true,
+      isSearchProduct: false,
       timeOut: null
     }
   },
@@ -179,29 +181,34 @@ export default {
       if (!this.isEmptyValue(this.searchValue)) {
         filtersProduct = listWithPrice.filter(data => data.product.name.toLowerCase().includes(this.searchValue.toLowerCase()) || data.product.value.toLowerCase().includes(this.searchValue.toLowerCase()))
         if (!this.isEmptyValue(filtersProduct)) {
+          this.isSearchProduct = true
           return filtersProduct
         }
-        this.isLoadedServer = true
-        this.timeOut = setTimeout(() => {
-          this.$store.dispatch('listProductPriceFromServer', {
-            containerUuid: 'Products-Price-List',
-            pageNumber: 1,
-            searchValue: this.searchValue
-          })
-            .then(() => {
-              const recordsList = this.listWithPrice
-
-              if (this.isEmptyValue(recordsList)) {
-                this.$message({
-                  message: 'Sin resultados coincidentes con la busqueda',
-                  type: 'info',
-                  showClose: true
-                })
-              }
-              this.isLoadedServer = false
-              return recordsList
+        if (this.isSearchProduct) {
+          this.timeOut = setTimeout(() => {
+            this.$store.dispatch('listProductPriceFromServer', {
+              containerUuid: 'Products-Price-List',
+              pageNumber: 1,
+              searchValue: this.searchValue
             })
-        }, 2000)
+              .then(() => {
+                const recordsList = this.listWithPrice
+
+                if (this.isEmptyValue(recordsList)) {
+                  this.$message({
+                    message: 'Sin resultados coincidentes con la busqueda',
+                    type: 'info',
+                    showClose: true
+                  })
+                  this.isSearchProduct = false
+                  return recordsList
+                }
+                this.isSearchProduct = false
+                this.isLoadedServer = false
+                return recordsList
+              })
+          }, 2000)
+        }
       }
       return listWithPrice
     },
@@ -256,11 +263,13 @@ export default {
         if (mutation.type === 'updateValueOfField' &&
           !mutation.payload.columnName.includes('DisplayColumn') &&
           mutation.payload.containerUuid === this.metadata.containerUuid) {
+          this.isSearchProduct = true
           clearTimeout(this.timeOut)
           this.timeOut = setTimeout(() => {
             this.$store.commit('setIsReloadProductPrice')
           }, 1000)
-        } else if (mutation.type === 'addActionKeyPerformed' && mutation.payload.containerUuid === this.metadata.containerUuid) {
+        } else if (mutation.type === 'addActionKeyPerformead' && mutation.payload.containerUuid === this.metadata.containerUuid) {
+          this.isSearchProduct = true
           this.$store.dispatch('listProductPriceFromServer', {
             containerUuid: mutation.payload.containerUuid,
             pageNumber: 1,
