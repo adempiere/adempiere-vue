@@ -132,7 +132,11 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
     },
     isTemplateOfCustomer() {
-      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner.id
+      const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      if (!this.isEmptyValue(currentOrder.listPayments.payments)) {
+        return !this.isEmptyValue(currentOrder.listPayments.payments)
+      }
+      return currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner.id
     },
     showCustomer() {
       return this.$store.getters.getShowUpdateCustomer
