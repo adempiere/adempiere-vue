@@ -184,6 +184,7 @@ export default {
           this.isSearchProduct = true
           return filtersProduct
         }
+        this.isLoadedServer = true
         if (this.isSearchProduct) {
           this.timeOut = setTimeout(() => {
             this.$store.dispatch('listProductPriceFromServer', {
