@@ -17,7 +17,7 @@
 -->
 <template>
   <el-main
-    v-shortkey="popoverListBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+    v-shortkey="popoverListBusinessParnet ? {close: ['esc']} : {}"
     @shortkey.native="actionList"
   >
     <el-collapse v-model="activeAccordion" accordion>
@@ -206,6 +206,13 @@ export default {
       }
       return this.$store.dispatch('listBPartnerFromServer', values)
         .then(response => {
+          if (this.isEmptyValue(response)) {
+            this.$message({
+              type: 'warning',
+              showClose: true,
+              message: this.$t('businessPartner.notFound')
+            })
+          }
           return response
         })
         .finally(() => {
