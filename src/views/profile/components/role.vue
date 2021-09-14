@@ -1,5 +1,8 @@
 <template>
   <el-form>
+    <el-form-item :label="$t('login.userName')">
+      {{ userInfo }}
+    </el-form-item>
     <el-form-item :label="$t('profile.currentRole')">
       {{ currentRole.name }}
     </el-form-item>
@@ -61,6 +64,13 @@ export default {
     }
   },
   computed: {
+    userInfo() {
+      const name = this.$store.getters['user/userInfo'].name
+      if (this.isEmptyValue(name)) {
+        return ''
+      }
+      return name
+    },
     currentRole() {
       return this.$store.getters['user/getRole']
     },
