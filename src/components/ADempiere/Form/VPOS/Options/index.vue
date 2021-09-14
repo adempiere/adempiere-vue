@@ -710,8 +710,8 @@ export default {
       createOrder({
         posUuid,
         customerUuid: this.currentOrder.businessPartner.uuid,
-        priceListUuid: this.currentPointOfSales.priceList.uuid,
-        warehouseUuid: this.currentPointOfSales.warehouse.uuid
+        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
       })
         .then(order => {
           this.$store.dispatch('currentOrder', order)

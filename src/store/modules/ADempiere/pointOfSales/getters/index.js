@@ -55,6 +55,7 @@ export default {
         ...state.currentPointOfSales,
         listOrder: state.listOrder,
         warehousesList: state.warehousesList,
+        currentWarehouse: state.currentWarehousePos,
         documentTypesList: state.documentTypesList,
         pricesList: state.pricesList,
         currentPriceList: state.currentPriceList,

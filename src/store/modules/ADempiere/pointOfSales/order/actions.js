@@ -38,16 +38,15 @@ export default {
   createOrder({ commit, dispatch, rootGetters }, {
     posUuid,
     customerUuid,
-    documentTypeUuid,
-    priceListUuid,
-    warehouseUuid
+    documentTypeUuid
   }) {
+    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
     return createOrder({
       posUuid,
       customerUuid,
       documentTypeUuid,
-      priceListUuid,
-      warehouseUuid
+      priceListUuid: currentPriceList.uuid,
+      warehouseUuid: currentWarehouse.uuid
     })
       .then(order => {
         commit('setOrder', order)
@@ -75,17 +74,16 @@ export default {
     orderUuid,
     posUuid,
     customerUuid,
-    documentTypeUuid,
-    priceListUuid,
-    warehouseUuid
+    documentTypeUuid
   }) {
+    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
     updateOrder({
       orderUuid,
       posUuid,
       documentTypeUuid,
       customerUuid,
-      priceListUuid,
-      warehouseUuid
+      priceListUuid: currentPriceList.uuid,
+      warehouseUuid: currentWarehouse.uuid
     })
       .then(response => {
         dispatch('reloadOrder', { orderUuid: response.uuid })
@@ -110,10 +108,8 @@ export default {
    * @param {number} price Price Producto
    * @param {number} discountRate DiscountRate Producto
    */
-  createOrderLine({ commit, dispatch }, {
+  createOrderLine({ commit, dispatch, rootGetters }, {
     orderUuid,
-    priceListUuid,
-    warehouseUuid,
     productUuid,
     chargeUuid,
     description,
@@ -121,10 +117,11 @@ export default {
     price,
     discountRate
   }) {
+    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
     createOrderLine({
       orderUuid,
-      priceListUuid,
-      warehouseUuid,
+      priceListUuid: currentPriceList.uuid,
+      warehouseUuid: currentWarehouse.uuid,
       productUuid,
       chargeUuid,
       description,
