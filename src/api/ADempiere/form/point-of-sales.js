@@ -138,12 +138,8 @@ export function createCustomer({
   name,
   lastName,
   description,
-  contactName,
-  eMail,
+  addresses,
   phone,
-  businessPartnerGroupUuid,
-  // Location
-  address,
   posUuid
 }) {
   return request({
@@ -152,17 +148,11 @@ export function createCustomer({
     data: {
       value,
       tax_id: taxId,
-      duns,
-      naics,
       name,
       last_name: lastName,
       description,
-      contact_name: contactName,
-      e_mail: eMail,
       phone,
-      business_partner_group_uid: businessPartnerGroupUuid,
-      // Location
-      address,
+      addresses,
       pos_uuid: posUuid
     }
   })
@@ -175,27 +165,14 @@ export function createCustomer({
 // Update Customer
 export function updateCustomer({
   uuid,
-  value,
-  taxId,
-  duns,
-  naics,
-  name,
-  lastName,
+  Value,
+  TaxId,
+  Duns,
+  Naics,
+  Name,
+  Name2,
   description,
-  contactName,
-  email,
-  phone,
-  addressUuid,
-  address1,
-  address2,
-  address3,
-  address4,
-  cityUuid,
-  cityName,
-  postalCode,
-  regionUuid,
-  regionName,
-  countryUuid,
+  addresses,
   posUuid
 }) {
   return request({
@@ -203,27 +180,14 @@ export function updateCustomer({
     method: 'post',
     data: {
       uuid,
-      value,
-      tax_id: taxId,
-      duns,
-      naics,
-      name,
-      last_name: lastName,
+      value: Value,
+      tax_id: TaxId,
+      duns: Duns,
+      naics: Naics,
+      name: Name,
+      last_name: Name2,
       description,
-      contact_name: contactName,
-      email,
-      phone,
-      address_uuid: addressUuid,
-      address1,
-      address2,
-      address3,
-      address4,
-      city_uuid: cityUuid,
-      city_name: cityName,
-      postal_code: postalCode,
-      region_uuid: regionUuid,
-      region_name: regionName,
-      country_uuid: countryUuid,
+      addresses,
       pos_uuid: posUuid
     }
   })

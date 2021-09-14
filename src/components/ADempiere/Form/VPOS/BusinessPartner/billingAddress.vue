@@ -16,15 +16,15 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <el-col :span="12">
+  <el-col :span="$store.getters.getCopyShippingAddress ? 24 : 12">
     <el-card class="box-card" shadow="never">
       <div slot="header" class="clearfix">
-        <span>{{ $t('form.pos.order.BusinessPartnerCreate.shippingAddress') }}</span>
+        <span>{{ $t('form.pos.order.BusinessPartnerCreate.billingAddress') }}</span>
       </div>
       <div class="text item">
         <el-scrollbar wrap-class="scroll-child">
           <field-definition
-            v-for="(field) in fieldsListLocationShippingAddress"
+            v-for="(field) in fieldsListLocationBillingAddress"
             :ref="field.columnName"
             :key="field.columnName"
             :metadata-field="field"
@@ -37,11 +37,11 @@
 
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldListShippingAddress.js'
+import fieldsList from './fieldListBillingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
 
 export default {
-  name: 'ShippingAddress',
+  name: 'BillingAddress',
   mixins: [
     formMixin,
     BParterMixin
@@ -51,8 +51,8 @@ export default {
       type: Object,
       default: () => {
         return {
-          uuid: 'Shipping-Address',
-          containerUuid: 'Shipping-Address',
+          uuid: 'Billing-Address',
+          containerUuid: 'Billing-Address',
           fieldsList
         }
       }
@@ -73,11 +73,19 @@ export default {
     }
   },
   computed: {
-    fieldsListLocationShippingAddress() {
+    fieldsListLocationBillingAddress() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
       }
-      return this.fieldsList
+      return this.fieldsList.map(billing => {
+        if (!this.$store.getters.getCopyShippingAddress) {
+          return {
+            ...billing,
+            size: { 'xs': 12, 'sm': 12, 'md': 12, 'lg': 12, 'xl': 12 }
+          }
+        }
+        return billing
+      })
     },
     adviserPin() {
       const value = this.$store.getters.getValueOfField({
@@ -99,14 +107,6 @@ export default {
     },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
-    },
-    copyShippingAddress: {
-      get() {
-        return this.$store.getters.getCopyShippingAddress
-      },
-      set(value) {
-        this.$store.dispatch('changeCopyShippingAddress', value)
-      }
     }
   },
   beforeDestroy() {

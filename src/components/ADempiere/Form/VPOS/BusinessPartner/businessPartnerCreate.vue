@@ -26,10 +26,12 @@
       class="create-bp"
     >
       <el-row :gutter="24">
-        <el-col :span="copyShippingAddress ? 12 : 8">
+        <el-col :span="24">
           <el-card class="box-card" shadow="never">
             <div slot="header" class="clearfix">
-              <span>Datos del Cliente</span>
+              <span>
+                {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
+              </span>
             </div>
             <div class="text item">
               <field-definition
@@ -41,22 +43,12 @@
             </div>
           </el-card>
         </el-col>
-        <el-col :span="copyShippingAddress ? 12 : 8">
-          <el-card class="box-card" shadow="never">
-            <div slot="header" class="clearfix">
-              <span>Direccion del Cliente</span>
-            </div>
-            <div class="text item">
-              <field-definition
-                v-for="(field) in fieldsListLocation"
-                :ref="field.columnName"
-                :key="field.columnName"
-                :metadata-field="field"
-              />
-            </div>
-          </el-card>
-        </el-col>
+      </el-row>
+      <el-row :gutter="24">
+        <billing-address />
         <shipping-address v-if="!copyShippingAddress" />
+      </el-row>
+      <el-row :gutter="24">
         <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
           <samp style="float: right; padding-right: 10px;">
             <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
@@ -89,13 +81,15 @@
 import { createCustomer } from '@/api/ADempiere/form/point-of-sales.js'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldsListCreate.js'
+import BillingAddress from './billingAddress.vue'
 import ShippingAddress from './shippingAddress.vue'
 import BParterMixin from './mixinBusinessPartner.js'
 
 export default {
   name: 'BusinessPartnerCreate',
   components: {
-    ShippingAddress
+    ShippingAddress,
+    BillingAddress
   },
   mixins: [
     formMixin,
@@ -132,16 +126,10 @@ export default {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
       }
-      return this.fieldsList.filter(field => field.tabindex > 4 && field.tabindex < 13)
-    },
-    fieldsListLocationShippingAddress() {
-      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
-        return this.$store.getters.getFieldLocation
-      }
-      return this.fieldsList.filter(field => field.tabindex > 13)
+      return this.fieldsList.filter(field => field.tabindex > 2)
     },
     datos() {
-      return this.fieldsList.filter(field => field.tabindex <= 4)
+      return this.fieldsList
     },
     adviserPin() {
       const value = this.$store.getters.getValueOfField({
@@ -206,43 +194,20 @@ export default {
     },
     // TODO: Get locations values.
     createBusinessParter() {
-      const values = this.$store.getters.getValuesView({
+      const values = this.datesForm(this.$store.getters.getValuesView({
         containerUuid: this.containerUuid,
-        format: 'object'
-      })
-      const shippingAddress = this.addressForm(this.$store.getters.getValuesView({
-        containerUuid: 'Shipping-Address',
         format: 'object'
       }))
-      shippingAddress.isShipping = true
-      const name2 = this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
-        columnName: 'Name2'
-      })
-      values.name2 = name2
+      values.addresses = [this.billingAddress, this.shippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: this.containerUuid,
         formatReturn: 'name'
       })
-      const addressCustomer = this.addressForm(this.$store.getters.getValuesView({
-        containerUuid: this.containerUuid,
-        format: 'object'
-      }))
-      const address = [addressCustomer, shippingAddress]
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
-        createCustomer({
-          value: values.Value,
-          taxId: values.Value,
-          name: values.Name,
-          lastName: values.Name2,
-          description: values.Description,
-          contactName: values.ContactName,
-          email: values.EMail,
-          phone: values.Phone,
-          address,
-          posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid
-        })
+        createCustomer(
+          values
+        )
           .then(responseBPartner => {
             // TODO: Add new record into vuex store.
             this.setBusinessPartner(responseBPartner)
@@ -284,9 +249,11 @@ export default {
         containerUuid: this.containerUuid,
         panelType: this.panelType
       })
-      this.clearLocationValues()
+      this.clearAddresses('Billing-Address')
+      this.clearAddresses('Shipping-Address')
+      this.clearDataCustomer(this.containerUuid)
     },
-    addressForm(values) {
+    datesForm(values) {
       const valuesToSend = {}
       Object.keys(values).forEach(key => {
         const value = values[key]
@@ -294,90 +261,25 @@ export default {
           return
         }
         switch (key) {
-          case 'C_Country_ID_UUID':
-            valuesToSend['countryUuid'] = value
+          case 'Value':
+            valuesToSend['value'] = value
             break
-          case 'C_Region_ID_UUID':
-            valuesToSend['regionUuid'] = value
+          case 'Name':
+            valuesToSend['name'] = value
             break
-          case 'DisplayColumn_C_Region_ID':
-            valuesToSend['regionName'] = value
+          case 'Name2':
+            valuesToSend['lastName'] = value
             break
-          case 'C_City_ID_UUID':
-            valuesToSend['cityUuid'] = value
+          case 'TaxID':
+            valuesToSend['taxId'] = value
             break
-          case 'DisplayColumn_C_City_ID':
-            valuesToSend['cityName'] = value
-            break
-          case 'Address1':
-            valuesToSend['address1'] = value
-            break
-          case 'Address2':
-            valuesToSend['address2'] = value
-            break
-          case 'Address3':
-            valuesToSend['address3'] = value
-            break
-          case 'Address4':
-            valuesToSend['address4'] = value
-            break
-          case 'Postal':
-            valuesToSend['postalCode'] = value
+          case 'Phone':
+            valuesToSend['phone'] = value
             break
         }
       })
+      valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
       return valuesToSend
-    },
-    clearLocationValues() {
-      this.$store.commit('updateValuesOfContainer', {
-        containerUuid: this.containerUuid,
-        attributes: [{
-          columnName: 'C_Location_ID',
-          value: undefined
-        }, {
-          columnName: 'DisplayColumn_C_Location_ID',
-          value: undefined
-        }, {
-          columnName: 'C_Country_ID',
-          value: undefined
-        }, {
-          columnName: 'C_Country_ID_UUID',
-          value: undefined
-        }, {
-          columnName: 'DisplayColumn_C_Country_ID',
-          value: undefined
-        }, {
-          columnName: 'C_Region_ID',
-          value: undefined
-        }, {
-          columnName: 'C_Region_ID_UUID',
-          value: undefined
-        }, {
-          columnName: 'DisplayColumn_C_Region_ID',
-          value: undefined
-        }, {
-          columnName: 'C_City_ID',
-          value: undefined
-        }, {
-          columnName: 'C_City_ID_UUID',
-          value: undefined
-        }, {
-          columnName: 'DisplayColumn_C_City_ID',
-          value: undefined
-        }, {
-          columnName: 'Address1',
-          value: undefined
-        }, {
-          columnName: 'Address2',
-          value: undefined
-        }, {
-          columnName: 'Address3',
-          value: undefined
-        }, {
-          columnName: 'Address4',
-          value: undefined
-        }]
-      })
     },
     changeShipping(value) {
       this.$store.dispatch('changeCopyShippingAddress', value)

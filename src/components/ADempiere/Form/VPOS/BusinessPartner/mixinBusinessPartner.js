@@ -39,6 +39,34 @@ export default {
         refreshListWithoutValues: ['shift', 'r'],
         refreshList: ['f5']
       }
+    },
+    billingAddress() {
+      const billingAddress = this.addressForm(this.$store.getters.getValuesView({
+        containerUuid: 'Billing-Address',
+        format: 'object'
+      }))
+      billingAddress.is_default_billing = true
+      billingAddress.is_default_shipping = this.copyShippingAddress
+      const city = this.$store.getters.getValueOfField({
+        containerUuid: 'Billing-Address',
+        columnName: 'C_City_ID_UUID'
+      })
+      if (this.isEmptyValue(city)) {
+        return []
+      }
+      return billingAddress
+    },
+    shippingAddress() {
+      const shippingAddress = this.addressForm(this.$store.getters.getValuesView({
+        containerUuid: 'Shipping-Address',
+        format: 'object'
+      }))
+      shippingAddress.is_default_shipping = true
+      shippingAddress.is_default_billing = this.copyShippingAddress
+      if (this.copyShippingAddress) {
+        return this.billingAddress
+      }
+      return shippingAddress
     }
   },
   methods: {
@@ -152,6 +180,84 @@ export default {
       if (isCloseForm) {
         this.closeForm()
       }
+    },
+    clearDataCustomer(containerUuid) {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [{
+          columnName: 'Name',
+          value: undefined
+        }, {
+          columnName: 'Value',
+          value: undefined
+        }, {
+          columnName: 'TaxID',
+          value: undefined
+        }, {
+          columnName: 'Name2',
+          value: undefined
+        }]
+      })
+    },
+    clearAddresses(containerUuid) {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [{
+          columnName: 'Name',
+          value: undefined
+        }, {
+          columnName: 'Description',
+          value: undefined
+        }, {
+          columnName: 'Name2',
+          value: undefined
+        }, {
+          columnName: 'Phone',
+          value: undefined
+        }, {
+          columnName: 'EMail',
+          value: undefined
+        }, {
+          columnName: 'ContactName',
+          value: undefined
+        }, {
+          columnName: 'C_Country_ID_UUID',
+          value: undefined
+        }, {
+          columnName: 'Postal',
+          value: undefined
+        }, {
+          columnName: 'C_Region_ID',
+          value: undefined
+        }, {
+          columnName: 'C_Region_ID_UUID',
+          value: undefined
+        }, {
+          columnName: 'DisplayColumn_C_Region_ID',
+          value: undefined
+        }, {
+          columnName: 'C_City_ID',
+          value: undefined
+        }, {
+          columnName: 'C_City_ID_UUID',
+          value: undefined
+        }, {
+          columnName: 'DisplayColumn_C_City_ID',
+          value: undefined
+        }, {
+          columnName: 'Address1',
+          value: undefined
+        }, {
+          columnName: 'Address2',
+          value: undefined
+        }, {
+          columnName: 'Address3',
+          value: undefined
+        }, {
+          columnName: 'Address4',
+          value: undefined
+        }]
+      })
     }
   }
 }

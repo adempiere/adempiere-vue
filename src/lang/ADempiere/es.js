@@ -448,6 +448,9 @@ export default {
         BusinessPartnerCreate: {
           businessPartner: 'Socio de Negocios',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
+          customerData: 'Datos del Cliente',
+          billingAddress: 'Dirección de Facturación',
+          shippingAddress: 'Dirección de Envió',
           taxId: 'Identificación Fiscal'
         }
       },

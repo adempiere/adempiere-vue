@@ -21,8 +21,8 @@
       {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}
       <el-popover
         v-model="showCreate"
-        placement="top-start"
-        :width="copyShippingAddress ? '600' : '800'"
+        placement="bottom-start"
+        width="1200"
         trigger="click"
         @hide="popoverClose"
       >
@@ -68,7 +68,7 @@
         v-if="!isEmptyValue(currentOrder.businessPartner.uuid)"
         v-model="showUpdate"
         placement="right"
-        width="600"
+        width="1200"
         trigger="click"
       >
         <business-partner-update

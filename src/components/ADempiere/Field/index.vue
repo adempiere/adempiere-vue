@@ -340,7 +340,7 @@ export default {
     min-height: 250px;
   }
   .from-field {
-    max-height: 100px;
+    max-height: 65px;
   }
   .el-form-item {
     margin-bottom: 10px !important;

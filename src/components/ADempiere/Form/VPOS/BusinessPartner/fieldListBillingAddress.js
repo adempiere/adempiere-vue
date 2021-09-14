@@ -20,7 +20,7 @@ const fieldBase = {
   tableName: 'C_Location',
   isFromDictionary: true,
   overwriteDefinition: {
-    size: 12,
+    size: 6,
     index: 0
   }
 }
@@ -34,7 +34,7 @@ export default [
     overwriteDefinition: {
       tabindex: 1,
       isCustomField: true,
-      size: 12,
+      size: 6,
       sequence: 1,
       isMandatory: true
     }
@@ -48,7 +48,7 @@ export default [
       tabindex: 2,
       isCustomField: true,
       sequence: 2,
-      size: 12
+      size: 6
     }
   },
   {
@@ -60,7 +60,7 @@ export default [
       tabindex: 3,
       isCustomField: true,
       sequence: 2,
-      size: 12
+      size: 6
     }
   },
   {
@@ -72,7 +72,7 @@ export default [
       tabindex: 3,
       isCustomField: true,
       sequence: 2,
-      size: 12
+      size: 6
     }
   },
   {
@@ -84,7 +84,7 @@ export default [
       tabindex: 4,
       isCustomField: true,
       sequence: 3,
-      size: 12
+      size: 6
     }
   },
   {
@@ -96,7 +96,7 @@ export default [
       tabindex: 2,
       isCustomField: true,
       sequence: 4,
-      size: 12
+      size: 6
     }
   },
   {
@@ -108,7 +108,7 @@ export default [
       isActiveLogics: true, // enable logics
       defaultValue: '@#C_Country_ID@',
       tabindex: 5,
-      size: 12,
+      size: 6,
       sequenceFields: 'CO',
       isMandatory: false
     }
@@ -119,8 +119,8 @@ export default [
     columnName: 'C_Region_ID',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 8,
-      size: 12,
+      tabindex: 6,
+      size: 6,
       sequenceFields: 'R',
       isMandatory: false
     }
@@ -132,7 +132,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 7,
-      size: 12,
+      size: 6,
       sequenceFields: 'C',
       isMandatory: false
     }
@@ -143,8 +143,8 @@ export default [
     columnName: 'Address1',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 8,
-      size: 12,
+      tabindex: 6,
+      size: 6,
       sequenceFields: 'A1'
     }
   },
@@ -155,7 +155,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 9,
-      size: 12,
+      size: 6,
       sequenceFields: 'A2'
     }
   },
@@ -166,7 +166,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 10,
-      size: 12,
+      size: 6,
       sequenceFields: 'A3'
     }
   },
@@ -177,7 +177,7 @@ export default [
     overwriteDefinition: {
       tabindex: 11,
       isCustomField: true,
-      size: 12,
+      size: 6,
       sequenceFields: 'A4'
     }
   },
@@ -188,7 +188,7 @@ export default [
     overwriteDefinition: {
       tabindex: 12,
       isCustomField: true,
-      size: 12,
+      size: 6,
       sequenceFields: 'P'
     }
   }
