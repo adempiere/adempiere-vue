@@ -1,5 +1,16 @@
 <template>
   <el-form>
+    <label>{{ $t('login.userName') }}</label>
+    <el-select
+      v-model="userInfo"
+      :disabled="true"
+      value-key="key"
+    >
+      <el-option
+        :label="userInfo"
+        :value="userInfo"
+      />
+    </el-select>
     <label>{{ $t('route.role') }}</label>
     <el-select
       v-model="currentRoleUuid"
@@ -53,6 +64,13 @@
 export default {
   name: 'RolesNavbar',
   computed: {
+    userInfo() {
+      const name = this.$store.getters['user/userInfo'].name
+      if (this.isEmptyValue(name)) {
+        return ''
+      }
+      return name
+    },
     currentRoleUuid: {
       get() {
         return this.$store.getters['user/getRole'].uuid

@@ -38,7 +38,7 @@
         width="245"
         trigger="click"
       >
-        <div>
+        <div style="padding: 10px;">
           <profile-preview
             :user="user"
             :avatar="avatar"
