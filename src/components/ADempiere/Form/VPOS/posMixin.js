@@ -296,6 +296,8 @@ export default {
         })
           .then(response => {
             this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
+            this.$store.dispatch('changeFocusNewOrder', true)
+            this.$refs.ProductValue[0].$refs.product.focus()
           })
           .catch(error => {
             console.error(error.message)
@@ -617,6 +619,7 @@ export default {
         })
           .then(response => {
             this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
+            this.$store.dispatch('changeFocusNewOrder', true)
           })
           .catch(error => {
             console.error(error.message)

@@ -665,6 +665,9 @@ export default {
       this.visible = value
     },
     numberOfLines(value) {
+      if (this.isNewOrder) {
+        this.$refs.ProductValue[0].$refs.product.focus()
+      }
       if (value > 0) {
         this.convertedAmount()
       }
