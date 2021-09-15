@@ -154,7 +154,6 @@ const actions = {
             name: sessionInfo.name,
             processed: sessionInfo.processed
           })
-          console.log({ sessionInfo })
           const { userInfo } = sessionInfo
           commit('SET_NAME', sessionInfo.name)
           commit('SET_INTRODUCTION', userInfo.description)
