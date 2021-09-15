@@ -708,9 +708,10 @@ export default {
           } else {
             this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
               .then(response => {
-                this.completePreparedOrder(posUuid, orderUuid, payments)
+                if (response.type === 'success') {
+                  this.completePreparedOrder(posUuid, orderUuid, payments)
+                }
               })
-            this.completePreparedOrder(posUuid, orderUuid, payments)
             this.$store.commit('dialogoInvoce', { show: false, success: true })
           }
           break

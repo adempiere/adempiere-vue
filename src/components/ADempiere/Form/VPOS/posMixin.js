@@ -331,7 +331,9 @@ export default {
               case 1:
                 this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
                   .then(response => {
-                    this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
+                    if (response.type === 'success') {
+                      this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
+                    }
                   })
                 break
               case 3:

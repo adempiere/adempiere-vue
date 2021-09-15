@@ -400,7 +400,10 @@ export default {
       .then(response => {
         const orderUuid = response.orderUuid
         dispatch('listPayments', { orderUuid })
-        return response
+        return {
+          ...response,
+          type: 'success'
+        }
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -409,7 +412,7 @@ export default {
           message: error.message,
           showClose: true
         })
-        return
+        return { type: 'error' }
       })
   },
   /**
