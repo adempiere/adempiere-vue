@@ -296,6 +296,7 @@ export default {
           clearTimeout(this.timeOut)
           this.isLoadRecord = true
           this.timeOut = setTimeout(() => {
+            this.$store.dispatch('setOrdersListPageNumber', 1)
             this.loadOrdersList()
           }, 2000)
         }
