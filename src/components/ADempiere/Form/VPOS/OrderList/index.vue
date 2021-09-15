@@ -55,7 +55,7 @@
     <el-table
       ref="orderTable"
       v-shortkey="shortsKey"
-      v-loading="!ordersList.isLoaded"
+      v-loading="!ordersList.isLoaded || isLoadRecord"
       :data="sortTableOrderList"
       border
       fit
@@ -168,6 +168,7 @@ export default {
       defaultMaxPagination: 50,
       fieldsList: fieldsListOrders,
       metadataList: [],
+      isLoadRecord: false,
       isCustomForm: true,
       activeAccordion: 'query-criteria',
       timeOut: null
@@ -221,6 +222,9 @@ export default {
       if (value && this.isEmptyValue(this.metadataList)) {
         this.setFieldsList()
       }
+    },
+    sortTableOrderList(value) {
+      this.isLoadRecord = false
     }
   },
   created() {
@@ -248,6 +252,7 @@ export default {
       }
     },
     loadOrdersList() {
+      this.isLoadRecord = true
       const point = this.$store.getters.posAttributes.currentPointOfSales.uuid
       if (!this.isEmptyValue(point)) {
         this.$store.dispatch('listOrdersFromServer', {
@@ -289,6 +294,7 @@ export default {
           !mutation.payload.columnName.includes('_UUID') &&
           mutation.payload.containerUuid === this.metadata.containerUuid) {
           clearTimeout(this.timeOut)
+          this.isLoadRecord = true
           this.timeOut = setTimeout(() => {
             this.loadOrdersList()
           }, 2000)

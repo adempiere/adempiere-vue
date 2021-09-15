@@ -259,11 +259,11 @@ export default {
       })
       .catch(error => {
         console.warn(`listOrdersFromServer: ${error.message}. Code: ${error.code}.`)
-        // showMessage({
-        //   type: 'info',
-        //   message: error.message,
-        //   showClose: true
-        // })
+        showMessage({
+          type: 'info',
+          message: error.message,
+          showClose: true
+        })
       })
   },
   setOrder({ commit, dispatch }, order) {
