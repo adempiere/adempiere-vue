@@ -122,7 +122,7 @@
             <el-button type="danger" icon="el-icon-close" @click="exit" />
             <el-button type="info" icon="el-icon-minus" :disabled="isDisabled" @click="undoPatment" />
             <el-button type="primary" icon="el-icon-plus" :disabled="validPay || addPay || isDisabled" @click="addCollectToList(paymentBox)" />
-            <el-button type="success" :disabled="isDisabled || isDisabled" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
+            <el-button type="success" :disabled="isDisabled" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
           </samp>
         </el-header>
         <!-- Panel where they show the payments registered from the collection container -->
@@ -425,6 +425,9 @@ export default {
         fieldsList: fieldLogic,
         isValidate: true
       })
+      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate)) {
+        return true
+      }
       if (this.defaulValuePaymentMethods.tender_type === 'X') {
         return false
       }
