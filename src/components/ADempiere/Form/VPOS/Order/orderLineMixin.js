@@ -145,8 +145,8 @@ export default {
       createOrderLine({
         orderUuid,
         productUuid,
-        priceListUuid: this.currentPointOfSales.priceList.uuid,
-        warehouseUuid: this.currentPointOfSales.warehouse.uuid
+        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
       })
         .then(orderLine => {
           this.fillOrderLine(orderLine)
@@ -191,8 +191,8 @@ export default {
         quantity,
         price,
         discountRate,
-        priceListUuid: this.currentPointOfSales.priceList.uuid,
-        warehouseUuid: this.currentPointOfSales.warehouse.uuid
+        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
       })
         .then(response => {
           this.fillOrderLineQuantities({

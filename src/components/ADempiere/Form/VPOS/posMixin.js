@@ -490,8 +490,8 @@ export default {
       findProduct({
         searchValue: searchProduct,
         posUuid: this.currentPointOfSales.uuid,
-        priceListUuid: this.currentPointOfSales.priceList.uuid,
-        warehouseUuid: this.currentPointOfSales.warehouse.uuid
+        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
       })
         .then(productPrice => {
           this.product = productPrice.product

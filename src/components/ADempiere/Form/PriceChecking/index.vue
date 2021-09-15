@@ -238,8 +238,8 @@ export default {
             getProductPrice({
               searchValue: mutation.payload.value,
               posUuid: this.currentPointOfSales.uuid,
-              priceListUuid: this.currentPointOfSales.priceList.uuid,
-              warehouseUuid: this.currentPointOfSales.warehouse.uuid
+              priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+              warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
             })
               .then(productPrice => {
                 this.messageError = true
@@ -294,8 +294,8 @@ export default {
             getProductPrice({
               searchValue: mutation.payload.value,
               posUuid: this.currentPointOfSales.uuid,
-              priceListUuid: this.currentPointOfSales.priceList.uuid,
-              warehouseUuid: this.currentPointOfSales.warehouse.uuid
+              priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+              warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
             })
               .then(productPrice => {
                 this.messageError = true
