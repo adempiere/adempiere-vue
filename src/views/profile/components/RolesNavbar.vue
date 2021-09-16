@@ -1,17 +1,6 @@
 <template>
   <el-form>
-    <label>{{ $t('login.userName') }}</label>
-    <el-select
-      v-model="userInfo"
-      :disabled="true"
-      value-key="key"
-    >
-      <el-option
-        :label="userInfo"
-        :value="userInfo"
-      />
-    </el-select>
-    <label>{{ $t('route.role') }}</label>
+    <label> <b> {{ $t('route.role') }} </b> </label>
     <el-select
       v-model="currentRoleUuid"
       :filterable="isFiltrable"
@@ -26,7 +15,7 @@
       />
     </el-select>
 
-    <label>{{ $t('route.organization') }}</label>
+    <label> <b> {{ $t('route.organization') }} </b> </label>
     <el-select
       v-model="currentOrganizationUuid"
       :filterable="isFiltrable"
@@ -42,7 +31,7 @@
       />
     </el-select>
 
-    <label>{{ $t('route.warehouse') }}</label>
+    <label> <b> {{ $t('route.warehouse') }} </b> </label>
     <el-select
       v-model="currentWarehouseUuid"
       :filterable="isFiltrable"
@@ -64,13 +53,6 @@
 export default {
   name: 'RolesNavbar',
   computed: {
-    userInfo() {
-      const name = this.$store.getters['user/userInfo'].name
-      if (this.isEmptyValue(name)) {
-        return ''
-      }
-      return name
-    },
     currentRoleUuid: {
       get() {
         return this.$store.getters['user/getRole'].uuid
@@ -93,6 +75,9 @@ export default {
       set(organizationToSet) {
         this.changeOrganization(organizationToSet)
       }
+    },
+    currentRole() {
+      return this.$store.getters['user/getRole']
     },
     organizationsList() {
       return this.$store.getters['user/getOrganizations']

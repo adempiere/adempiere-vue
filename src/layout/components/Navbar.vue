@@ -35,7 +35,7 @@
       <el-button v-show="!isMenuMobile && isMobile" type="text" icon="el-icon-more" @click="isMenuOption()" />
       <el-popover
         placement="bottom"
-        width="245"
+        width="260"
         trigger="click"
       >
         <div style="padding: 10px;">

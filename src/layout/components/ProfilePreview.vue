@@ -1,11 +1,14 @@
 <template>
   <div class="user-profi">
     <router-link to="/profile/index">
-      <img v-if="avatarResize" :src="avatarResize" class="sidebar-logo">
-
-      <p style="float: right;max-width: 150px;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;">
-        {{ currentRole.clientName }}
-      </p>
+      <el-row>
+        <el-col :span="24" style="text-align: center;">
+          <el-avatar shape="circle" :size="100" fit="fill" :src="avatarResize" />
+          <br>
+          <b> {{ userInfo }} </b>
+          <el-button round style="margin-top: 3%;"> {{ currentRole.name }} </el-button>
+        </el-col>
+      </el-row>
     </router-link>
     <roles-navbar />
   </div>
@@ -34,14 +37,25 @@ export default {
     avatar: {
       type: String,
       default: ''
+    },
+    fits: {
+      type: Array,
+      default: () => ['fill', 'contain', 'cover', 'none', 'scale-down']
     }
   },
   computed: {
+    userInfo() {
+      const name = this.$store.getters['user/userInfo'].name
+      if (this.isEmptyValue(name)) {
+        return ''
+      }
+      return name
+    },
     currentRole() {
       return this.$store.getters['user/getRole']
     },
     avatarResize() {
-      const defaultAvatar = 'https://avatars1.githubusercontent.com/u/1263359?s=200&v=4?imageView2/1/w/40/h/40'
+      const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
       if (this.isEmptyValue(this.avatar) || defaultAvatar.includes(this.avatar)) {
         return defaultAvatar
       }
