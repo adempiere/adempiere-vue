@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+
 /**
  * Dictionary Window Getters
  */
@@ -34,5 +36,13 @@ export default {
     return state.storedWindows[windowUuid].tabsList.find(tab => {
       return tab.uuid === tabUuid
     })
+  },
+
+  getTableName: (state, getters) => (windowUuid, tabUuid) => {
+    const tab = getters.getStoredTab(windowUuid, tabUuid)
+    if (!isEmptyValue(tab)) {
+      return tab.tableName
+    }
+    return undefined
   }
 }

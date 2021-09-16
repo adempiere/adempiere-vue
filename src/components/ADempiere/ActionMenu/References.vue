@@ -95,7 +95,7 @@ export default defineComponent({
       parentUuid
     } = parent._props
     const {
-      tableName
+      getTableName
     } = props.referencesManager
 
     const isLoadedReferences = ref(false)
@@ -111,6 +111,7 @@ export default defineComponent({
         recordUuid.value !== 'create-new'
     })
 
+    // is container manage references
     const isReferecesContent = computed(() => {
       if (!root.isEmptyValue(props.referencesManager) && isWithRecord.value) {
         return true
@@ -127,6 +128,7 @@ export default defineComponent({
       if (isReferecesContent.value) {
         return root.$store.getters.getStoredReferences({
           windowUuid: parentUuid,
+          tableName: getTableName(),
           recordUuid: recordUuid.value
         })
       }
@@ -154,10 +156,6 @@ export default defineComponent({
     }
 
     const getReferences = () => {
-      if (!isReferecesContent.value) {
-        return
-      }
-
       const references = getterReferences.value
       if (!root.isEmptyValue(references)) {
         referencesList.value = references.referencesList
@@ -167,24 +165,28 @@ export default defineComponent({
 
         root.$store.dispatch('getReferencesFromServer', {
           parentUuid,
-          tableName,
+          tableName: getTableName(),
           recordUuid: recordUuid.value
         })
           .then(responseReferences => {
             referencesList.value = responseReferences.referencesList
           })
+          // handle error in store
+          .catch(() => {})
           .finally(() => {
             isLoadedReferences.value = true
           })
       }
     }
 
-    // when change record uuid loaded references
-    watch(recordUuid, () => {
-      getReferences()
-    })
+    if (isReferecesContent.value) {
+      // when change record uuid loaded references
+      watch(recordUuid, () => {
+        getReferences()
+      })
 
-    getReferences()
+      getReferences()
+    }
 
     return {
       referencesList,

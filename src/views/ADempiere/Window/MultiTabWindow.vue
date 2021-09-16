@@ -137,8 +137,11 @@ export default defineComponent({
     })
 
     const referencesManager = ref({
-      tableName: (tableName) => {
-        return tableName
+      getTableName: () => {
+        const tabUuid = props.windowMetadata.currentTabUuid
+        const windowUuid = props.windowMetadata.uuid
+
+        return root.$store.getters.getTableName(windowUuid, tabUuid)
       }
     })
 
