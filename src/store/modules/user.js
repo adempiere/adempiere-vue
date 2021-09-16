@@ -92,9 +92,7 @@ const mutations = {
     state.role = role
   },
   SET_USER: (state, payload) => {
-    console.log(payload)
     state.userInfo = payload
-    console.log(state.userInfo)
   },
   SET_USER_UUID: (state, payload) => {
     state.userUuid = payload
