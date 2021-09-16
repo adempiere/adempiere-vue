@@ -191,7 +191,10 @@ export default {
             containerUuid: mutation.payload.containerUuid,
             format: 'object'
           })
-          this.searchBPartnerList(values)
+          clearTimeout(this.timeOut)
+          this.timeOut = setTimeout(() => {
+            this.searchBPartnerList(values)
+          }, 1000)
         }
       })
     },
