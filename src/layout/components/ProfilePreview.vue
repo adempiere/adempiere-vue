@@ -5,7 +5,7 @@
         <el-col :span="24" style="text-align: center;">
           <el-avatar shape="circle" :size="100" fit="fill" :src="avatarResize" />
           <br>
-          <b> {{ userInfo }} </b>
+          <b> {{ userName }} </b>
           <el-button round style="margin-top: 3%;"> {{ currentRole.name }} </el-button>
         </el-col>
       </el-row>
@@ -45,23 +45,24 @@ export default {
   },
   computed: {
     userInfo() {
-      const name = this.$store.getters['user/userInfo'].name
-      if (this.isEmptyValue(name)) {
+      return this.$store.getters['user/userInfo']
+    },
+    userName() {
+      if (this.isEmptyValue(this.userInfo)) {
         return ''
       }
-      return name
+      return this.userInfo.name
     },
     currentRole() {
       return this.$store.getters['user/getRole']
     },
     avatarResize() {
-      const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-      if (this.isEmptyValue(this.avatar) || defaultAvatar.includes(this.avatar)) {
-        return defaultAvatar
+      if (this.isEmptyValue(this.userInfo.image)) {
+        return require('@/image/ADempiere/avatar/no-avatar.png')
       }
 
       const { uri } = getImagePath({
-        file: this.avatar,
+        file: this.userInfo.image,
         width: 40,
         height: 40
       })
