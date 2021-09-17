@@ -206,6 +206,7 @@ export default defineComponent({
 <style lang="scss">
 .menu-references {
   .el-button--warning {
+    font-weight: bold;
     // darker orange tone for better readability
     border-color: #ff9b00;
     color: #ff9b00;

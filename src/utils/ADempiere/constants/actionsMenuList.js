@@ -14,11 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import clipboard from '@/directive/clipboard'
 import language from '@/lang'
 import { showMessage } from '@/utils/ADempiere/notification.js'
-
-function generateLink() {}
+import { copyToClipboard } from '@/utils/ADempiere/coreUtils'
 
 /**
  * Create new record
@@ -60,9 +58,30 @@ export const sharedLink = {
   svg: false,
   icon: 'el-icon-share',
   actionName: 'sharedLink',
-  sharedLink: ({ root }) => {
-    const link = generateLink(root.router)
-    clipboard(link)
+  sharedLink: ({ root, parentUuid, containerUuid }) => {
+    const values = root.$store.getters.getValuesView({
+      parentUuid,
+      containerUuid,
+      format: 'map'
+    })
+
+    root.$router.push({
+      name: root.$router.name,
+      params: {
+        ...root.$router.params
+      },
+      query: {
+        ...root.$router.query,
+        filters: Array.from(values)
+      }
+    })
+
+    const link = window.location.href
+
+    copyToClipboard({
+      text: link,
+      isShowMessage: true
+    })
   }
 }
 

@@ -251,18 +251,19 @@ export default defineComponent({
     // light blue style of the first section of the menu button
     // >.el-button::first-child {
     >.el-button:not(:last-child) {
+      font-weight: bold;
       // margin-right: -1px;
-      color: #409eff;
+      color: #0080ff;
+      border-color: #0080ff;
       background: #ecf5ff;
-      border-color: #b3d8ff;
     }
 
     // light blue style of the drop down menu section
     .el-button--primary:last-child {
       // margin-right: 2px;
-      color: #409eff;
+      color: #0080ff;
+      border-color: #0080ff;
       background: #e6f1fd;
-      border-color: #b3d8ff;
       border-left-color: #000000 !important;
     }
 

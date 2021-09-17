@@ -149,6 +149,7 @@ const value = {
      * uuid), from a view (container)
      * @param {string} parentUuid
      * @param {string} containerUuid
+     * @param {string} format array|object|pairs|map
      * @returns {object|array}
      */
     getValuesView: (state) => ({
@@ -167,7 +168,9 @@ const value = {
 
       // generate context only columnName
       const objectValues = {}
-      const pairsValues = Object.keys(contextAllContainers).map(key => {
+      const pairsValues = []
+      const mapValues = new Map()
+      const arrayValues = Object.keys(contextAllContainers).map(key => {
         const value = contextAllContainers[key]
         if (isOnlyColumns) {
           key = key
@@ -179,6 +182,8 @@ const value = {
 
         // set container context (smart browser, process/report, form)
         objectValues[columnName] = value
+        pairsValues.push([key, value])
+        mapValues.set(key, value)
         return {
           columnName,
           value
@@ -186,7 +191,13 @@ const value = {
       })
 
       if (format === 'array') {
+        return arrayValues
+      }
+      if (format === 'pairs') {
         return pairsValues
+      }
+      if (format === 'map') {
+        return mapValues
       }
       return objectValues
     },
