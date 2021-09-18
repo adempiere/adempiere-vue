@@ -60,7 +60,7 @@ const dataManager = {
         const tab = rootGetters.getStoredTab(parentUuid, containerUuid)
 
         const currentRoute = router.app._route
-        delete router.app._route.query.filters
+        delete currentRoute.query.filters
         // set action
         router.push({
           name: currentRoute.name,

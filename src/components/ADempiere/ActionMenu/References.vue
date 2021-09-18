@@ -33,10 +33,15 @@
       {{ $t('actionMenu.references') }}
 
       <i
-        v-if="!isReferecesContent || isLoadedReferences"
+        v-if="isLoadingReferences"
+        key="loading"
+        class="el-icon-loading el-icon--right"
+      />
+      <i
+        v-else
+        key="loaded"
         class="el-icon-arrow-down el-icon--right"
       />
-      <i v-else class="el-icon-loading el-icon--right" />
     </el-button>
 
     <el-dropdown-menu slot="dropdown">
@@ -98,7 +103,7 @@ export default defineComponent({
       getTableName
     } = props.referencesManager
 
-    const isLoadedReferences = ref(false)
+    const isLoadingReferences = ref(false)
     const referencesList = ref([])
 
     const recordUuid = computed(() => {
@@ -113,7 +118,7 @@ export default defineComponent({
 
     // is container manage references
     const isReferecesContent = computed(() => {
-      if (!root.isEmptyValue(props.referencesManager) && isWithRecord.value) {
+      if (!root.isEmptyValue(props.referencesManager)) {
         return true
       }
       return false
@@ -121,7 +126,8 @@ export default defineComponent({
 
     const isDisabledMenu = computed(() => {
       return !(isReferecesContent.value &&
-        isLoadedReferences.value)
+        isWithRecord.value &&
+        !isLoadingReferences.value)
     })
 
     const getterReferences = computed(() => {
@@ -159,9 +165,8 @@ export default defineComponent({
       const references = getterReferences.value
       if (!root.isEmptyValue(references)) {
         referencesList.value = references.referencesList
-        isLoadedReferences.value = true
       } else {
-        isLoadedReferences.value = false
+        isLoadingReferences.value = true
 
         root.$store.dispatch('getReferencesFromServer', {
           parentUuid,
@@ -174,15 +179,18 @@ export default defineComponent({
           // handle error in store
           .catch(() => {})
           .finally(() => {
-            isLoadedReferences.value = true
+            isLoadingReferences.value = false
           })
       }
     }
 
     if (isReferecesContent.value) {
       // when change record uuid loaded references
-      watch(recordUuid, () => {
-        getReferences()
+      watch(recordUuid, (newValue) => {
+        // TODO: Add validate uuid record with route
+        if (newValue !== 'create-new' && !root.isEmptyValue(newValue)) {
+          getReferences()
+        }
       })
 
       getReferences()
@@ -192,7 +200,7 @@ export default defineComponent({
       referencesList,
       // computeds
       isReferecesContent,
-      isLoadedReferences,
+      isLoadingReferences,
       isDisabledMenu,
       // methods
       openReference

@@ -32,7 +32,10 @@
                   v-model="repositoryData.clone"
                   :disabled="true"
                 />
-                <el-button icon="el-icon-copy-document" @click="fallbackCopyTextToClipboard(repositoryData.clone)" />
+                <el-button
+                  icon="el-icon-copy-document"
+                  @click="copyToClipboard(repositoryData.clone)"
+                />
               </div>
             </el-tab-pane>
             <el-tab-pane label="SSH" name="ssh">
@@ -41,7 +44,10 @@
                   v-model="repositoryData.sshUrl"
                   :disabled="true"
                 />
-                <el-button icon="el-icon-copy-document" @click="fallbackCopyTextToClipboard(repositoryData.sshUrl)" />
+                <el-button
+                  icon="el-icon-copy-document"
+                  @click="copyToClipboard(repositoryData.sshUrl)"
+                />
               </div>
             </el-tab-pane>
           </el-tabs>
@@ -138,6 +144,7 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 import { config } from '@/utils/ADempiere/config'
 import RepositoryTags from './RepositoryTags'
 import { fetchReleasesList, fetchReadme } from '@/api/documentation/documentation'
+import { copyToClipboard } from '@/utils/ADempiere/coreUtils'
 
 export default defineComponent({
   name: 'Repository-Documentation',
@@ -166,33 +173,6 @@ export default defineComponent({
     const stopper = computed(() => {
       return releasesList.value.length - 1
     })
-
-    // fallback Copy Text To Clip board
-    const fallbackCopyTextToClipboard = (text) => {
-      const textArea = document.createElement('textarea')
-      textArea.value = text
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-      try {
-        if (document.execCommand('copy')) {
-          clipboardMessage(root.$t('notifications.copySuccessful'))
-        }
-      } catch (err) {
-        clipboardMessage(root.$t('notifications.copyUnsuccessful'))
-      }
-      document.body.removeChild(textArea)
-    }
-
-    // Notification Message when Copying TextNotification Message when Copying Text
-    const clipboardMessage = (message) => {
-      root.$message({
-        message,
-        type: 'success',
-        showClose: true,
-        duration: 1500
-      })
-    }
 
     // Repository
     fetchReadme({
@@ -263,7 +243,7 @@ export default defineComponent({
       // computed
       stopper,
       // methods
-      fallbackCopyTextToClipboard
+      copyToClipboard
     }
   }
 })

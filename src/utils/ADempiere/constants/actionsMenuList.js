@@ -66,12 +66,12 @@ export const sharedLink = {
     })
 
     root.$router.push({
-      name: root.$router.name,
+      name: root.$route.name,
       params: {
-        ...root.$router.params
+        ...root.$route.params
       },
       query: {
-        ...root.$router.query,
+        ...root.$route.query,
         filters: Array.from(values)
       }
     })
