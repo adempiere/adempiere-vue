@@ -68,7 +68,12 @@ const persistence = {
           return
         }
         const route = router.app._route
-        recordUuid = route.query.action === 'create-new' ? getters.getUuidOfContainer(field.containerUuid) : route
+        recordUuid = route.query.action === 'create-new' ? getters.getUuidOfContainer(field.containerUuid) : route.query.action
+        console.log('flushPersistenceQueue', {
+          containerUuid: field.containerUuid,
+          tableName: field.tabTableName,
+          recordUuid
+        })
         dispatch('flushPersistenceQueue', {
           containerUuid: field.containerUuid,
           tableName: field.tabTableName,
@@ -102,7 +107,10 @@ const persistence = {
             })
               .then(response => {
                 // TODO: Get list record log
-                response.type = 'createEntity'
+                showMessage({
+                  message: language.t('recordManager.updatedRecord'),
+                  type: 'success'
+                })
                 resolve(response)
               })
               .catch(error => reject(error))

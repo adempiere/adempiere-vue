@@ -16,7 +16,8 @@
 
 const recordManager = {
   deleteRecordSuccessful: 'Record deleted successfully',
-  deleteRecordError: 'Error deleting record'
+  deleteRecordError: 'Error deleting record',
+  updatedRecord: 'record Updated'
 }
 
 export default recordManager
