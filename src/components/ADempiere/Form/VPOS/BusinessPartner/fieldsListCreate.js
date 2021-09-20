@@ -66,5 +66,17 @@ export default [
       sequence: 2,
       size: 6
     }
+  },
+  {
+    elementColumnName: 'C_BP_Group_ID',
+    columnName: 'C_BP_Group_ID',
+    tableName,
+    isFromDictionary: true,
+    overwriteDefinition: {
+      tabindex: 2,
+      isCustomField: true,
+      sequence: 2,
+      size: 6
+    }
   }
 ]
