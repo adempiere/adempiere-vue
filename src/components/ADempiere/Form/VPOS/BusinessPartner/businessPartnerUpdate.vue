@@ -26,7 +26,6 @@
       size="small"
       class="create-bp"
     >
-      {{ validateCustomerTemplate }}
       <el-row :gutter="24">
         <el-col :span="24">
           <el-card class="box-card" shadow="never" style="height: 150px;">
