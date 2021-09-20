@@ -422,10 +422,12 @@ const actions = {
         value
       })
       // Run specific action
+      const recordUuid = router.app._route.query.action
       containerManager.actionPerformed({
         containerUuid: field.containerUuid,
         field,
-        value
+        value,
+        recordUuid
       })
         .then(response => {
           if (response) {

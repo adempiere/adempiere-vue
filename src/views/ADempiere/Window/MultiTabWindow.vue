@@ -85,6 +85,21 @@ export default defineComponent({
           field,
           value
         })
+          .then(response => {
+            if (response.type === 'createEntity') {
+              root.$router.push({
+                name: root.$route.name,
+                query: {
+                  ...root.$route.query,
+                  action: response.uuid
+                },
+                params: {
+                  ...root.$router.params,
+                  recordId: response.id
+                }
+              }, () => {})
+            }
+          })
       },
 
       seekRecord: ({ row, tableName, parentUuid, containerUuid }) => {
