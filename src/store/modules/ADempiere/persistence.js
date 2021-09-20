@@ -69,11 +69,6 @@ const persistence = {
         }
         const route = router.app._route
         recordUuid = route.query.action === 'create-new' ? getters.getUuidOfContainer(field.containerUuid) : route.query.action
-        console.log('flushPersistenceQueue', {
-          containerUuid: field.containerUuid,
-          tableName: field.tabTableName,
-          recordUuid
-        })
         dispatch('flushPersistenceQueue', {
           containerUuid: field.containerUuid,
           tableName: field.tabTableName,
