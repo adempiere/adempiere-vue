@@ -9,7 +9,7 @@
       "timeout": 10000
     },
     "images": {
-      "url": "https://proxy.cid.spin-suite.com/adempiere-api/img/"
+      "url": "https://api.erpya.com/adempiere-api/img/"
     }
   },
   "repository": {
