@@ -528,7 +528,8 @@ export default {
       salesRepresentative: 'Agente Comercial',
       businessPartner: 'Socio de Negocio',
       copyShippingAddress: 'Copiar dirección para el envío',
-      documentNo: 'Nro. Documento'
+      documentNo: 'Nro. Documento',
+      emptyList: 'Utilice los filtros para realizar la busqueda de las ordenes'
     },
     productInfo: {
       product: 'Producto',

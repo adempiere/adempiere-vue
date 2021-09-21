@@ -46,11 +46,11 @@
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover">
               <el-popover
+                v-model="showListOrdes"
                 placement="right"
                 width="900"
                 trigger="click"
                 @show="seeOrderList"
-                @hide="showFieldListOrder = !showFieldListOrder"
               >
                 <orders-list
                   :parent-metadata="metadata"
@@ -62,7 +62,7 @@
                 >
                   <el-button
                     type="text"
-                    @click="showFieldListOrder = !showFieldListOrder"
+                    @click="openListOrdes"
                   >
                     <svg-icon icon-class="list" />
                     <br>
@@ -476,6 +476,14 @@ export default {
         }
       }
       return this.currentPointOfSales.currentOrder
+    },
+    showListOrdes: {
+      get() {
+        return this.$store.getters.getShowList
+      },
+      set(value) {
+        this.$store.commit('showListOrders', value)
+      }
     }
   },
   watch: {
@@ -502,6 +510,9 @@ export default {
             break
         }
       }
+    },
+    openListOrdes() {
+      this.showFieldListOrder = true
     },
     closePin() {
       this.visible = false

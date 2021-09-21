@@ -152,5 +152,8 @@ export default {
   // get Payment type list
   getPaymentTypeList: (state) => {
     return state.tenderTypes
+  },
+  getShowList: (state) => {
+    return state.listOrder.isShowPopover
   }
 }

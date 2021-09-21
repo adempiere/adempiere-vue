@@ -552,7 +552,8 @@ export default {
       salesRepresentative: 'Sales Agent',
       businessPartner: 'Business Partner',
       copyShippingAddress: 'Copy shipping address',
-      documentNo: 'Document No.'
+      documentNo: 'Document No.',
+      emptyList: 'Use the filters to search for orders'
     },
     productInfo: {
       product: 'Product',
