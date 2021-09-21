@@ -37,6 +37,17 @@ export default {
       value = state.storedWindows[uuid][attributeNameControl]
     }
 
-    state.storedWindows[uuid][attributeName] = value
+    Vue.set(state.storedWindows[uuid], attributeName, value)
+    // state.storedWindows[uuid][attributeName] = value
+  },
+
+  /**
+   *
+   * @param {*} state
+   * @param {string} parentUuid
+   * @param {object} tab
+   */
+  setCurrentTab(state, { parentUuid, tab }) {
+    Vue.set(state.storedWindows[parentUuid], 'currentTab', tab)
   }
 }

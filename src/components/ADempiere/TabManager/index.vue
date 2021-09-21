@@ -166,8 +166,12 @@ export default defineComponent({
       return key > 0 && isCreateNew.value
     }
 
-    const setCurrentTab = () => {
-      // TODO: Add store current tab
+    function setCurrentTab() {
+      console.info(props.tabsList[currentTab.value])
+      root.$store.commit('setCurrentTab', {
+        parentUuid: props.parentUuid,
+        tab: props.tabsList[currentTab.value]
+      })
     }
 
     const containerManagerTab = computed(() => {
@@ -192,11 +196,14 @@ export default defineComponent({
      */
     const handleClick = (tabHTML) => {
       const { tabuuid, tabindex } = tabHTML.$attrs
+
+      setTabNumber(tabindex)
+
+      // set metadata tab
       if (tabUuid.value !== tabuuid) {
         tabUuid.value = tabuuid
         setCurrentTab()
       }
-      setTabNumber(tabindex)
     }
 
     const setTabNumber = (tabNumber = '0') => {
