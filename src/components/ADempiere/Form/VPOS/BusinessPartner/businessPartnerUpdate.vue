@@ -28,7 +28,7 @@
     >
       <el-row :gutter="24">
         <el-col :span="24">
-          <el-card class="box-card" shadow="never">
+          <el-card class="box-card" shadow="never" style="height: 150px;">
             <div slot="header" class="clearfix">
               <span>
                 {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
@@ -39,15 +39,22 @@
                 v-for="(field) in datos"
                 :ref="field.columnName"
                 :key="field.columnName"
-                :metadata-field="field"
+                :metadata-field="{
+                  ...field,
+                  isReadOnly: validateCustomerTemplate
+                }"
               />
             </div>
           </el-card>
         </el-col>
       </el-row>
       <el-row :gutter="24">
-        <billing-address />
-        <shipping-address />
+        <billing-address
+          :disabled="validateCustomerTemplate"
+        />
+        <shipping-address
+          :disabled="validateCustomerTemplate"
+        />
       </el-row>
       <el-row :gutter="24">
         <el-col :span="24">
@@ -134,8 +141,19 @@ export default {
     datos() {
       return this.fieldsList.filter(field => field.tabindex <= 4)
     },
+    recordsBusinessPartners() {
+      return this.$store.getters.getBusinessPartnersList
+    },
     currentBusinessPartner() {
-      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
+      const customer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      const searchCustomer = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'C_BPartner_ID' // this.parentMetadata.columnName
+      })
+      if (this.isEmptyValue(customer.businessPartner.value)) {
+        return this.recordsBusinessPartners.find(businessPartners => businessPartners.id === searchCustomer)
+      }
+      return customer.businessPartner
     },
     isTemplateOfCustomer() {
       const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
@@ -149,6 +167,13 @@ export default {
     },
     copyShippingAddress() {
       return this.$store.getters.getCopyShippingAddress
+    },
+    validateCustomerTemplate() {
+      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner
+      if (this.isEmptyValue(templateCustomer)) {
+        return false
+      }
+      return templateCustomer.value === this.currentBusinessPartner.value
     }
   },
   watch: {
@@ -296,66 +321,6 @@ export default {
           value: customer.last_name
         }]
       })
-    },
-    addressForm(values) {
-      const valuesToSend = {}
-      Object.keys(values).forEach(key => {
-        const value = values[key]
-        if (this.isEmptyValue(value)) {
-          return
-        }
-        switch (key) {
-          case 'Name':
-            valuesToSend['last_name'] = value
-            break
-          case 'Name2':
-            valuesToSend['first_name'] = value
-            break
-          case 'Description':
-            valuesToSend['description'] = value
-            break
-          case 'EMail':
-            valuesToSend['email'] = value
-            break
-          case 'Phone':
-            valuesToSend['phone'] = value
-            break
-          case 'ContactName':
-            valuesToSend['contact_name'] = value
-            break
-          case 'C_Country_ID_UUID':
-            valuesToSend['countryUuid'] = value
-            break
-          case 'C_Region_ID_UUID':
-            valuesToSend['regionUuid'] = value
-            break
-          case 'DisplayColumn_C_Region_ID':
-            valuesToSend['regionName'] = value
-            break
-          case 'C_City_ID_UUID':
-            valuesToSend['cityUuid'] = value
-            break
-          case 'DisplayColumn_C_City_ID':
-            valuesToSend['cityName'] = value
-            break
-          case 'Address1':
-            valuesToSend['address1'] = value
-            break
-          case 'Address2':
-            valuesToSend['address2'] = value
-            break
-          case 'Address3':
-            valuesToSend['address3'] = value
-            break
-          case 'Address4':
-            valuesToSend['address4'] = value
-            break
-          case 'Postal':
-            valuesToSend['postalCode'] = value
-            break
-        }
-      })
-      return valuesToSend
     },
     datesForm(values) {
       const valuesToSend = {}

@@ -27,7 +27,7 @@
     >
       <el-row :gutter="24">
         <el-col :span="24">
-          <el-card class="box-card" shadow="never">
+          <el-card class="box-card" shadow="never" style="height: 220px;">
             <div slot="header" class="clearfix">
               <span>
                 {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}

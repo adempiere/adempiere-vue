@@ -65,7 +65,7 @@
         </el-button>
       </el-popover>
       <el-popover
-        v-if="!isEmptyValue(currentOrder.businessPartner.uuid)"
+        v-if="!isEmptyValue(currentOrder)"
         v-model="showUpdate"
         placement="right"
         width="1200"
@@ -215,7 +215,14 @@ export default {
       }
     },
     currentOrder() {
-      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      const customer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      if (this.isEmptyValue(customer.businessPartner.value)) {
+        return this.$store.getters.getValueOfField({
+          containerUuid: this.parentMetadata.containerUuid,
+          columnName: 'C_BPartner_ID' // this.parentMetadata.columnName
+        })
+      }
+      return customer
     },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet

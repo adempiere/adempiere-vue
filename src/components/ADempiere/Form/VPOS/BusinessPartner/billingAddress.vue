@@ -27,7 +27,10 @@
             v-for="(field) in fieldsListLocationBillingAddress"
             :ref="field.columnName"
             :key="field.columnName"
-            :metadata-field="field"
+            :metadata-field="{
+              ...field,
+              isReadOnly: disabled
+            }"
           />
         </el-scrollbar>
       </div>
@@ -58,6 +61,10 @@ export default {
       }
     },
     showField: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     }
