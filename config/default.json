@@ -1,11 +1,11 @@
 {
   "server": {
-    "host": "20.12.0.102",
+    "host": "localhost",
     "port": 9527
   },
   "adempiere": {
     "api": {
-      "url": "https://proxy.cid.spin-suite.com/api/adempiere/",
+      "url": "https://api.erpya.com/api/adempiere/",
       "timeout": 10000
     },
     "images": {
