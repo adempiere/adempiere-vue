@@ -307,7 +307,7 @@ export default {
     remoteSearch(searchValue) {
       return new Promise(resolve => {
         const message = {
-          message: 'Sin resultados coincidentes con la busqueda',
+          message: this.$t('notifications.searchWithOutRecords'),
           type: 'info',
           showClose: true
         }

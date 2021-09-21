@@ -21,7 +21,7 @@
       <template slot="label">
         {{ $t('form.productInfo.codeProduct') }}
         <el-popover
-          v-model="visible"
+          v-model="showProductList"
           v-shortkey="keyShortcuts"
           placement="bottom-start"
           trigger="click"
@@ -145,6 +145,14 @@ export default {
         refreshList2: ['shift', 'f5'],
         closeProductList: ['esc']
       }
+    },
+    showProductList: {
+      get() {
+        return this.$store.getters.getShowProductList
+      },
+      set(value) {
+        this.$store.commit('setShowProductList', value)
+      }
     }
   },
   methods: {
@@ -194,7 +202,7 @@ export default {
 
                 if (this.isEmptyValue(recordsList)) {
                   this.$message({
-                    message: 'Sin resultados coincidentes con la busqueda',
+                    message: this.$t('notifications.searchWithOutRecords'),
                     type: 'info',
                     showClose: true
                   })
@@ -211,7 +219,7 @@ export default {
       callBack(results)
     },
     close() {
-      this.visible = false
+      this.$store.commit('setShowProductList', false)
     },
     handleSelect(elementSelected) {
       const valueProduct = this.isEmptyValue(elementSelected.product) ? elementSelected.value : elementSelected.product.value

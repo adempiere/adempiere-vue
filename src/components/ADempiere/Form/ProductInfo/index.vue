@@ -140,7 +140,7 @@ export default {
 
                 if (this.isEmptyValue(recordsList)) {
                   this.$message({
-                    message: 'Sin resultados coincidentes con la busqueda',
+                    message: this.$t('notifications.searchWithOutRecords'),
                     type: 'info',
                     showClose: true
                   })

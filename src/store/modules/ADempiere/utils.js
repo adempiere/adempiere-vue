@@ -38,7 +38,8 @@ const initStateUtils = {
   overdrawnInvoice: {
     visible: false
   },
-  isNewOrder: false
+  isNewOrder: false,
+  showProductList: false
 }
 
 export default {
@@ -131,6 +132,9 @@ export default {
     },
     setCopyShippingAddress(state, payload) {
       state.copyShippingAddress = payload
+    },
+    setShowProductList(state, payload) {
+      state.showProductList = payload
     }
   },
   actions: {
@@ -312,6 +316,9 @@ export default {
     },
     getFocusNewOrder: (state) => {
       return state.isNewOrder
+    },
+    getShowProductList: (state) => {
+      return state.showProductList
     }
   }
 }
