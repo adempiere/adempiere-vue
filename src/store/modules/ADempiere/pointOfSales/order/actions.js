@@ -217,7 +217,7 @@ export default {
     }
     let pageToken
     if (!isEmptyValue(token)) {
-      const page = pageNumber - 1
+      const page = pageNumber > 0 ? pageNumber - 1 : 0
       pageToken = token + '-' + page
     }
     let values = getters.getValuesView({

@@ -425,7 +425,7 @@ export default {
         fieldsList: fieldLogic,
         isValidate: true
       })
-      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate)) {
+      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate) && this.dayRate.currencyTo.id !== this.currentPointOfSales.currentPriceList.currency.id) {
         return true
       }
       if (this.defaulValuePaymentMethods.tender_type === 'X') {
