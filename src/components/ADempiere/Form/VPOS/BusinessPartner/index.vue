@@ -44,7 +44,7 @@
       <el-popover
         v-model="showFieldList"
         placement="top-start"
-        width="800"
+        width="900"
         trigger="click"
         :disabled="isDisabled"
         @hide="closeList"

@@ -406,7 +406,8 @@ export default {
     searchWithEnter: 'Press enter to search for the product by Product Code, Name or UPC.'
   },
   businessPartner: {
-    notFound: 'Business partner not found.'
+    notFound: 'Business partner not found.',
+    emptyBusinessPartner: 'Use the filters to search for a business partner by Code, Name, Email and Phone Number'
   },
   form: {
     pos: {

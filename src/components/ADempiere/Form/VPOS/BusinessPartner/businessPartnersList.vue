@@ -43,17 +43,19 @@
         </el-form>
       </el-collapse-item>
     </el-collapse>
-
     <el-table
       ref="businesPartnerTable"
+      v-loading="isLoadedList"
       :data="businessPartnersList"
       highlight-current-row
       border
       fit
       height="350"
-
       @current-change="handleCurrentChange"
     >
+      <p slot="empty" style="width: 100%;">
+        {{ $t('businessPartner.emptyBusinessPartner') }}
+      </p>
       <el-table-column
         :label="$t('form.productInfo.code')"
         prop="value"
@@ -78,6 +80,24 @@
       :current-page="1"
       :handle-change-page="handleChangePage"
     />
+    <el-row :gutter="24">
+      <el-col :span="24">
+        <samp style="float: right; padding-right: 10px;">
+          <el-button
+            type="danger"
+            class="custom-button-create-bp"
+            icon="el-icon-close"
+            @click="closeListCustomer"
+          />
+          <el-button
+            type="primary"
+            class="custom-button-create-bp"
+            icon="el-icon-check"
+            @click="changeCustomer"
+          />
+        </samp>
+      </el-col>
+    </el-row>
     <!-- -->
   </el-main>
 </template>
@@ -131,7 +151,9 @@ export default {
       isLoadedRecords: false,
       activeAccordion: 'query-criteria',
       fieldsList,
+      selectCustomer: {},
       metadataList: [],
+      isLoadedList: false,
       unsubscribe: () => {}
     }
   },
@@ -178,7 +200,16 @@ export default {
       this.$store.dispatch('changePopoverListBusinessPartner', false)
     },
     handleCurrentChange(row) {
-      this.setBusinessPartner(row)
+      this.selectCustomer = row
+    },
+    changeCustomer() {
+      if (!this.isEmptyValue(this.selectCustomer)) {
+        this.setBusinessPartner(this.selectCustomer)
+        this.closeListCustomer()
+      }
+    },
+    closeListCustomer() {
+      this.$store.dispatch('changePopoverListBusinessPartner', false)
     },
     handleChangePage(newPage) {
       this.$store.dispatch('setBPartnerPageNumber', newPage)
@@ -202,6 +233,7 @@ export default {
       if (isConvert && !this.isEmptyValue(values)) {
         values = this.convertValuesToSend(values)
       }
+      this.isLoadedList = true
       return this.$store.dispatch('listBPartnerFromServer', values)
         .then(response => {
           if (this.isEmptyValue(response)) {
@@ -214,6 +246,7 @@ export default {
           return response
         })
         .finally(() => {
+          this.isLoadedList = false
           this.isLoadedRecords = true
         })
     },
@@ -237,3 +270,10 @@ export default {
   }
 }
 </script>
+<style>
+.el-table__empty-text {
+  line-height: 60px;
+  width: 100%;
+  color: #909399;
+}
+</style>

@@ -382,7 +382,8 @@ export default {
     searchWithEnter: 'Pulse enter para realizar la busqueda del producto segun su Codigo, Nombre o UPC'
   },
   businessPartner: {
-    notFound: 'Socio de negocio no encontrado.'
+    notFound: 'Socio de negocio no encontrado.',
+    emptyBusinessPartner: 'Utilice los filtros para realizar la busqueda de socio de negocio según su Código, Nombre, Email y Teléfono'
   },
   form: {
     pos: {
