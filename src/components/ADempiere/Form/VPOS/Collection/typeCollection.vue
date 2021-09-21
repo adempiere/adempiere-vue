@@ -281,11 +281,11 @@ export default {
       return ''
     },
     iSOCode(value) {
-      const currencyPay = this.convertionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === value.currencyUuid)
+      const currencyPay = this.listCurrency.find(currency => currency.uuid === value.currencyUuid)
       if (!currencyPay) {
         return ''
       }
-      return currencyPay.currencyTo.iSOCode
+      return currencyPay.iso_code
     },
     amountConvertion(value) {
       const currencyPay = this.convertionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === value.currencyUuid)
