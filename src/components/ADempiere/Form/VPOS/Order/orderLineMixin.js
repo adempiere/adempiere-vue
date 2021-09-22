@@ -39,16 +39,16 @@ export default {
           size: 'auto'
         },
         quantityOrdered: {
-          columnName: 'QtyOrdered',
+          columnName: 'QtyEntered',
           label: this.$t('form.pos.tableProduct.quantity'),
           isNumeric: true,
-          size: '100px'
+          size: 'auto'
         },
         discount: {
           columnName: 'Discount',
           label: '% ' + this.$t('form.pos.order.discount'),
           isNumeric: true,
-          size: '110px'
+          size: 'auto'
         },
         discountTotal: {
           columnName: 'DiscountTotal',
@@ -60,20 +60,20 @@ export default {
           columnName: 'DisplayTaxAmount',
           label: this.$t('form.pos.tableProduct.displayTaxAmount'),
           isNumeric: true,
-          size: 'auto'
+          size: '110px'
         },
         grandTotal: {
           columnName: 'GrandTotal',
           label: 'Total',
           isNumeric: true,
           isVisible: true,
-          size: 'auto'
+          size: '110px'
         },
         convertedAmount: {
           columnName: 'ConvertedAmount',
           label: this.$t('form.pos.collect.convertedAmount'),
           isNumeric: true,
-          size: 'auto'
+          size: '110px'
         }
       },
       currentOrderLine: {
@@ -203,7 +203,6 @@ export default {
           this.$store.commit('pin', false)
           this.fillOrderLine(response)
           this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
-          this.$store.dispatch('currentLine', response)
         })
         .catch(error => {
           console.error(error.message)
@@ -267,7 +266,7 @@ export default {
       const currency = this.pointOfSalesCurrency.iSOCode
       if (columnName === 'CurrentPrice') {
         return this.formatPrice(row.priceList, currency)
-      } else if (columnName === 'QtyOrdered') {
+      } else if (columnName === 'QtyEntered') {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {
         return this.formatQuantity(row.discount) + '%'

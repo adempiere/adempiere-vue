@@ -92,6 +92,7 @@
               style="overflow: auto;"
               @current-change="handleCurrentLineChange"
               @shortkey.native="shortcutKeyMethod"
+              @cell-click="editCell"
             >
               <template v-for="(valueOrder, item, key) in orderLineDefinition">
                 <el-table-column
@@ -103,7 +104,40 @@
                   :align="valueOrder.isNumeric ? 'right' : 'left'"
                 >
                   <template slot-scope="scope">
-                    <span>
+                    <template v-if="isEditQtyOrdered && fileColumnNameEdit === 'CurrentPrice' && valueOrder.columnName === 'CurrentPrice' && !isEmptyValue(isEditLine.uuid) && isEditLine.uuid === scope.row.uuid">
+                      <el-input-number
+                        ref="editField"
+                        v-model="scope.row.priceList"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        :autofocus="true"
+                        controls-position="right"
+                        @change="changeEdit(scope.row.priceList, 'PriceEntered')"
+                        @shortkey.native="theActionEdit"
+                      />
+                    </template>
+                    <template v-else-if="isEditQtyOrdered && fileColumnNameEdit === 'QtyEntered' && valueOrder.columnName === 'QtyEntered' && !isEmptyValue(isEditLine.uuid) && isEditLine.uuid === scope.row.uuid">
+                      <el-input-number
+                        ref="editField"
+                        v-model="scope.row.quantityOrdered"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        :autofocus="true"
+                        controls-position="right"
+                        @change="changeEdit(scope.row.quantityOrdered, valueOrder.columnName)"
+                        @shortkey.native="theActionEdit"
+                      />
+                    </template>
+                    <template v-else-if="isEditQtyOrdered && fileColumnNameEdit === 'Discount' && valueOrder.columnName === 'Discount' && !isEmptyValue(isEditLine.uuid) && isEditLine.uuid === scope.row.uuid">
+                      <el-input-number
+                        ref="editField"
+                        v-model="scope.row.discount"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        :autofocus="true"
+                        controls-position="right"
+                        @change="changeEdit(scope.row.discount, valueOrder.columnName)"
+                        @shortkey.native="theActionEdit"
+                      />
+                    </template>
+                    <span v-else>
                       {{ displayValue(scope.row, valueOrder) }}
                     </span>
                   </template>
@@ -444,7 +478,11 @@ export default {
       attributePin: {},
       validatePin: true,
       visible: false,
-      showInfo: false
+      isEditQtyOrdered: false,
+      isEditLine: {},
+      fileColumnNameEdit: '',
+      showInfo: false,
+      epale: 0
     }
   },
   computed: {
@@ -686,6 +724,14 @@ export default {
     },
     orderDate(value) {
       this.$store.state['pointOfSales/point/index'].conversionsList = []
+    },
+    isEditLine(value) {
+      if (!this.isEmptyValue(value.uuid) && this.isEditQtyOrdered && !this.isEmptyValue(this.$refs.editField)) {
+        setTimeout(() => {
+          this.$refs.editField[0].focus()
+          this.$refs.editField[0].select()
+        }, 500)
+      }
     }
   },
   mounted() {
@@ -712,6 +758,62 @@ export default {
     formatDateToSend,
     formatPrice,
     formatQuantity,
+    editCell(row, column) {
+      switch (column.columnKey) {
+        case 'CurrentPrice':
+        case 'QtyEntered':
+        case 'Discount':
+          this.isEditQtyOrdered = true
+          this.fileColumnNameEdit = column.columnKey
+          this.isEditLine = row
+          setTimeout(() => {
+            this.$refs.editField[0].focus()
+            this.$refs.editField[0].select()
+          }, 100)
+          break
+      }
+    },
+    changeEdit(value, columnName) {
+      if (!this.allowsModifyQuantity && (columnName === 'QtyEntered')) {
+        const attributePin = {
+          containerUuid: 'line',
+          columnName,
+          value,
+          type: 'updateOrder',
+          label: this.$t('form.pos.pinMessage.qtyEntered')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+        return
+      } else if (!this.modifyPrice && (columnName === 'PriceEntered' || columnName === 'Discount')) {
+        const attributePin = {
+          containerUuid: 'line',
+          columnName,
+          value,
+          type: 'updateOrder',
+          label: columnName === 'PriceEntered' ? this.$t('form.pos.pinMessage.price') : this.$t('form.pos.pinMessage.discount')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+        return
+      }
+      const changeLine = { columnName, value }
+      this.updateOrderLine(changeLine)
+    },
+    theActionEdit(event) {
+      switch (event.srcKey) {
+        case 'enter':
+          this.$refs.editField[0].select()
+          break
+        case 'close':
+          this.exitEdit()
+          break
+      }
+    },
+    exitEdit() {
+      this.isEditLine = {}
+      this.isEditQtyOrdered = false
+    },
     keyActionClosePin(event) {
       this.visible = false
       this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })

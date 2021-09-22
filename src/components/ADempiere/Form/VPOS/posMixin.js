@@ -248,6 +248,7 @@ export default {
             message: 'Acción a realizar',
             showClose: true
           })
+          this.exitEdit()
         })
         .catch(error => {
           console.error(error.message)
@@ -363,6 +364,9 @@ export default {
       this.pin = ''
       this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
       this.setDocumentType(this.currentOrder.documentType)
+      if (!this.isEmptyValue(this.currentOrder.uuid)) {
+        this.$store.dispatch('reloadOrder', { orderUuid: this.currentOrder.uuid })
+      }
     },
     refundAllowed(posUuid, orderUuid, payments) {
       this.$store.dispatch('updateOrderPos', true)
