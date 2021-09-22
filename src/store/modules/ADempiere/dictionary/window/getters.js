@@ -44,5 +44,11 @@ export default {
       return tab.tableName
     }
     return undefined
+  },
+
+  getCurrentTab: (state, getters) => (windowUuid) => {
+    const window = getters.getStoredWindow(windowUuid)
+
+    return window.currentTab
   }
 }

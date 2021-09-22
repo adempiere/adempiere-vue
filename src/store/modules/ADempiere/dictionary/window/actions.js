@@ -40,5 +40,37 @@ export default {
           resolve(window)
         })
     })
+  },
+
+  changeTabAttribute({ commit, getters }, {
+    parentUuid,
+    containerUuid,
+    attributeName,
+    attributeNameControl,
+    attributeValue
+  }) {
+    const tab = getters.getStoredTab(parentUuid, containerUuid)
+
+    commit('changeTabAttribute', {
+      tab,
+      attributeName,
+      attributeValue,
+      attributeNameControl
+    })
+
+    // set value into current tab
+    const currentTab = getters.getCurrentTab(parentUuid)
+    if (currentTab.uuid === containerUuid) {
+      // commit('changeTabAttribute', {
+      //   tab: currentTab,
+      //   attributeName,
+      //   attributeValue
+      // })
+      commit('changeWindowAttribute', {
+        uuid: parentUuid,
+        attributeName: 'currentTab',
+        attributeValue: tab
+      })
+    }
   }
 }

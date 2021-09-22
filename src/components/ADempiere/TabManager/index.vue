@@ -20,6 +20,8 @@
   <div style="height: 100% !important;">
     <auxiliary-panel
       v-if="isShowRecords"
+      :parent-uuid="parentUuid"
+      :container-uuid="tabUuid"
       :label="tabsList[currentTab].name"
     >
       <record-navigation
@@ -152,8 +154,14 @@ export default defineComponent({
       }
     })
 
+    // use getter to reactive properties
+    const currentTabMetadata = computed(() => {
+      // return props.tabsList[currentTab.value]
+      return root.$store.getters.getCurrentTab(props.parentUuid)
+    })
+
     const isShowRecords = computed(() => {
-      return root.$store.getters.getExternalContainer
+      return currentTabMetadata.value.isShowedTableRecords
     })
 
     const isShowMultiRecords = ref(true)
@@ -279,8 +287,12 @@ export default defineComponent({
 
     const openContainer = () => {
       if (props.isParentTabs) {
-        // TODO: Add tab manager store
-        root.$store.commit('setExternalContainer', true)
+        root.$store.dispatch('changeTabAttribute', {
+          parentUuid: props.parentUuid,
+          containerUuid: tabUuid.value,
+          attributeName: 'isShowedTableRecords',
+          attributeValue: true
+        })
         return
       }
       isShowMultiRecords.value = !isShowMultiRecords.value

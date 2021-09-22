@@ -41,6 +41,15 @@ export default {
     // state.storedWindows[uuid][attributeName] = value
   },
 
+  changeTabAttribute(state, payload) {
+    let value = payload.attributeValue
+    if (!isEmptyValue(payload.attributeNameControl)) {
+      value = payload.tab[payload.attributeNameControl]
+    }
+
+    payload.tab[payload.attributeName] = value
+  },
+
   /**
    *
    * @param {*} state

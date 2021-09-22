@@ -80,6 +80,7 @@ export function generatePanelAndFields({
     fieldsList,
     // app attributes
     isLoadedFieldsList: true,
+    isShowedTableRecords: false,
     isShowedTotals: false
   }
 
