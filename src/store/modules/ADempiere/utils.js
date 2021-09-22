@@ -32,9 +32,6 @@ const initStateUtils = {
   updatePayment: false,
   createBusinessPartner: false,
 
-  // TODO: Change to tab
-  showContainer: false,
-
   step: 0,
   updateCustomer: false,
   overdrawnInvoice: {
@@ -118,9 +115,7 @@ export default {
     popoverCreateBusinessPartner(state, createBusinessPartner) {
       state.createBusinessPartner = createBusinessPartner
     },
-    setExternalContainer(state, show) {
-      state.showContainer = show
-    },
+
     popoverOverdrawnInvoice(state, payload) {
       state.overdrawnInvoice = payload
     },
@@ -280,11 +275,6 @@ export default {
     },
     getPopoverCreateBusinessParnet: (state) => {
       return state.createBusinessPartner
-    },
-
-    // TODO: Change to tab
-    getExternalContainer: (state) => {
-      return state.showContainer
     },
 
     getStepCurrent: (state) => {
