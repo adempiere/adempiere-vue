@@ -208,15 +208,14 @@ export default {
                   })
                 }
 
-                callBack(recordsList)
+                callBack(this.orderedByProduct(recordsList))
               })
           }, 1500)
           return
         }
       }
-
       // call callback function to return suggestions
-      callBack(results)
+      callBack(this.orderedByProduct(results))
     },
     close() {
       this.$store.commit('setShowProductList', false)
@@ -230,6 +229,18 @@ export default {
         value: valueProduct
       })
       this.$refs.product.focus()
+    },
+    orderedByProduct(productList) {
+      return productList.sort((element, item) => {
+        if (element.product.name > item.product.name) {
+          return 1
+        }
+        if (element.product.name < item.product.name) {
+          return -1
+        }
+        // a must be equal to b
+        return 0
+      })
     }
   }
 }
