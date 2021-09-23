@@ -32,6 +32,7 @@ export default {
   fieldCurrency: {},
   convertionRate: [],
   refundLoaded: [],
+  deliveryList: [],
   listRefund: [],
   addRefund: {},
   currentFieldCurrencyRedund: {},

@@ -57,5 +57,8 @@ export default {
   },
   getAddRefund: (state) => {
     return state.addRefund
+  },
+  getDeliveryList: (state) => {
+    return state.deliveryList
   }
 }

@@ -173,6 +173,29 @@
               </p>
             </el-card>
           </el-col>
+          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover">
+              <el-popover
+                placement="right"
+                trigger="click"
+                width="800"
+              >
+                <confirm-delivery
+                  :is-selectable="false"
+                  popover-name="isShowPopoverMenu"
+                />
+                <div
+                  slot="reference"
+                  :style="blockOption"
+                  @click="isShowProductsPriceList = !isShowProductsPriceList"
+                >
+                  <svg-icon icon-class="shopping" />
+                  <br>
+                  Confirmar Entrega
+                </div>
+              </el-popover>
+            </el-card>
+          </el-col>
         </el-row>
       </el-collapse-item>
 
@@ -342,6 +365,7 @@
 <script>
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
 import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
+import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
 import {
   generateImmediateInvoice,
   withdrawal,
@@ -361,7 +385,8 @@ export default {
   components: {
     ListProductPrice,
     OrdersList,
-    ModalDialog
+    ModalDialog,
+    ConfirmDelivery
   },
   mixins: [
     orderLineMixin

@@ -76,5 +76,8 @@ export default {
   },
   setCurrencyRedund(state, currency) {
     state.currentFieldCurrencyRedund = currency
+  },
+  setDeliveryList(state, delivery) {
+    state.deliveryList = delivery
   }
 }
