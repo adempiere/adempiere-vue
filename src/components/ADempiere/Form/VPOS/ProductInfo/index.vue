@@ -46,7 +46,7 @@
         v-shortkey="keyShortcuts"
         :placeholder="$t('quickAccess.searchWithEnter')"
         clearable
-        style="width: 100%;"
+        style="width: 100%; height: 600px;"
         popper-class="custom-field-prodcut-info"
         :trigger-on-focus="false"
         :fetch-suggestions="localSearch"
@@ -63,18 +63,18 @@
         </template>
 
         <template slot-scope="props">
-          <div class="header">
+          <div class="header" style="margin: 0px">
             <b> {{ props.item.product.value }} - {{ props.item.product.name }} </b>
           </div>
-          <div>
-            <div style="float: left;width: 70%;">
-              <p style="overflow: hidden;text-overflow: ellipsis;text-align: inherit;">
+          <div style="margin: 0px">
+            <div style="float: left;width: 70%;margin: 0px">
+              <p style="overflow: hidden;text-overflow: ellipsis;text-align: inherit;margin: 0px">
                 {{ props.item.product.upc }} <br>
                 {{ props.item.product.description }}
               </p>
             </div>
-            <div style="width: 30%;float: right;">
-              <p style="overflow: hidden;text-overflow: ellipsis;text-align: end;">
+            <div style="width: 30%;float: right;margin: 0px">
+              <p style="overflow: hidden;text-overflow: ellipsis;text-align: end;margin: 0px">
                 {{ formatPrice(props.item.priceStandard, props.item.currency.iSOCode) }}
                 <br>
                 {{ formatQuantity(props.item.quantityAvailable) }}
@@ -210,7 +210,7 @@ export default {
 
                 callBack(recordsList)
               })
-          }, 2000)
+          }, 1500)
           return
         }
       }
@@ -242,10 +242,27 @@ export default {
     width: 800px;
     left: 15%;
   }
+  .el-autocomplete-suggestion {
+    position: absolute;
+    top: 179px;
+    left: 105px;
+    transform-origin: center top;
+    z-index: 2033;
+    width: 849px;
+    height: 400px;
+  }
+  .el-scrollbar__wrap {
+    overflow: scroll;
+    height: 100%;
+    max-height: 400px;
+  }
   .custom-field-prodcut-info {
     li {
       line-height: normal;
-      padding: 15px;
+      padding-bottom: 15px;
+      padding-top: 5px;
+      padding-right: 15px;
+      padding-left: 15px;
 
       .header {
         text-overflow: ellipsis;
