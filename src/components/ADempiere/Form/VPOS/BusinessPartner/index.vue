@@ -20,21 +20,19 @@
     <template slot="label">
       {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}
       <el-popover
-        v-model="showCreate"
+        v-model="popoverCreateBusinessParnet"
         placement="bottom-start"
         width="1200"
         trigger="click"
-        @hide="popoverClose"
       >
         <business-partner-create
           :parent-metadata="parentMetadata"
-          :show-field="showCreate"
+          :show-field="popoverCreateBusinessParnet"
         />
         <el-button
           slot="reference"
           type="text"
           :disabled="isDisabled"
-          @click="popoverOpen"
         >
           <i
             class="el-icon-circle-plus"
@@ -42,22 +40,20 @@
         </el-button>
       </el-popover>
       <el-popover
-        v-model="showFieldList"
-        placement="top-start"
+        v-model="popoverListBusinessParnet"
+        placement="start"
         width="900"
         trigger="click"
         :disabled="isDisabled"
-        @hide="closeList"
       >
         <business-partners-list
           :parent-metadata="parentMetadata"
           :shows-popovers="showsPopovers"
-          :show-field="showFieldList"
+          :show-field="popoverListBusinessParnet"
         />
         <el-button
           slot="reference"
           type="text"
-          @click="popoverList"
         >
           <i
             class="el-icon-search"
@@ -224,11 +220,23 @@ export default {
       }
       return customer
     },
-    popoverCreateBusinessParnet() {
-      return this.$store.getters.getPopoverCreateBusinessParnet
+    popoverCreateBusinessParnet: {
+      get() {
+        return this.$store.getters.getPopoverCreateBusinessParnet
+      },
+      set(value) {
+        this.$store.commit('popoverCreateBusinessPartner', value)
+        return value
+      }
     },
-    popoverListBusinessParnet() {
-      return this.$store.getters.getPopoverListBusinessParnet
+    popoverListBusinessParnet: {
+      get() {
+        return this.$store.getters.getPopoverListBusinessParnet
+      },
+      set(value) {
+        this.$store.dispatch('changePopoverListBusinessPartner', value)
+        return value
+      }
     },
     showUpdateCustomer() {
       return this.$store.getters.getShowUpdateCustomer
@@ -249,9 +257,6 @@ export default {
   watch: {
     popoverCreateBusinessParnet(value) {
       this.showCreate = value
-    },
-    popoverListBusinessParnet(value) {
-      this.showFieldList = value
     },
     showUpdateCustomer(value) {
       this.visible = value
@@ -462,9 +467,10 @@ export default {
       this.$store.dispatch('changePopover', true)
     },
     popoverList(value) {
-      if (!this.showFieldList) {
-        this.$store.dispatch('changePopoverListBusinessPartner', true)
-      }
+      // if (!this.showFieldList) {
+      console.log(value)
+      this.$store.commit('popoverListBusinessPartner', true)
+      // }
     },
     closeList() {
       if (this.showFieldList) {
