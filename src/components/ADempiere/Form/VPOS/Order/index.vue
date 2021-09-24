@@ -93,6 +93,7 @@
               @current-change="handleCurrentLineChange"
               @shortkey.native="shortcutKeyMethod"
               @cell-click="editCell"
+              @click.native.prevent="focusProducto()"
             >
               <template v-for="(valueOrder, item, key) in orderLineDefinition">
                 <el-table-column
@@ -481,8 +482,7 @@ export default {
       isEditQtyOrdered: false,
       isEditLine: {},
       fileColumnNameEdit: '',
-      showInfo: false,
-      epale: 0
+      showInfo: false
     }
   },
   computed: {
@@ -758,6 +758,9 @@ export default {
     formatDateToSend,
     formatPrice,
     formatQuantity,
+    focusProducto(value) {
+      this.$refs.ProductValue[0].$refs.product.focus()
+    },
     editCell(row, column) {
       switch (column.columnKey) {
         case 'CurrentPrice':
