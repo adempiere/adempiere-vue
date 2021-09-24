@@ -978,3 +978,11 @@ export function createCustomerBankAccount({
       return responseCreateCustomerBankAccount
     })
 }
+
+export function createShipment({
+  posUuid,
+  orderUuid,
+  listProduct
+}) {
+  console.info(`Create Shipment pos uuid ${posUuid}, order uuid ${orderUuid} and list prouct ${listProduct}`)
+}

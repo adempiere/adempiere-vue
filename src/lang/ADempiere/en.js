@@ -427,7 +427,8 @@ export default {
           cancelOrder: 'Cancel Order',
           orderRemoved: 'Order Deleted',
           copyOrder: 'Copy Order',
-          createNewReturnOrder: 'Create a new return order'
+          createNewReturnOrder: 'Create a new return order',
+          confirmDelivery: 'Confirmar Entrega'
         },
         cashManagement: {
           title: 'Cash Management',

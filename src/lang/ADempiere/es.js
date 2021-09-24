@@ -403,7 +403,8 @@ export default {
           cancelOrder: 'Cancelar Orden',
           orderRemoved: 'Orden Borrada',
           copyOrder: 'Copiar Orden',
-          createNewReturnOrder: 'Crear una nueva orden de devolución'
+          createNewReturnOrder: 'Crear una nueva orden de devolución',
+          confirmDelivery: 'Confirmar Entrega'
         },
         cashManagement: {
           title: 'Gestión de Caja',

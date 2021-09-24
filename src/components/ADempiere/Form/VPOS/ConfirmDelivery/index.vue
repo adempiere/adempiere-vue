@@ -42,7 +42,6 @@
       fit
       height="450"
       highlight-current-row
-      @row-click="selectProduct"
       @shortkey.native="keyAction"
     >
       <el-table-column
@@ -60,28 +59,56 @@
       />
     </el-table>
     <el-dialog
-      title="Confirmar Entrega"
+      :title="$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')"
       :visible.sync="dialogVisible"
       width="30%"
       :modal="false"
     >
       <span>
         <p class="total">
+          {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}:
+          <b class="order-info">
+            {{ currentOrder.businessPartner.name }}
+          </b>
+        </p>
+        <p class="total">
+          {{ $t('form.pos.order.order') }}:
+          <b class="order-info">
+            {{ currentOrder.documentNo }}
+          </b>
+        </p>
+        <p class="total">
           {{ $t('form.pos.order.itemQuantity') }}:
-          <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
+          <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
             {{ getItemQuantity }}
           </b>
         </p>
         <p class="total">
           {{ $t('form.pos.order.numberLines') }}:
-          <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
+          <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
             {{ numberOfLines }}
           </b>
         </p>
       </span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <samp style="float: right; padding-right: 10px;">
+              <el-button
+                type="danger"
+                class="custom-button-create-bp"
+                icon="el-icon-close"
+                @click="closeDialog"
+              />
+              <el-button
+                type="primary"
+                class="custom-button-create-bp"
+                icon="el-icon-check"
+                @click="makeDelivery"
+              />
+            </samp>
+          </el-col>
+        </el-row>
       </span>
     </el-dialog>
     <el-row :gutter="24">
@@ -108,7 +135,7 @@
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
-import { findProduct } from '@/api/ADempiere/form/point-of-sales.js'
+import { findProduct, createShipment } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'ConfirmDelivery',
@@ -149,7 +176,7 @@ export default {
   },
   computed: {
     getItemQuantity() {
-      if (this.isEmptyValue(this.currentOrder)) {
+      if (this.isEmptyValue(this.productdeliveryList)) {
         return 0
       }
       const result = this.productdeliveryList.map(order => {
@@ -164,7 +191,7 @@ export default {
       return 0
     },
     numberOfLines() {
-      if (this.isEmptyValue(this.currentOrder)) {
+      if (this.isEmptyValue(this.productdeliveryList)) {
         return 0
       }
       return this.productdeliveryList.length
@@ -239,11 +266,8 @@ export default {
     loadProductsPricesList() {
       this.$store.dispatch('listProductPriceFromServer', {})
     },
-    selectProduct(row) {
-      this.currentProduct = row
-    },
     close() {
-      this.$store.commit('setShowProductList', false)
+      this.$store.commit('setConfirmDelivery', false)
     },
     addProductFromList() {
       if (!this.isSelectable) {
@@ -281,7 +305,7 @@ export default {
         .then(response => {
           const product = {
             ...response.product,
-            quantity: response.quantityAvailable
+            quantity: 1
           }
           this.$store.dispatch('addDeliveryList', product)
         })
@@ -314,6 +338,26 @@ export default {
           showClose: true
         })
       }
+    },
+    makeDelivery() {
+      const posUuid = this.currentPointOfSales.uuid
+      const orderUuid = this.currentOrder.uuid
+      const listProduct = this.productdeliveryList.map(product => {
+        return {
+          orderLineUuid: product.uuid,
+          quantity: product.quantity
+        }
+      })
+      createShipment({
+        posUuid,
+        orderUuid,
+        listProduct
+      })
+      this.dialogVisible = false
+      this.$store.commit('setConfirmDelivery', false)
+    },
+    closeDialog() {
+      this.dialogVisible = false
     }
   }
 }
