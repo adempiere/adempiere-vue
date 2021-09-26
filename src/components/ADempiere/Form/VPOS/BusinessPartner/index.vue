@@ -41,10 +41,9 @@
       </el-popover>
       <el-popover
         v-model="popoverListBusinessParnet"
-        placement="start"
+        placement="bottom-start"
         width="900"
         trigger="click"
-        :disabled="isDisabled"
       >
         <business-partners-list
           :parent-metadata="parentMetadata"
@@ -467,15 +466,7 @@ export default {
       this.$store.dispatch('changePopover', true)
     },
     popoverList(value) {
-      // if (!this.showFieldList) {
-      console.log(value)
       this.$store.commit('popoverListBusinessPartner', true)
-      // }
-    },
-    closeList() {
-      if (this.showFieldList) {
-        this.$store.dispatch('changePopoverListBusinessPartner', false)
-      }
     },
     popoverClose(value) {
       this.$store.commit('setShowedLocation', false)

@@ -260,7 +260,6 @@ export default {
     transform-origin: center top;
     z-index: 2033;
     width: 849px;
-    height: 400px;
   }
   .el-scrollbar__wrap {
     overflow: scroll;
