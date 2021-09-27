@@ -123,6 +123,12 @@ export default {
       loading: true,
       index: 0,
       currentCustomer: {},
+      shipping: {
+        uuid: ''
+      },
+      billing: {
+        uuid: ''
+      },
       region: {
         id: '',
         uuid: '',
@@ -170,7 +176,7 @@ export default {
     },
     validateCustomerTemplate() {
       const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner
-      if (this.isEmptyValue(templateCustomer)) {
+      if (this.isEmptyValue(templateCustomer) || this.isEmptyValue(this.currentBusinessPartner)) {
         return false
       }
       return templateCustomer.value === this.currentBusinessPartner.value
@@ -206,6 +212,8 @@ export default {
         containerUuid: 'Business-Partner-Update',
         format: 'object'
       })
+      this.shippingAddress.uuid = this.isEmptyValue(this.shipping) ? '' : this.shipping.uuid
+      this.billingAddress.uuid = this.isEmptyValue(this.billing) ? '' : this.billing.uuid
       values.addresses = [this.billingAddress, this.shippingAddress]
       values.uuid = this.currentBusinessPartner.uuid
       values.posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
@@ -220,10 +228,10 @@ export default {
         searchValue: this.currentBusinessPartner.value
       })
         .then(response => {
-          const billing = response.addresses.find(address => address.is_default_billing)
-          const shipping = response.addresses.find(address => address.is_default_shipping)
-          this.loadAddresses(shipping, 'Shipping-Address')
-          this.loadAddresses(billing, 'Billing-Address')
+          this.billing = response.addresses.find(address => address.is_default_billing)
+          this.shipping = response.addresses.find(address => address.is_default_shipping)
+          this.loadAddresses(this.shipping, 'Shipping-Address')
+          this.loadAddresses(this.billing, 'Billing-Address')
           this.loadDataCustomer(response, this.containerUuid)
           this.currentCustomer = response
           this.loading = false
@@ -264,31 +272,31 @@ export default {
           value: address.email
         }, {
           columnName: 'ContactName',
-          value: address.contact_name
+          value: this.empty(address.contact_name)
         }, {
           columnName: 'C_Country_ID_UUID',
           value: undefined
         }, {
           columnName: 'Postal',
-          value: address.postal_code
+          value: this.empty(address.postal_code)
         }, {
           columnName: 'C_Region_ID',
-          value: address.region.id
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.id) : ''
         }, {
           columnName: 'C_Region_ID_UUID',
-          value: address.region.uuid
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.uuid) : ''
         }, {
           columnName: 'DisplayColumn_C_Region_ID',
-          value: address.region.name
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.name) : ''
         }, {
           columnName: 'C_City_ID',
-          value: address.city.id
+          value: this.empty(address.city.id)
         }, {
           columnName: 'C_City_ID_UUID',
-          value: address.city.uuid
+          value: this.empty(address.city.uuid)
         }, {
           columnName: 'DisplayColumn_C_City_ID',
-          value: address.city.name
+          value: this.empty(address.city.name)
         }, {
           columnName: 'Address1',
           value: address.address_1
@@ -303,6 +311,12 @@ export default {
           value: address.address_4
         }]
       })
+    },
+    empty(value) {
+      if (this.isEmptyValue(value)) {
+        return ''
+      }
+      return value
     },
     loadDataCustomer(customer, containerUuid) {
       this.$store.commit('updateValuesOfContainer', {
