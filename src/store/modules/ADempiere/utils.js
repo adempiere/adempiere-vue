@@ -39,7 +39,8 @@ const initStateUtils = {
     visible: false
   },
   isNewOrder: false,
-  showProductList: false
+  showProductList: false,
+  confirmDelivery: false
 }
 
 export default {
@@ -135,6 +136,9 @@ export default {
     },
     setShowProductList(state, payload) {
       state.showProductList = payload
+    },
+    setConfirmDelivery(state, payload) {
+      state.confirmDelivery = payload
     }
   },
   actions: {
@@ -319,6 +323,9 @@ export default {
     },
     getShowProductList: (state) => {
       return state.showProductList
+    },
+    getConfirmDelivery: (state) => {
+      return state.confirmDelivery
     }
   }
 }

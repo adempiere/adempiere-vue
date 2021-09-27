@@ -708,12 +708,16 @@ export default {
       }
       if (!this.isEmptyValue(rate.currencyTo.iSOCode) && rate.currencyTo.iSOCode === this.currentPointOfSales.priceList.currency.iSOCode) {
         const convert = this.convertionsList.find(convert => {
-          if (!this.isEmptyValue(convert.currencyTo) && this.currentPointOfSales.displayCurrency.iso_code === convert.currencyTo.iSOCode) {
+          if (!this.isEmptyValue(convert.currencyTo) && !this.isEmptyValue(this.currentPointOfSales.displayCurrency) && this.currentPointOfSales.displayCurrency.iso_code === convert.currencyTo.iSOCode) {
             return convert
           }
         })
         const convertAmount = !this.isEmptyValue(convert) ? (convert.divideRate > convert.multiplyRate ? convert.divideRate : convert.multiplyRate) : ''
-        return this.formatPrice(1, this.currentPointOfSales.displayCurrency.iso_code) + ' ~ ' + this.formatPrice(convertAmount, this.currentPointOfSales.priceList.currency.iSOCode)
+        const displayCurrency = this.isEmptyValue(this.currentPointOfSales.displayCurrency) ? '' : this.currentPointOfSales.displayCurrency.iso_code
+        if (this.isEmptyValue(convertAmount)) {
+          return this.formatPrice(1, displayCurrency)
+        }
+        return this.formatPrice(1, displayCurrency) + ' ~ ' + this.formatPrice(convertAmount, this.currentPointOfSales.priceList.currency.iSOCode)
       }
       return this.formatPrice(1, rate.currencyTo.iSOCode) + ' ~ ' + this.formatPrice(amount, this.currentPointOfSales.priceList.currency.iSOCode)
     },

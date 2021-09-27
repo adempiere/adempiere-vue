@@ -403,7 +403,8 @@ export default {
           cancelOrder: 'Cancelar Orden',
           orderRemoved: 'Orden Borrada',
           copyOrder: 'Copiar Orden',
-          createNewReturnOrder: 'Crear una nueva orden de devolución'
+          createNewReturnOrder: 'Crear una nueva orden de devolución',
+          confirmDelivery: 'Confirmar Entrega'
         },
         cashManagement: {
           title: 'Gestión de Caja',
@@ -493,6 +494,7 @@ export default {
           customerLimit: 'Limite Orden',
           available: 'Disponible',
           emptyPayment: 'Método de pago no soportado',
+          emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
           fieldList: {
             code: 'Cedula',

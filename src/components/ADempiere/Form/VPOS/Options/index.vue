@@ -31,7 +31,7 @@
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.salesOrder.title')" name="salesOrder">
         <el-row :gutter="12" style="padding-right: 10px;">
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
                 @click="!allowsCreateOrder ? validateOption($t('form.pos.pinMessage.newOrder')) : newOrder()"
@@ -44,7 +44,7 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-popover
                 v-model="showListOrdes"
                 placement="right"
@@ -74,7 +74,7 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.generateImmediateInvoice')) : generateImmediateInvoice"
@@ -87,7 +87,7 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.completePreparedOrder')) : completePreparedOrder"
@@ -100,7 +100,7 @@
           </el-col>
 
           <el-col v-if="allowsReturnOrder" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction')) : reverseSalesTransaction"
@@ -113,7 +113,7 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createPos')) : withdrawal"
@@ -126,7 +126,7 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="printTicket"
@@ -138,7 +138,7 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder')) : createNewCustomerReturnOrder"
@@ -150,7 +150,7 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.copyOrder')) : copyOrder "
@@ -162,7 +162,7 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelOrder')) : deleteOrder"
@@ -173,13 +173,38 @@
               </p>
             </el-card>
           </el-col>
+          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <el-popover
+                v-model="popoverConfirmDelivery"
+                placement="right"
+                trigger="click"
+                width="800"
+                :disabled="isEmptyValue(currentOrder.uuid)"
+              >
+                <confirm-delivery
+                  :is-selectable="false"
+                  popover-name="isShowPopoverMenu"
+                />
+                <div
+                  slot="reference"
+                  :style="blockOption"
+                  :disabled="true"
+                >
+                  <svg-icon icon-class="shopping" />
+                  <br>
+                  {{ $t('form.pos.optionsPoinSales.salesOrder.confirmDelivery') }}
+                </div>
+              </el-popover>
+            </el-card>
+          </el-col>
         </el-row>
       </el-collapse-item>
 
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.cashManagement.title')" name="cashManagement">
         <el-row :gutter="12" style="padding-right: 10px;">
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
               >
@@ -190,7 +215,7 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
               >
@@ -201,7 +226,7 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="cashClosing"
@@ -218,7 +243,7 @@
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.generalOptions.title')" name="generalOptions">
         <el-row :gutter="24" style="padding-right: 10px;">
           <el-col :span="size">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="adviserPin ? validateOption($t('form.pos.optionsPoinSales.generalOptions.changePos')) : changePos">
                 <p
                   style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
@@ -241,7 +266,7 @@
           </el-col>
           <!-- Product List Price -->
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-popover
                 placement="right"
                 trigger="click"
@@ -265,7 +290,7 @@
           </el-col>
           <!-- List Warehouse -->
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
                 <p
                   style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
@@ -288,7 +313,7 @@
           </el-col>
           <!-- List Price -->
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
                 <p
                   style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
@@ -342,6 +367,7 @@
 <script>
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
 import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
+import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
 import {
   generateImmediateInvoice,
   withdrawal,
@@ -361,7 +387,8 @@ export default {
   components: {
     ListProductPrice,
     OrdersList,
-    ModalDialog
+    ModalDialog,
+    ConfirmDelivery
   },
   mixins: [
     orderLineMixin
@@ -381,6 +408,7 @@ export default {
       validatePin: true,
       visible: false,
       showFieldListOrder: false,
+      showConfirmDelivery: false,
       posProcess
     }
   },
@@ -484,9 +512,22 @@ export default {
       set(value) {
         this.$store.commit('showListOrders', value)
       }
+    },
+    popoverConfirmDelivery: {
+      get() {
+        return this.$store.getters.getConfirmDelivery
+      },
+      set(value) {
+        if (!this.isEmptyValue(this.currentOrder.uuid)) {
+          this.$store.commit('setConfirmDelivery', value)
+        }
+      }
     }
   },
   watch: {
+    // popoverConfirmDelivery(value) {
+    //   this.showConfirmDelivery = value
+    // },
     visible(value) {
       if (value && !this.isEmptyValue(this.$refs)) {
         setTimeout(() => {
@@ -897,6 +938,12 @@ export default {
         this.$store.commit('setShowPOSCollection', false)
         this.$store.dispatch('listOrderLine', [])
       })
+    },
+    openConfirmDelivery() {
+      console.log(this.isEmptyValue(this.currentOrder.uuid))
+      // if (!this.isEmptyValue(this.currentOrder.uuid)) {
+      //   this.showConfirmDelivery = true
+      // }
     }
   }
 }

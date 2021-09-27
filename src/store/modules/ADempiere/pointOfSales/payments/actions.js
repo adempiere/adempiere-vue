@@ -489,6 +489,30 @@ export default {
           showClose: true
         })
       })
+  },
+  addDeliveryList({ commit, state, getters }, product) {
+    const deliveryList = state.deliveryList
+    const addProduct = deliveryList.find(delivery => {
+      if (delivery.uuid === product.uuid) {
+        return delivery
+      }
+      return undefined
+    })
+    if (isEmptyValue(addProduct)) {
+      deliveryList.push(product)
+      commit('setDeliveryList', deliveryList)
+    } else {
+      deliveryList.map(delivery => {
+        if (delivery.uuid === product.uuid) {
+          return {
+            ...delivery,
+            quantity: delivery.quantity++
+          }
+        }
+        return delivery
+      })
+      commit('setDeliveryList', deliveryList)
+    }
   }
 
 }
