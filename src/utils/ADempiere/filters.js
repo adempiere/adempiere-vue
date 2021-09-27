@@ -92,7 +92,33 @@ class Filters {
       ...filter,
       operator
     })
+
     return this
+  }
+
+  /**
+   * Convert URI to filters
+   * @param {array} filters
+   * @returns {object} data
+   */
+  convertFilters(filters) {
+    if (!filters) {
+      return
+    }
+
+    const delimiter = ','
+    const data = {}
+    filters.forEach(str => {
+      // TODO: Limit to first delimiter
+      // const items = filter.split(delimiter)
+      const index = str.indexOf(delimiter)
+      const columnName = str.substr(0, index)
+      const value = str.substr(index + 1)
+
+      data[columnName] = value
+    })
+
+    return data
   }
 
   /**

@@ -1,4 +1,3 @@
-import Vue from 'vue'
 
 const initStateUtils = {
   width: 0,
@@ -15,16 +14,6 @@ const initStateUtils = {
   selectionProcess: [],
   isContainerInfo: false,
   documentAction: [],
-  openRoute: {
-    path: '',
-    name: '',
-    route: {},
-    params: {},
-    definedParameters: {},
-    query: {},
-    isReaded: false,
-    isLoaded: false
-  },
   splitWidthRight: 3,
   splitWidthLeft: 3,
   parametersProcessPos: [],
@@ -81,16 +70,7 @@ export default {
     setReportTypeToShareLink(state, payload) {
       state.reportType = payload
     },
-    setOpenRoute(state, payload) {
-      state.openRoute = {
-        ...state.openRoute,
-        ...payload
-      }
-    },
-    setReadRoute(state, payload) {
-      Vue.set(state.openRoute, 'definedParameters', payload.parameters)
-      Vue.set(state.openRoute, 'isLoaded', true)
-    },
+
     resetStateUtils(state) {
       state = initStateUtils
     },
@@ -154,14 +134,7 @@ export default {
     setProcessSelect({ commit }, params) {
       commit('setProcessSelecetion', params)
     },
-    setOpenRoute({ commit }, routeParameters) {
-      commit('setOpenRoute', {
-        ...routeParameters
-      })
-    },
-    setReadRoute({ commit }, parameters) {
-      commit('setReadRoute', parameters)
-    },
+
     setTempShareLink({ commit }, parameters) {
       if (!parameters.href.includes(String(parameters.processId))) {
         commit('setTempShareLink', parameters.href)
@@ -249,12 +222,7 @@ export default {
     getReportType: (state) => {
       return state.reportType
     },
-    getIsLoadedOpenRoute: (state) => {
-      return state.openRoute.isLoaded
-    },
-    getIsReadedOpenRoute: (state) => {
-      return state.openRoute.isReaded
-    },
+
     getOrders: (state) => {
       return state.documentAction
     },

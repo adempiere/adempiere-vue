@@ -251,6 +251,7 @@ export default defineComponent({
     // light blue style of the first section of the menu button
     // >.el-button::first-child {
     >.el-button:not(:last-child) {
+      min-width: 105px;
       font-weight: bold;
       // margin-right: -1px;
       color: #0080ff;
