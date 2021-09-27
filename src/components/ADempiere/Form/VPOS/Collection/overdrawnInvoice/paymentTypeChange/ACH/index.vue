@@ -113,6 +113,9 @@ export default {
     },
     currencyReference() {
       const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
+      if (this.isEmptyValue(reference)) {
+        return ''
+      }
       const currency = this.listCurrency.find(currency => {
         if (currency.id === reference) {
           return currency
@@ -177,7 +180,7 @@ export default {
       return this.$store.state['pointOfSales/point/index'].conversionsList
     },
     dayRate() {
-      const currency = this.listCurrency.find(currency => currency.iso_code === this.currencyReference.iso_code)
+      const currency = this.listCurrency.find(currency => !this.isEmptyValue(this.currencyReference) && currency.iso_code === this.currencyReference.iso_code)
       const convert = this.convertionsList.find(convert => {
         if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
           return convert

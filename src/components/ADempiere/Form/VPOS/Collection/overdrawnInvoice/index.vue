@@ -50,7 +50,14 @@
             </template>
           </div>
           <div class="text item">
-            <el-row :gutter="24">
+            <span v-if="isEmptyValue(paymentTypeListRefund)">
+              <el-empty :image-size="200">
+                <template slot="description">
+                  <p style="text-align: center;font-size: 20px;"> {{ $t('form.pos.collect.overdrawnInvoice.emptyListPayment') }} </p>
+                </template>
+              </el-empty>
+            </span>
+            <el-row v-else :gutter="24">
               <el-col v-for="(payment, index) in paymentTypeListRefund" :key="index" :span="6">
                 <div @click="selectPayment(payment)">
                   <el-card
@@ -139,7 +146,14 @@
             </template>
           </div>
           <div class="text item">
-            <el-row :gutter="24">
+            <span v-if="isEmptyValue(paymentTypeList)">
+              <el-empty :image-size="200">
+                <template slot="description">
+                  <p style="text-align: center;font-size: 20px;"> {{ $t('form.pos.collect.overdrawnInvoice.emptyListPayment') }} </p>
+                </template>
+              </el-empty>
+            </span>
+            <el-row v-else :gutter="24">
               <el-col v-for="(payment, index) in paymentTypeList" :key="index" :span="6">
                 <div @click="selectPayment(payment)">
                   <el-card
@@ -354,7 +368,7 @@ export default {
       if (!this.isEmptyValue(this.selectionTypeRefund) && !this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
         return this.selectionTypeRefund.refund_reference_currency.iso_code
       }
-      if (this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency.iso_code)) {
+      if (this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency)) {
         return ''
       }
       return this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency.iso_code
@@ -363,8 +377,8 @@ export default {
       if (!this.isEmptyValue(this.selectionTypeRefund) && !this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
         return this.selectionTypeRefund.refund_reference_currency
       }
-      if (this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency.iso_code)) {
-        return ''
+      if (this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency)) {
+        return {}
       }
       return this.$store.getters.posAttributes.currentPointOfSales.refundReferenceCurrency
     },

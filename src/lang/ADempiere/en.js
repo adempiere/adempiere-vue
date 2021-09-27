@@ -517,6 +517,7 @@ export default {
           customerLimit: 'Order Limit',
           available: 'Available',
           emptyPayment: 'Unsupported payment method',
+          emptyListPayment: 'You do not have any payment method associated with this option',
           addPayment: 'You must add a change type to complete the operation',
           fieldList: {
             code: 'Cedula',

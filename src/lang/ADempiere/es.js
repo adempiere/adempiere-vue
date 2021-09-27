@@ -493,6 +493,7 @@ export default {
           customerLimit: 'Limite Orden',
           available: 'Disponible',
           emptyPayment: 'Método de pago no soportado',
+          emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
           fieldList: {
             code: 'Cedula',
