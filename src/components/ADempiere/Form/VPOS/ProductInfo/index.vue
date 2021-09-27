@@ -42,7 +42,7 @@
 
       <el-autocomplete
         ref="product"
-        v-model="value"
+        v-model="sendProduct"
         v-shortkey="keyShortcuts"
         :placeholder="$t('quickAccess.searchWithEnter')"
         clearable
@@ -51,7 +51,7 @@
         :trigger-on-focus="false"
         :fetch-suggestions="localSearch"
         :select-when-unmatched="true"
-        :highlight-first-item="true"
+        :highlight-first-item="false"
         @shortkey.native="shortcutKeyMethod"
         @select="handleSelect"
       >
@@ -115,6 +115,7 @@ export default {
   data() {
     return {
       visible: false,
+      sendProduct: '',
       timeOut: null
     }
   },
@@ -153,6 +154,24 @@ export default {
       set(value) {
         this.$store.commit('setShowProductList', value)
       }
+    },
+    getProductValue() {
+      return this.$store.getters.getValueOfField({
+        containerUuid: 'POS',
+        columnName: 'ProductValue'
+      })
+    }
+  },
+  watch: {
+    getProductValue(value) {
+      this.sendProduct = value
+    },
+    sendProduct(value) {
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'POS',
+        columnName: 'ProductValue',
+        value
+      })
     }
   },
   methods: {
@@ -228,6 +247,7 @@ export default {
         // TODO: Verify with 'value' or 'searchValue' attribute
         value: valueProduct
       })
+      this.sendProduct = ''
       this.$refs.product.focus()
     },
     orderedByProduct(productList) {
