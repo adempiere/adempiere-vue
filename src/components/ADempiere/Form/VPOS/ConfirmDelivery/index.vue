@@ -57,6 +57,14 @@
         :label="$t('form.pos.tableProduct.quantity')"
         align="right"
       />
+      <el-table-column
+        :label="$t('form.pos.tableProduct.options')"
+        width="180"
+      >
+        <template slot-scope="scope">
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteOrderLine(scope.row)" />
+        </template>
+      </el-table-column>
     </el-table>
     <el-dialog
       :title="$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')"
@@ -294,6 +302,10 @@ export default {
         this.isSearchProduct = true
         this.findProductToShipping(value)
       }, 500)
+    },
+    deleteOrderLine(line) {
+      const index = this.productdeliveryList.findIndex(product => product.uuid === line.uuid)
+      this.productdeliveryList.splice(index, 1)
     },
     findProductToShipping(searchValue) {
       findProduct({
