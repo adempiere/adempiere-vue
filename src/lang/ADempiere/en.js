@@ -454,7 +454,7 @@ export default {
         pin: 'Insert Pin',
         remove: 'Remove',
         displayTaxAmount: 'Tax',
-        displayTaxIMP: '%IMP',
+        displayTaxIMP: '%Imp',
         displayDiscountAmount: 'Discount',
         empty: 'Enter the product name, code or UPC'
       },
@@ -464,7 +464,7 @@ export default {
         date: 'Date',
         subTotal: 'Sub-Total',
         type: 'Type',
-        discount: '%Dto',
+        discount: '%Dcto',
         tax: 'Tax',
         total: 'Total',
         itemQuantity: 'Item Quantity',
