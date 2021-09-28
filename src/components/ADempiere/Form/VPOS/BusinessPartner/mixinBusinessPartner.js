@@ -110,6 +110,9 @@ export default {
           case 'C_Country_ID_UUID':
             valuesToSend['countryUuid'] = value
             break
+          case 'DisplayColumn_C_Country_ID':
+            valuesToSend['countryName'] = value
+            break
           case 'C_Region_ID_UUID':
             valuesToSend['regionUuid'] = value
             break

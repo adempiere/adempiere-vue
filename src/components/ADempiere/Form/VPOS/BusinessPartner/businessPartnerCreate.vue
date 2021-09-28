@@ -198,6 +198,11 @@ export default {
         containerUuid: this.containerUuid,
         format: 'object'
       }))
+      const billingAddress = this.billingAddress
+      if (this.isEmptyValue(billingAddress.last_name)) {
+        billingAddress.last_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
+        billingAddress.first_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
+      }
       values.addresses = [this.billingAddress, this.shippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: this.containerUuid,
