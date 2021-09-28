@@ -241,7 +241,7 @@
           </el-dialog>
           <el-footer :class="classOrderFooter">
             <div class="keypad">
-              <span id="toolPoint">
+              <el-row :gutter="24">
                 <el-button type="primary" icon="el-icon-top" :disabled="isDisabled" @click="arrowTop" />
                 <el-button type="primary" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
                 <el-button v-show="isValidForDeleteLine(listOrderLine)" type="danger" icon="el-icon-delete" :disabled="isDisabled" @click="deleteOrderLine(currentOrderLine)" />
@@ -254,7 +254,7 @@
                 >
                   {{ labelButtonCollections }}
                 </el-button>
-              </span>
+              </el-row>
               <p id="point" style="margin-bottom: 5%;margin-top: 3%;">
                 <el-dropdown
                   v-if="!isEmptyValue(currentPointOfSales)"
@@ -488,6 +488,9 @@ export default {
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'
+    },
+    isShowedPOSKeyLaout() {
+      return this.$store.getters.getShowPOSKeyLayout
     },
     classOrderFooter() {
       if (this.isMobile) {
@@ -969,6 +972,7 @@ export default {
     padding-right: 9px;
     padding-bottom: 0px;
     padding-left: 9px;
+    overflow: auto;
     height: auto !important;
   }
   .keypad {

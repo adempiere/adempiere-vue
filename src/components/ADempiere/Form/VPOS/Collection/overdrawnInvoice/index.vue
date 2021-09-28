@@ -220,6 +220,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button
+          v-if="caseOrder === 1"
           type="info"
           class="custom-button-create-bp"
           icon="el-icon-back"
@@ -569,15 +570,17 @@ export default {
       const orderUuid = this.currentOrder.uuid
       const payments = this.currentOrder.listPayments.payments
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: this.renderComponentContainer, formatReturn: 'name' })
-      if (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.defaultReferenceCurrency.uuid)) {
+      if (this.caseOrder === 1 && (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.defaultReferenceCurrency.uuid))) {
         this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
-        this.$message({
-          type: 'warning',
-          message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
-          duration: 1500,
-          showClose: true
-        })
-        return
+        if (this.option !== 4) {
+          this.$message({
+            type: 'warning',
+            message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
+            duration: 1500,
+            showClose: true
+          })
+          return
+        }
       }
       Object.keys(values).forEach(element => {
         this.$store.commit('updateValueOfField', {
@@ -592,6 +595,10 @@ export default {
         return
       }
       this.$store.dispatch('addRefundLoaded', values)
+      if (this.caseOrder === 2) {
+        this.success()
+        return
+      }
       this.$store.dispatch('addCreateCustomerAccount', {
         posUuid,
         customer,
@@ -643,6 +650,10 @@ export default {
     },
     optionSelected({ posUuid, orderUuid, customerDetails, payments }) {
       switch (this.option) {
+        case 1:
+          this.completePreparedOrder(posUuid, orderUuid, payments)
+          this.$store.commit('dialogoInvoce', { show: false, success: true })
+          break
         case 2:
           this.completePreparedOrder(posUuid, orderUuid, payments)
           this.$store.commit('dialogoInvoce', { show: false, success: true })
