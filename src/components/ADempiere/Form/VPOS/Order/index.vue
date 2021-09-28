@@ -146,7 +146,7 @@
               </template>
               <el-table-column
                 :label="$t('form.pos.tableProduct.options')"
-                width="180"
+                width="164"
               >
                 <template slot-scope="scope">
                   <el-popover

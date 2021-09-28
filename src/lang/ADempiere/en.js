@@ -453,8 +453,8 @@ export default {
         editQuantities: 'Edit Quantities',
         pin: 'Insert Pin',
         remove: 'Remove',
-        displayTaxAmount: 'Tax Amount',
-        displayDiscountAmount: 'Amount of Discount',
+        displayTaxAmount: 'Tax',
+        displayDiscountAmount: 'Discount',
         empty: 'Enter the product name, code or UPC'
       },
       order: {
@@ -463,7 +463,7 @@ export default {
         date: 'Date',
         subTotal: 'Sub-Total',
         type: 'Type',
-        discount: 'Descuento',
+        discount: '%Dto',
         tax: 'Tax',
         total: 'Total',
         itemQuantity: 'Item Quantity',
@@ -487,7 +487,7 @@ export default {
         change: 'Change',
         totalInvoiced: 'Total Invoiced',
         convertAmount: 'Convert Quantity',
-        convertedAmount: 'Converted Amount',
+        convertedAmount: 'Converted',
         fullPayment: 'Full Payment',
         dayRate: 'Day Rate',
         noDayRate: 'No daily rate has been generated for the currency.',

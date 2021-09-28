@@ -429,8 +429,8 @@ export default {
         editQuantities: 'Editar Cantidades',
         pin: 'Ingrese Pin',
         remove: 'Eliminar',
-        displayTaxAmount: 'Monto del Impuesto',
-        displayDiscuentAmount: 'Monto del Descuento',
+        displayTaxAmount: 'Impuesto',
+        displayDiscuentAmount: 'Descuento',
         empty: 'Ingrese el nombre del producto, código o UPC'
       },
       order: {
@@ -439,7 +439,7 @@ export default {
         date: 'Fecha',
         subTotal: 'Sub-Total',
         type: 'Tipo',
-        discount: 'Descuento',
+        discount: '%Dto',
         tax: 'Impuesto',
         total: 'Total',
         itemQuantity: 'Cantidad de Artículos',
@@ -463,7 +463,7 @@ export default {
         change: 'Cambio',
         totalInvoiced: 'Total Facturado',
         convertAmount: 'Convertir Cantidad',
-        convertedAmount: 'Monto Convertido',
+        convertedAmount: 'Convertido',
         fullPayment: 'Cobro Completo',
         Currency: 'Moneda',
         dayRate: 'Tasa del Día',
