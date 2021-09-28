@@ -41,10 +41,9 @@
       </el-popover>
       <el-popover
         v-model="popoverListBusinessParnet"
-        placement="start"
+        placement="bottom-start"
         width="900"
         trigger="click"
-        :disabled="isDisabled"
       >
         <business-partners-list
           :parent-metadata="parentMetadata"
@@ -54,6 +53,7 @@
         <el-button
           slot="reference"
           type="text"
+          :disabled="isDisabled"
         >
           <i
             class="el-icon-search"
@@ -255,6 +255,29 @@ export default {
     }
   },
   watch: {
+    popoverListBusinessParnet(value) {
+      if (!value) {
+        this.$store.commit('updateValuesOfContainer', {
+          containerUuid: 'Business-Partner-List',
+          attributes: [{
+            columnName: 'Code',
+            value: undefined
+          }, {
+            columnName: 'Value',
+            value: undefined
+          }, {
+            columnName: 'Name',
+            value: undefined
+          }, {
+            columnName: 'EMail',
+            value: undefined
+          }, {
+            columnName: 'Phone',
+            value: undefined
+          }]
+        })
+      }
+    },
     popoverCreateBusinessParnet(value) {
       this.showCreate = value
     },
@@ -465,17 +488,6 @@ export default {
     },
     popoverOpen(value) {
       this.$store.dispatch('changePopover', true)
-    },
-    popoverList(value) {
-      // if (!this.showFieldList) {
-      console.log(value)
-      this.$store.commit('popoverListBusinessPartner', true)
-      // }
-    },
-    closeList() {
-      if (this.showFieldList) {
-        this.$store.dispatch('changePopoverListBusinessPartner', false)
-      }
     },
     popoverClose(value) {
       this.$store.commit('setShowedLocation', false)
