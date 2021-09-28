@@ -60,7 +60,13 @@ export default {
           columnName: 'DisplayTaxAmount',
           label: this.$t('form.pos.tableProduct.displayTaxAmount'),
           isNumeric: true,
-          size: '110px'
+          size: '155px'
+        },
+        discounDisplayTaxIndicator: {
+          columnName: 'taxIndicator',
+          label: this.$t('form.pos.tableProduct.displayTaxIMP'),
+          isNumeric: true,
+          size: '60px'
         },
         grandTotal: {
           columnName: 'GrandTotal',
@@ -261,6 +267,8 @@ export default {
         return !this.isEmptyValue(this.currentPointOfSales.displayCurrency)
       } else if (row.columnName === 'DiscountTotal') {
         return this.currentPointOfSales.isDisplayDiscount
+      } else if (row.columnName === 'taxIndicator') {
+        return this.currentPointOfSales.isDisplayDiscount
       } else if (row.columnName === 'DisplayTaxAmount') {
         return this.currentPointOfSales.isDisplayTaxAmount
       }
@@ -284,6 +292,8 @@ export default {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {
         return this.formatQuantity(row.discount) + '%'
+      } else if (columnName === 'taxIndicator') {
+        return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
         return this.formatPrice(row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {

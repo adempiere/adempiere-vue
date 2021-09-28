@@ -454,6 +454,7 @@ export default {
         pin: 'Insert Pin',
         remove: 'Remove',
         displayTaxAmount: 'Tax',
+        displayTaxIMP: '%IMP',
         displayDiscountAmount: 'Discount',
         empty: 'Enter the product name, code or UPC'
       },

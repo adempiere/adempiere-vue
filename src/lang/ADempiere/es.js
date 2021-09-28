@@ -430,6 +430,7 @@ export default {
         pin: 'Ingrese Pin',
         remove: 'Eliminar',
         displayTaxAmount: 'Impuesto',
+        displayTaxIMP: '%IMP',
         displayDiscuentAmount: 'Descuento',
         empty: 'Ingrese el nombre del producto, código o UPC'
       },
