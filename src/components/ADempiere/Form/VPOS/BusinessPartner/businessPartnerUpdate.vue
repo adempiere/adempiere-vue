@@ -156,8 +156,12 @@ export default {
         containerUuid: this.$route.meta.uuid,
         columnName: 'C_BPartner_ID' // this.parentMetadata.columnName
       })
-      if (this.isEmptyValue(customer.businessPartner.value)) {
-        return this.recordsBusinessPartners.find(businessPartners => businessPartners.id === searchCustomer)
+      if (this.isEmptyValue(customer.businessPartner)) {
+        const templateBusinessPartners = this.recordsBusinessPartners.find(businessPartners => businessPartners.id === searchCustomer)
+        if (this.isEmptyValue(templateBusinessPartners)) {
+          return ''
+        }
+        return templateBusinessPartners
       }
       return customer.businessPartner
     },

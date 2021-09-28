@@ -146,7 +146,7 @@
               </template>
               <el-table-column
                 :label="$t('form.pos.tableProduct.options')"
-                width="164"
+                width="165"
               >
                 <template slot-scope="scope">
                   <el-popover
@@ -686,8 +686,14 @@ export default {
       return []
     },
     listDocumentTypes() {
-      if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.documentTypesList)) {
-        return this.$store.getters.posAttributes.currentPointOfSales.documentTypesList
+      const listDocumentTypes = this.$store.getters.posAttributes.currentPointOfSales.documentTypesList
+      const templatePosDocumentTypes = this.$store.getters.posAttributes.currentPointOfSales.documentType
+      if (!this.isEmptyValue(listDocumentTypes)) {
+        const addDocumentType = listDocumentTypes.find(documentType => documentType.uuid === templatePosDocumentTypes.uuid)
+        if (this.isEmptyValue(addDocumentType)) {
+          listDocumentTypes.push(this.$store.getters.posAttributes.currentPointOfSales.documentType)
+        }
+        return listDocumentTypes
       }
       return []
     },

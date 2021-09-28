@@ -121,6 +121,12 @@ export default {
     },
     isShowKeyLayout() {
       return this.$store.getters.getShowPOSKeyLayout
+    },
+    isDisplayTaxAmount() {
+      return this.currentPointOfSales.isDisplayTaxAmount
+    },
+    isDisplayDiscount() {
+      return this.currentPointOfSales.isDisplayDiscount
     }
   },
   watch: {
@@ -132,6 +138,31 @@ export default {
         this.orderLineDefinition.lineDescription.size = '300px'
         this.orderLineDefinition.currentPrice.size = '165px'
       }
+    },
+    isDisplayTaxAmount(value) {
+      if (!value) {
+        this.orderLineDefinition.lineDescription.size = 'auto'
+        this.orderLineDefinition.convertedAmount.size = '350px'
+        this.orderLineDefinition.grandTotal.size = '350px'
+      } else {
+        this.orderLineDefinition.lineDescription.size = '345px'
+      }
+    },
+    isDisplayDiscount(value) {
+      if (!value) {
+        this.orderLineDefinition.lineDescription.size = 'auto'
+        this.orderLineDefinition.convertedAmount.size = '350px'
+        this.orderLineDefinition.grandTotal.size = '350px'
+      } else {
+        this.orderLineDefinition.lineDescription.size = '345px'
+      }
+    }
+  },
+  created() {
+    if (!this.isDisplayTaxAmount || !this.isDisplayDiscount) {
+      this.orderLineDefinition.lineDescription.size = 'auto'
+      this.orderLineDefinition.grandTotal.size = '350px'
+      this.orderLineDefinition.convertedAmount.size = '350px'
     }
   },
   methods: {
