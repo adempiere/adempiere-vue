@@ -47,11 +47,11 @@ export default {
       }))
       billingAddress.is_default_billing = true
       billingAddress.is_default_shipping = this.copyShippingAddress
-      const city = this.$store.getters.getValueOfField({
+      const region = this.$store.getters.getValueOfField({
         containerUuid: 'Billing-Address',
-        columnName: 'C_City_ID_UUID'
+        columnName: 'C_Region_ID_UUID'
       })
-      if (this.isEmptyValue(city)) {
+      if (this.isEmptyValue(region)) {
         return []
       }
       return billingAddress
