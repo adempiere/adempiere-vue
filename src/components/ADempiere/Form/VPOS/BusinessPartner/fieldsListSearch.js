@@ -17,11 +17,21 @@
 // List of fields to send in search
 export default [
   {
+    columnName: 'Code',
+    tableName: 'C_BPartner',
+    overwriteDefinition: {
+      name: 'Search Value',
+      sequence: 0,
+      isCustomField: true
+    }
+  },
+  {
     elementColumnName: 'Value',
     columnName: 'Value',
     tableName: 'C_BPartner',
     isFromDictionary: true,
-    definition: {
+    overwriteDefinition: {
+      sequence: 1,
       isCustomField: true
     }
   },
@@ -30,7 +40,8 @@ export default [
     columnName: 'Name',
     tableName: 'C_BPartner',
     isFromDictionary: true,
-    definition: {
+    overwriteDefinition: {
+      sequence: 2,
       isCustomField: true
     }
   },
@@ -39,7 +50,8 @@ export default [
     columnName: 'EMail',
     tableName: 'AD_user',
     isFromDictionary: true,
-    definition: {
+    overwriteDefinition: {
+      sequence: 3,
       isCustomField: true
     }
   },
@@ -47,7 +59,8 @@ export default [
     elementColumnName: 'Phone',
     columnName: 'Phone',
     isFromDictionary: true,
-    definition: {
+    overwriteDefinition: {
+      sequence: 3,
       isCustomField: true
     }
   }
