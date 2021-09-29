@@ -938,12 +938,6 @@ export default {
         this.$store.commit('setShowPOSCollection', false)
         this.$store.dispatch('listOrderLine', [])
       })
-    },
-    openConfirmDelivery() {
-      console.log(this.isEmptyValue(this.currentOrder.uuid))
-      // if (!this.isEmptyValue(this.currentOrder.uuid)) {
-      //   this.showConfirmDelivery = true
-      // }
     }
   }
 }

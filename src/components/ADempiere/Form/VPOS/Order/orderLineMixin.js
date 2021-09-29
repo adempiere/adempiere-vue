@@ -56,17 +56,17 @@ export default {
           isNumeric: true,
           size: '110px'
         },
-        discounDisplayTaxAmounttTotal: {
-          columnName: 'DisplayTaxAmount',
-          label: this.$t('form.pos.tableProduct.displayTaxAmount'),
-          isNumeric: true,
-          size: '155px'
-        },
         discounDisplayTaxIndicator: {
           columnName: 'taxIndicator',
           label: this.$t('form.pos.tableProduct.displayTaxIMP'),
           isNumeric: true,
           size: '60px'
+        },
+        discounDisplayTaxAmounttTotal: {
+          columnName: 'DisplayTaxAmount',
+          label: this.$t('form.pos.tableProduct.displayTaxAmount'),
+          isNumeric: true,
+          size: '155px'
         },
         grandTotal: {
           columnName: 'GrandTotal',
