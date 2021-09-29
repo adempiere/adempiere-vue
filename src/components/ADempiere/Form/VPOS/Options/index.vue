@@ -62,7 +62,7 @@
                 >
                   <el-button
                     type="text"
-                    @click="openListOrdes"
+                    @click="openListOrdes()"
                   >
                     <svg-icon icon-class="list" />
                     <br>
@@ -77,7 +77,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.generateImmediateInvoice')) : generateImmediateInvoice"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.generateImmediateInvoice')) : generateImmediateInvoice()"
               >
                 <i class="el-icon-document-add" />
                 <br>
@@ -90,7 +90,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.completePreparedOrder')) : completePreparedOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.completePreparedOrder')) : completePreparedOrder()"
               >
                 <i class="el-icon-success" />
                 <br>
@@ -103,7 +103,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction')) : reverseSalesTransaction"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction')) : reverseSalesTransaction()"
               >
                 <i class="el-icon-error" />
                 <br>
@@ -116,7 +116,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createPos')) : withdrawal"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createPos')) : withdrawal()"
               >
                 <i class="el-icon-document-remove" />
                 <br>
@@ -129,7 +129,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="printTicket"
+                @click="printTicket()"
               >
                 <i class="el-icon-printer" />
                 <br>
@@ -141,7 +141,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder')) : createNewCustomerReturnOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder')) : createNewCustomerReturnOrder()"
               >
                 <i class="el-icon-refresh-left" />
                 <br>
@@ -153,7 +153,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.copyOrder')) : copyOrder "
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.copyOrder')) : copyOrder()"
               >
                 <i class="el-icon-document-copy" />
                 <br>
@@ -165,7 +165,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelOrder')) : deleteOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelOrder')) : deleteOrder()"
               >
                 <i class="el-icon-close" />
                 <br>
@@ -595,6 +595,7 @@ export default {
         })
     },
     validateOption(name) {
+      console.log(name)
       this.visible = true
       this.attributePin = {
         type: 'updateOrder',
@@ -646,11 +647,13 @@ export default {
     },
     generateImmediateInvoice() {
       // TODO: Add BPartner
-      const { uuid: posUuid, id: posId } = this.getCurrentPOS
+      const { uuid: posUuid, id: posId } = this.currentPointOfSales
       generateImmediateInvoice({
         posId,
         posUuid
       })
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
     },
     completePreparedOrder() {
       if (this.isEmptyValue(this.currentOrder.uuid)) {
@@ -693,6 +696,8 @@ export default {
           })
           this.$store.dispatch('updateOrderPos', false)
           this.$store.dispatch('updatePaymentPos', false)
+          // close panel lef
+          this.$store.commit('setShowPOSOptions', false)
         })
     },
     reverseSalesTransaction() {
@@ -724,19 +729,25 @@ export default {
         }
       ]
       this.$store.dispatch('addParametersProcessPos', parametersList)
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
     },
     withdrawal() {
-      const { uuid: posUuid, id: posId } = this.getCurrentPOS
+      const { uuid: posUuid, id: posId } = this.currentPointOfSales
       // TODO: Add BParner, C_BankAccount_ID (caja), CashTransferBankAccount_ID, PAY_C_BankAccount_ID
       withdrawal({
         posId,
         posUuid
       })
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
     },
     createNewCustomerReturnOrder() {
       createNewReturnOrder({
         orderUuid: this.currentOrder.uuid
       })
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
     },
     showModal(action) {
       this.$store.dispatch('setShowDialog', {
@@ -748,6 +759,7 @@ export default {
       })
     },
     copyOrder() {
+      console.log(this.currentOrder)
       if (this.isEmptyValue(this.currentOrder.uuid)) {
         return ''
       }
@@ -792,6 +804,8 @@ export default {
         .finally(() => {
           const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
           this.showModal(process)
+          // close panel lef
+          this.$store.commit('setShowPOSOptions', false)
         })
     },
     copyLineOrder() {
@@ -799,7 +813,7 @@ export default {
       this.showModal(process)
     },
     cashClosing() {
-      const { uuid: posUuid, id: posId } = this.getCurrentPOS
+      const { uuid: posUuid, id: posId } = this.currentPointOfSales
       cashClosing({
         posId,
         posUuid
@@ -826,6 +840,8 @@ export default {
             showClose: true
           })
           this.$store.dispatch('updateOrderPos', false)
+          // close panel lef
+          this.$store.commit('setShowPOSOptions', false)
         })
     },
     seeOrderList() {

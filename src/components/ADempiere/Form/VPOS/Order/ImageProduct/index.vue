@@ -18,6 +18,7 @@
     <el-skeleton :loading="loading" animated>
       <template slot="template">
         <el-skeleton-item
+          style="width: 140px; height: 140px;"
           variant="image"
         />
       </template>
@@ -28,7 +29,7 @@
               <el-image
                 :src="getImageFromSource(listImage[item - 1])"
                 class="image"
-                style="width: auto; height: 140px;"
+                style="width: 140px; height: 140px;"
               >
                 <div slot="error" class="image-slot">
                   <el-skeleton :loading="true" animated>

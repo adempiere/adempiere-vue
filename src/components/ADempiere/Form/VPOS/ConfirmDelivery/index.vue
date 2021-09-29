@@ -56,12 +56,49 @@
         prop="quantity"
         :label="$t('form.pos.tableProduct.quantity')"
         align="right"
+        width="90"
       />
       <el-table-column
         :label="$t('form.pos.tableProduct.options')"
-        width="180"
+        column-key="value"
+        width="160"
       >
         <template slot-scope="scope">
+          <el-popover
+            ref="open"
+            v-model="value"
+            placement="right-start"
+            width="600"
+            trigger="click"
+            :visible-arrow="currentLineInfo === scope.row.uuid"
+          >
+            <el-form
+              label-position="top"
+              :style="currentLineInfo === scope.row.uuid ? 'float: right;display: contents;line-height: 30px;' : 'float: right;display: none;line-height: 30px;'"
+            >
+              <el-row style="margin: 10px!important;">
+                <el-col :span="6">
+                  <div>
+                    <image-product
+                      :show="showInfo"
+                      :metadata-line="{
+                        product: scope.row,
+                        uuid: scope.row.uuid
+                      }"
+                    />
+                  </div>
+                </el-col>
+                <el-col :span="18">
+                  {{ $t('form.productInfo.code') }}: <b>{{ scope.row.value }}</b><br>
+                  {{ $t('form.productInfo.name') }}: <b>{{ scope.row.name }}</b><br>
+                  {{ $t('form.productInfo.description') }}: <b>{{ scope.row.description }}</b><br>
+                  {{ $t('form.productInfo.UM') }}: <b>{{ scope.row.uomName }}</b><br>
+                  {{ $t('form.pos.tableProduct.quantity') }}: <b>{{ scope.row.quantity }}</b><br>
+                </el-col>
+              </el-row>
+            </el-form>
+            <el-button slot="reference" type="primary" icon="el-icon-info" size="mini" style="margin-right: 3%;" @click="showInfoLine(scope.row)" />
+          </el-popover>
           <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteOrderLine(scope.row)" />
         </template>
       </el-table-column>
@@ -144,9 +181,13 @@
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
 import { findProduct, createShipment } from '@/api/ADempiere/form/point-of-sales.js'
+import ImageProduct from '@/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
 
 export default {
   name: 'ConfirmDelivery',
+  components: {
+    ImageProduct
+  },
   mixins: [
     formMixin
   ],
@@ -179,6 +220,8 @@ export default {
       input: '',
       dialogVisible: false,
       deliveryList: [],
+      showInfo: false,
+      value: false,
       timeOut: null
     }
   },
@@ -241,6 +284,21 @@ export default {
         containerUuid: this.metadata.containerUuid,
         columnName: 'ProductValue'
       })
+    },
+    currentLineInfo() {
+      const currentLine = this.$store.state['pointOfSales/orderLine/index'].line
+      if (this.isEmptyValue(currentLine)) {
+        return ''
+      }
+      return currentLine.uuid
+    }
+  },
+  watch: {
+    currentLineInfo(value) {
+      if (!this.isEmptyValue(this.$refs.open)) {
+        this.$refs.open.showPopper = false
+        this.$refs.open.destroyPopper()
+      }
     }
   },
   created() {
@@ -366,7 +424,16 @@ export default {
         listProduct
       })
       this.dialogVisible = false
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
       this.$store.commit('setConfirmDelivery', false)
+    },
+    closeInfo(line) {
+      this.showInfo = false
+    },
+    showInfoLine(line) {
+      this.$store.commit('setLine', line)
+      this.showInfo = true
     },
     closeDialog() {
       this.dialogVisible = false

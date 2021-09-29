@@ -282,11 +282,6 @@ export default {
     width: 849px;
     max-height: 400px;
   }
-  .el-scrollbar__wrap {
-    overflow: scroll;
-    height: 100%;
-    max-height: 400px;
-  }
   .custom-field-prodcut-info {
     li {
       line-height: normal;
