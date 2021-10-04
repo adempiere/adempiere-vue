@@ -183,9 +183,24 @@ export default {
         })
       }
     },
+    currentBusinessPartner() {
+      const customer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      const searchCustomer = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'C_BPartner_ID' // this.parentMetadata.columnName
+      })
+      if (this.isEmptyValue(customer.businessPartner)) {
+        const templateBusinessPartners = this.recordsBusinessPartners.find(businessPartners => businessPartners.id === searchCustomer)
+        if (this.isEmptyValue(templateBusinessPartners)) {
+          return ''
+        }
+        return templateBusinessPartners
+      }
+      return customer.businessPartner
+    },
     displayedValue: {
       get() {
-        return this.$store.getters.getValueOfField({
+        return this.currentBusinessPartner.value + ' - ' + this.$store.getters.getValueOfField({
           containerUuid: this.parentMetadata.containerUuid,
           // DisplayColumn_'ColumnName'
           columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.displayColumnName
