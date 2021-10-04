@@ -71,7 +71,7 @@
         align="right"
       >
         <template slot-scope="scope">
-          {{ formatPrice(scope.row.priceStandard) }}
+          {{ formatPrice(scope.row.priceStandard, scope.row.currency.iSOCode) }}
         </template>
       </el-table-column>
     </el-table>
