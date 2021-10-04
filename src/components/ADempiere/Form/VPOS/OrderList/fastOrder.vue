@@ -228,9 +228,18 @@ export default {
   },
   watch: {
     openPopover(value) {
+      const date = new Date()
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'Aisle-Vendor-List',
+        columnName: 'DateOrderedFrom',
+        value: date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
+      })
       if (value && this.isEmptyValue(this.ordersInvoiced)) {
         this.setFieldsList()
-        this.listOrdersInvoiced()
+        clearTimeout(this.timeOut)
+        this.timeOut = setTimeout(() => {
+          this.listOrdersInvoiced()
+        }, 1000)
       }
     }
   },
