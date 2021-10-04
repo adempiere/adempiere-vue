@@ -59,19 +59,19 @@
         align="right"
       />
       <el-table-column
-        :label="$t('form.pos.collect.convertedAmount')"
-        align="right"
-      >
-        <template slot-scope="scope">
-          {{ formatPrice(scope.row.schemaPriceStandard, scope.row.schemaCurrency.iSOCode) }}
-        </template>
-      </el-table-column>
-      <el-table-column
         :label="$t('form.productInfo.price')"
         align="right"
       >
         <template slot-scope="scope">
           {{ formatPrice(scope.row.priceStandard) }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('form.pos.collect.convertedAmount')"
+        align="right"
+      >
+        <template slot-scope="scope">
+          {{ formatPrice(scope.row.schemaPriceStandard, scope.row.schemaCurrency.iSOCode) }}
         </template>
       </el-table-column>
     </el-table>
