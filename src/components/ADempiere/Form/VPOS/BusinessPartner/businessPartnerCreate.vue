@@ -159,9 +159,23 @@ export default {
       set(value) {
         this.$store.dispatch('changeCopyShippingAddress', value)
       }
+    },
+    valueField() {
+      const value = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'Value'
+      })
+      return value
     }
   },
   watch: {
+    valueField(value) {
+      this.$store.commit('updateValueOfField', {
+        containerUuid: this.containerUuid,
+        columnName: 'TaxID',
+        value: value
+      })
+    },
     showField(value) {
       if (value) {
         setTimeout(() => {
