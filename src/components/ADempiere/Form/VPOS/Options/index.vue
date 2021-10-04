@@ -595,7 +595,6 @@ export default {
         })
     },
     validateOption(name) {
-      console.log(name)
       this.visible = true
       this.attributePin = {
         type: 'updateOrder',
@@ -759,7 +758,6 @@ export default {
       })
     },
     copyOrder() {
-      console.log(this.currentOrder)
       if (this.isEmptyValue(this.currentOrder.uuid)) {
         return ''
       }

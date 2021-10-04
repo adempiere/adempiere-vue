@@ -748,7 +748,11 @@ export default {
             if (!this.isEmptyValue(searchConversion)) {
               rate = searchConversion.divideRate > searchConversion.multiplyRate ? searchConversion.divideRate : searchConversion.multiplyRate
             }
-            sum += pay.amount * rate
+            if (this.currentPointOfSales.priceList.currency.id === 50001) {
+              sum += pay.amount * rate
+            } else {
+              sum += pay.amountConvertion
+            }
           } else {
             sum += pay.amount
           }
