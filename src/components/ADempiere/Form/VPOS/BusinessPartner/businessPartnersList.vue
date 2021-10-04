@@ -93,6 +93,7 @@
             type="primary"
             class="custom-button-create-bp"
             icon="el-icon-check"
+            :disabled="isDisabled"
             @click="changeCustomer"
           />
         </samp>
@@ -140,6 +141,10 @@ export default {
           isShowList: false
         }
       }
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false
     },
     showField: {
       type: Boolean,

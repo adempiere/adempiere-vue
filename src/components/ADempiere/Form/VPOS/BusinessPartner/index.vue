@@ -49,11 +49,11 @@
           :parent-metadata="parentMetadata"
           :shows-popovers="showsPopovers"
           :show-field="popoverListBusinessParnet"
+          :is-disabled="isDisabled"
         />
         <el-button
           slot="reference"
           type="text"
-          :disabled="isDisabled"
         >
           <i
             class="el-icon-search"
@@ -73,6 +73,7 @@
         <el-button
           slot="reference"
           type="text"
+          :disabled="isDisabled"
         >
           <i
             class="el-icon-edit"
