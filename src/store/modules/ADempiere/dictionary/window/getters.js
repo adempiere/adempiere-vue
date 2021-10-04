@@ -46,6 +46,14 @@ export default {
     return undefined
   },
 
+  getStoredFieldsFromTab: (state, getters) => (windowUuid, tabUuid) => {
+    const tab = getters.getStoredTab(windowUuid, tabUuid)
+    if (!isEmptyValue(tab)) {
+      return tab.fieldsList
+    }
+    return undefined
+  },
+
   getCurrentTab: (state, getters) => (windowUuid) => {
     const window = getters.getStoredWindow(windowUuid)
 

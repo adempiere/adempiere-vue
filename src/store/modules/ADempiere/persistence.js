@@ -44,16 +44,20 @@ const persistence = {
       value
     }) {
       return new Promise((resolve, reject) => {
+        const { parentUuid, containerUuid } = field
         commit('addChangeToPersistenceQueue', {
-          containerUuid: field.containerUuid,
+          containerUuid,
           columnName: field.columnName,
           value
         })
 
         // TODO: Add dictonary getter
+        const fieldsList = getters.getStoredFieldsFromTab(parentUuid, containerUuid)
+
         const emptyFields = getters.getFieldsListEmptyMandatory({
-          containerUuid: field.containerUuid,
-          formatReturn: false
+          containerUuid,
+          formatReturn: false,
+          fieldsList
         }).filter(itemField => {
           return !LOG_COLUMNS_NAME_LIST.includes(itemField.columnName)
         }).map(itemField => {
@@ -68,9 +72,12 @@ const persistence = {
           return
         }
         const route = router.app._route
-        recordUuid = route.query.action === 'create-new' ? getters.getUuidOfContainer(field.containerUuid) : route.query.action
+        recordUuid = route.query.action === 'create-new'
+          ? getters.getUuidOfContainer(field.containerUuid)
+          : route.query.action
+
         dispatch('flushPersistenceQueue', {
-          containerUuid: field.containerUuid,
+          containerUuid,
           tableName: field.tabTableName,
           recordUuid
         })
