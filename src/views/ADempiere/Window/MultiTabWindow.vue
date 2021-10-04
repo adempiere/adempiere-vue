@@ -116,13 +116,24 @@ export default defineComponent({
           }
         }, () => {})
 
-        const attributes = convertObjectToKeyValue({
-          object: row
+        const tab = root.$store.getters.getStoredTab(parentUuid, containerUuid)
+        const defaultValues = root.$store.getters.getParsedDefaultValues({
+          parentUuid,
+          containerUuid,
+          isSOTrxMenu: root.$route.meta.isSalesTransaction,
+          fieldsList: tab.fieldsList,
+          formatToReturn: 'object'
         })
+
+        const attributes = convertObjectToKeyValue({
+          object: Object.assign(defaultValues, row)
+        })
+
         root.$store.dispatch('notifyPanelChange', {
           parentUuid,
           containerUuid,
-          attributes
+          attributes,
+          isOverWriteParent: true
         })
       },
 

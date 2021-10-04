@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Vue from 'vue'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { isEmptyValue, typeValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertStringToBoolean } from '@/utils/ADempiere/valueFormat.js'
 import {
   ACTIVE, PROCESSING, PROCESSED
@@ -201,6 +201,46 @@ const value = {
       }
       return objectValues
     },
+
+    /**
+     * Get values and column's name as key (without parent uuid or container
+     * uuid), from a view (container)
+     * @param {string} parentUuid
+     * @param {string} containerUuid
+     * @param {string} format array|object|pairs|map
+     * @returns {object|array}
+     */
+    getValuesViewType: (state) => ({
+      parentUuid,
+      containerUuid
+    }) => {
+      // generate context with parent uuid or container uuid associated
+      const contextAllContainers = {}
+      Object.keys(state.field).forEach(key => {
+        if (key.includes(parentUuid) || key.includes(containerUuid)) {
+          contextAllContainers[key] = state.field[key]
+        }
+      })
+
+      // generate context only columnName
+      const hashMap = new Map()
+      Object.keys(contextAllContainers).forEach(key => {
+        const value = contextAllContainers[key]
+        const columnName = key
+          .replace(`${parentUuid}_`, '')
+          .replace(`${containerUuid}_`, '')
+
+        // set container context (smart browser, process/report, form)
+        const type = typeValue(value)
+        hashMap.set(columnName, [
+          columnName, type, value
+        ])
+      })
+      // const pairsValues = hashMap.values()
+
+      return hashMap
+    },
+
     getUuidOfContainer: (state) => (containerUuid) => {
       return state.field[containerUuid + '_' + UUID_KEY]
     },

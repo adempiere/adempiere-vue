@@ -38,7 +38,7 @@ export const isEmptyValue = function(value) {
 
   switch (typeOfValue) {
     case 'UNDEFINED':
-    case 'ERRORR':
+    case 'ERROR':
     case 'NULL':
       isEmpty = true
       break
@@ -99,6 +99,45 @@ export function typeValue(value) {
     .toUpperCase()
 
   return typeOfValue
+}
+
+/**
+ * Cast value wiht type of value
+ * @param {string} value
+ * @param {string} type
+ * @returns {mixed} castValue
+ */
+export function castValueWithType({
+  value,
+  type
+}) {
+  let castValue
+  if (isEmptyValue(value)) {
+    return castValue
+  }
+
+  switch (type) {
+    case 'UNDEFINED':
+    case 'ERROR':
+    case 'NULL':
+      // emtpy value
+      break
+    case 'BOOLEAN':
+      castValue = Boolean(value)
+      break
+    case 'DATE':
+      castValue = new Date(value)
+      break
+    case 'STRING':
+      castValue = String(value)
+      break
+    case 'MATH':
+    case 'NUMBER':
+      castValue = Number(value)
+      break
+  }
+
+  return castValue
 }
 
 /**
@@ -544,13 +583,13 @@ export function currencyFind({
   }
   return defaultCurrency.iSOCode
 }
+
 /**
  * Search the Payment List for the Current Payment
  * @author Elsio Sanchez <elsiosanches@gmail.com>
  * @param {string} currentPayment Current Payment
  * @param {array} listTypePayment Payment Type Listings
  */
-
 export function tenderTypeFind({
   currentPayment,
   listTypePayment
@@ -565,9 +604,11 @@ export function tenderTypeFind({
   }
   return currentPayment
 }
+
 export function clearVariables() {
   partialValue = ''
 }
+
 export function formatConversionCurrenty(params) {
   let exponential, expre
   const number = params.toString()
@@ -580,11 +621,11 @@ export function formatConversionCurrenty(params) {
   }
   return params
 }
+
 /**
  * convert Values To Send
  * @param {string, number, boolean, date} values
  */
-
 export function convertValuesToSend(values) {
   const valuesToSend = {}
 

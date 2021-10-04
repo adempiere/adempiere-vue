@@ -15,10 +15,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Filters from '@/utils/ADempiere/filters'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 const initState = {
   linkOpened: '',
   fullPath: '',
+  containerUuid: '',
   filters: {},
   parsedFilters: {},
   isReadFilters: false
@@ -39,6 +41,15 @@ const permantLink = {
     setFilters(state, filters) {
       state.filters = filters
     },
+    setContainerUuid(state, containerUuid) {
+      state.containerUuid = containerUuid
+    },
+    setParsedFilters(state, parsedFilters) {
+      state.parsedFilters = parsedFilters
+    },
+    setIsReadFilters(state) {
+      state.isReadFilters = true
+    },
     resetStatePermantLink(state) {
       state = initState
     }
@@ -52,16 +63,26 @@ const permantLink = {
       commit('setLinkOpened', window.location.href)
       commit('setFullPath', fullPath)
 
-      const queryFilters = query.filters
-      const instance = Filters.newInstance()
+      const { containerUuid, filters } = query
+      commit('setContainerUuid', containerUuid)
+      commit('setFilters', filters)
 
-      const readFilters = instance.convertFilters(queryFilters)
+      const readFilters = Filters.newInstance().convertFilters(filters)
+      commit('setParsedFilters', readFilters)
 
-      commit('setFilters', readFilters)
+      if (isEmptyValue(filters)) {
+        commit('setIsReadFilters')
+      }
     }
   },
 
   getters: {
+    getLinkContainerUuid: (state) => {
+      return state.containerUuid
+    },
+    isReadFilters: (state) => {
+      return state.isReadFilters
+    },
     getLinkOpened: (state) => {
       return state.linkOpened
     },
@@ -69,7 +90,7 @@ const permantLink = {
       return state.filters
     },
     getParsedFilters: (state) => {
-      return state.parsedFilters
+      return state.parsedFilters || {}
     }
   }
 }

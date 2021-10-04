@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { castValueWithType, isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 class Filters {
   constructor() {
@@ -108,14 +108,23 @@ class Filters {
 
     const delimiter = ','
     const data = {}
+    // str: columnName, type, value
     filters.forEach(str => {
-      // TODO: Limit to first delimiter
-      // const items = filter.split(delimiter)
       const index = str.indexOf(delimiter)
       const columnName = str.substr(0, index)
-      const value = str.substr(index + 1)
 
-      data[columnName] = value
+      // type, value
+      const str2 = str.substr(index + 1)
+
+      const index2 = str2.indexOf(delimiter)
+      const type = str2.substr(0, index2)
+
+      const value = str2.substr(index2 + 1)
+
+      data[columnName] = castValueWithType({
+        value,
+        type
+      })
     })
 
     return data

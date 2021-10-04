@@ -22,6 +22,7 @@ import {
   deleteEntity
 } from '@/api/ADempiere/common/persistence'
 import router from '@/router'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 const dataManager = {
   namespaced: true,
@@ -73,12 +74,32 @@ const dataManager = {
           }
         }, () => {})
 
-        const defaultAttributes = rootGetters.getParsedDefaultValues({
+        let defaultAttributes = rootGetters.getParsedDefaultValues({
           parentUuid,
           containerUuid,
           isSOTrxMenu: currentRoute.meta.isSalesTransaction,
           fieldsList: tab.fieldsList
         })
+
+        // set vales with permant link
+        if (!rootGetters['permantLink/isReadFilters'] &&
+          containerUuid === rootGetters['permantLink/getLinkContainerUuid']) {
+          const parsedFilters = rootGetters['permantLink/getParsedFilters']
+          if (!isEmptyValue(parsedFilters)) {
+            // merge values
+            defaultAttributes = defaultAttributes.map(attribute => {
+              const filterValue = parsedFilters[attribute.columnName]
+              return {
+                ...attribute,
+                value: filterValue
+              }
+            })
+          }
+
+          commit('permantLink/setIsReadFilters', null, {
+            root: true
+          })
+        }
 
         defaultAttributes.forEach(attribute => {
           commit('addChangeToPersistenceQueue', {

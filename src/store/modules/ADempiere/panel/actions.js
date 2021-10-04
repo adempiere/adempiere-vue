@@ -368,7 +368,8 @@ const actions = {
   notifyPanelChange({ dispatch, getters }, {
     parentUuid,
     containerUuid,
-    attributes = []
+    attributes = [],
+    isOverWriteParent
   }) {
     if (typeValue(attributes) === 'OBJECT') {
       attributes = convertObjectToKeyValue({
@@ -379,7 +380,8 @@ const actions = {
     dispatch('updateValuesOfContainer', {
       parentUuid,
       containerUuid,
-      attributes
+      attributes,
+      isOverWriteParent
     })
       .then(() => {
         // Nothing for now
