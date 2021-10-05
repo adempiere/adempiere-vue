@@ -30,13 +30,13 @@ export default {
           columnName: 'LineDescription',
           label: this.$t('form.pos.tableProduct.product'),
           isNumeric: false,
-          size: '400px'
+          size: 'auto'
         },
         currentPrice: {
           columnName: 'CurrentPrice',
           label: this.$t('form.productInfo.price'),
           isNumeric: true,
-          size: 'auto'
+          size: '120px'
         },
         quantityOrdered: {
           columnName: 'QtyEntered',
@@ -54,7 +54,7 @@ export default {
           columnName: 'DiscountTotal',
           label: this.$t('form.pos.tableProduct.displayDiscuentAmount'),
           isNumeric: true,
-          size: 'auto'
+          size: '150px'
         },
         discounDisplayTaxIndicator: {
           columnName: 'taxIndicator',
@@ -66,20 +66,20 @@ export default {
           columnName: 'DisplayTaxAmount',
           label: this.$t('form.pos.tableProduct.displayTaxAmount'),
           isNumeric: true,
-          size: 'auto'
+          size: '150px'
         },
         grandTotal: {
           columnName: 'GrandTotal',
           label: 'Total',
           isNumeric: true,
           isVisible: true,
-          size: 'auto'
+          size: '150px'
         },
         convertedAmount: {
           columnName: 'ConvertedAmount',
           label: this.$t('form.pos.collect.convertedAmount'),
           isNumeric: true,
-          size: 'auto'
+          size: '150px'
         }
       },
       currentOrderLine: {
@@ -131,10 +131,10 @@ export default {
   },
   watch: {
     isShowKeyLayout(value) {
-      if (value) {
+      if (!value) {
         this.orderLineDefinition.lineDescription.size = 'auto'
       } else {
-        this.orderLineDefinition.lineDescription.size = '400px'
+        this.orderLineDefinition.lineDescription.size = '250px'
       }
     }
   },
