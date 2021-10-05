@@ -257,10 +257,10 @@ git clone -b develop git@github.com:adempiere/adempiere-vue.git
 cd adempiere-vue
 
 # instale las dependencias
-npm install
+yarn install
 
 # corra el proyecto como desarrollador
-npm run dev
+yarn dev
 ```
 
 Automáticamente se abrirá el siguiente enlace en su navegador http://localhost:9527
@@ -269,26 +269,26 @@ Automáticamente se abrirá el siguiente enlace en su navegador http://localhost
 
 ```bash
 # Construcción para entornos de prueba
-npm run build:stage
+yarn build:stage
 
 # Construcción para entornos de producción
-npm run build:prod
+yarn build:prod
 ```
 
 ## Avanzado
 
 ```bash
 # Vista previa con efectos de entorno
-npm run preview
+yarn preview
 
 # Vista previa  con efectos + análisis de recursos estáticos
-npm run preview -- --report
+yarn preview --report
 
 # Chequeo de formato de código
-npm run lint
+yarn lint
 
 # Chequeo de formato de código y auto-corrección
-npm run lint -- --fix
+yarn lint --fix
 ```
 
 Vaya a [Documentación](https://adempiere.github.io/adempiere-vue/es/guide/essentials/deploy.html#compilar) para mayor información.
