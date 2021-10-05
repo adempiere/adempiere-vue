@@ -62,10 +62,7 @@ const actions = {
       resetRouter()
       dispatch('generateRoutes')
         .then(accessRoutes => {
-          accessRoutes.forEach(access => {
-            // dynamically add accessible routes
-            router.addRoute(access)
-          })
+          router.addRoutes(accessRoutes)
         })
         .finally(() => {
           // finish progress bar
