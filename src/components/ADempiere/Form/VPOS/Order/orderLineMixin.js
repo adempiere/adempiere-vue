@@ -299,7 +299,7 @@ export default {
       } else if (row.columnName === 'DiscountTotal') {
         return this.currentPointOfSales.isDisplayDiscount
       } else if (row.columnName === 'taxIndicator') {
-        return this.currentPointOfSales.isDisplayDiscount
+        return this.currentPointOfSales.isDisplayTaxAmount
       } else if (row.columnName === 'DisplayTaxAmount') {
         return this.currentPointOfSales.isDisplayTaxAmount
       }
