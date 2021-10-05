@@ -122,7 +122,7 @@
             <el-button type="danger" icon="el-icon-close" @click="exit" />
             <el-button type="info" icon="el-icon-minus" :disabled="isDisabled" @click="undoPatment" />
             <el-button type="primary" icon="el-icon-plus" :disabled="validPay || addPay || isDisabled" @click="addCollectToList(paymentBox)" />
-            <el-button type="success" :disabled="isDisabled || completeBusinessPartner" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
+            <el-button type="success" :disabled="completeBusinessPartner" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
           </samp>
         </el-header>
         <!-- Panel where they show the payments registered from the collection container -->
@@ -600,6 +600,9 @@ export default {
       return this.change
     },
     completeBusinessPartner() {
+      if (this.isDisabled) {
+        return this.isDisabled
+      }
       return this.isEmptyValue(this.currentPointOfSales.unaddressedCustomer) ? false : this.currentPointOfSales.unaddressedCustomer
     }
   },
