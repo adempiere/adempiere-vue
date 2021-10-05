@@ -275,10 +275,10 @@ git clone -b develop git@github.com:adempiere/adempiere-vue-.git
 cd adempiere-vue
 
 # install dependency
-yarn install
+npm install
 
 # develop
-yarn dev
+npm run dev
 ```
 
 This will automatically open http://localhost:9527
@@ -287,26 +287,26 @@ This will automatically open http://localhost:9527
 
 ```bash
 # build for test environment
-yarn build:stage
+npm run build:stage
 
 # build for production environment
-yarn build:prod
+npm run build:prod
 ```
 
 ## Advanced
 
 ```bash
 # preview the release environment effect
-yarn preview
+npm run preview
 
 # preview the release environment effect + static resource analysis
-yarn preview --report
+npm run preview -- --report
 
 # code format check
-yarn lint
+npm run lint
 
 # code format check and auto fix
-yarn lint --fix
+npm run lint -- --fix
 ```
 
 Refer to [Documentation](https://adempiere.github.io/adempiere-vue/guide/essentials/deploy.html#build) for more information
