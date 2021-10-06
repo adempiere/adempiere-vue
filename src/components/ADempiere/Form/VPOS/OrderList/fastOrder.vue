@@ -37,7 +37,8 @@
             <field
               :metadata-field="{
                 ...field,
-                size: 6
+                size: 6,
+                name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
               }"
             />
           </el-form-item>

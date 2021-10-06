@@ -419,6 +419,7 @@ export default {
           changeWarehouseList: 'Cambiar de Almacén',
           changePriceList: 'Cambiar Lista de Precio',
           dateTo: 'Fecha Hasta',
+          dateOrder: 'Fecha Orden',
           dateFrom: 'Fecha Desde'
         }
       },

@@ -443,6 +443,7 @@ export default {
           changeWarehouseList: 'Change Warehouse',
           changePriceList: 'Change Price List',
           dateTo: 'Date To',
+          dateOrder: 'Date Order',
           dateFrom: 'Date From'
         }
       },
