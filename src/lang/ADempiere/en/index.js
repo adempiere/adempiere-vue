@@ -2,6 +2,8 @@
 import actionMenu from './actionMenu'
 
 export default {
+  actionMenu,
+
   language: 'Language',
   route: {
     dashboard: 'Dashboard',
@@ -316,6 +318,7 @@ export default {
     deleteRecord: 'Delete Record',
     undoNew: 'Undo New Record',
     containerInfo: {
+      attachment: 'Attachment',
       notes: 'Notes List',
       changeLog: 'ACtivity',
       workflowLog: 'Workflow Log',
@@ -429,7 +432,8 @@ export default {
           print: 'Print Document',
           cancelOrder: 'Cancel Order',
           orderRemoved: 'Order Deleted',
-          copyOrder: 'Copy Order'
+          copyOrder: 'Copy Order',
+          createNewReturnOrder: 'Create a new return order'
         },
         cashManagement: {
           title: 'Cash Management',
@@ -451,7 +455,8 @@ export default {
         options: 'Options',
         editQuantities: 'Edit Quantities',
         pin: 'Insert Pin',
-        remove: 'Remove'
+        remove: 'Remove',
+        empty: 'Enter the product name, code or UPC'
       },
       order: {
         order: 'Order',
@@ -478,11 +483,14 @@ export default {
         pending: 'Pending',
         payment: 'Payment',
         change: 'Change',
+        totalInvoiced: 'Total Invoiced',
         convertAmount: 'Convert Quantity',
         convertedAmount: 'Converted Amount',
         fullPayment: 'Full Payment',
         dayRate: 'Day Rate',
         noDayRate: 'No daily rate has been generated for the currency.',
+        refund: 'Refund',
+        Currency: 'Currency',
         TenderType: {
           directDeposit: 'Direct Deposit',
           creditCard: 'Credit Card',
@@ -493,15 +501,48 @@ export default {
           account: 'Account',
           cash: 'Cash',
           zelle: 'Zelle'
+        },
+        overdrawnInvoice: {
+          title: 'OverdrawnInvoice',
+          below: 'Invoice will remain with an open balance',
+          above: 'Customer Details',
+          returned: 'Your change is',
+          coupon: 'Generate a Gift Card or Vale',
+          returnMoney: 'Return money in another form of payment',
+          adjustDocument: 'You want to Adjust Document',
+          dailyLimit: 'Daily Limit',
+          customerLimit: 'Order Limit',
+          available: 'Available',
+          emptyPayment: 'Unsupported payment method',
+          addPayment: 'You must add a change type to complete the operation'
         }
       },
       keyLayout: {
         noProducto: 'No product available. Back to top'
+      },
+      pinMessage: {
+        pin: 'Enter pin for ',
+        documentType: 'change document type',
+        warehouse: 'change warehouse',
+        price: 'change price',
+        qtyEntered: 'change quantity',
+        priceList: 'change price list',
+        discount: 'add discount',
+        delete: 'delete product',
+        addProduct: 'add product',
+        invoiceOpen: 'generate invoice with an open balance'
       }
     },
     priceChecking: {
       productNotFound: 'Unavailable Product',
       basePrice: 'Base price'
+    },
+    byInvoice: {
+      title: 'Aisle Vendor Orders to be Invoiced',
+      label: 'To be invoiced',
+      salesRepresentative: 'Sales Agent',
+      businessPartner: 'Business Partner',
+      documentNo: 'Document No.'
     },
     productInfo: {
       product: 'Product',
@@ -517,8 +558,9 @@ export default {
       taxAmount: 'Tax Amount',
       grandTotal: 'Grand Total',
       grandTotalConverted: 'Grand Total Converted',
-      quantityAvailable: 'Quantity Avalible',
-      upc: 'UPC / EAN'
+      quantityAvailable: 'Available',
+      upc: 'UPC / EAN',
+      UM: 'UM'
     },
     guideSteps: {
       productValue: {
@@ -561,8 +603,50 @@ export default {
       toolsPoint: {
         title: 'Point of Sale Tools'
       }
-    }
-  },
-
-  actionMenu
+    },
+    activity: {
+      title: 'Your Workflow Activities',
+      filtersSearch: {
+        history: 'History records',
+        forward: 'Re-send'
+      },
+      table: {
+        priority: 'Priority',
+        node: 'Node'
+      },
+      workflow: {
+        title: 'Workflow',
+        description: 'Workflow life cycle diagram. The highlighted Node is the one currently awaiting verification.'
+      },
+      workflowLogs: {
+        title: 'Change Log',
+        description: 'Workflow timeline'
+      }
+    },
+    match: {
+      title: {
+        invoice: 'Invoice',
+        deliveryReceipt: 'Delivery / Receipt'
+      },
+      description: {
+        searchCriteria: 'Select a Business Partner to check the pending documents to be assigned',
+        invoice: 'Select an Invoice to assign the corresponding Delivery/Receipt to',
+        deliveryReceipt: 'Select at least one Delivery/Receipt to which you require to assign the selected invoice'
+      },
+      field: {
+        toAssigned: 'To be Assigned',
+        assigning: 'Assigning',
+        difference: 'Difference'
+      },
+      filtersSearch: {
+        sameBusinessPartner: 'Same Business Partner',
+        sameProduct: 'Same Product ',
+        sameQuantity: 'SameQuantity '
+      },
+      table: {
+        nrDocument: 'Nr Document'
+      }
+    },
+    weight: 'Weight'
+  }
 }

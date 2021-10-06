@@ -15,6 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import language from '@/lang'
+import { showMessage } from '@/utils/ADempiere/notification.js'
+import { copyToClipboard } from '@/utils/ADempiere/coreUtils'
 
 /**
  * Create new record
@@ -22,10 +24,29 @@ import language from '@/lang'
 export const createNewRecord = {
   sequence: 0,
   name: language.t('actionMenu.createNewRecord'),
+  type: 'setDefaultValues',
   enabled: true,
   svg: false,
   icon: 'el-icon-circle-plus-outline',
-  callBack: () => {}
+  actionName: 'createNewRecord',
+  createNewRecord: ({ root, parentUuid, containerUuid }) => {
+    root.$store.dispatch('dataManager/setDefaultValues', {
+      parentUuid,
+      containerUuid
+    })
+  }
+}
+
+export const undoChange = {
+  sequence: 0,
+  name: language.t('actionMenu.createNewRecord'),
+  type: 'undoModifyData',
+  enabled: false,
+  svg: false,
+  icon: 'el-icon-circle-plus-outline',
+  actionName: 'undoChange',
+  undoChange: ({ root, parentUuid, containerUuid }) => {
+  }
 }
 
 /**
@@ -36,15 +57,67 @@ export const sharedLink = {
   enabled: true,
   svg: false,
   icon: 'el-icon-share',
-  callBack: () => {}
+  actionName: 'sharedLink',
+  sharedLink: ({ root, parentUuid, containerUuid }) => {
+    const viewValues = root.$store.getters.getValuesViewType({
+      parentUuid,
+      containerUuid
+    })
+
+    const pairsValues = Array.from(viewValues.values())
+
+    root.$router.push({
+      name: root.$route.name,
+      params: {
+        ...root.$route.params
+      },
+      query: {
+        ...root.$route.query,
+        containerUuid,
+        filters: pairsValues
+      }
+    }, () => {})
+
+    const link = window.location.href
+
+    copyToClipboard({
+      text: link,
+      isShowMessage: true
+    })
+  }
 }
 
+/**
+ * Delete record (entity) with record
+ */
 export const deleteRecord = {
   name: language.t('actionMenu.deleteRecord'),
   enabled: true,
   svg: false,
   icon: 'el-icon-delete',
-  callBack: () => {}
+  type: 'deleteEntity',
+  actionName: 'deleteRecord',
+  deleteRecord: ({ root, parentUuid, containerUuid, recordId, recordUuid }) => {
+    root.$store.dispatch('dataManager/deleteEntity', {
+      parentUuid,
+      containerUuid,
+      recordId,
+      recordUuid
+    })
+      .then(() => {
+        showMessage({
+          message: root.$t('recordManager.deleteRecordSuccessful'),
+          type: 'success'
+        })
+      })
+      .catch(error => {
+        showMessage({
+          message: root.$t('recordManager.deleteRecordError'),
+          type: 'error'
+        })
+        console.warn(`Delete Entity - Error ${error.message}, Code: ${error.code}.`)
+      })
+  }
 }
 
 export const refreshRecords = {
@@ -52,7 +125,47 @@ export const refreshRecords = {
   enabled: true,
   svg: false,
   icon: 'el-icon-refresh',
-  callBack: () => {}
+  actionName: 'refreshRecords',
+  refreshRecords: ({ root, parentUuid, containerUuid, tableName }) => {
+    // used to window
+    // TODO: implement to browser
+    root.$store.dispatch('dataManager/getEntities', {
+      parentUuid,
+      containerUuid
+    })
+  }
+}
+
+export const lockRecord = {
+  name: language.t('actionMenu.refreshRecords'),
+  type: 'lockRecord',
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-lock',
+  actionName: 'lockRecord',
+  lockRecord: ({ root, parentUuid, containerUuid, tableName }) => {
+  }
+}
+
+export const unlockRecord = {
+  name: language.t('actionMenu.refreshRecords'),
+  type: 'unlockRecord',
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-unlock',
+  actionName: 'unlockRecord',
+  unlockRecord: ({ root, parentUuid, containerUuid, tableName }) => {
+  }
+}
+
+export const recordAccess = {
+  name: language.t('actionMenu.refreshRecords'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-c-scale-to-original',
+  actionName: 'recordAccess',
+  recordAccess: ({ root, parentUuid, containerUuid, tableName }) => {
+  }
 }
 
 export const windowActions = [

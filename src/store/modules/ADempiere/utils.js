@@ -1,4 +1,3 @@
-import Vue from 'vue'
 
 const initStateUtils = {
   width: 0,
@@ -15,23 +14,18 @@ const initStateUtils = {
   selectionProcess: [],
   isContainerInfo: false,
   documentAction: [],
-  openRoute: {
-    path: '',
-    name: '',
-    route: {},
-    params: {},
-    definedParameters: {},
-    query: {},
-    isReaded: false,
-    isLoaded: false
-  },
   splitWidthRight: 3,
   splitWidthLeft: 3,
   parametersProcessPos: [],
   updateOrder: false,
   updatePayment: false,
   createBusinessPartner: false,
-  showContainer: false
+
+  step: 0,
+  updateCustomer: false,
+  overdrawnInvoice: {
+    visible: false
+  }
 }
 
 export default {
@@ -76,16 +70,7 @@ export default {
     setReportTypeToShareLink(state, payload) {
       state.reportType = payload
     },
-    setOpenRoute(state, payload) {
-      state.openRoute = {
-        ...state.openRoute,
-        ...payload
-      }
-    },
-    setReadRoute(state, payload) {
-      Vue.set(state.openRoute, 'definedParameters', payload.parameters)
-      Vue.set(state.openRoute, 'isLoaded', true)
-    },
+
     resetStateUtils(state) {
       state = initStateUtils
     },
@@ -104,11 +89,18 @@ export default {
     setUpdatePayment(state, payment) {
       state.updatePayment = payment
     },
+    setStepCurrent(state, step) {
+      state.step = step
+    },
     popoverCreateBusinessPartner(state, createBusinessPartner) {
       state.createBusinessPartner = createBusinessPartner
     },
-    setExternalContainer(state, show) {
-      state.showContainer = show
+
+    popoverOverdrawnInvoice(state, payload) {
+      state.overdrawnInvoice = payload
+    },
+    showUpdateCustomer(state, show) {
+      state.updateCustomer = show
     }
   },
   actions: {
@@ -142,14 +134,7 @@ export default {
     setProcessSelect({ commit }, params) {
       commit('setProcessSelecetion', params)
     },
-    setOpenRoute({ commit }, routeParameters) {
-      commit('setOpenRoute', {
-        ...routeParameters
-      })
-    },
-    setReadRoute({ commit }, parameters) {
-      commit('setReadRoute', parameters)
-    },
+
     setTempShareLink({ commit }, parameters) {
       if (!parameters.href.includes(String(parameters.processId))) {
         commit('setTempShareLink', parameters.href)
@@ -178,6 +163,16 @@ export default {
     },
     changePopover({ commit }, params) {
       commit('popoverCreateBusinessPartner', params)
+    },
+    changePopoverOverdrawnInvoice({ commit }, { attributePin, visible }) {
+      const overdrawn = {
+        attributePin,
+        visible
+      }
+      commit('popoverOverdrawnInvoice', overdrawn)
+    },
+    changeShowUpdateCustomer({ commit }, show) {
+      commit('showUpdateCustomer', show)
     }
   },
   getters: {
@@ -227,12 +222,7 @@ export default {
     getReportType: (state) => {
       return state.reportType
     },
-    getIsLoadedOpenRoute: (state) => {
-      return state.openRoute.isLoaded
-    },
-    getIsReadedOpenRoute: (state) => {
-      return state.openRoute.isReaded
-    },
+
     getOrders: (state) => {
       return state.documentAction
     },
@@ -254,8 +244,15 @@ export default {
     getPopoverCreateBusinessParnet: (state) => {
       return state.createBusinessPartner
     },
-    getExternalContainer: (state) => {
-      return state.showContainer
+
+    getStepCurrent: (state) => {
+      return state.step
+    },
+    getOverdrawnInvoice: (state) => {
+      return state.overdrawnInvoice
+    },
+    getShowUpdateCustomer: (state) => {
+      return state.updateCustomer
     }
   }
 }

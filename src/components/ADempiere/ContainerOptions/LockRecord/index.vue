@@ -20,12 +20,12 @@
   <span v-if="isFirstTab" key="withTooltip">
     <el-tooltip
       v-if="isFirstTab"
-      :content="isLocked ? $t('data.lockRecord') : $t('data.unlockRecord')"
+      :content="tooltipText"
       placement="top"
     >
       <el-button type="text" @click="lockRecord()">
         <i
-          :class="isLocked ? 'el-icon-lock' : 'el-icon-unlock'"
+          :class="{ 'el-icon-lock': isLocked, 'el-icon-unlock': !isLocked }"
           style="font-size: 15px; color: black;"
         />
       </el-button>
@@ -33,7 +33,7 @@
 
     <slot name="prefix" />
 
-    <span :style="isLocked ? 'color: red;' :'color: #1890ff;'">
+    <span :class="{ 'locked-record': isLocked }">
       {{ tabName }}
     </span>
 
@@ -87,6 +87,13 @@ export default defineComponent({
     const isValidUuid = (recordUuid) => {
       return !root.isEmptyValue(recordUuid) && recordUuid !== 'create-new'
     }
+
+    const tooltipText = computed(() => {
+      if (isLocked.value) {
+        return root.$t('data.unlockRecord')
+      }
+      return root.$t('data.lockRecord')
+    })
 
     const lockRecord = () => {
       const action = isLocked.value ? 'unlockRecord' : 'lockRecord'
@@ -176,9 +183,16 @@ export default defineComponent({
       isLocked,
       // computed
       isFirstTab,
+      tooltipText,
       // methods
       lockRecord
     }
   }
 })
 </script>
+
+<style lang="scss">
+.locked-record {
+  color: red !important;
+}
+</style>

@@ -26,8 +26,8 @@
     type="primary"
     trigger="click"
     class="menu-actions"
-    @command="clickRunAction"
-    @click="runAction(defaultActionToRun)"
+    @command="runAction"
+    @click="runDefaultAction"
   >
     {{ defaultActionName }}
 
@@ -135,15 +135,19 @@ export default defineComponent({
 
   setup(props, { root }) {
     const {
+      parentUuid,
       containerUuid,
       tableName
     } = props.actionsManager
 
-    const actionsList = ref(
-      props.actionsManager.actionsList({ uuid: containerUuid, tableName })
-    )
+    // set initial value
+    const actionsList = ref([])
+    if (props.actionsManager && props.actionsManager.getActionList) {
+      actionsList.value = props.actionsManager.getActionList()
+    }
 
     const recordUuid = computed(() => {
+      // TODO: Change query name 'action'
       const { action } = root.$route.query
       return action
     })
@@ -178,56 +182,36 @@ export default defineComponent({
       return actionsList.value[0]
     })
 
-    const clickRunAction = (action) => {
-      console.log('clickRunAction', action)
-    }
-
-    const runAction = (action) => {
-      console.log('runAction', action)
-      action.callBack()
+    /**
+     * Run default action with last parameters
+     */
+    function runDefaultAction() {
+      runAction(defaultActionToRun.value)
     } // end runAction
 
     /**
-     * Get element-ui icon from action
+     * Run selected action
+     * @param {object} action
      */
-    const iconAction = ({ type, action }) => {
-      let icon = 'el-icon-setting'
-      if (type === 'dataAction') {
-        switch (action) {
-          case 'setDefaultValues':
-            icon = 'el-icon-circle-plus-outline'
-            break
-          case 'deleteEntity':
-            icon = 'el-icon-delete'
-            break
-          case 'undoModifyData':
-            icon = 'el-icon-refresh-left'
-            break
-          case 'lockRecord':
-            icon = 'el-icon-lock'
-            break
-          case 'unlockRecord':
-            icon = 'el-icon-unlock'
-            break
-          case 'recordAccess':
-            icon = 'el-icon-c-scale-to-original'
-            break
-        }
-      }
-
-      return icon
+    function runAction(action) {
+      const { actionName } = action
+      action[actionName]({
+        root,
+        parentUuid,
+        containerUuid,
+        tableName,
+        recordUuid: recordUuid.value,
+        uuid: action.uuid
+      })
     }
 
     return {
-      // size: pro,
       actionsList,
       // computeds
       defaultActionName,
-      defaultActionToRun,
       // methods
       runAction,
-      clickRunAction,
-      iconAction
+      runDefaultAction
     }
   }
 })
@@ -267,18 +251,20 @@ export default defineComponent({
     // light blue style of the first section of the menu button
     // >.el-button::first-child {
     >.el-button:not(:last-child) {
+      min-width: 105px;
+      font-weight: bold;
       // margin-right: -1px;
-      color: #409eff;
+      color: #0080ff;
+      border-color: #0080ff;
       background: #ecf5ff;
-      border-color: #b3d8ff;
     }
 
     // light blue style of the drop down menu section
     .el-button--primary:last-child {
       // margin-right: 2px;
-      color: #409eff;
+      color: #0080ff;
+      border-color: #0080ff;
       background: #e6f1fd;
-      border-color: #b3d8ff;
       border-left-color: #000000 !important;
     }
 

@@ -57,5 +57,18 @@ export default {
   },
   setFieldCurrency(state, currency) {
     state.fieldCurrency = currency
+  },
+  dialogoInvoce(state, { show, type, success }) {
+    state.dialogoInvoce = {
+      show,
+      type,
+      success
+    }
+  },
+  setRefundLoaded(state, refund) {
+    state.refundLoaded = refund
+  },
+  setCurrencyRedund(state, currency) {
+    state.currentFieldCurrencyRedund = currency
   }
 }

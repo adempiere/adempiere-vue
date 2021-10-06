@@ -33,10 +33,15 @@
       {{ $t('actionMenu.references') }}
 
       <i
-        v-if="!isReferecesContent || isLoadedReferences"
+        v-if="isLoadingReferences"
+        key="loading"
+        class="el-icon-loading el-icon--right"
+      />
+      <i
+        v-else
+        key="loaded"
         class="el-icon-arrow-down el-icon--right"
       />
-      <i v-else class="el-icon-loading el-icon--right" />
     </el-button>
 
     <el-dropdown-menu slot="dropdown">
@@ -95,10 +100,10 @@ export default defineComponent({
       parentUuid
     } = parent._props
     const {
-      tableName
+      getTableName
     } = props.referencesManager
 
-    const isLoadedReferences = ref(false)
+    const isLoadingReferences = ref(false)
     const referencesList = ref([])
 
     const recordUuid = computed(() => {
@@ -111,8 +116,9 @@ export default defineComponent({
         recordUuid.value !== 'create-new'
     })
 
+    // is container manage references
     const isReferecesContent = computed(() => {
-      if (!root.isEmptyValue(props.referencesManager) && isWithRecord.value) {
+      if (!root.isEmptyValue(props.referencesManager)) {
         return true
       }
       return false
@@ -120,13 +126,15 @@ export default defineComponent({
 
     const isDisabledMenu = computed(() => {
       return !(isReferecesContent.value &&
-        isLoadedReferences.value)
+        isWithRecord.value &&
+        !isLoadingReferences.value)
     })
 
     const getterReferences = computed(() => {
       if (isReferecesContent.value) {
         return root.$store.getters.getStoredReferences({
           windowUuid: parentUuid,
+          tableName: getTableName(),
           recordUuid: recordUuid.value
         })
       }
@@ -154,43 +162,45 @@ export default defineComponent({
     }
 
     const getReferences = () => {
-      if (!isReferecesContent.value) {
-        return
-      }
-
       const references = getterReferences.value
       if (!root.isEmptyValue(references)) {
         referencesList.value = references.referencesList
-        isLoadedReferences.value = true
       } else {
-        isLoadedReferences.value = false
+        isLoadingReferences.value = true
 
         root.$store.dispatch('getReferencesFromServer', {
           parentUuid,
-          tableName,
+          tableName: getTableName(),
           recordUuid: recordUuid.value
         })
           .then(responseReferences => {
             referencesList.value = responseReferences.referencesList
           })
+          // handle error in store
+          .catch(() => {})
           .finally(() => {
-            isLoadedReferences.value = true
+            isLoadingReferences.value = false
           })
       }
     }
 
-    // when change record uuid loaded references
-    watch(recordUuid, () => {
-      getReferences()
-    })
+    if (isReferecesContent.value) {
+      // when change record uuid loaded references
+      watch(recordUuid, (newValue) => {
+        // TODO: Add validate uuid record with route
+        if (newValue !== 'create-new' && !root.isEmptyValue(newValue)) {
+          getReferences()
+        }
+      })
 
-    getReferences()
+      getReferences()
+    }
 
     return {
       referencesList,
       // computeds
       isReferecesContent,
-      isLoadedReferences,
+      isLoadingReferences,
       isDisabledMenu,
       // methods
       openReference
@@ -204,6 +214,7 @@ export default defineComponent({
 <style lang="scss">
 .menu-references {
   .el-button--warning {
+    font-weight: bold;
     // darker orange tone for better readability
     border-color: #ff9b00;
     color: #ff9b00;

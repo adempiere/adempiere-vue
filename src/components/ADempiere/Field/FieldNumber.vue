@@ -39,7 +39,6 @@
       :class="cssClassStyle"
       autofocus
       @change="preHandleChange"
-      @blur="customFocusLost"
       @focus="focusGained"
       @keydown.native="keyPressed"
       @keyup.native="keyReleased"
@@ -181,11 +180,6 @@ export default {
     },
     customFocusGained(event) {
       this.isFocus = true
-      // this.focusGained(event)
-
-      this.$nextTick(() => {
-        this.$refs[this.metadata.columnName].focus()
-      })
     },
     customFocusLost(event) {
       this.isFocus = false

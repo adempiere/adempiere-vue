@@ -65,7 +65,7 @@
 
   <loading-view
     v-else
-    key="window-loading"
+    key="browser-loading"
   />
 </template>
 
@@ -78,8 +78,8 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 
+import { BUTTON } from '@/utils/ADempiere/references'
 import { sharedLink } from '@/utils/ADempiere/constants/actionsMenuList'
-import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
 
 export default defineComponent({
   name: 'BrowserView',
@@ -153,14 +153,10 @@ export default defineComponent({
     })
 
     const tableHeader = computed(() => {
-      const panel = generatePanelAndFields({
-        containerUuid: browserUuid,
-        panelMetadata: browserMetadata.value
-      })
-      return panel.fieldsList
+      return browserMetadata.value.fieldsList
     })
 
-    const getBrowserDefinition = () => {
+    function getBrowserDefinition() {
       const browser = storedBrowser.value
       if (browser) {
         browserMetadata.value = browser
@@ -181,7 +177,23 @@ export default defineComponent({
         console.log(value)
       },
 
-      validateReadOnly(field) {
+      /**
+       * Is displayed field in panel single record
+       */
+      isDisplayedField({ displayType, isActive, isQueryCriteria }) {
+        // button field not showed
+        if (displayType === BUTTON.id) {
+          return false
+        }
+
+        return isActive && isQueryCriteria
+      },
+
+      isMandatoryField({ isMandatoryFromLogic }) {
+        return isMandatoryFromLogic
+      },
+
+      validateReadOnly({ field }) {
         return field.isReadOnlyFromLogic
       }
     }
@@ -189,13 +201,29 @@ export default defineComponent({
     const containerManagerTable = {
       ...containerManager,
 
-      validateReadOnly(field) {
+      /**
+       * Is displayed column in table multi record
+       */
+      isDisplayedColumn({ displayType, isActive, isDisplayed, isDisplayedFromLogic, isKey }) {
+        // button field not showed
+        if (isKey || displayType === BUTTON.id) {
+          return false
+        }
+
+        return isActive && isDisplayed && isDisplayedFromLogic
+      },
+
+      isMandatoryColumn({ isMandatory, isMandatoryFromLogic }) {
+        return isMandatory || isMandatoryFromLogic
+      },
+
+      validateReadOnly({ field }) {
         return field.isReadOnly
       }
     }
 
     const actionsManager = ref({
-      actionsList: [
+      getActionList: () => [
         sharedLink
       ]
     })

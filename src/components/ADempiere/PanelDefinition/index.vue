@@ -27,7 +27,6 @@
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
-import { generatePanelAndFields } from './panelUtils'
 
 export default defineComponent({
   name: 'PanelDefinition',
@@ -51,8 +50,15 @@ export default defineComponent({
     }
   },
 
-  setup(props) {
+  setup(props, { root }) {
     const metadata = ref({})
+
+    if (root.$route.query.action === 'create-new') {
+      root.$store.dispatch('dataManager/setDefaultValues', {
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid
+      })
+    }
 
     const componentRender = computed(() => {
       return () => import('@/components/ADempiere/PanelDefinition/StandardPanel')
@@ -64,14 +70,8 @@ export default defineComponent({
      */
     const getPanel = () => {
       // generated panel properties
-      const panel = generatePanelAndFields({
-        parentUuid: props.parentUuid,
-        containerUuid: props.containerUuid,
-        panelMetadata: props.panelMetadata
-      })
-
       // set panel genereated
-      metadata.value = panel
+      metadata.value = props.panelMetadata
     }
 
     getPanel()

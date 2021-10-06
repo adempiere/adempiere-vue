@@ -20,7 +20,6 @@ import {
   deleteOrderLine
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { formatPercent } from '@/utils/ADempiere/valueFormat.js'
-import { showMessage } from '@/utils/ADempiere/notification.js'
 
 export default {
   name: 'OrderLineMixin',
@@ -75,16 +74,31 @@ export default {
         quantityOrdered: 0,
         uuid: ''
       },
-      totalAmountConvertedLine: {
-      }
+      totalAmountConvertedLine: {}
     }
   },
   computed: {
-
-  },
-  created() {
-    if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.displayCurrency)) {
-      this.convertedAmountAsTotal(this.$store.getters.posAttributes.currentPointOfSales.displayCurrency)
+    totalAmountConverted() {
+      const conversionsList = this.$store.state['pointOfSales/point/index'].conversionsList
+      if (this.isEmptyValue(conversionsList) && !this.isEmptyValue(this.currentPointOfSales.conversionTypeUuid)) {
+        return 1
+      }
+      const converted = conversionsList.find(converted => {
+        if (converted.conversionTypeUuid === this.currentPointOfSales.conversionTypeUuid) {
+          return converted
+        }
+      })
+      if (!this.isEmptyValue(converted)) {
+        return converted.divideRate
+      }
+      return 1
+    },
+    isPosRequiredPin() {
+      const pos = this.$store.getters.posAttributes.currentPointOfSales
+      if (!this.isEmptyValue(pos.isPosRequiredPin)) {
+        return pos.isPosRequiredPin
+      }
+      return false
     }
   },
   methods: {
@@ -97,7 +111,7 @@ export default {
         //
         case this.$t('form.pos.tableProduct.editQuantities'):
           this.fillOrderLineQuantities({
-            currentPrice: this.currentOrderLine.currentPrice,
+            currentPrice: this.currentOrderLine.priceList,
             quantityOrdered: this.currentOrderLine.quantityOrdered,
             discount: this.currentOrderLine.discount
           })
@@ -165,7 +179,7 @@ export default {
       })
         .then(response => {
           this.fillOrderLineQuantities({
-            currentPrice: response.price,
+            currentPrice: response.priceList,
             quantityOrdered: response.quantity,
             discount: response.discountRate
           })
@@ -183,56 +197,33 @@ export default {
           })
         })
     },
+
     deleteOrderLine(lineSelection) {
-      console
-      deleteOrderLine({
-        orderLineUuid: lineSelection.uuid
-      })
-        .then(() => {
-          this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
+      if (!this.isPosRequiredPin) {
+        deleteOrderLine({
+          orderLineUuid: lineSelection.uuid
         })
-        .catch(error => {
-          console.error(error.message)
-          this.$message({
-            type: 'error',
-            message: error.message,
-            showClose: true
+          .then(() => {
+            this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
           })
-        })
-    },
-    convertedAmountAsTotal(value) {
-      this.$store.dispatch('conversionDivideRate', {
-        conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
-        currencyFromUuid: this.pointOfSalesCurrency.uuid,
-        currencyToUuid: value.uuid
-      })
-        .then(response => {
-          if (!this.isEmptyValue(response.currencyTo)) {
-            const currency = {
-              ...response.currencyTo,
-              amountConvertion: response.divideRate,
-              multiplyRate: response.multiplyRate
-            }
-            this.totalAmountConvertedLine = currency
-          } else {
-            this.totalAmountConvertedLine.multiplyRate = '1'
-            this.totalAmountConvertedLine.iSOCode = value.iSOCode
-          }
-        })
-        .catch(error => {
-          console.warn(`conversionDivideRate: ${error.message}. Code: ${error.code}.`)
-          showMessage({
-            type: 'error',
-            message: error.message,
-            showClose: true
+          .catch(error => {
+            console.error(error.message)
+            this.$message({
+              type: 'error',
+              message: error.message,
+              showClose: true
+            })
           })
-        })
-    },
-    getTotalAmount(basePrice, multiplyRate) {
-      if (this.isEmptyValue(basePrice) || this.isEmptyValue(multiplyRate)) {
-        return 0
       }
-      return (basePrice * multiplyRate)
+    },
+    convertedAmount() {
+      if (!this.isEmptyValue(this.currentPointOfSales.displayCurrency) && this.totalAmountConverted === 1) {
+        this.$store.dispatch('searchConversion', {
+          conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
+          currencyFromUuid: this.currentPointOfSales.currentPriceList.currency.uuid,
+          currencyToUuid: this.currentPointOfSales.displayCurrency.uuid
+        })
+      }
     },
     /**
      * Show the correct display format
@@ -241,12 +232,13 @@ export default {
      */
     displayValue(row, orderLine) {
       const { columnName } = orderLine
+      // const iSOCode = this.isEmptyValue(this.currentPointOfSales.displayCurrency) ? '' : this.currentPointOfSales.displayCurrency.iSOCode
       if (columnName === 'LineDescription') {
         return row.lineDescription
       }
       const currency = this.pointOfSalesCurrency.iSOCode
       if (columnName === 'CurrentPrice') {
-        return this.formatPrice(row.priceActual, currency)
+        return this.formatPrice(row.priceList, currency)
       } else if (columnName === 'QtyOrdered') {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {
@@ -254,7 +246,7 @@ export default {
       } else if (columnName === 'GrandTotal') {
         return this.formatPrice(row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {
-        return this.formatPrice(this.getTotalAmount(row.grandTotal, this.totalAmountConvertedLine.multiplyRate), this.totalAmountConvertedLine.iSOCode)
+        return this.formatPrice(row.grandTotal / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       }
     },
     productPrice(price, discount) {

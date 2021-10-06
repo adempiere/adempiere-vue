@@ -158,6 +158,15 @@ export default defineComponent({
 <style scoped lang="scss" src="./common-style.scss">
 </style>
 <style lang="scss">
+.menu-relations {
+  // darker green tone for better readability
+  .el-button--success {
+    font-weight: bold;
+    border-color: #12c240;
+    color: #12c240;
+  }
+}
+
 // dropdown menu item list container
 .el-dropdown-menu {
   padding: 10px 0;

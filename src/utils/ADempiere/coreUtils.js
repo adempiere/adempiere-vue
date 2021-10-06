@@ -45,7 +45,101 @@ export function zoomIn({
     showMessage({
       type: 'error',
       showClose: true,
-      message: language.$t('notifications.noRoleAccess')
+      message: language.t('notifications.noRoleAccess')
     })
   }
+}
+
+/**
+ * Copy text into clipboard
+ * @param {string} text, text copy to clipboard
+ * @param {boolean} isShowMessage, is show notification when copy or error
+ * @returns
+ */
+export function copyToClipboard({
+  text,
+  isShowMessage = true
+}) {
+  if (navigator.clipboard) {
+    copyWhitNavigatorClipboard({
+      text,
+      isShowMessage
+    })
+    return
+  }
+
+  copyWithDOMClipboard({
+    text,
+    isShowMessage
+  })
+}
+
+export function copyWhitNavigatorClipboard({
+  text,
+  isShowMessage = true
+}) {
+  if (!navigator.clipboard) {
+    // web browser doesn't support
+    return
+  }
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      if (isShowMessage) {
+        showMessage({
+          type: 'success',
+          message: language.t('notifications.copySuccessful'),
+          showClose: true,
+          duration: 1500
+        })
+      }
+    })
+    .catch(() => {
+      if (isShowMessage) {
+        showMessage({
+          type: 'error',
+          message: language.t('notifications.copyUnsuccessful'),
+          showClose: true,
+          duration: 1500
+        })
+      }
+    })
+}
+
+export function copyWithDOMClipboard({
+  text,
+  isShowMessage = true
+}) {
+  const id = 'text-area-clipboard-' + +new Date() + ((Math.random() * 1000).toFixed(0) + '')
+  const textArea = document.createElement('textarea')
+  textArea.id = id
+  textArea.value = text
+  textArea.text = text
+  document.body.appendChild(textArea)
+  textArea.focus()
+  textArea.select()
+
+  try {
+    if (document.execCommand('copy')) {
+      if (isShowMessage) {
+        showMessage({
+          type: 'success',
+          message: language.t('notifications.copySuccessful'),
+          showClose: true,
+          duration: 1500
+        })
+      }
+    }
+  } catch (err) {
+    if (isShowMessage) {
+      showMessage({
+        type: 'error',
+        message: language.t('notifications.copyUnsuccessful'),
+        showClose: true,
+        duration: 1500
+      })
+    }
+  }
+
+  // document.body.removeChild(textArea)
+  textArea.remove()
 }

@@ -20,18 +20,9 @@
   <div v-if="isLoaded" key="window-loaded" class="view-base">
     <el-container style="min-height: calc(100vh - 84px)">
       <el-aside style="width: 100%; margin-bottom: 0px; padding-right: 10px; padding-left: 10px;">
-
-        <!-- // TODO: Add header window component for auxiliary menu and worflow status -->
-        <action-menu
-          :parent-uuid="windowUuid"
-          :references-manager="referencesManager"
-          :actions-manager="actionsManager"
-          :relations-manager="relationsManager"
-        />
-
         <component
           :is="renderWindowComponent"
-          :container-manager="containerManagerWindow"
+          :window-manager="containerManagerWindow"
           :window-metadata="windowMetadata"
         />
       </el-aside>
@@ -47,16 +38,16 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import ActionMenu from '@/components/ADempiere/ActionMenu'
 import LoadingView from '@/components/ADempiere/LoadingView'
+
 import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
-import { generateWindow as generateWindowDictionary } from './windowUtils'
+import { generateWindow } from './windowUtils'
+import { BUTTON } from '@/utils/ADempiere/references'
 
 export default defineComponent({
   name: 'Window',
 
   components: {
-    ActionMenu,
     LoadingView
   },
 
@@ -91,35 +82,79 @@ export default defineComponent({
       seekTab: function(eventInfo) {
         console.log('seekTab: ', eventInfo)
         return new Promise()
+      },
+
+      isDisplayedColumn: ({ isDisplayedGrid, isDisplayedFromLogic, isActive, isKey, displayType }) => {
+        // button field not showed
+        if (displayType === BUTTON.id) {
+          return false
+        }
+
+        // verify if field is active
+        if (!isActive) {
+          return false
+        }
+
+        // window (table) result
+        return isDisplayedGrid && isDisplayedFromLogic && !isKey
+      },
+
+      isDisplayedField: ({ isDisplayed, isDisplayedFromLogic, isActive, displayType }) => {
+        // button field not showed
+        if (displayType === BUTTON.id) {
+          return false
+        }
+
+        // verify if field is active
+        if (!isActive) {
+          return false
+        }
+
+        return isDisplayed && isDisplayedFromLogic
+      },
+
+      validateReadOnly({
+        field,
+        // records values
+        preferenceClientId,
+        clientId,
+        isActive,
+        isProcessing,
+        isProcessed,
+        isWithRecord
+      }) {
+        // evaluate context
+        if (preferenceClientId !== clientId && isWithRecord) {
+          return true
+        }
+        // record is inactive
+        if (!isActive && field.columnName !== 'IsActive') {
+          return true
+        }
+        if (field.isAlwaysUpdateable) {
+          return false
+        }
+        if (isWithRecord && (isProcessing || isProcessed)) {
+          return true
+        }
+
+        // not updateable and record saved
+        if (!field.isUpdateable && isWithRecord) {
+          return true
+        }
+        return (
+          field.isReadOnly || field.isReadOnlyFromLogic || field.isReadOnlyFromForm
+        )
       }
     }
+
     if (!root.isEmptyValue(props.containerManager)) {
       containerManagerWindow = {
         ...containerManagerWindow,
         // overwirte methods
-        ...props.containerManager,
-
-        isDisplayedColumn: ({ isDisplayedGrid, isDisplayedFromLogic, isKey }) => {
-          // window (table) result
-          return isDisplayedGrid &&
-            isDisplayedFromLogic &&
-            !isKey
-        }
+        ...props.containerManager
       }
     }
-
-    const actionsManager = ref({
-      // overwrite logic or add actions
-      ...props.containerManager.actionsManager
-    })
-    const referencesManager = ref({
-      // overwrite logic
-      ...props.containerManager.referencesManager
-    })
-    const relationsManager = ref({
-      // overwrite logic
-      ...props.containerManager.relationsManager
-    })
 
     const isLoaded = ref(false)
     const windowMetadata = ref({})
@@ -134,16 +169,16 @@ export default defineComponent({
       return root.$store.getters.getStoredWindow(windowUuid)
     })
 
-    const generateWindow = (window) => {
+    function setLoadWindow(window) {
       windowMetadata.value = window
       isLoaded.value = true
     }
 
     // get window from vuex store or request from server
-    const getWindow = () => {
+    function getWindow() {
       let window = storedWindow.value
       if (!root.isEmptyValue(window)) {
-        generateWindow(window)
+        setLoadWindow(window)
         return
       }
       // metadata props use for test
@@ -151,13 +186,13 @@ export default defineComponent({
         // from server response
         window = convertWindow(props.metadata)
         // add apps properties
-        window = generateWindowDictionary(window)
+        window = generateWindow(window)
         // add into store
         return root.$store.dispatch('addWindow', window)
           .then(windowResponse => {
             // to obtain the load effect
             setTimeout(() => {
-              generateWindow(windowResponse)
+              setLoadWindow(windowResponse)
             }, 1000)
           })
       }
@@ -166,13 +201,12 @@ export default defineComponent({
       })
         .then(windowResponse => {
           // add apps properties
-          window = generateWindowDictionary(windowResponse)
-          generateWindow(window)
+          setLoadWindow(windowResponse)
         })
     }
 
     const renderWindowComponent = computed(() => {
-      const windowComponent = () => import('@/views/ADempiere/Window/StandardWindow')
+      const windowComponent = () => import('@/views/ADempiere/Window/MultiTabWindow.vue')
 
       return windowComponent
     })
@@ -184,9 +218,6 @@ export default defineComponent({
       windowUuid,
       containerManagerWindow,
       windowMetadata,
-      actionsManager,
-      referencesManager,
-      relationsManager,
       // computed
       renderWindowComponent,
       isLoaded

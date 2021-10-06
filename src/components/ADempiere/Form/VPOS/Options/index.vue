@@ -33,8 +33,8 @@
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover">
               <p
-                :style="isEmptyValue($route.query.action) ? 'cursor: not-allowed; text-align: center !important; color: gray;' : blockOption"
-                @click="newOrder"
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
+                @click="!allowsCreateOrder ? '' : newOrder"
               >
                 <i class="el-icon-news" />
                 <br>
@@ -77,7 +77,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="generateImmediateInvoice"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.generateImmediateInvoice')) : generateImmediateInvoice"
               >
                 <i class="el-icon-document-add" />
                 <br>
@@ -90,7 +90,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="completePreparedOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.completePreparedOrder')) : completePreparedOrder"
               >
                 <i class="el-icon-success" />
                 <br>
@@ -99,11 +99,11 @@
             </el-card>
           </el-col>
 
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="allowsReturnOrder" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="reverseSalesTransaction"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction')) : reverseSalesTransaction"
               >
                 <i class="el-icon-error" />
                 <br>
@@ -116,7 +116,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="withdrawal"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createPos')) : withdrawal"
               >
                 <i class="el-icon-document-remove" />
                 <br>
@@ -129,7 +129,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="printOrder"
+                @click="printTicket"
               >
                 <i class="el-icon-printer" />
                 <br>
@@ -137,16 +137,15 @@
               </p>
             </el-card>
           </el-col>
-
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="createNewCustomerReturnOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder')) : createNewCustomerReturnOrder"
               >
                 <i class="el-icon-refresh-left" />
                 <br>
-                Crear Nueva Orden de Devolución
+                {{ $t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder') }}
               </p>
             </el-card>
           </el-col>
@@ -154,7 +153,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="copyOrder "
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.copyOrder')) : copyOrder "
               >
                 <i class="el-icon-document-copy" />
                 <br>
@@ -166,7 +165,7 @@
             <el-card shadow="hover">
               <p
                 :style="blockOption"
-                @click="deleteOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelOrder')) : deleteOrder"
               >
                 <i class="el-icon-close" />
                 <br>
@@ -220,7 +219,7 @@
         <el-row :gutter="24" style="padding-right: 10px;">
           <el-col :span="size">
             <el-card shadow="hover">
-              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
+              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="adviserPin ? validateOption($t('form.pos.optionsPoinSales.generalOptions.changePos')) : changePos">
                 <p
                   style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
                 >
@@ -278,7 +277,7 @@
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
                     v-for="item in warehousesListPointOfSales"
-                    :key="item.uuid"
+                    :key="item.id"
                     :command="item"
                   >
                     {{ item.name }}
@@ -312,6 +311,31 @@
         </el-row>
       </el-collapse-item>
     </el-collapse>
+    <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + attributePin.label" width="40%" :visible.sync="visible">
+      <el-input
+        id="pin"
+        ref="pin"
+        v-model="pin"
+        v-shortkey="visible ? {close: ['esc'], enter: ['enter']} : {}"
+        autofocus
+        type="password"
+        :placeholder="$t('form.pos.tableProduct.pin')"
+        :focus="true"
+        @shortkey.native="theAction"
+      />
+      <span style="float: right;">
+        <el-button
+          type="danger"
+          icon="el-icon-close"
+          @click="closePin"
+        />
+        <el-button
+          type="primary"
+          icon="el-icon-check"
+          @click="openPin(pin)"
+        />
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -319,7 +343,6 @@
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
 import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
 import {
-  printOrder,
   generateImmediateInvoice,
   withdrawal,
   createNewReturnOrder,
@@ -328,9 +351,9 @@ import {
   createOrder,
   processOrder
 } from '@/api/ADempiere/form/point-of-sales.js'
+import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 import ModalDialog from '@/components/ADempiere/Dialog'
 import posProcess from '@/utils/ADempiere/constants/posProcess'
-import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
 
 export default {
@@ -341,8 +364,7 @@ export default {
     ModalDialog
   },
   mixins: [
-    orderLineMixin,
-    posMixin
+    orderLineMixin
   ],
   props: {
     metadata: {
@@ -354,10 +376,27 @@ export default {
     return {
       activeName: '',
       processPos: '',
-      showFieldListOrder: false
+      pin: '',
+      attributePin: {},
+      validatePin: true,
+      visible: false,
+      showFieldListOrder: false,
+      posProcess
     }
   },
   computed: {
+    infowOverdrawnInvoice() {
+      if (this.$store.getters.getOverdrawnInvoice.attributePin) {
+        return this.$store.getters.getOverdrawnInvoice.attributePin
+      }
+      return ''
+    },
+    allowsReturnOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsReturnOrder
+    },
+    allowsCreateOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
+    },
     isShowProductsPriceList: {
       get() {
         return this.$store.state['pointOfSales/point/index'].productPrice.isShowPopoverMenu
@@ -381,8 +420,11 @@ export default {
         }
       }
     },
+    adviserPin() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isPosRequiredPin
+    },
     blockOption() {
-      if (!this.isEmptyValue(this.$route.query.pos)) {
+      if (!this.isEmptyValue(this.currentOrder.uuid)) {
         return 'cursor: pointer; text-align: center !important; color: black;min-height: 50px;'
       }
       return 'cursor: not-allowed; text-align: center !important; color: gray;min-height: 50px;'
@@ -390,20 +432,162 @@ export default {
     size() {
       const size = this.$store.getters.getWidthLeft
       return 24 / size
+    },
+    currentPointOfSales() {
+      return this.$store.getters.posAttributes.currentPointOfSales
+    },
+    listPointOfSales() {
+      return this.$store.getters.posAttributes.pointOfSalesList
+    },
+    priceListPointOfSales() {
+      const list = this.$store.getters.posAttributes.currentPointOfSales.pricesList
+      if (this.isEmptyValue(list)) {
+        return []
+      }
+      return list
+    },
+    warehousesListPointOfSales() {
+      const list = this.$store.getters.posAttributes.currentPointOfSales.warehousesList
+      if (this.isEmptyValue(list)) {
+        return []
+      }
+      return list
+    },
+    ordersList() {
+      if (this.isEmptyValue(this.currentPointOfSales)) {
+        return []
+      }
+      return this.currentPointOfSales.listOrder
+    },
+    currentOrder() {
+      if (this.isEmptyValue(this.currentPointOfSales)) {
+        return {
+          documentType: {},
+          documentStatus: {
+            value: ''
+          },
+          totalLines: 0,
+          grandTotal: 0,
+          salesRepresentative: {},
+          businessPartner: {
+            value: '',
+            uuid: ''
+          }
+        }
+      }
+      return this.currentPointOfSales.currentOrder
+    }
+  },
+  watch: {
+    visible(value) {
+      if (value && !this.isEmptyValue(this.$refs)) {
+        setTimeout(() => {
+          this.focusPin()
+        }, 300)
+      }
     }
   },
   created() {
-    this.findProcess()
+    this.findProcess(this.posProcess)
   },
   methods: {
+    theAction(event) {
+      if (this.visible) {
+        switch (event.srcKey) {
+          case 'enter':
+            this.openPin(this.pin)
+            break
+          case 'close':
+            this.closePin()
+            break
+        }
+      }
+    },
+    closePin() {
+      this.visible = false
+      this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
+      this.pin = ''
+    },
+    focusPin() {
+      this.$refs.pin.focus()
+    },
+    openPin(pin) {
+      this.focusPin()
+      validatePin({
+        posUuid: this.currentPointOfSales.uuid,
+        pin
+      })
+        .then(response => {
+          this.validatePin = true
+          this.pin = ''
+          this.visible = false
+          this.optionPin(this.attributePin)
+          this.$message({
+            type: 'success',
+            message: 'Acción a realizar',
+            showClose: true
+          })
+        })
+        .catch(error => {
+          console.error(error.message)
+          this.$message({
+            type: 'error',
+            message: error.message,
+            showClose: true
+          })
+          this.pin = ''
+        })
+        .finally(() => {
+          this.pin = ''
+          this.visible = false
+        })
+    },
+    validateOption(name) {
+      this.visible = true
+      this.attributePin = {
+        type: 'updateOrder',
+        label: name
+      }
+    },
+    optionPin(action) {
+      switch (action.label) {
+        case this.$t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder'):
+          this.createNewCustomerReturnOrder()
+          break
+        case this.$t('form.pos.optionsPoinSales.salesOrder.completePreparedOrder'):
+          this.completePreparedOrder()
+          break
+        case this.$t('form.pos.optionsPoinSales.salesOrder.generateImmediateInvoice'):
+          this.generateImmediateInvoice()
+          break
+        case this.$t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction'):
+          this.reverseSalesTransaction()
+          break
+        case this.$t('form.pos.optionsPoinSales.salesOrder.createPos'):
+          this.withdrawal()
+          break
+        case this.$t('form.pos.optionsPoinSales.salesOrder.print'):
+          this.printTicket()
+          break
+        case this.$t('form.pos.optionsPoinSales.salesOrder.copyOrder'):
+          this.copyOrder()
+          break
+        case this.$t('form.pos.optionsPoinSales.salesOrder.cancelOrder'):
+          this.deleteOrder()
+          break
+        case this.$t('form.pos.optionsPoinSales.generalOptions.changePos'):
+          this.changePos()
+          break
+      }
+    },
     notSubmitForm(event) {
       event.preventDefault()
       return false
     },
-    printOrder() {
-      printOrder({
-        orderUuid: this.$route.query.action
-      })
+    printTicket() {
+      const orderUuid = this.currentOrder.uuid
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('printTicket', { posUuid, orderUuid })
     },
     generateImmediateInvoice() {
       // TODO: Add BPartner
@@ -414,6 +598,10 @@ export default {
       })
     },
     completePreparedOrder() {
+      if (this.isEmptyValue(this.currentOrder.uuid)) {
+        return ''
+      }
+      const orderUuid = this.currentOrder.uuid
       const posUuid = this.currentPointOfSales.uuid
       this.$store.dispatch('updateOrderPos', true)
       this.$store.dispatch('updatePaymentPos', true)
@@ -424,7 +612,7 @@ export default {
       })
       processOrder({
         posUuid,
-        orderUuid: this.$route.query.action,
+        orderUuid,
         createPayments: false,
         payments: []
       })
@@ -435,6 +623,7 @@ export default {
             message: this.$t('notifications.completed'),
             showClose: true
           })
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
         })
         .catch(error => {
           this.$message({
@@ -452,6 +641,9 @@ export default {
         })
     },
     reverseSalesTransaction() {
+      if (this.isEmptyValue(this.currentOrder.uuid)) {
+        return ''
+      }
       const process = this.$store.getters.getProcess(posProcess[0].uuid)
       this.showModal(process)
       const parametersList = [
@@ -473,7 +665,7 @@ export default {
         },
         {
           columnName: 'C_DocTypeRMA_ID',
-          value: 'VO'
+          value: this.currentOrder.documentType.id
         }
       ]
       this.$store.dispatch('addParametersProcessPos', parametersList)
@@ -488,7 +680,7 @@ export default {
     },
     createNewCustomerReturnOrder() {
       createNewReturnOrder({
-        orderUuid: this.$route.query.action
+        orderUuid: this.currentOrder.uuid
       })
     },
     showModal(action) {
@@ -501,17 +693,20 @@ export default {
       })
     },
     copyOrder() {
+      if (this.isEmptyValue(this.currentOrder.uuid)) {
+        return ''
+      }
       this.processPos = posProcess[1].uuid
       const posUuid = this.currentPointOfSales.uuid
       const parametersList = [{
         columnName: 'C_Order_ID',
         value: this.currentOrder.id
       }]
+      this.$store.commit('setShowPOSCollection', false)
       this.$store.dispatch('addParametersProcessPos', parametersList)
       createOrder({
         posUuid,
-        customerUuid: this.currentOrder.businessPartner.uuid,
-        warehouseUuid: this.$store.getters.currentWarehouse.uuid
+        customerUuid: this.currentOrder.businessPartner.uuid
       })
         .then(order => {
           this.$store.dispatch('currentOrder', order)
@@ -538,13 +733,12 @@ export default {
           })
         })
         .finally(() => {
-          const process = this.$store.getters.getProcess(posProcess[1].uuid)
+          const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
           this.showModal(process)
         })
     },
     copyLineOrder() {
-      this.processPos = posProcess[1].uuid
-      const process = this.$store.getters.getProcess(posProcess[1].uuid)
+      const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
       this.showModal(process)
     },
     cashClosing() {
@@ -555,9 +749,12 @@ export default {
       })
     },
     deleteOrder() {
+      if (this.isEmptyValue(this.currentOrder.uuid)) {
+        return ''
+      }
       this.$store.dispatch('updateOrderPos', true)
       deleteOrder({
-        orderUuid: this.$route.query.action
+        orderUuid: this.currentOrder.uuid
       })
         .then(response => {
           this.changePos(this.currentPointOfSales)
@@ -586,6 +783,103 @@ export default {
           this.$store.dispatch('getProcessFromServer', { containerUuid: item.uuid, processId: item.id })
         })
       }
+    },
+    changePos(posElement) {
+      this.$store.dispatch('setCurrentPOS', posElement)
+      this.clearOrder()
+    },
+    newOrder() {
+      const posUuid = this.currentPointOfSales.uuid
+      let customerUuid = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'C_BPartner_ID_UUID'
+      })
+      const id = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'C_BPartner_ID'
+      })
+      const documentTypeUuid = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'C_DocTypeTarget_ID_UUID'
+      })
+      if (this.isEmptyValue(customerUuid) || id === 1000006) {
+        customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+      }
+      this.$store.dispatch('createOrder', {
+        posUuid,
+        customerUuid,
+        salesRepresentativeUuid: this.currentPointOfSales.salesRepresentative.uuid,
+        documentTypeUuid
+      })
+        .then(response => {
+          this.$store.dispatch('reloadOrder', { orderUuid: response.uuid })
+          this.$router.push({
+            params: {
+              ...this.$route.params
+            },
+            query: {
+              ...this.$route.query,
+              action: response.uuid
+            }
+          }).then(() => {
+            this.$store.commit('setShowPOSCollection', false)
+            this.$store.dispatch('listOrdersFromServer', {
+              posUuid: this.currentPointOfSales.uuid
+            })
+          }).catch(() => {})
+        })
+    },
+    clearOrder() {
+      this.$router.push({
+        params: {
+          ...this.$route.params
+        },
+        query: {
+          pos: this.currentPointOfSales.id
+        }
+      }).catch(() => {
+      }).finally(() => {
+        this.$store.commit('setListPayments', {})
+        const { templateBusinessPartner } = this.currentPointOfSales
+        this.$store.commit('updateValuesOfContainer', {
+          containerUuid: this.metadata.containerUuid,
+          attributes: [{
+            columnName: 'UUID',
+            value: undefined
+          },
+          {
+            columnName: 'ProductValue',
+            value: undefined
+          },
+          {
+            columnName: 'C_BPartner_ID',
+            value: templateBusinessPartner.id
+          },
+          {
+            columnName: 'DisplayColumn_C_BPartner_ID',
+            value: templateBusinessPartner.name
+          },
+          {
+            columnName: ' C_BPartner_ID_UUID',
+            value: templateBusinessPartner.uuid
+          }]
+        })
+        this.$store.dispatch('setOrder', {
+          documentType: {},
+          documentStatus: {
+            value: ''
+          },
+          totalLines: 0,
+          grandTotal: 0,
+          salesRepresentative: {},
+          businessPartner: {
+            value: '',
+            uuid: ''
+          }
+        })
+        this.$store.commit('setShowPOSCollection', false)
+        this.$store.dispatch('listOrderLine', [])
+      })
     }
   }
 }

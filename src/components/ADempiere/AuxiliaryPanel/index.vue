@@ -17,14 +17,24 @@
 -->
 
 <template>
-  <div class="container-main">
+  <el-main
+    v-shortkey="shorcutKeys"
+    class="container-main"
+    @shortkey.native="keyAction"
+  >
     <el-row :gutter="12" style="height: 100% !important;">
       <transition name="slide-fade" style="height: 100% !important;">
         <el-col :span="10" class="container-main" :style="fullscreen ? {width: 100 + '%'} : ''">
           <el-card class="table">
             <div slot="header">
               {{ label }}
-              <el-button type="text" icon="el-icon-close" style="float: right;padding: 3px 0px;font-size: 22px;padding-left: 5px;" @click="closeContainer" />
+
+              <el-button
+                type="text"
+                icon="el-icon-close"
+                style="float: right;padding: 3px 0px;font-size: 22px;padding-left: 5px;"
+                @click="closeContainer"
+              />
               <el-button
                 type="text"
                 style="float: right; font-size: 18px; padding: 3px 0"
@@ -33,20 +43,31 @@
                 <svg-icon :icon-class="!fullscreen ? 'fullscreen' : 'exit-fullscreen'" />
               </el-button>
             </div>
+
             <slot />
+
           </el-card>
         </el-col>
       </transition>
     </el-row>
-  </div>
+  </el-main>
 </template>
 
 <script>
-import { defineComponent, ref } from '@vue/composition-api'
+import { defineComponent, computed, ref } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'AuxiliaryPanel',
+
   props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
+    containerUuid: {
+      type: String,
+      required: true
+    },
     // Container Title or Description
     label: {
       type: String,
@@ -61,9 +82,30 @@ export default defineComponent({
 
   setup(props, { root }) {
     const fullscreen = ref(false)
-    const closeContainer = () => {
-      root.$store.commit('setExternalContainer', false)
+
+    const shorcutKeys = computed(() => {
+      return {
+        closePanel: ['esc']
+      }
+    })
+
+    function keyAction(event) {
+      switch (event.srcKey) {
+        case 'closePanel':
+          closeContainer()
+          break
+      }
     }
+
+    function closeContainer() {
+      root.$store.dispatch('changeTabAttribute', {
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        attributeName: 'isShowedTableRecords',
+        attributeValue: false
+      })
+    }
+
     const percent = (position) => {
       if (position) {
         return '0%'
@@ -73,8 +115,11 @@ export default defineComponent({
 
     return {
       fullscreen,
-      // methodo
+      // computeds
+      shorcutKeys,
+      // methods
       closeContainer,
+      keyAction,
       percent
     }
   }

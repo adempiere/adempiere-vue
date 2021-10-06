@@ -14,16 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Vue from 'vue'
 import { requestReferencesList } from '@/api/ADempiere/window'
 
 const references = {
   state: {
-    storedReferences: []
+    storedReferences: {}
   },
 
   mutations: {
     addReferencesList(state, payload) {
-      state.storedReferences.push(payload)
+      const { windowUuid, tableName, recordUuid } = payload
+      const key = windowUuid + '_' + tableName + '_' + recordUuid
+
+      Vue.set(state.storedReferences, key, payload)
     }
   },
 
@@ -39,7 +43,7 @@ const references = {
       tableName,
       recordUuid
     }) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         requestReferencesList({
           windowUuid: parentUuid,
           tableName,
@@ -59,6 +63,7 @@ const references = {
           })
           .catch(error => {
             console.warn(`References Load Error ${error.code}: ${error.message}.`)
+            reject(error)
           })
       })
     }
@@ -70,11 +75,9 @@ const references = {
       tableName,
       recordUuid
     }) => {
-      return state.storedReferences.find(item => {
-        return item.windowUuid === windowUuid &&
-          item.tableName === tableName &&
-          item.recordUuid === recordUuid
-      })
+      const key = windowUuid + '_' + tableName + '_' + recordUuid
+
+      return state.storedReferences[key]
     }
   }
 }

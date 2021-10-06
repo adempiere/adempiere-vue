@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser.js'
+import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
 
 export default {
   getBrowserDefinitionFromServer({ commit }, uuid) {
@@ -22,7 +23,11 @@ export default {
       requestBrowserMetadata({
         uuid
       })
-        .then(browser => {
+        .then(browserResponse => {
+          const browser = generatePanelAndFields({
+            containerUuid: uuid,
+            panelMetadata: browserResponse
+          })
           commit('addBrowserToList', browser)
 
           resolve(browser)

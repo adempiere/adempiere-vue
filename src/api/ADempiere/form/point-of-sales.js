@@ -18,7 +18,7 @@
 import { request } from '@/utils/ADempiere/request'
 import { config } from '@/utils/ADempiere/config'
 import { isEmptyValue } from '@/utils/ADempiere'
-
+import { camelizeObjectKeys } from '@/utils/ADempiere/transformObject.js'
 /**
  * method in api/price-checking.js as getProductPrice
  * @author elsiosanchez <elsiosanches@gmail.com>
@@ -125,6 +125,157 @@ export function updateOrder({
       return convertOrder(updateOrderResponse)
     })
 }
+// Create Customer
+export function createCustomer({
+  value,
+  taxId,
+  duns,
+  naics,
+  name,
+  name2,
+  description,
+  contactName,
+  eMail,
+  phone,
+  businessPartnerGroupUuid,
+  // Location
+  address1,
+  address2,
+  address3,
+  address4,
+  cityUuid,
+  cityName,
+  postalCode,
+  regionUuid,
+  regionName,
+  countryUuid,
+  posUuid
+}) {
+  return request({
+    url: 'form/addons/point-of-sales/create-customer',
+    method: 'post',
+    data: {
+      value,
+      tax_id: taxId,
+      duns,
+      naics,
+      name,
+      last_name: name2,
+      description,
+      contact_name: contactName,
+      e_mail: eMail,
+      phone,
+      business_partner_group_uid: businessPartnerGroupUuid,
+      // Location
+      address1,
+      address2,
+      address3,
+      address4,
+      city_uuid: cityUuid,
+      city_name: cityName,
+      postal_code: postalCode,
+      region_uuid: regionUuid,
+      region_name: regionName,
+      country_uuid: countryUuid,
+      pos_uuid: posUuid
+    }
+  })
+    .then(businessPartnerResponse => {
+      const { convertBusinessPartner } = require('@/utils/ADempiere/apiConverts/core.js')
+
+      return convertBusinessPartner(businessPartnerResponse)
+    })
+}
+// Update Customer
+export function updateCustomer({
+  uuid,
+  value,
+  taxId,
+  duns,
+  naics,
+  name,
+  lastName,
+  description,
+  contactName,
+  email,
+  phone,
+  addressUuid,
+  address1,
+  address2,
+  address3,
+  address4,
+  cityUuid,
+  cityName,
+  postalCode,
+  regionUuid,
+  regionName,
+  countryUuid,
+  posUuid
+}) {
+  return request({
+    url: 'form/addons/point-of-sales/update-customer',
+    method: 'post',
+    data: {
+      uuid,
+      value,
+      tax_id: taxId,
+      duns,
+      naics,
+      name,
+      last_name: lastName,
+      description,
+      contact_name: contactName,
+      email,
+      phone,
+      address_uuid: addressUuid,
+      address1,
+      address2,
+      address3,
+      address4,
+      city_uuid: cityUuid,
+      city_name: cityName,
+      postal_code: postalCode,
+      region_uuid: regionUuid,
+      region_name: regionName,
+      country_uuid: countryUuid,
+      pos_uuid: posUuid
+    }
+  })
+    .then(businessPartnerResponse => {
+      const { convertBusinessPartner } = require('@/utils/ADempiere/apiConverts/core.js')
+
+      return convertBusinessPartner(businessPartnerResponse)
+    })
+}
+
+export function customer({
+  searchValue,
+  value,
+  name,
+  contactName,
+  eMail,
+  phone,
+  postalCode
+}) {
+  return request({
+    url: 'form/addons/point-of-sales/customer',
+    method: 'get',
+    params: {
+      search_value: searchValue,
+      value,
+      name,
+      contact_name: contactName,
+      e_mail: eMail,
+      phone,
+      postal_code: postalCode
+    }
+  })
+    .then(businessPartnerResponse => {
+      const { convertBusinessPartner } = require('@/utils/ADempiere/apiConverts/core.js')
+
+      return convertBusinessPartner(businessPartnerResponse)
+    })
+}
 
 // Get order from uuid
 export function getOrder(orderUuid) {
@@ -183,48 +334,6 @@ export function listOrders({
   pageSize,
   pageToken
 }) {
-  /*
-  const Criteria = require('@/utils/ADempiere/criteria.js')
-  const criteria = new Criteria({
-    tableName: 'C_Order'
-  })
-
-  criteria.addCondition({
-    columnName: 'DocumentNo',
-    value: documentNo
-  }).addCondition({
-    columnName: 'C_BPartner_ID_UUID',
-    value: businessPartnerUuid
-  }).addCondition({
-    columnName: 'GrandTotal',
-    value: grandTotal
-  }).addCondition({
-    columnName: 'OpenAmt',
-    value: openAmount
-  }).addCondition({
-    columnName: 'IsPaid',
-    value: isPaid
-  }).addCondition({
-    columnName: 'Processed',
-    value: isProcessed
-  }).addCondition({
-    columnName: 'IsAisleSeller',
-    value: isAisleSeller
-  }).addCondition({
-    columnName: 'IsInvoiced',
-    value: isInvoiced
-  }).addCondition({
-    columnName: 'DateOrderedFrom',
-    value: dateOrderedFrom
-  }).addCondition({
-    columnName: 'DateOrderedTo',
-    value: dateOrderedTo
-  }).addCondition({
-    columnName: 'SalesRep_ID_UUID',
-    value: salesRepresentativeId
-  })
-  */
-
   return request({
     url: `${config.pointOfSales.endpoint}/orders`,
     method: 'get',
@@ -379,10 +488,7 @@ export function getKeyLayout({ keyLayoutUuid }) {
 export function getProductPriceList({
   searchValue,
   businessPartnerUuid,
-  validFrom,
   posUuid,
-  // Query
-  // criteria,
   pageSize,
   pageToken
 }) {
@@ -392,7 +498,6 @@ export function getProductPriceList({
     params: {
       pos_uuid: posUuid,
       search_value: searchValue,
-      valid_from: validFrom,
       business_partner_uuid: businessPartnerUuid,
       page_size: pageSize,
       page_token: pageToken
@@ -411,10 +516,21 @@ export function getProductPriceList({
     })
 }
 
-export function printOrder({
+export function printTicket({
+  posUuid,
   orderUuid
 }) {
-  console.info(`Print order ${orderUuid}`)
+  return request({
+    url: `${config.pointOfSales.endpoint}/print-ticket`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      order_uuid: orderUuid
+    }
+  })
+    .then(printTicketResponse => {
+      return camelizeObjectKeys(printTicketResponse)
+    })
 }
 
 export function generateImmediateInvoice({
@@ -468,6 +584,7 @@ export function createPayment({
   amount,
   paymentDate,
   tenderTypeCode,
+  isRefund,
   currencyUuid
 }) {
   return request({
@@ -483,11 +600,12 @@ export function createPayment({
       amount: amount,
       payment_date: paymentDate,
       tender_type_code: tenderTypeCode,
+      is_refund: isRefund,
       currency_uuid: currencyUuid
     }
   })
     .then(createPaymentResponse => {
-      return createPaymentResponse
+      return camelizeObjectKeys(createPaymentResponse)
     })
 }
 
@@ -569,10 +687,10 @@ export function getPaymentsList({
  *
  * req.query.token - user token
  * Body:
- * req.body.pos_uuid - POS UUID reference
- * req.body.order_uuid - Order UUID reference
- * req.body.create_payments - Optional create payments (if is true then hope payments array)
- * req.body.payments
+ *.pos_uuid - POS UUID reference
+ *.order_uuid - Order UUID reference
+ *.create_payments - Optional create payments (if is true then hope payments array)
+ *.payments
  * [
  * invoice_uuid - Invoice UUID reference
  * bank_uuid - Bank UUID reference
@@ -620,6 +738,72 @@ export function processOrder({
 }
 
 /**
+ * Overdrawn Invoice
+ * This request allows you to process an order if the payment is more or less than the invoice.
+ *
+ * req.query.token - user token
+ * Body:
+ *.pos_uuid - POS UUID reference
+ *.order_uuid - Order UUID reference
+ *.create_payments - Optional create payments (if is true then hope payments array)
+ *.payments
+ * [
+ * invoice_uuid - Invoice UUID reference
+ * bank_uuid - Bank UUID reference
+ * reference_no - Reference no
+ * description - Description for Payment
+ * amount - Payment Amount
+ * tender_type_code - Tender Type
+ * payment_date - Payment Date (default now)
+ * currency_uuid - Currency UUID reference
+ * ]
+ *.customer_details [
+ * key - columnName
+ * value - value
+ * ] - customer data in case of refund or voucher card
+ *.option - reimbursement rate
+ */
+
+export function overdrawnInvoice({
+  posUuid,
+  orderUuid,
+  createPayments,
+  payments,
+  customerDetails,
+  option
+}) {
+  if (!isEmptyValue(payments)) {
+    payments = payments.map(parameter => {
+      return {
+        invoice_uuid: parameter.invoiceUuid,
+        bank_uuid: parameter.bankUuid,
+        reference_no: parameter.referenceNo,
+        description: parameter.description,
+        amount: parameter.amount,
+        tender_type_code: parameter.tenderTypeCode,
+        payment_ate: parameter.paymentDate,
+        currency_uid: parameter.currencyUuid
+      }
+    })
+  }
+  return request({
+    url: '/form/addons/point-of-sales/overdrawn-invoice',
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      order_uuid: orderUuid,
+      create_payments: createPayments,
+      payments: payments,
+      customer_details: customerDetails,
+      option: option
+    }
+  })
+    .then(processOrderResponse => {
+      return processOrderResponse
+    })
+}
+
+/**
  * Validate Ping
  * @param {string} posUuidd - POS UUID reference
  * @param {string} pin - User PIN
@@ -643,10 +827,10 @@ export function validatePin({
 }
 
 /**
- * list Warehouse
+ * list Warehouses
  * @param {string} posUuidd - POS UUID reference
  */
-export function listWarehouse({
+export function listWarehouses({
   posUuid
 }) {
   return request({
@@ -658,6 +842,25 @@ export function listWarehouse({
   })
     .then(listWarehouseResponse => {
       return listWarehouseResponse
+    })
+}
+
+/**
+ * list Document Types
+ * @param {string} posUuidd - POS UUID reference
+ */
+export function listDocumentTypes({
+  posUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/available-document-types`,
+    method: 'get',
+    params: {
+      pos_uuid: posUuid
+    }
+  })
+    .then(response => {
+      return response
     })
 }
 
@@ -703,11 +906,11 @@ export function listCurrencies({
  * Tender Type
  * @param {string} posUuidd - POS UUID reference
  */
-export function listTenderType({
+export function listTenderTypes({
   posUuid
 }) {
   return request({
-    url: `${config.pointOfSales.endpoint}/available-tender-types`,
+    url: `${config.pointOfSales.endpoint}/available-payment-methods`,
     method: 'get',
     params: {
       pos_uuid: posUuid
@@ -715,5 +918,32 @@ export function listTenderType({
   })
     .then(listTenderType => {
       return listTenderType
+    })
+}
+
+/**
+ * Create Customer Account
+ * @param {string} posUuidd - POS UUID reference
+ */
+export function createCustomerAccount({
+  posUuid,
+  orderUuid,
+  customerAccount,
+  tenderTypeCode,
+  currencyUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/available-payment-methods`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      order_uuid: orderUuid,
+      customer_account: customerAccount,
+      tender_type_code: tenderTypeCode,
+      currency_uuid: currencyUuid
+    }
+  })
+    .then(responseCustomerAccount => {
+      return responseCustomerAccount
     })
 }

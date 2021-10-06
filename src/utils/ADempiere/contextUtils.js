@@ -16,6 +16,7 @@
 
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
+import { ACCOUNTING_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'
 import evaluator from '@/utils/ADempiere/evaluator'
 import store from '@/store'
 
@@ -145,12 +146,6 @@ export function getParentFields({
   return parentFields
 }
 
-export const specialColumns = [
-  'C_AcctSchema_ID',
-  'C_Currency_ID',
-  'C_Convertion_Type_ID'
-]
-
 /**
  * Parse Context String
  * @param {string} value: (REQUIRED) String to parsing
@@ -175,7 +170,7 @@ export function parseContext({
 
   if (isEmptyValue(value)) {
     value = undefined
-    if (specialColumns.includes(columnName)) {
+    if (ACCOUNTING_COLUMNS.includes(columnName)) {
       value = contextInfo = getContext({
         columnName: '$' + columnName
       })
@@ -231,7 +226,7 @@ export function parseContext({
         })
       } else {
         // get accounting context
-        if (specialColumns.includes(columnName)) {
+        if (ACCOUNTING_COLUMNS.includes(columnName)) {
           contextInfo = getContext({
             columnName: '$' + columnName
           })

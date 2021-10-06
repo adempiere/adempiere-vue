@@ -26,12 +26,22 @@
       class="create-bp"
     >
       <el-row :gutter="24">
-        <field-definition
-          v-for="(field) in fieldsList"
-          :ref="field.columnName"
-          :key="field.columnName"
-          :metadata-field="field"
-        />
+        <el-col :span="12">
+          <field-definition
+            v-for="(field) in datos"
+            :ref="field.columnName"
+            :key="field.columnName"
+            :metadata-field="field"
+          />
+        </el-col>
+        <el-col :span="12">
+          <field-definition
+            v-for="(field) in fieldsListLocation"
+            :ref="field.columnName"
+            :key="field.columnName"
+            :metadata-field="field"
+          />
+        </el-col>
 
         <el-col :span="24">
           <samp style="float: right; padding-right: 10px;">
@@ -55,7 +65,7 @@
 </template>
 
 <script>
-import { requestCreateBusinessPartner } from '@/api/ADempiere/system-core.js'
+import { createCustomer } from '@/api/ADempiere/form/point-of-sales.js'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldsListCreate.js'
 import BParterMixin from './mixinBusinessPartner.js'
@@ -91,6 +101,35 @@ export default {
       unsubscribe: () => {}
     }
   },
+  computed: {
+    fieldsListLocation() {
+      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
+        return this.$store.getters.getFieldLocation
+      }
+      return this.fieldsList.filter(field => field.tabindex > 4)
+    },
+    datos() {
+      return this.fieldsList.filter(field => field.tabindex <= 4)
+    },
+    adviserPin() {
+      const value = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'Value'
+      })
+      const name = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'Name'
+      })
+      const isSeller = this.$store.getters.posAttributes.currentPointOfSales.isAisleSeller
+      if (!this.isEmptyValue(value) && !this.isEmptyValue(name) && isSeller) {
+        return isSeller
+      }
+      return false
+    },
+    currentPointOfSales() {
+      return this.$store.getters.posAttributes.currentPointOfSales
+    }
+  },
   watch: {
     showField(value) {
       if (value) {
@@ -109,7 +148,7 @@ export default {
     },
     // TODO: Get locations values.
     createBusinessParter() {
-      let values = this.$store.getters.getValuesView({
+      const values = this.$store.getters.getValuesView({
         containerUuid: this.containerUuid,
         format: 'object'
       })
@@ -117,7 +156,6 @@ export default {
         containerUuid: this.containerUuid,
         columnName: 'Name2'
       })
-      values = this.convertValuesToSend(values)
       values.name2 = name2
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: this.containerUuid,
@@ -125,7 +163,27 @@ export default {
       })
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
-        requestCreateBusinessPartner(values)
+        createCustomer({
+          value: values.Value,
+          taxId: values.Value,
+          name: values.Name,
+          lastName: values.Name2,
+          description: values.Description,
+          contactName: values.ContactName,
+          email: values.EMail,
+          phone: values.Phone,
+          address1: values.Address1,
+          address2: values.Address2,
+          address3: values.Address3,
+          address4: values.Address4,
+          cityUuid: values.C_City_ID_UUID,
+          cityName: values.DisplayColumn_C_City_ID,
+          postalCode: values.Postal,
+          regionUuid: values.C_Region_ID_UUID,
+          regionName: values.DisplayColumn_C_Region_ID,
+          countryUuid: values.C_Country_ID_UUID,
+          posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid
+        })
           .then(responseBPartner => {
             // TODO: Add new record into vuex store.
             this.setBusinessPartner(responseBPartner)

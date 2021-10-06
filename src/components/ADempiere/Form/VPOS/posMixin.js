@@ -16,7 +16,9 @@
 
 import {
   findProduct,
-  updateOrderLine
+  updateOrderLine,
+  deleteOrderLine,
+  processOrder
 } from '@/api/ADempiere/form/point-of-sales.js'
 import {
   formatDate,
@@ -24,6 +26,7 @@ import {
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 import orderLineMixin from './Order/orderLineMixin.js'
+import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'POSMixin',
@@ -46,12 +49,31 @@ export default {
         quantityAvailable: 0
       },
       edit: false,
-      displayType: ''
+      displayType: '',
+      pin: '',
+      attributePin: {},
+      validatePin: false,
+      visible: false
     }
   },
   computed: {
-    getWarehouse() {
-      return this.$store.getters['user/getWarehouse']
+    allowsCreateOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
+    },
+    allowsCollectOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCollectOrder
+    },
+    allowsModifyQuantity() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsModifyQuantity
+    },
+    allowsReturnOrder() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsReturnOrder
+    },
+    modifyPrice() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isModifyPrice
+    },
+    adviserPin() {
+      return this.$store.getters.posAttributes.currentPointOfSales.isAisleSeller
     },
     isSetTemplateBP() {
       const currentPOS = this.currentPointOfSales
@@ -140,6 +162,16 @@ export default {
         return []
       }
       return this.currentOrder.lineOrder
+    },
+    isPosRequiredPin() {
+      const pos = this.$store.getters.posAttributes.currentPointOfSales
+      if (!this.isEmptyValue(pos.isPosRequiredPin)) {
+        return pos.isPosRequiredPin
+      }
+      return false
+    },
+    showOverdrawnInvoice() {
+      return this.$store.getters.getOverdrawnInvoice.visible
     }
   },
   watch: {
@@ -171,6 +203,9 @@ export default {
       if (!value && !this.isEmptyValue(this.$route.query)) {
         this.reloadOrder(true)
       }
+    },
+    showOverdrawnInvoice(value) {
+      this.visible = value
     }
   },
   beforeMount() {
@@ -183,6 +218,153 @@ export default {
     formatDate,
     formatPrice,
     formatQuantity,
+    theAction(event) {
+      if (this.visible) {
+        switch (event.srcKey) {
+          case 'enter':
+            this.openPin(this.pin)
+            break
+          case 'close':
+            this.closePin()
+            break
+        }
+      }
+    },
+    openPin(pin) {
+      validatePin({
+        posUuid: this.currentPointOfSales.uuid,
+        pin
+      })
+        .then(response => {
+          this.validatePin = true
+          this.pin = ''
+          this.visible = false
+          this.pinAction(this.attributePin)
+          this.$message({
+            type: 'success',
+            message: 'Acción a realizar',
+            showClose: true
+          })
+        })
+        .catch(error => {
+          console.error(error.message)
+          this.$message({
+            type: 'error',
+            message: error.message,
+            showClose: true
+          })
+          this.pin = ''
+        })
+        .finally(() => {
+          this.visible = false
+          this.pin = ''
+        })
+    },
+    pinAction(action) {
+      action = this.isEmptyValue(action) ? this.$store.getters.getOverdrawnInvoice.attributePin : action
+      if (action.type === 'updateOrder') {
+        switch (action.columnName) {
+          case 'QtyEntered':
+          case 'PriceEntered':
+          case 'Discount':
+            this.updateOrderLine(action)
+            break
+          case 'C_DocTypeTarget_ID': {
+            const documentTypeUuid = this.$store.getters.getValueOfField({
+              containerUuid: this.$route.meta.uuid,
+              columnName: 'C_DocTypeTarget_ID_UUID'
+            })
+            this.$store.dispatch('updateOrder', {
+              orderUuid: this.$route.query.action,
+              posUuid: this.currentPointOfSales.uuid,
+              documentTypeUuid
+            })
+            break
+          }
+        }
+      } else if (action.type === 'addProduct') {
+        this.findProduct(action.value)
+      } else if (action.type === 'deleteLine') {
+        deleteOrderLine({
+          orderLineUuid: action.uuid
+        })
+          .then(response => {
+            this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
+          })
+          .catch(error => {
+            console.error(error.message)
+            this.$message({
+              type: 'error',
+              message: error.message,
+              showClose: true
+            })
+          })
+      } else if (action.type === 'maximumRefundAllowed') {
+        this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
+      } else if (action.type === 'actionPos') {
+        switch (action.action) {
+          case 'changeWarehouse':
+            this.$store.commit('setCurrentWarehousePos', action)
+            break
+          case 'changeDocumentType':
+            this.$store.commit('setCurrentDocumentTypePos', action)
+            break
+          case 'changePriceList':
+            this.$store.commit('setCurrentPriceList', action)
+            break
+          case 'openBalanceInvoice':
+            this.$store.commit('dialogoInvoce', { show: true, type: 2 })
+            this.$store.commit('dialogoInvoce', { show: false })
+            this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
+            break
+        }
+      }
+    },
+    closePin() {
+      this.visible = false
+      this.pin = ''
+      this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
+      this.setDocumentType(this.currentOrder.documentType)
+    },
+    refundAllowed(posUuid, orderUuid, payments) {
+      this.$store.dispatch('updateOrderPos', true)
+      this.$store.dispatch('updatePaymentPos', true)
+      this.$message({
+        type: 'info',
+        message: this.$t('notifications.processing'),
+        showClose: true
+      })
+      processOrder({
+        posUuid,
+        orderUuid,
+        createPayments: !this.isEmptyValue(payments),
+        payments: payments
+      })
+        .then(response => {
+          this.$store.dispatch('reloadOrder', response.uuid)
+          this.$message({
+            type: 'success',
+            message: this.$t('notifications.completed'),
+            showClose: true
+          })
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: error.message,
+            showClose: true
+          })
+        })
+        .finally(() => {
+          this.$store.dispatch('listOrdersFromServer', {
+            posUuid: this.currentPointOfSales.uuid
+          })
+          this.$store.dispatch('updateOrderPos', false)
+          this.$store.dispatch('updatePaymentPos', false)
+          this.$store.commit('dialogoInvoce', { show: false })
+        })
+    },
     withoutPOSTerminal() {
       if (this.isEmptyValue(this.currentPointOfSales)) {
         this.$message({
@@ -271,11 +453,12 @@ export default {
       }
       findProduct({
         searchValue: searchProduct,
-        priceListUuid: this.curretnPriceList.uuid
+        priceListUuid: this.curretnPriceList.uuid,
+        posUuid: this.currentPointOfSales.uuid
       })
         .then(productPrice => {
           this.product = productPrice.product
-          this.createOrder(true)
+          this.createOrder({ withLine: true })
         })
         .catch(error => {
           console.warn(error.message)
@@ -283,17 +466,6 @@ export default {
             type: 'info',
             message: error.message,
             showClose: true
-          })
-
-          this.$store.commit('updateValueOfField', {
-            containerUuid: 'Products-Price-List',
-            columnName: 'ProductValue',
-            value: `${searchProduct}`
-          })
-
-          this.$store.commit('showListProductPrice', {
-            attribute: 'isShowPopoverField',
-            isShowed: true
           })
         })
         .finally(() => {
@@ -306,12 +478,12 @@ export default {
           })
         })
     },
-    createOrder(withLine) {
+    createOrder({ withLine = false, newOrder = false, customer }) {
       if (this.withoutPOSTerminal()) {
         return
       }
       const orderUuid = this.$route.query.action
-      if (this.isEmptyValue(orderUuid)) {
+      if (this.isEmptyValue(orderUuid) || newOrder) {
         const posUuid = this.currentPointOfSales.uuid
         let customerUuid = this.$store.getters.getValueOfField({
           containerUuid: this.metadata.containerUuid,
@@ -327,6 +499,9 @@ export default {
         })
         if (this.isEmptyValue(customerUuid) || id === 1000006) {
           customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+        }
+        if (customer) {
+          customerUuid = customer
         }
         // user session
         this.$store.dispatch('createOrder', {
@@ -362,7 +537,7 @@ export default {
     reloadOrder(requery, orderUuid) {
       if (requery) {
         if (this.isEmptyValue(orderUuid)) {
-          orderUuid = this.$route.query.action
+          orderUuid = this.currentOrder.uuid
           // if (this.isEmptyValue(orderUuid)) {
           //   orderUuid = this.$store.getters.currentOrder.uuid // this.currentOrder.uuid
           // }
@@ -371,6 +546,7 @@ export default {
           this.$store.dispatch('reloadOrder', { orderUuid })
         }
       }
+      this.setDocumentType(this.currentOrder.documentType)
     },
     fillOrder(order, setToStore = true) {
       const orderToPush = {
@@ -394,22 +570,83 @@ export default {
     getOrderTax(currency) {
       return this.formatPrice(this.currentOrder.grandTotal - this.currentOrder.totalLines, currency)
     },
+    deleteOrderLine(lineSelection) {
+      if (this.currentPointOfSales.isAllowsModifyQuantity) {
+        deleteOrderLine({
+          orderLineUuid: lineSelection.uuid
+        })
+          .then(response => {
+            this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
+          })
+          .catch(error => {
+            console.error(error.message)
+            this.$message({
+              type: 'error',
+              message: error.message,
+              showClose: true
+            })
+          })
+      } else {
+        const attributePin = {
+          ...lineSelection,
+          type: 'deleteLine',
+          label: this.$t('form.pos.pinMessage.delete')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+      }
+    },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
         // TODO: Add container uuid comparison
         if (mutation.type === 'addActionKeyPerformed') {
           switch (mutation.payload.columnName) {
             case 'ProductValue':
-              this.findProduct(mutation.payload.value)
+              // this.findProduct(mutation.payload.value)
+              // if (this.isPosRequiredPin) {
+              if (this.allowsCreateOrder) {
+                this.findProduct(mutation.payload.value)
+              } else {
+                const attributePin = {
+                  ...mutation.payload,
+                  type: 'addProduct',
+                  label: this.$t('form.pos.pinMessage.addProduct')
+                }
+                this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+                this.visible = true
+              }
+              // } else {
+              //   this.findProduct(mutation.payload.value)
+              // }
               break
           }
         } else if (mutation.type === 'addActionPerformed') {
           switch (mutation.payload.columnName) {
             case 'QtyEntered':
+              if (this.allowsModifyQuantity && !this.isEmptyValue(this.$store.state['pointOfSales/orderLine/index'].line)) {
+                this.updateOrderLine(mutation.payload)
+              } else {
+                const attributePin = {
+                  ...mutation.payload,
+                  type: 'updateOrder',
+                  label: this.$t('form.pos.pinMessage.qtyEntered')
+                }
+                this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+                this.visible = true
+              }
+              break
             case 'PriceEntered':
             case 'Discount':
-              if (!this.isEmptyValue(this.$store.state['pointOfSales/orderLine/index'].line)) {
+              if (this.modifyPrice) {
                 this.updateOrderLine(mutation.payload)
+              } else {
+                const attributePin = {
+                  ...mutation.payload,
+                  type: 'updateOrder',
+                  label: mutation.payload.columnName === 'PriceEntered' ? this.$t('form.pos.pinMessage.price') : this.$t('form.pos.pinMessage.discount')
+                }
+                this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+                this.visible = true
               }
               break
             case 'C_DocTypeTarget_ID': {
@@ -417,7 +654,14 @@ export default {
                 containerUuid: mutation.payload.containerUuid,
                 columnName: 'C_DocTypeTarget_ID_UUID'
               })
-              if (!this.isEmptyValue(documentTypeUuid) && !this.isEmptyValue(this.currentOrder.documentType.uuid) && this.currentOrder.documentType.uuid !== documentTypeUuid) {
+              if (this.isPosRequiredPin && !this.isEmptyValue(documentTypeUuid) && !this.isEmptyValue(this.currentOrder.documentType.uuid)) {
+                const attributePin = {
+                  ...mutation.payload,
+                  type: 'updateOrder'
+                }
+                this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+                this.visible = true
+              } else if (!this.isEmptyValue(documentTypeUuid) && !this.isEmptyValue(this.currentOrder.documentType.uuid)) {
                 this.$store.dispatch('updateOrder', {
                   orderUuid: this.$route.query.action,
                   posUuid: this.currentPointOfSales.uuid,
@@ -432,18 +676,17 @@ export default {
             case 'DisplayColumn_TenderType':
               this.displayType = mutation.payload.value
               break
-
             case 'C_BPartner_ID_UUID': {
               const bPartnerValue = mutation.payload.value
-              if (!this.isEmptyValue(this.currentPointOfSales)) {
+              if (!this.isEmptyValue(this.currentPointOfSales.templateBusinessPartner) && this.$route.meta.uuid === mutation.payload.containerUuid) {
                 const bPartnerPOS = this.currentPointOfSales.templateBusinessPartner.uuid
+                this.updateOrder(mutation.payload)
                 // Does not send values to server, when empty values are set or
                 // if BPartner set equal to BPartner POS template
                 if (this.isEmptyValue(bPartnerValue) || bPartnerValue === bPartnerPOS) {
                   break
                 }
               }
-              this.updateOrder(mutation.payload)
               break
             }
           }
@@ -501,7 +744,7 @@ export default {
           break
       }
     },
-    newOrder() {
+    clearOrder() {
       this.$router.push({
         params: {
           ...this.$route.params
@@ -511,7 +754,7 @@ export default {
         }
       }).catch(() => {
       }).finally(() => {
-        this.$store.commit('setListPayments', [])
+        this.$store.commit('setListPayments', {})
         const { templateBusinessPartner } = this.currentPointOfSales
         this.$store.commit('updateValuesOfContainer', {
           containerUuid: this.metadata.containerUuid,
@@ -555,7 +798,7 @@ export default {
     },
     changePos(posElement) {
       this.$store.dispatch('setCurrentPOS', posElement)
-      this.newOrder()
+      this.clearOrder()
     }
   }
 }

@@ -37,6 +37,7 @@ export default {
     referenceNo,
     description,
     amount,
+    convertedAmount,
     paymentDate,
     tenderTypeCode,
     currencyUuid
@@ -53,6 +54,7 @@ export default {
         referenceNo,
         description,
         amount,
+        convertedAmount,
         paymentDate,
         tenderTypeCode,
         currencyUuid
@@ -87,10 +89,11 @@ export default {
         amount: payment.amount,
         paymentDate: payment.paymentDate,
         tenderTypeCode: payment.tenderTypeCode,
+        isRefund: false,
         currencyUuid: payment.currencyUuid
       })
         .then(response => {
-          const orderUuid = response.order_uuid
+          const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
         })
         .catch(error => {
@@ -171,36 +174,6 @@ export default {
   addRateConvertion({ commit, state, getters }, currency) {
     commit('conversionRate', currency)
   },
-  conversionMultiplyRate({ commit }, {
-    containerUuid,
-    conversionTypeUuid,
-    currencyFromUuid,
-    currencyToUuid
-    // conversionDate
-  }) {
-    requestGetConversionRate({
-      conversionTypeUuid,
-      currencyFromUuid,
-      currencyToUuid
-      // conversionDate
-    })
-      .then(response => {
-        const multiplyRate = isEmptyValue(response.multiplyRate) ? 1 : response.multiplyRate
-        if (containerUuid === 'Collection') {
-          commit('currencyMultiplyRateCollection', multiplyRate)
-        } else {
-          commit('currencyMultiplyRate', multiplyRate)
-        }
-      })
-      .catch(error => {
-        console.warn(`conversionMultiplyRate: ${error.message}. Code: ${error.code}.`)
-        showMessage({
-          type: 'error',
-          message: error.message,
-          showClose: true
-        })
-      })
-  },
   changeMultiplyRate({ commit }, params) {
     commit('currencyMultiplyRate', params)
   },
@@ -215,6 +188,7 @@ export default {
     referenceNo,
     description,
     amount,
+    convertedAmount,
     paymentDate,
     tenderTypeCode,
     currencyUuid
@@ -226,7 +200,7 @@ export default {
       return undefined
     })
     if (isEmptyValue(listPayments)) {
-      createPayment({
+      return createPayment({
         posUuid,
         orderUuid,
         invoiceUuid,
@@ -234,13 +208,19 @@ export default {
         referenceNo,
         description,
         amount,
+        convertedAmount,
         paymentDate,
         tenderTypeCode,
+        isRefund: false,
         currencyUuid
       })
         .then(response => {
-          const orderUuid = response.order_uuid
+          const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
+          return {
+            ...response,
+            type: 'Success'
+          }
         })
         .catch(error => {
           console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -249,9 +229,13 @@ export default {
             message: error.message,
             showClose: true
           })
+          return {
+            ...error,
+            type: 'error'
+          }
         })
     } else {
-      updatePayment({
+      return updatePayment({
         paymentUuid: listPayments.uuid,
         bankUuid,
         referenceNo,
@@ -263,6 +247,10 @@ export default {
         .then(response => {
           const orderUuid = response.order_uuid
           dispatch('listPayments', { orderUuid })
+          return {
+            ...response,
+            type: 'Success'
+          }
         })
         .catch(error => {
           console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -271,6 +259,10 @@ export default {
             message: error.message,
             showClose: true
           })
+          return {
+            ...error,
+            type: 'error'
+          }
         })
     }
   },
@@ -322,26 +314,46 @@ export default {
     })
     commit('setCurrencyDisplaye', displaycurrency)
   },
-  convertionPayment({ commit }, {
-    conversionTypeUuid,
-    currencyFromUuid,
-    currencyToUuid
+  addRefundLoaded({ commit, state }, refund) {
+    const addRefund = state.refundLoaded
+    addRefund.push(refund)
+    commit('setRefundLoaded', addRefund)
+  },
+  currencyRedund({ commit }, currency) {
+    commit('setCurrencyRedund', currency)
+  },
+  sendCreateCustomerAccount({ commit, dispatch }, {
+    customerAccount,
+    posUuid,
+    orderUuid,
+    invoiceUuid,
+    bankUuid,
+    referenceNo,
+    description,
+    amount,
+    convertedAmount,
+    paymentDate,
+    tenderTypeCode,
+    currencyUuid
   }) {
-    requestGetConversionRate({
-      conversionTypeUuid,
-      currencyFromUuid,
-      currencyToUuid
+    return createPayment({
+      customerAccount,
+      posUuid,
+      orderUuid,
+      invoiceUuid,
+      bankUuid,
+      referenceNo,
+      description,
+      amount,
+      convertedAmount,
+      paymentDate,
+      tenderTypeCode,
+      currencyUuid
     })
       .then(response => {
-        commit('setConvertionPayment', response)
-      })
-      .catch(error => {
-        console.warn(`ConvertionPayment: ${error.message}. Code: ${error.code}.`)
-        showMessage({
-          type: 'error',
-          message: error.message,
-          showClose: true
-        })
+        const orderUuid = response.orderUuid
+        dispatch('listPayments', { orderUuid })
+        return response
       })
   }
 }

@@ -106,6 +106,7 @@
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import preferenceFields from './preferenceFields.js'
 import { createFieldFromDictionary } from '@/utils/ADempiere/lookupFactory'
+import { CLIENT, ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
 import { setPreference, deletePreference } from '@/api/ADempiere/field/preference.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 import language from '@/lang'
@@ -149,13 +150,13 @@ export default {
       if (this.isEmptyValue(this.metadataList)) {
         return ''
       }
-      const forCurrentUser = this.metadataList.find(field => field.columnName === 'AD_User_ID')
-      const forCurrentClient = this.metadataList.find(field => field.columnName === 'AD_Client_ID')
-      const forCurrentOrganization = this.metadataList.find(field => field.columnName === 'AD_Org_ID')
-      const forCurrentContainer = this.metadataList.find(field => field.columnName === 'AD_Window_ID')
+      const forCurrentClient = this.metadataList.find(field => field.columnName === CLIENT)
       if (!forCurrentClient) {
         return ''
       }
+      const forCurrentUser = this.metadataList.find(field => field.columnName === 'AD_User_ID')
+      const forCurrentOrganization = this.metadataList.find(field => field.columnName === ORGANIZATION)
+      const forCurrentContainer = this.metadataList.find(field => field.columnName === 'AD_Window_ID')
       //  Create Message
       var expl = language.t('components.preference.for')//  components.preference.for
       if (forCurrentOrganization && forCurrentClient) {
@@ -224,8 +225,8 @@ export default {
     },
     remove() {
       const isForCurrentUser = this.metadataList.find(field => field.columnName === 'AD_User_ID').value
-      const isForCurrentClient = this.metadataList.find(field => field.columnName === 'AD_Client_ID').value
-      const isForCurrentOrganization = this.metadataList.find(field => field.columnName === 'AD_Org_ID').value
+      const isForCurrentClient = this.metadataList.find(field => field.columnName === CLIENT).value
+      const isForCurrentOrganization = this.metadataList.find(field => field.columnName === ORGANIZATION).value
       const isForCurrentContainer = this.metadataList.find(field => field.columnName === 'AD_Window_ID').value
       deletePreference({
         parentUuid: this.fieldAttributes.parentUuid,
@@ -275,8 +276,8 @@ export default {
     },
     sendValue(list) {
       const isForCurrentUser = this.metadataList.find(field => field.columnName === 'AD_User_ID').value
-      const isForCurrentClient = this.metadataList.find(field => field.columnName === 'AD_Client_ID').value
-      const isForCurrentOrganization = this.metadataList.find(field => field.columnName === 'AD_Org_ID').value
+      const isForCurrentClient = this.metadataList.find(field => field.columnName === CLIENT).value
+      const isForCurrentOrganization = this.metadataList.find(field => field.columnName === ORGANIZATION).value
       const isForCurrentContainer = this.metadataList.find(field => field.columnName === 'AD_Window_ID').value
       //
       setPreference({

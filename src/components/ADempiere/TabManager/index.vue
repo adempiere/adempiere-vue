@@ -20,6 +20,8 @@
   <div style="height: 100% !important;">
     <auxiliary-panel
       v-if="isShowRecords"
+      :parent-uuid="parentUuid"
+      :container-uuid="tabUuid"
       :label="tabsList[currentTab].name"
     >
       <record-navigation
@@ -66,7 +68,6 @@
         </lock-record>
 
         <!-- records in table to multi records -->
-        <!-- // TODO: remove generatePanelAndFields metho with store -->
         <default-table
           v-if="!isParentTabs"
           v-show="!isParentTabs && isShowMultiRecords"
@@ -76,11 +77,7 @@
           :container-manager="containerManagerTab"
           :header="tableHeaders"
           :data-table="recordsList"
-          :panel-metadata="generatePanelAndFields({
-            parentUuid: parentUuid,
-            containerUuid: tabAttributes.uuid,
-            panelMetadata: tabAttributes
-          })"
+          :panel-metadata="tabAttributes"
         />
         <!-- fields in panel to single record -->
         <panel-definition
@@ -101,7 +98,6 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
 import AuxiliaryPanel from '@/components/ADempiere/AuxiliaryPanel'
 import DefaultTable from '@/components/ADempiere/DefaultTable'
 import LockRecord from '@/components/ADempiere/ContainerOptions/LockRecord'
@@ -158,8 +154,14 @@ export default defineComponent({
       }
     })
 
+    // use getter to reactive properties
+    const currentTabMetadata = computed(() => {
+      // return props.tabsList[currentTab.value]
+      return root.$store.getters.getCurrentTab(props.parentUuid)
+    })
+
     const isShowRecords = computed(() => {
-      return root.$store.getters.getExternalContainer
+      return currentTabMetadata.value.isShowedTableRecords
     })
 
     const isShowMultiRecords = ref(true)
@@ -172,8 +174,12 @@ export default defineComponent({
       return key > 0 && isCreateNew.value
     }
 
-    const setCurrentTab = () => {
-      // TODO: Add store current tab
+    function setCurrentTab() {
+      console.info(props.tabsList[currentTab.value])
+      root.$store.commit('setCurrentTab', {
+        parentUuid: props.parentUuid,
+        tab: props.tabsList[currentTab.value]
+      })
     }
 
     const containerManagerTab = computed(() => {
@@ -187,15 +193,8 @@ export default defineComponent({
     // create the table header
     const tableHeaders = computed(() => {
       const panel = props.tabsList[tabNo]
-      if (panel && panel.fields) {
-        // TODO: Change to stored generated panel
-        const panelGenerated = generatePanelAndFields({
-          parentUuid: props.parentUuid,
-          containerUuid: panel.uuid,
-          panelMetadata: panel
-        })
-        return panelGenerated.fieldsList
-        // panel.fields
+      if (panel && panel.fieldsList) {
+        return panel.fieldsList
       }
       return []
     })
@@ -205,11 +204,14 @@ export default defineComponent({
      */
     const handleClick = (tabHTML) => {
       const { tabuuid, tabindex } = tabHTML.$attrs
+
+      setTabNumber(tabindex)
+
+      // set metadata tab
       if (tabUuid.value !== tabuuid) {
         tabUuid.value = tabuuid
         setCurrentTab()
       }
-      setTabNumber(tabindex)
     }
 
     const setTabNumber = (tabNumber = '0') => {
@@ -285,8 +287,12 @@ export default defineComponent({
 
     const openContainer = () => {
       if (props.isParentTabs) {
-        // TODO: Add tab manager store
-        root.$store.commit('setExternalContainer', true)
+        root.$store.dispatch('changeTabAttribute', {
+          parentUuid: props.parentUuid,
+          containerUuid: tabUuid.value,
+          attributeName: 'isShowedTableRecords',
+          attributeValue: true
+        })
         return
       }
       isShowMultiRecords.value = !isShowMultiRecords.value
@@ -307,7 +313,6 @@ export default defineComponent({
       isShowRecords,
       tabStyle,
       // methods
-      generatePanelAndFields,
       handleClick,
       openContainer,
       isDisabledTab

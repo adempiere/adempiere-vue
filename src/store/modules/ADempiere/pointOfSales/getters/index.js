@@ -55,6 +55,7 @@ export default {
         ...state.currentPointOfSales,
         listOrder: state.listOrder,
         warehousesList: state.warehousesList,
+        documentTypesList: state.documentTypesList,
         pricesList: state.pricesList,
         currentPriceList: state.currentPriceList,
         currentOrder: {
@@ -124,11 +125,28 @@ export default {
   /**
    * Current Warehouse
    */
-  currentWarehouse: (state) => {
-    if (!isEmptyValue(state.currentWarehouse)) {
-      return state.currentWarehouse
+  getCurrentWarehousePos: (state) => {
+    if (!isEmptyValue(state.currentWarehousePos)) {
+      return state.currentWarehousePos
     }
     return {}
-  }
+  },
+
+  /**
+   * Current Document Type
+   */
+  getCurrentDocumentTypePos: (state) => {
+    if (!isEmptyValue(state.currentDocumentTypePos)) {
+      return state.currentDocumentTypePos
+    }
+    return {}
+  },
   // Current POS, it can be s
+  getCurrenciesList: (state) => {
+    return state.currenciesList
+  },
+  // get Payment type list
+  getPaymentTypeList: (state) => {
+    return state.tenderTypes
+  }
 }

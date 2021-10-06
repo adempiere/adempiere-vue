@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
+
 export function generateWindow(responseWindow) {
   const {
     tabsList, tabsListParent, tabsListChild,
@@ -70,10 +72,14 @@ export function generateTabs({
       isParentTab: Boolean(firstTabTableName === tabItem.tableName),
       // app properties
       isShowedRecordNavigation: !(tabItem.isSingleRow),
-      isLoadFieldsList: false,
       index // this index is not related to the index in which the tabs are displayed
     }
-    return tab
+
+    return generatePanelAndFields({
+      parentUuid,
+      containerUuid: tabItem.uuid,
+      panelMetadata: tab
+    })
   })
 
   const tabsListParent = tabsList.filter(tabItem => {
