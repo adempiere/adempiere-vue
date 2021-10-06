@@ -425,10 +425,11 @@ export default {
         fieldsList: fieldLogic,
         isValidate: true
       })
-      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate) && this.dayRate.currencyTo.id !== this.currentPointOfSales.currentPriceList.currency.id) {
+      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate) && this.currentFieldCurrency !== this.currentPointOfSales.currentPriceList.currency.iSOCode) {
         return true
       }
-      if (this.defaulValuePaymentMethods.tender_type === 'X') {
+      const paymentMethods = this.availablePaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+      if (paymentMethods.tender_type === 'X') {
         return false
       }
       if (this.isEmptyValue(fieldsEmpty)) {

@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import language from '@/lang'
 const tableName = 'C_Payment'
 
 export default [
@@ -80,6 +81,7 @@ export default [
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.name'),
       size: 24,
       displayLogicPayment: 'Z',
       isActiveLogics: true,
