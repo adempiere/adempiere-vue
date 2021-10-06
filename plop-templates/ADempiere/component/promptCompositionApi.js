@@ -1,7 +1,7 @@
 const { notEmpty } = require('../../utils.js')
 
 module.exports = {
-  description: 'Generate ADempiere .vue component (Composition API)',
+  description: 'Generate ADempiere component.vue (Composition API)',
   prompts: [{
     type: 'input',
     name: 'name',
@@ -39,7 +39,7 @@ module.exports = {
     const actions = [{
       type: 'add',
       path: `src/components/ADempiere/${name}/index.vue`,
-      templateFile: 'plop-templates/component/compositionApiTemplate.hbs',
+      templateFile: 'plop-templates/ADempiere/component/compositionApiTemplate.hbs',
       data: {
         name: name,
         template: data.blocks.includes('template'),
