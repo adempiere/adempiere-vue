@@ -580,6 +580,7 @@ export default {
       } else {
         this.createOrderLine(orderUuid)
       }
+      this.$store.commit('setShowPOSCollection', false)
       this.$store.dispatch('changeFocusNewOrder', true)
     },
     reloadOrder(requery, orderUuid) {
