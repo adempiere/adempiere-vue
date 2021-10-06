@@ -744,15 +744,7 @@ export default {
         cash.forEach((pay) => {
           if (!this.isEmptyValue(pay.divideRate)) {
             const searchConversion = this.$store.state['pointOfSales/point/index'].conversionsList.find(currency => currency.currencyTo.uuid === pay.currencyUuid)
-            let rate = 1
-            if (!this.isEmptyValue(searchConversion)) {
-              rate = searchConversion.divideRate > searchConversion.multiplyRate ? searchConversion.divideRate : searchConversion.multiplyRate
-            }
-            if (this.currentPointOfSales.priceList.currency.id === 50001) {
-              sum += pay.amount * rate
-            } else {
-              sum += pay.amountConvertion
-            }
+            sum += pay.amount * searchConversion.divideRate
           } else {
             sum += pay.amount
           }
