@@ -14,39 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-{{#if state}}
-const initState = {
-  {{name}}: {}
-}
-
+{{#if template}}
+<template>
+  <div />
+</template>
 {{/if}}
-const {{name}} = {
-  {{#if state}}
-  state: initState,
-  {{/if}}
-  {{#if mutations}}
 
-  mutations: {
-    {{#if state}}
-    resetState{{capitalize name}}(state) {
-      state = initState
-    }
-    {{/if}}
-  },
-  {{/if}}
-  {{#if actions}}
+{{#if script}}
+<script>
+import { defineComponent } from '@vue/composition-api'
 
-  actions: {
-  },
-  {{/if}}
-  {{#if getters}}
+export default {
+  name: '{{ capitalize name }}',
 
-  getters: {
-    get{{capitalize name}}: (state) => {
-      return state.{{name}}
-    }
+  props: {},
+
+  setup(props, { root }) {
+    return {}
   }
-  {{/if}}
 }
+</script>
+{{/if}}
 
-export default {{name}}
+{{#if style}}
+<style lang="scss" scoped>
+</style>
+{{/if}}

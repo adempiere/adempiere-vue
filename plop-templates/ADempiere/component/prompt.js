@@ -1,7 +1,7 @@
 const { notEmpty } = require('../../utils.js')
 
 module.exports = {
-  description: 'Generate ADempiere .vue component',
+  description: 'Generate ADempiere component.vue',
   prompts: [{
     type: 'input',
     name: 'name',
@@ -41,7 +41,7 @@ module.exports = {
     const actions = [{
       type: 'add',
       path: `src/components/ADempiere/${name}/index.vue`,
-      templateFile: 'plop-templates/component/index.hbs',
+      templateFile: 'plop-templates/ADempiere/component/index.hbs',
       data: {
         name: name,
         template: data.blocks.includes('template'),

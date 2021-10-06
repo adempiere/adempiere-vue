@@ -26,3 +26,5 @@ config/certs/*.pem
 .project
 
 .talismanrc
+
+package-lock.json

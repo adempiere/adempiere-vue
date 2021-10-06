@@ -213,7 +213,7 @@ export default {
       valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
       return valuesToSend
     },
-    setBusinessPartner({ id, name, uuid }, isCloseForm = true) {
+    setBusinessPartner({ id, name, uuid, value }, isCloseForm = true) {
       const { parentUuid, containerUuid } = this.parentMetadata
       // set ID value
       this.$store.commit('updateValueOfField', {
@@ -229,7 +229,7 @@ export default {
         containerUuid,
         // DisplayColumn_'ColumnName'
         columnName: 'DisplayColumn_C_BPartner_ID', // this.parentMetadata.displayColumnName,
-        value: name
+        value: value + ' - ' + name
       })
 
       // set UUID value

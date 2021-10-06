@@ -885,52 +885,58 @@ export default {
       this.clearOrder()
     },
     changeWarehouse(warehouse) {
-      if (warehouse.is_pos_required_pin) {
-        const attributePin = {
-          ...warehouse,
-          action: 'changeWarehouse',
-          type: 'actionPos',
-          label: this.$t('form.pos.pinMessage.warehouse')
+      if (warehouse.id !== this.currentWarehouse.id) {
+        if (warehouse.is_pos_required_pin) {
+          const attributePin = {
+            ...warehouse,
+            action: 'changeWarehouse',
+            type: 'actionPos',
+            label: this.$t('form.pos.pinMessage.warehouse')
+          }
+          const visible = true
+          this.visible = visible
+          this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        } else {
+          this.$store.commit('setCurrentWarehousePos', warehouse)
         }
-        const visible = true
-        this.visible = visible
-        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-      } else {
-        this.$store.commit('setCurrentWarehousePos', warehouse)
       }
     },
     changeDocumentType(documentType) {
-      if (!documentType.is_pos_required_pin) {
-        this.$store.dispatch('updateOrder', {
-          orderUuid: this.currentOrder.uuid,
-          posUuid: this.currentPointOfSales.uuid,
-          documentTypeUuid: documentType.uuid,
-          priceListUuid: this.currentPointOfSales.priceList.uuid,
-          warehouseUuid: this.currentPointOfSales.warehouse.uuid
-        })
-      } else {
-        const attributePin = {
-          ...documentType,
-          action: 'changeDocumentType',
-          type: 'actionPos',
-          label: this.$t('form.pos.pinMessage.documentType')
+      if (documentType.id !== this.currentDocumentType.id) {
+        if (!documentType.is_pos_required_pin) {
+          this.$store.dispatch('updateOrder', {
+            orderUuid: this.currentOrder.uuid,
+            posUuid: this.currentPointOfSales.uuid,
+            documentTypeUuid: documentType.uuid,
+            priceListUuid: this.currentPointOfSales.priceList.uuid,
+            warehouseUuid: this.currentPointOfSales.warehouse.uuid
+          })
+        } else {
+          const attributePin = {
+            ...documentType,
+            action: 'changeDocumentType',
+            type: 'actionPos',
+            label: this.$t('form.pos.pinMessage.documentType')
+          }
+          this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+          this.visible = true
         }
-        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-        this.visible = true
       }
     },
     changePriceList(priceList) {
-      if (priceList.is_pos_required_pin) {
-        const attributePin = {
-          ...priceList,
-          action: 'changePriceList',
-          type: 'actionPos',
-          label: this.$t('form.pos.pinMessage.priceList')
+      if (priceList.id !== this.currentPriceList.id) {
+        if (priceList.is_pos_required_pin) {
+          const attributePin = {
+            ...priceList,
+            action: 'changePriceList',
+            type: 'actionPos',
+            label: this.$t('form.pos.pinMessage.priceList')
+          }
+          this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+          this.visible = true
+        } else {
+          this.$store.commit('setCurrentPriceList', priceList)
         }
-        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-        this.visible = true
-      } else {
-        this.$store.commit('setCurrentPriceList', priceList)
       }
     },
     arrowTop() {
