@@ -164,6 +164,9 @@ export default {
         }
       }
       commit('addInExecution', processResult)
+      let oldRouter = {
+        path: ''
+      }
       if (panelType === 'window') {
         reportType = 'pdf'
       } else if (panelType === 'browser') {
@@ -179,9 +182,12 @@ export default {
           })
         }
       } else {
+        const tabViewsVisited = getters.visitedViews
+        dispatch('tagsView/delView', routeToDelete)
+        oldRouter = tabViewsVisited[tabViewsVisited.length - 1]
         // close view if is process, report.
         router.push({
-          path: '/dashboard'
+          path: oldRouter.path
         }, () => {})
         dispatch('tagsView/delView', routeToDelete)
 
