@@ -41,7 +41,7 @@
                 />
               </template>
             </el-col>
-            <el-col :span="isEmptyValue(currentOrder) ? 5 : 5" :style="styleTab">
+            <el-col :span="6" :style="styleTab">
               <business-partner
                 id="BusinessPartner"
                 :parent-metadata="{
@@ -53,27 +53,19 @@
                 :is-disabled="isDisabled"
               />
             </el-col>
-            <el-col :span="isEmptyValue(currentOrder) ? 4 : 8" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
-              <el-row :gutter="4">
-                <el-col :span="5" style="padding-left: 0px; padding-right: 0px;">
-                  <el-tag
-                    v-if="!isEmptyValue(currentOrder.documentStatus.value)"
-                    :type="tagStatus(currentOrder.documentStatus.value)"
-                  >
-                    <span v-if="!isEmptyValue(currentOrder.documentStatus.value)">
-                      {{ currentOrder.documentStatus.name }}
-                    </span>
-                  </el-tag>
-                </el-col>
-                <el-col :span="10" style="padding-left: 0px; padding-right: 0px;">
-                  <fast-ordes-list />
-                </el-col>
-                <el-col :span="9" style="padding-left: 0px; padding-right: 0px;">
-                  <el-button type="primary" plain :style="isShowedPOSKeyLayout ? 'float: right;' : ''" @click="newOrder">
-                    {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
-                  </el-button>
-                </el-col>
-              </el-row>
+            <el-col :span="isShowKeyLayout ? 8 : 7" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2%;'">
+              <el-tag
+                v-if="!isEmptyValue(currentOrder.documentStatus.value)"
+                :type="tagStatus(currentOrder.documentStatus.value)"
+              >
+                <span v-if="!isEmptyValue(currentOrder.documentStatus.value)" style="font-size: 12px;">
+                  {{ currentOrder.documentStatus.name }}
+                </span>
+              </el-tag>
+              <fast-ordes-list style="margin-right: 2%;margin-left: 2%;font-size: 12px;" />
+              <el-button type="primary" style="font-size: 12px;" plain @click="newOrder">
+                {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
+              </el-button>
             </el-col>
           </el-row>
         </el-form>
@@ -523,7 +515,10 @@ export default {
       if (this.isEmptyValue(this.currentOrder)) {
         return 14
       }
-      return 11
+      if (this.isShowedPOSKeyLayout) {
+        return 10
+      }
+      return 12
     },
     shortsKey() {
       return {

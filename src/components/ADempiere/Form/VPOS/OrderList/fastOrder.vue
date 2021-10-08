@@ -135,7 +135,7 @@
         </el-col>
       </el-row>
     </el-container>
-    <el-button slot="reference" type="primary" plain>
+    <el-button slot="reference" type="primary" plain style="font-size: 12px;">
       <svg-icon icon-class="tree-table" />
       <b> {{ $t('form.byInvoice.label') }} </b>
     </el-button>
