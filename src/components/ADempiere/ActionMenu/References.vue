@@ -112,6 +112,7 @@ export default defineComponent({
     })
 
     const isWithRecord = computed(() => {
+      // TODO: Add validate uuid record with route
       return !root.isEmptyValue(recordUuid.value) &&
         recordUuid.value !== 'create-new'
     })
@@ -186,14 +187,15 @@ export default defineComponent({
 
     if (isReferecesContent.value) {
       // when change record uuid loaded references
-      watch(recordUuid, (newValue) => {
-        // TODO: Add validate uuid record with route
-        if (newValue !== 'create-new' && !root.isEmptyValue(newValue)) {
+      watch(recordUuid, (newValue, oldValue) => {
+        if (isWithRecord.value && newValue !== oldValue) {
           getReferences()
         }
       })
 
-      getReferences()
+      if (isWithRecord.value) {
+        getReferences()
+      }
     }
 
     return {
