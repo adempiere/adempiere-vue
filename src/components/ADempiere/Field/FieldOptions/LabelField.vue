@@ -3,13 +3,19 @@
     <span>
       {{ label }}
     </span>
+
     <span v-if="isMandatory" :style="'color: #f34b4b'">*</span>
+
     <i class="el-icon-info" :style="iconStyle" />
   </div>
 </template>
 
 <script>
-export default {
+import { defineComponent, computed } from '@vue/composition-api'
+
+export default defineComponent({
+  name: 'LabelField',
+
   props: {
     isMandatory: {
       type: Boolean,
@@ -24,25 +30,32 @@ export default {
       default: false
     }
   },
-  computed: {
-    labelStyle() {
+
+  setup(props) {
+    const labelStyle = computed(() => {
       let displayStyle
-      this.isMobile ? displayStyle = 'display: flex;width: auto;' : 'display: block;'
+      props.isMobile ? displayStyle = 'display: flex; width: auto;' : 'display: block;'
       return displayStyle + ' margin-left: 3px;'
-    },
-    iconStyle() {
-      if (this.isMobile) {
+    })
+
+    const iconStyle = computed(() => {
+      if (props.isMobile) {
         return 'margin-left: 5px; margin-top: 7px;'
       }
       return 'margin-left: -5px; padding-bottom: 6px;'
+    })
+
+    return {
+      iconStyle,
+      labelStyle
     }
   }
-}
+})
 </script>
+
 <style scoped>
 .el-icon-info {
     font-size: 11px;
     color: #008fd3;
 }
 </style>
-

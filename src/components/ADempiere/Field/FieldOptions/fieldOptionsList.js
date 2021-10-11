@@ -68,12 +68,12 @@ export const calculatorOptionItem = {
   componentRender: () => import('@/components/ADempiere/Field/FieldOptions/calculator')
 }
 
-export const preferenceOptionItem = {
+export const preferenceValueOptionItem = {
   name: language.t('field.preference'),
   enabled: true,
   svg: false,
   icon: 'el-icon-notebook-2',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/preference')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/PreferenceValue')
 }
 
 export const logsOptionItem = {
@@ -97,7 +97,7 @@ export const documentStatusOptionItem = {
 
 export const optionsListStandad = [
   infoOptionItem,
-  preferenceOptionItem,
+  preferenceValueOptionItem,
   logsOptionItem
 ]
 
