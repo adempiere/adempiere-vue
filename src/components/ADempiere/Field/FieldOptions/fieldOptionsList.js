@@ -16,12 +16,26 @@
 
 import language from '@/lang'
 
+/**
+ * For lookup fields with context info
+ */
 export const infoOptionItem = {
   name: language.t('field.info'),
   enabled: true,
   svg: false,
   icon: 'el-icon-info',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/contextInfo')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/ContextInfo')
+}
+
+/**
+ * For zoom window of the field
+ */
+export const zoomInOptionItem = {
+  name: language.t('table.ProcessActivity.zoomIn'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-files',
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/ContextInfo')
 }
 
 /**
@@ -33,17 +47,6 @@ export const operatorOptionItem = {
   svg: false,
   icon: 'el-icon-rank',
   componentRender: () => import('@/components/ADempiere/Field/FieldOptions/operatorComparison')
-}
-
-/**
- * For lookup fields with context info
- */
-export const zoomInOptionItem = {
-  name: language.t('table.ProcessActivity.zoomIn'),
-  enabled: true,
-  svg: false,
-  icon: 'el-icon-files',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/contextInfo')
 }
 
 /**

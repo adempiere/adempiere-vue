@@ -103,6 +103,14 @@ export default defineComponent({
       },
 
       seekRecord: ({ row, tableName, parentUuid, containerUuid }) => {
+        if (root.isEmptyValue(row)) {
+          root.$store.dispatch('dataManager/setDefaultValues', {
+            parentUuid,
+            containerUuid
+          })
+          return
+        }
+
         root.$router.push({
           name: root.$route.name,
           query: {
@@ -116,12 +124,12 @@ export default defineComponent({
           }
         }, () => {})
 
-        const tab = root.$store.getters.getStoredTab(parentUuid, containerUuid)
+        const fieldsList = root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
         const defaultValues = root.$store.getters.getParsedDefaultValues({
           parentUuid,
           containerUuid,
           isSOTrxMenu: root.$route.meta.isSalesTransaction,
-          fieldsList: tab.fieldsList,
+          fieldsList,
           formatToReturn: 'object'
         })
 

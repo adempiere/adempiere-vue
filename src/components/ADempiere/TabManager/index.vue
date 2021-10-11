@@ -265,12 +265,24 @@ export default defineComponent({
         ...props.tabsList[currentTab.value]
       }).then(responseData => {
         if (!isCreateNew.value && !root.isEmptyValue(responseData)) {
-          let row = responseData[0]
+          let row
+          const { action } = root.$route.query
           // uuid into action query
-          if (!root.isEmptyValue(root.$route.query.action)) {
-            row = responseData.find(rowData => {
-              return rowData.UUID === root.$route.query.action
-            })
+          if (!root.isEmptyValue(action)) {
+            if (action === 'zoomIn') {
+              const { columnName, value } = root.$route.query
+              row = responseData.find(rowData => {
+                return rowData[columnName] === value
+              })
+            } else {
+              row = responseData.find(rowData => {
+                return rowData.UUID === action
+              })
+            }
+          }
+          // set first record
+          if (root.isEmptyValue(row)) {
+            row = responseData[0]
           }
 
           const tableName = props.tabsList[currentTab.value].tableName

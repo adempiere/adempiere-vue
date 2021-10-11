@@ -61,6 +61,7 @@
         <template slot="title">
           <label-field :is-mandatory="metadata.required && isEmptyValue(valueField)" :label="metadata.name" />
         </template>
+
         <el-menu-item
           v-for="(option, key) in optionsList"
           :key="key"
@@ -78,6 +79,7 @@
               :field-attributes="fieldAttributes"
               :field-value="valueField"
             />
+
             <el-button slot="reference" type="text" style="color: #606266;">
               <label-popover-option :option="option" />
             </el-button>
@@ -95,6 +97,7 @@
 
 <script>
 import { defineComponent, computed, ref, watch } from '@vue/composition-api'
+
 import {
   optionsListStandad, optionsListAdvancedQuery,
   documentStatusOptionItem, translateOptionItem,
@@ -103,6 +106,8 @@ import {
 import LabelField from './LabelField.vue'
 import LabelPopoverOption from './LabelPopoverOption.vue'
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
+import { isLookup, LIST } from '@/utils/ADempiere/references.js'
+import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 
 export default defineComponent({
   name: 'FieldOptions',
@@ -166,13 +171,29 @@ export default defineComponent({
       return '110'
     })
 
-    function redirect({ window }) {
+    function redirect() {
+      let window = props.metadata.reference.zoomWindows
+      if (typeValue(window) === 'ARRAY') {
+        window = window[0]
+      }
+
+      let value = valueField.value
+      let columnName = props.metadata.columnName
+      if (props.metadata.displayType === LIST.id) {
+        columnName = 'AD_Reference_ID'
+        const valueQuery = props.metadata.reference.directQuery
+          .match(/AD_Reference_ID=\d+/i)
+          .toString()
+        value = Number(valueQuery.replace(/[^\d]/g, ''))
+      }
+
       zoomIn({
         uuid: window.uuid,
         query: {
           tabParent: 0,
-          action: 'advancedQuery',
-          [props.metadata.columnName]: valueField
+          action: 'zoomIn',
+          columnName,
+          value
         }
       })
     }
@@ -180,13 +201,10 @@ export default defineComponent({
     const handleCommand = (command) => {
       root.$store.commit('setRecordAccess', false)
       if (command.name === root.$t('table.ProcessActivity.zoomIn')) {
-        if (!root.isEmptyValue(props.metadata.reference.zoomWindows)) {
-          redirect({
-            window: props.metadata.reference.zoomWindows[0]
-          })
-        }
+        redirect()
         return
       }
+
       if (isMobile.value) {
         root.$store.commit('changeShowRigthPanel', true)
       } else {
@@ -199,18 +217,6 @@ export default defineComponent({
         fieldAttributes: props.metadata
       })
     }
-
-    const isContextInfo = computed(() => {
-      const field = props.metadata
-      if (!field.isPanelWindow) {
-        return false
-      }
-
-      return Boolean(field.contextInfo &&
-        field.contextInfo.isActive) ||
-        Boolean(field.reference &&
-        !root.isEmptyValue(field.reference.zoomWindows))
-    })
 
     const isDocuemntStatus = computed(() => {
       if (props.metadata.isPanelWindow && !props.metadata.isAdvancedQuery) {
@@ -231,20 +237,18 @@ export default defineComponent({
     })
 
     const optionsList = computed(() => {
+      const field = props.metadata
       const menuOptions = []
-      if (props.metadata.isNumericField) {
+      if (field.isNumericField) {
         menuOptions.push(calculatorOptionItem)
       }
       // infoOption, operatorOption
-      if (props.metadata.isAdvancedQuery) {
+      if (field.isAdvancedQuery) {
         return menuOptions.concat(optionsListAdvancedQuery)
       }
 
-      if (isContextInfo.value) {
-        menuOptions.push(zoomInOptionItem)
-      }
-      if (props.metadata.isPanelWindow) {
-        if (props.metadata.isTranslatedField) {
+      if (field.isPanelWindow) {
+        if (field.isTranslatedField) {
           menuOptions.push(translateOptionItem)
         }
         if (isDocuemntStatus.value) {
@@ -252,7 +256,13 @@ export default defineComponent({
         }
       }
 
-      return menuOptions.concat(optionsListStandad)
+      if (field.reference &&
+        !root.isEmptyValue(field.reference.zoomWindows) &&
+        isLookup(field.displayType)) {
+        menuOptions.push(zoomInOptionItem)
+      }
+
+      return optionsListStandad.concat(menuOptions)
     })
 
     const openOptionField = computed({
@@ -299,24 +309,23 @@ export default defineComponent({
     }
     const handleSelect = (key, keyPath) => {
       if (key === root.$t('table.ProcessActivity.zoomIn')) {
-        redirect({
-          window: props.metadata.reference.zoomWindows[0]
-        })
+        redirect()
         return
       }
+
       if (isMobile.value) {
         root.$store.commit('changeShowRigthPanel', true)
       } else {
         root.$store.commit('changeShowOptionField', true)
         visibleForDesktop.value = true
-        root.$router.push({
-          name: root.$route.name,
-          query: {
-            ...root.$route.query,
-            typeAction: key,
-            fieldColumnName: props.metadata.columnName
-          }
-        }, () => {})
+        // root.$router.push({
+        //   name: root.$route.name,
+        //   query: {
+        //     ...root.$route.query,
+        //     typeAction: key,
+        //     fieldColumnName: props.metadata.columnName
+        //   }
+        // }, () => {})
       }
       root.$store.commit('changeShowPopoverField', true)
       const option = optionsList.value.find(option => {
