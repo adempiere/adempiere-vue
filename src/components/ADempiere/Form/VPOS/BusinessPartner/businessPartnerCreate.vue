@@ -17,8 +17,8 @@
 -->
 <template>
   <el-main
-    v-shortkey="shortsKey"
-    @shortkey.native="keyAction"
+    v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+    @shortkey.native="actionCreate"
   >
     <el-form
       label-position="top"
@@ -26,23 +26,36 @@
       class="create-bp"
     >
       <el-row :gutter="24">
-        <el-col :span="12">
-          <field-definition
-            v-for="(field) in datos"
-            :ref="field.columnName"
-            :key="field.columnName"
-            :metadata-field="field"
-          />
+        <el-col :span="24">
+          <el-card class="box-card" shadow="never" style="height: 150px;">
+            <div slot="header" class="clearfix">
+              <span>
+                {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
+              </span>
+            </div>
+            <div class="text item">
+              <field-definition
+                v-for="(field) in datos"
+                :ref="field.columnName"
+                :key="field.columnName"
+                :metadata-field="field"
+              />
+            </div>
+          </el-card>
         </el-col>
-        <el-col :span="12">
-          <field-definition
-            v-for="(field) in fieldsListLocation"
-            :ref="field.columnName"
-            :key="field.columnName"
-            :metadata-field="field"
-          />
+      </el-row>
+      <el-row :gutter="24">
+        <billing-address />
+        <shipping-address v-if="!copyShippingAddress" />
+      </el-row>
+      <el-row :gutter="24">
+        <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
+          <samp style="float: right; padding-right: 10px;">
+            <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
+              {{ $t('form.byInvoice.copyShippingAddress') }}
+            </el-checkbox>
+          </samp>
         </el-col>
-
         <el-col :span="24">
           <samp style="float: right; padding-right: 10px;">
             <el-button
@@ -68,10 +81,16 @@
 import { createCustomer } from '@/api/ADempiere/form/point-of-sales.js'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldsListCreate.js'
+import BillingAddress from './billingAddress.vue'
+import ShippingAddress from './shippingAddress.vue'
 import BParterMixin from './mixinBusinessPartner.js'
 
 export default {
   name: 'BusinessPartnerCreate',
+  components: {
+    ShippingAddress,
+    BillingAddress
+  },
   mixins: [
     formMixin,
     BParterMixin
@@ -97,6 +116,7 @@ export default {
       businessPartnerRecord: {},
       isLoadingRecord: false,
       fieldsList,
+      checked: true,
       isCustomForm: true,
       unsubscribe: () => {}
     }
@@ -106,10 +126,10 @@ export default {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
       }
-      return this.fieldsList.filter(field => field.tabindex > 4)
+      return this.fieldsList.filter(field => field.tabindex > 2)
     },
     datos() {
-      return this.fieldsList.filter(field => field.tabindex <= 4)
+      return this.fieldsList
     },
     adviserPin() {
       const value = this.$store.getters.getValueOfField({
@@ -128,6 +148,17 @@ export default {
     },
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
+    },
+    popoverCreateBusinessParnet() {
+      return this.$store.getters.getPopoverCreateBusinessParnet
+    },
+    copyShippingAddress: {
+      get() {
+        return this.$store.getters.getCopyShippingAddress
+      },
+      set(value) {
+        this.$store.dispatch('changeCopyShippingAddress', value)
+      }
     }
   },
   watch: {
@@ -137,53 +168,51 @@ export default {
           this.focusValue()
         }, 1500)
       }
+    },
+    copyShippingAddress(value) {
+      this.checked = value
     }
   },
   beforeDestroy() {
     this.unsubscribe()
   },
   methods: {
+    actionCreate(commands) {
+      if (commands.srcKey) {
+        switch (commands.srcKey) {
+          case 'enter':
+            this.createBusinessParter()
+            break
+          case 'close':
+            this.clearValues()
+            break
+        }
+      }
+    },
     focusValue() {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
     },
     // TODO: Get locations values.
     createBusinessParter() {
-      const values = this.$store.getters.getValuesView({
+      const values = this.datesForm(this.$store.getters.getValuesView({
         containerUuid: this.containerUuid,
         format: 'object'
-      })
-      const name2 = this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
-        columnName: 'Name2'
-      })
-      values.name2 = name2
+      }))
+      const billingAddress = this.billingAddress
+      if (this.isEmptyValue(billingAddress.last_name)) {
+        billingAddress.last_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
+        billingAddress.first_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
+      }
+      values.addresses = [this.billingAddress, this.shippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: this.containerUuid,
         formatReturn: 'name'
       })
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
-        createCustomer({
-          value: values.Value,
-          taxId: values.Value,
-          name: values.Name,
-          lastName: values.Name2,
-          description: values.Description,
-          contactName: values.ContactName,
-          email: values.EMail,
-          phone: values.Phone,
-          address1: values.Address1,
-          address2: values.Address2,
-          address3: values.Address3,
-          address4: values.Address4,
-          cityUuid: values.C_City_ID_UUID,
-          cityName: values.DisplayColumn_C_City_ID,
-          postalCode: values.Postal,
-          regionUuid: values.C_Region_ID_UUID,
-          regionName: values.DisplayColumn_C_Region_ID,
-          countryUuid: values.C_Country_ID_UUID,
-          posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid
-        })
+        createCustomer(
+          values
+        )
           .then(responseBPartner => {
             // TODO: Add new record into vuex store.
             this.setBusinessPartner(responseBPartner)
@@ -225,58 +254,40 @@ export default {
         containerUuid: this.containerUuid,
         panelType: this.panelType
       })
-      this.clearLocationValues()
+      this.clearAddresses('Billing-Address')
+      this.clearAddresses('Shipping-Address')
+      this.clearDataCustomer(this.containerUuid)
     },
-    clearLocationValues() {
-      this.$store.commit('updateValuesOfContainer', {
-        containerUuid: this.containerUuid,
-        attributes: [{
-          columnName: 'C_Location_ID',
-          value: undefined
-        }, {
-          columnName: 'DisplayColumn_C_Location_ID',
-          value: undefined
-        }, {
-          columnName: 'C_Country_ID',
-          value: undefined
-        }, {
-          columnName: 'C_Country_ID_UUID',
-          value: undefined
-        }, {
-          columnName: 'DisplayColumn_C_Country_ID',
-          value: undefined
-        }, {
-          columnName: 'C_Region_ID',
-          value: undefined
-        }, {
-          columnName: 'C_Region_ID_UUID',
-          value: undefined
-        }, {
-          columnName: 'DisplayColumn_C_Region_ID',
-          value: undefined
-        }, {
-          columnName: 'C_City_ID',
-          value: undefined
-        }, {
-          columnName: 'C_City_ID_UUID',
-          value: undefined
-        }, {
-          columnName: 'DisplayColumn_C_City_ID',
-          value: undefined
-        }, {
-          columnName: 'Address1',
-          value: undefined
-        }, {
-          columnName: 'Address2',
-          value: undefined
-        }, {
-          columnName: 'Address3',
-          value: undefined
-        }, {
-          columnName: 'Address4',
-          value: undefined
-        }]
+    datesForm(values) {
+      const valuesToSend = {}
+      Object.keys(values).forEach(key => {
+        const value = values[key]
+        if (this.isEmptyValue(value)) {
+          return
+        }
+        switch (key) {
+          case 'Value':
+            valuesToSend['value'] = value
+            break
+          case 'Name':
+            valuesToSend['name'] = value
+            break
+          case 'Name2':
+            valuesToSend['lastName'] = value
+            break
+          case 'TaxID':
+            valuesToSend['taxId'] = value
+            break
+          case 'Phone':
+            valuesToSend['phone'] = value
+            break
+        }
       })
+      valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
+      return valuesToSend
+    },
+    changeShipping(value) {
+      this.$store.dispatch('changeCopyShippingAddress', value)
     }
   }
 }

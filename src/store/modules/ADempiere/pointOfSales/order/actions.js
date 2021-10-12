@@ -22,7 +22,7 @@ import {
   listOrders,
   printTicket
 } from '@/api/ADempiere/form/point-of-sales.js'
-import { isEmptyValue, extractPagingToken, convertValuesToSend } from '@/utils/ADempiere/valueUtils.js'
+import { isEmptyValue, extractPagingToken, convertValuesToSendListOrders } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 
 /**
@@ -41,11 +41,13 @@ export default {
     documentTypeUuid,
     warehouseUuid
   }) {
+    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
     return createOrder({
       posUuid,
       customerUuid,
       documentTypeUuid,
-      warehouseUuid
+      priceListUuid: currentPriceList.uuid,
+      warehouseUuid: currentWarehouse.uuid
     })
       .then(order => {
         commit('setOrder', order)
@@ -73,15 +75,16 @@ export default {
     orderUuid,
     posUuid,
     customerUuid,
-    documentTypeUuid,
-    warehouseUuid
+    documentTypeUuid
   }) {
+    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
     updateOrder({
       orderUuid,
       posUuid,
       documentTypeUuid,
       customerUuid,
-      warehouseUuid
+      priceListUuid: currentPriceList.uuid,
+      warehouseUuid: currentWarehouse.uuid
     })
       .then(response => {
         dispatch('reloadOrder', { orderUuid: response.uuid })
@@ -94,6 +97,7 @@ export default {
           showClose: true
         })
       })
+    dispatch('changeFocusNewOrder', false)
   },
 
   /**
@@ -105,9 +109,8 @@ export default {
    * @param {number} price Price Producto
    * @param {number} discountRate DiscountRate Producto
    */
-  createOrderLine({ commit, dispatch }, {
+  createOrderLine({ commit, dispatch, rootGetters }, {
     orderUuid,
-    warehouseUuid,
     productUuid,
     chargeUuid,
     description,
@@ -115,9 +118,11 @@ export default {
     price,
     discountRate
   }) {
+    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
     createOrderLine({
       orderUuid,
-      warehouseUuid,
+      priceListUuid: currentPriceList.uuid,
+      warehouseUuid: currentWarehouse.uuid,
       productUuid,
       chargeUuid,
       description,
@@ -209,16 +214,17 @@ export default {
 
     let { pageNumber, token } = state.listOrder
     if (isEmptyValue(pageNumber)) {
-      pageNumber = 1
+      pageNumber = 0
     }
     let pageToken
     if (!isEmptyValue(token)) {
-      pageToken = token + '-' + pageNumber
+      const page = pageNumber > 0 ? pageNumber - 1 : 0
+      pageToken = token + '-' + page
     }
     let values = getters.getValuesView({
       containerUuid: 'Orders-List'
     })
-    values = convertValuesToSend(values)
+    values = convertValuesToSendListOrders(values)
     const { documentNo, businessPartnerUuid, grandTotal, openAmount, isPaid, isProcessed, isAisleSeller, isInvoiced, dateOrderedFrom, dateOrderedTo, salesRepresentativeUuid } = values
     listOrders({
       posUuid,
@@ -251,11 +257,11 @@ export default {
       })
       .catch(error => {
         console.warn(`listOrdersFromServer: ${error.message}. Code: ${error.code}.`)
-        // showMessage({
-        //   type: 'info',
-        //   message: error.message,
-        //   showClose: true
-        // })
+        showMessage({
+          type: 'info',
+          message: error.message,
+          showClose: true
+        })
       })
   },
   setOrder({ commit, dispatch }, order) {
@@ -282,13 +288,17 @@ export default {
     }
     commit('findOrder', {})
   },
-  printOrder({ commit, dispatch }, { posUuid, orderUuid }) {
+  printTicket({ commit, dispatch }, { posUuid, orderUuid }) {
     printTicket({
       posUuid,
       orderUuid
     })
       .then(response => {
-        console.log(response)
+        showMessage({
+          type: 'success',
+          message: response,
+          showClose: true
+        })
       })
       .catch(error => {
         console.warn(error.message)

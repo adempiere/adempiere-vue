@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-card
     v-if="!isEmptyValue(metadataList)"
@@ -31,11 +32,10 @@
       </span>
     </div>
     <div class="text item">
-      {{
-        getDescriptionOfPreference
-      }}
+      {{ getDescriptionOfPreference }}
     </div>
     <br>
+
     <div class="text item">
       <el-form
         :inline="true"
@@ -66,6 +66,7 @@
       </el-form>
     </div>
     <br>
+
     <el-row>
       <el-col :span="24">
         <samp style="float: left; padding-right: 10px;">
@@ -76,6 +77,7 @@
             @click="remove()"
           />
         </samp>
+
         <samp style="float: right; padding-right: 10px;">
           <el-button
             type="danger"
@@ -83,6 +85,7 @@
             icon="el-icon-close"
             @click="close()"
           />
+
           <el-button
             type="primary"
             class="custom-button-address-location"
@@ -93,6 +96,7 @@
       </el-col>
     </el-row>
   </el-card>
+
   <div
     v-else
     v-loading="isEmptyValue(metadataList)"
@@ -104,16 +108,15 @@
 
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin'
-import preferenceFields from './preferenceFields.js'
-import { createFieldFromDictionary } from '@/utils/ADempiere/lookupFactory'
+import preferenceFields from './preferenceValueFieldsList.js'
 import { CLIENT, ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
 import { setPreference, deletePreference } from '@/api/ADempiere/field/preference.js'
-import { showMessage } from '@/utils/ADempiere/notification.js'
-import language from '@/lang'
 
 export default {
-  name: 'Preference',
-  mixins: [formMixin],
+  name: 'PreferenceValue',
+  mixins: [
+    formMixin
+  ],
   props: {
     fieldAttributes: {
       type: [Object],
@@ -146,41 +149,61 @@ export default {
         }
       })
     },
+
+    clientField() {
+      return this.metadataList.find(field => {
+        return field.columnName === CLIENT
+      })
+    },
+    organizationField() {
+      return this.metadataList.find(field => {
+        return field.columnName === ORGANIZATION
+      })
+    },
+    userField() {
+      return this.metadataList.find(field => {
+        return field.columnName === 'AD_User_ID'
+      })
+    },
+    containerField() {
+      return this.metadataList.find(field => {
+        return field.columnName === 'AD_Window_ID'
+      })
+    },
+
     getDescriptionOfPreference() {
       if (this.isEmptyValue(this.metadataList)) {
         return ''
       }
-      const forCurrentClient = this.metadataList.find(field => field.columnName === CLIENT)
-      if (!forCurrentClient) {
+      if (!this.clientField) {
         return ''
       }
-      const forCurrentUser = this.metadataList.find(field => field.columnName === 'AD_User_ID')
-      const forCurrentOrganization = this.metadataList.find(field => field.columnName === ORGANIZATION)
-      const forCurrentContainer = this.metadataList.find(field => field.columnName === 'AD_Window_ID')
-      //  Create Message
-      var expl = language.t('components.preference.for')//  components.preference.for
-      if (forCurrentOrganization && forCurrentClient) {
-        if (forCurrentClient.value && forCurrentOrganization.value) {
-          expl = expl.concat(language.t('components.preference.clientAndOrganization'))//  components.preference.clientAndOrganization
-        } else if (forCurrentClient.value && !forCurrentOrganization.value) {
-          expl = expl.concat(language.t('components.preference.allOrganizationOfClient'))//  components.preference.allOrganizationOfClient
-        } else if (!forCurrentClient.value && forCurrentOrganization.value) {
-          forCurrentOrganization.value = false
-          expl = expl.concat(language.t('components.preference.entireSystem'))//  components.preference.entireSystem
+
+      // Create Message
+      let expl = this.$t('components.preference.for')
+      if (this.clientField && this.organizationField) {
+        if (this.clientField.value && this.organizationField.value) {
+          expl = expl.concat(this.$t('components.preference.clientAndOrganization'))
+        } else if (this.clientField.value && !this.organizationField.value) {
+          expl = expl.concat(this.$t('components.preference.allOrganizationOfClient'))
+        } else if (!this.clientField.value && this.organizationField.value) {
+          expl = expl.concat(this.$t('components.preference.entireSystem'))
         } else {
-          expl = expl.concat(language.t('components.preference.entireSystem'))//  components.preference.entireSystem
+          expl = expl.concat(this.$t('components.preference.entireSystem'))
         }
       }
-      if (forCurrentUser && forCurrentContainer) {
-        if (forCurrentUser.value) {
-          expl = expl.concat(language.t('components.preference.thisUser'))//  components.preference.thisUser
+
+      if (this.userField && this.containerField) {
+        if (this.userField.value) {
+          expl = expl.concat(this.$t('components.preference.thisUser'))
         } else {
-          expl = expl.concat(language.t('components.preference.allUsers'))//  components.preference.allUsers
+          expl = expl.concat(this.$t('components.preference.allUsers'))
         }
-        if (forCurrentContainer.value) {
-          expl = expl.concat(language.t('components.preference.thisWindow'))//  components.preference.thisWindow
+
+        if (this.containerField.value) {
+          expl = expl.concat(this.$t('components.preference.thisWindow'))
         } else {
-          expl = expl.concat(language.t('components.preference.allWindows'))//  components.preference.allWindows
+          expl = expl.concat(this.$t('components.preference.allWindows'))
         }
       }
       return expl
@@ -207,7 +230,6 @@ export default {
     }
   },
   methods: {
-    createFieldFromDictionary,
     close() {
       if (!this.isEmptyValue(this.$route.query.fieldColumnName)) {
         this.$router.push({
@@ -224,36 +246,29 @@ export default {
       }
     },
     remove() {
-      const isForCurrentUser = this.metadataList.find(field => field.columnName === 'AD_User_ID').value
-      const isForCurrentClient = this.metadataList.find(field => field.columnName === CLIENT).value
-      const isForCurrentOrganization = this.metadataList.find(field => field.columnName === ORGANIZATION).value
-      const isForCurrentContainer = this.metadataList.find(field => field.columnName === 'AD_Window_ID').value
       deletePreference({
         parentUuid: this.fieldAttributes.parentUuid,
         attribute: this.fieldAttributes.columnName,
-        isForCurrentUser,
-        isForCurrentClient,
-        isForCurrentOrganization,
-        isForCurrentContainer
+        isForCurrentClient: this.clientField.value,
+        isForCurrentOrganization: this.organizationField.value,
+        isForCurrentUser: this.userField.value,
+        isForCurrentContainer: this.containerField.value
       })
-        .then(preference => {
-          showMessage({
-            message: language.t('components.preference.preferenceRemoved')
+        .then(() => {
+          this.$message({
+            message: this.$t('components.preference.preferenceRemoved')
           })
           this.close()
         })
         .catch(error => {
-          showMessage({
+          this.$message({
             message: error.message,
             type: 'error'
           })
           console.warn(`setPreference error: ${error.message}.`)
         })
     },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    },
+
     setFieldsList() {
       const fieldsList = []
       // Product Code
@@ -272,31 +287,27 @@ export default {
             console.warn(`LookupFactory: Get Field From Server (State) - Error ${error.code}: ${error.message}.`)
           })
       })
+
       this.metadataList = fieldsList
     },
-    sendValue(list) {
-      const isForCurrentUser = this.metadataList.find(field => field.columnName === 'AD_User_ID').value
-      const isForCurrentClient = this.metadataList.find(field => field.columnName === CLIENT).value
-      const isForCurrentOrganization = this.metadataList.find(field => field.columnName === ORGANIZATION).value
-      const isForCurrentContainer = this.metadataList.find(field => field.columnName === 'AD_Window_ID').value
-      //
+    sendValue() {
       setPreference({
         parentUuid: this.fieldAttributes.parentUuid,
         attribute: this.fieldAttributes.columnName,
         value: this.fieldValue,
-        isForCurrentUser,
-        isForCurrentClient,
-        isForCurrentOrganization,
-        isForCurrentContainer
+        isForCurrentClient: this.clientField.value,
+        isForCurrentOrganization: this.organizationField.value,
+        isForCurrentUser: this.userField.value,
+        isForCurrentContainer: this.containerField.value
       })
-        .then(preference => {
-          showMessage({
-            message: language.t('components.preference.preferenceIsOk')
+        .then(() => {
+          this.$message({
+            message: this.$t('components.preference.preferenceIsOk')
           })
           this.close()
         })
         .catch(error => {
-          showMessage({
+          this.$message({
             message: error.message,
             type: 'error'
           })
@@ -307,20 +318,3 @@ export default {
   }
 }
 </script>
-
-<style>
- .title {
-    color: #000000;
-    text-size-adjust: 20px;
-    font-size: 120%;
-    /* font-weight: 605!important;
-    left: 50%; */
-  }
-  .value {
-    color: #606266;
-    text-size-adjust: 20px;
-    font-size: 120%;
-    /* font-weight: 605!important;
-    left: 50%; */
-  }
-</style>

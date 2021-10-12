@@ -75,7 +75,9 @@
           >
             <component
               :is="option.componentRender"
-              v-if="visibleForDesktop && showPanelFieldOption"
+              v-if="visibleForDesktop
+                && showPanelFieldOption
+                && option.name === currentFieldOption.name"
               :field-attributes="fieldAttributes"
               :field-value="valueField"
             />
@@ -130,6 +132,11 @@ export default defineComponent({
 
     const isMobile = computed(() => {
       return root.$store.state.app.device === 'mobile'
+    })
+
+    // current option field selected
+    const currentFieldOption = computed(() => {
+      return root.$store.getters.getFieldContextMenu
     })
 
     const valueField = computed(() => {
@@ -351,21 +358,24 @@ export default defineComponent({
 
     const fieldAttributes = ref(props.metadata)
     return {
+      // computed
+      currentFieldOption,
       isMobile,
       labelStyle,
       fieldAttributes,
-      optionsList,
-      closePopover,
-      openOptionField,
-      handleCommand,
-      handleOpen,
-      handleClose,
-      handleSelect,
       isDocuemntStatus,
+      optionsList,
+      openOptionField,
       visibleForDesktop,
       valueField,
       triggerMenu,
-      showPanelFieldOption
+      showPanelFieldOption,
+      // methods
+      closePopover,
+      handleClose,
+      handleCommand,
+      handleOpen,
+      handleSelect
     }
   }
 })

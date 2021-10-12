@@ -410,10 +410,11 @@ export default {
   quickAccess: {
     newRecord: 'Quick Access to Create New Record',
     listRecords: 'Quick Access to List All Records',
-    searchWithEnter: 'Press enter to search'
+    searchWithEnter: 'Press enter to search for the product by Product Code, Name or UPC.'
   },
   businessPartner: {
-    notFound: 'Business partner not found.'
+    notFound: 'Business partner not found.',
+    emptyBusinessPartner: 'Use the filters to search for a business partner by Code, Name, Email and Phone Number'
   },
   form: {
     pos: {
@@ -433,7 +434,8 @@ export default {
           cancelOrder: 'Cancel Order',
           orderRemoved: 'Order Deleted',
           copyOrder: 'Copy Order',
-          createNewReturnOrder: 'Create a new return order'
+          createNewReturnOrder: 'Create a new return order',
+          confirmDelivery: 'Confirmar Entrega'
         },
         cashManagement: {
           title: 'Cash Management',
@@ -446,7 +448,10 @@ export default {
           changePos: 'Change Point of Sale',
           listProducts: 'Change Point of Sale',
           changeWarehouseList: 'Change Warehouse',
-          changePriceList: 'Change Price List'
+          changePriceList: 'Change Price List',
+          dateTo: 'Date To',
+          dateOrder: 'Date Order',
+          dateFrom: 'Date From'
         }
       },
       tableProduct: {
@@ -456,6 +461,9 @@ export default {
         editQuantities: 'Edit Quantities',
         pin: 'Insert Pin',
         remove: 'Remove',
+        displayTaxAmount: 'Tax',
+        displayTaxIMP: '%Imp',
+        displayDiscountAmount: 'Discount',
         empty: 'Enter the product name, code or UPC'
       },
       order: {
@@ -464,7 +472,7 @@ export default {
         date: 'Date',
         subTotal: 'Sub-Total',
         type: 'Type',
-        discount: 'Descuento',
+        discount: '%Dcto',
         tax: 'Tax',
         total: 'Total',
         itemQuantity: 'Item Quantity',
@@ -475,6 +483,9 @@ export default {
         BusinessPartnerCreate: {
           businessPartner: 'Business Partner',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
+          customerData: 'Customer Data',
+          billingAddress: 'Billing Address',
+          shippingAddress: 'Shipping Address',
           taxId: 'Tax Identification'
         }
       },
@@ -485,11 +496,13 @@ export default {
         change: 'Change',
         totalInvoiced: 'Total Invoiced',
         convertAmount: 'Convert Quantity',
-        convertedAmount: 'Converted Amount',
+        convertedAmount: 'Converted',
         fullPayment: 'Full Payment',
         dayRate: 'Day Rate',
         noDayRate: 'No daily rate has been generated for the currency.',
         refund: 'Refund',
+        paymentMethods: 'Payment Methods',
+        emptyRate: 'No conversion rate to date',
         Currency: 'Currency',
         TenderType: {
           directDeposit: 'Direct Deposit',
@@ -514,7 +527,14 @@ export default {
           customerLimit: 'Order Limit',
           available: 'Available',
           emptyPayment: 'Unsupported payment method',
-          addPayment: 'You must add a change type to complete the operation'
+          emptyListPayment: 'You do not have any payment method associated with this option',
+          addPayment: 'You must add a change type to complete the operation',
+          fieldList: {
+            code: 'Cedula',
+            name: 'Holder Name',
+            accountType: 'Account Type',
+            bank: 'Bank'
+          }
         }
       },
       keyLayout: {
@@ -530,7 +550,8 @@ export default {
         discount: 'add discount',
         delete: 'delete product',
         addProduct: 'add product',
-        invoiceOpen: 'generate invoice with an open balance'
+        invoiceOpen: 'generate invoice with an open balance',
+        newOrder: 'create new order'
       }
     },
     priceChecking: {
@@ -542,7 +563,9 @@ export default {
       label: 'To be invoiced',
       salesRepresentative: 'Sales Agent',
       businessPartner: 'Business Partner',
-      documentNo: 'Document No.'
+      copyShippingAddress: 'Copy shipping address',
+      documentNo: 'Document No.',
+      emptyList: 'Use the filters to search for orders'
     },
     productInfo: {
       product: 'Product',

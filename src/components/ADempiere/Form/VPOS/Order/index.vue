@@ -35,12 +35,13 @@
                 <product-info
                   v-if="field.columnName === 'ProductValue'"
                   id="ProductValue"
+                  ref="ProductValue"
                   :key="field.columnName"
                   :metadata="field"
                 />
               </template>
             </el-col>
-            <el-col :span="isEmptyValue(currentOrder) ? 5 : 5" :style="styleTab">
+            <el-col :span="6" :style="styleTab">
               <business-partner
                 id="BusinessPartner"
                 :parent-metadata="{
@@ -52,27 +53,19 @@
                 :is-disabled="isDisabled"
               />
             </el-col>
-            <el-col :span="isEmptyValue(currentOrder) ? 4 : 8" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2.4%;'">
-              <el-row :gutter="4">
-                <el-col :span="4" style="padding-left: 0px; padding-right: 0px;">
-                  <el-tag
-                    v-if="!isEmptyValue(currentOrder.documentStatus.value)"
-                    :type="tagStatus(currentOrder.documentStatus.value)"
-                  >
-                    <span v-if="!isEmptyValue(currentOrder.documentStatus.value)">
-                      {{ currentOrder.documentStatus.name }}
-                    </span>
-                  </el-tag>
-                </el-col>
-                <el-col :span="8" style="padding-left: 0px; padding-right: 0px;">
-                  <fast-ordes-list />
-                </el-col>
-                <el-col :span="12" style="padding-left: 0px; padding-right: 0px;">
-                  <el-button type="primary" :disabled="!allowsCreateOrder" plain @click="newOrder">
-                    {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
-                  </el-button>
-                </el-col>
-              </el-row>
+            <el-col :span="isShowKeyLayout ? 8 : 7" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2%;'">
+              <el-tag
+                v-if="!isEmptyValue(currentOrder.documentStatus.value)"
+                :type="tagStatus(currentOrder.documentStatus.value)"
+              >
+                <span v-if="!isEmptyValue(currentOrder.documentStatus.value)" style="font-size: 12px;">
+                  {{ currentOrder.documentStatus.name }}
+                </span>
+              </el-tag>
+              <fast-ordes-list style="margin-right: 2%;margin-left: 2%;font-size: 12px;" />
+              <el-button type="primary" style="font-size: 12px;" plain @click="newOrder">
+                {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
+              </el-button>
             </el-col>
           </el-row>
         </el-form>
@@ -91,10 +84,12 @@
               style="overflow: auto;"
               @current-change="handleCurrentLineChange"
               @shortkey.native="shortcutKeyMethod"
+              @cell-click="editCell"
+              @click.native.prevent="focusProducto()"
             >
               <template v-for="(valueOrder, item, key) in orderLineDefinition">
                 <el-table-column
-                  v-if="(valueOrder.columnName === 'ConvertedAmount' && !isEmptyValue(currentPointOfSales.displayCurrency)) || valueOrder.columnName !== 'ConvertedAmount'"
+                  v-if="displayLabel(valueOrder)"
                   :key="key"
                   :column-key="valueOrder.columnName"
                   :label="valueOrder.label"
@@ -102,7 +97,40 @@
                   :align="valueOrder.isNumeric ? 'right' : 'left'"
                 >
                   <template slot-scope="scope">
-                    <span>
+                    <template v-if="isEditQtyOrdered && fileColumnNameEdit === 'CurrentPrice' && valueOrder.columnName === 'CurrentPrice' && !isEmptyValue(isEditLine.uuid) && isEditLine.uuid === scope.row.uuid">
+                      <el-input-number
+                        ref="editField"
+                        v-model="scope.row.priceList"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        :autofocus="true"
+                        controls-position="right"
+                        @change="changeEdit(scope.row.priceList, 'PriceEntered')"
+                        @shortkey.native="theActionEdit"
+                      />
+                    </template>
+                    <template v-else-if="isEditQtyOrdered && fileColumnNameEdit === 'QtyEntered' && valueOrder.columnName === 'QtyEntered' && !isEmptyValue(isEditLine.uuid) && isEditLine.uuid === scope.row.uuid">
+                      <el-input-number
+                        ref="editField"
+                        v-model="scope.row.quantityOrdered"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        :autofocus="true"
+                        controls-position="right"
+                        @change="changeEdit(scope.row.quantityOrdered, valueOrder.columnName)"
+                        @shortkey.native="theActionEdit"
+                      />
+                    </template>
+                    <template v-else-if="isEditQtyOrdered && fileColumnNameEdit === 'Discount' && valueOrder.columnName === 'Discount' && !isEmptyValue(isEditLine.uuid) && isEditLine.uuid === scope.row.uuid">
+                      <el-input-number
+                        ref="editField"
+                        v-model="scope.row.discount"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        :autofocus="true"
+                        controls-position="right"
+                        @change="changeEdit(scope.row.discount, valueOrder.columnName)"
+                        @shortkey.native="theActionEdit"
+                      />
+                    </template>
+                    <span v-else>
                       {{ displayValue(scope.row, valueOrder) }}
                     </span>
                   </template>
@@ -110,7 +138,7 @@
               </template>
               <el-table-column
                 :label="$t('form.pos.tableProduct.options')"
-                width="180"
+                width="165"
               >
                 <template slot-scope="scope">
                   <el-popover
@@ -120,6 +148,7 @@
                     trigger="click"
                     width="300"
                     :title="$t('form.productInfo.productInformation')"
+                    :hide="closeInfo"
                   >
                     <el-form
                       label-position="top"
@@ -128,18 +157,9 @@
                       <el-row style="margin: 10px!important;">
                         <el-col :span="4">
                           <div>
-                            <el-avatar v-if="isEmptyValue(scope.row.product.imageUrl)" shape="square" :size="100" src="https://#" @error="true">
-                              <el-image>
-                                <div slot="error" class="image-slot">
-                                  <i class="el-icon-picture-outline" />
-                                </div>
-                              </el-image>
-                            </el-avatar>
-                            <el-image
-                              v-else
-                              style="width: 100px; height: 100px"
-                              :src="scope.row.product.imageUrl"
-                              fit="contain"
+                            <image-product
+                              :show="showInfo"
+                              :metadata-line="scope.row"
                             />
                           </div>
                         </el-col>
@@ -157,15 +177,15 @@
                             <b>{{ scope.row.taxRate.name }}</b>
                             <br>
                             {{ $t('form.productInfo.grandTotal') }}:
-                            <b>{{ formatPrice((scope.row.priceList * scope.row.taxRate.rate / 100) + scope.row.priceList, pointOfSalesCurrency.iSOCode) }}</b>
+                            <b>{{ formatPrice((scope.row.priceList * scope.row.taxRate.rate / 100) + scope.row.priceList * scope.row.quantityOrdered, pointOfSalesCurrency.iSOCode) }}</b>
                             <br>
-                            {{ $t('form.productInfo.quantityAvailable') }}:
+                            {{ $t('form.pos.tableProduct.quantity') }}:
                             <b>{{ formatQuantity(scope.row.quantityOrdered) }}</b>
                           </div>
                         </el-col>
                       </el-row>
                     </el-form>
-                    <el-button slot="reference" type="primary" icon="el-icon-info" size="mini" style="margin-right: 3%;" />
+                    <el-button slot="reference" type="primary" icon="el-icon-info" size="mini" style="margin-right: 3%;" @click="showInfoLine(scope.row)" />
                   </el-popover>
                   <el-popover
                     placement="right"
@@ -213,7 +233,7 @@
           </el-dialog>
           <el-footer :class="classOrderFooter">
             <div class="keypad">
-              <span id="toolPoint">
+              <el-row :gutter="24">
                 <el-button type="primary" icon="el-icon-top" :disabled="isDisabled" @click="arrowTop" />
                 <el-button type="primary" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
                 <el-button v-show="isValidForDeleteLine(listOrderLine)" type="danger" icon="el-icon-delete" :disabled="isDisabled" @click="deleteOrderLine(currentOrderLine)" />
@@ -226,7 +246,7 @@
                 >
                   {{ labelButtonCollections }}
                 </el-button>
-              </span>
+              </el-row>
               <p id="point" style="margin-bottom: 5%;margin-top: 3%;">
                 <el-dropdown
                   v-if="!isEmptyValue(currentPointOfSales)"
@@ -286,6 +306,7 @@
                       v-for="item in listWarehouses"
                       :key="item.uuid"
                       :command="item"
+                      :disabled="isDisabled"
                     >
                       {{ item.name }}
                     </el-dropdown-item>
@@ -307,6 +328,7 @@
                       v-for="item in pointPriceList"
                       :key="item.uuid"
                       :command="item"
+                      :disabled="isDisabled"
                     >
                       {{ item.name }}
                     </el-dropdown-item>
@@ -413,11 +435,14 @@ import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOrder from './fieldsListOrder.js'
 import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner'
 import fieldLine from '@/components/ADempiere/Form/VPOS/Order/line/index'
+import ImageProduct from '@/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
+// src/components/ADempiere/Form/VPOS/Order/ImageProduct/index.vue
 import ProductInfo from '@/components/ADempiere/Form/VPOS/ProductInfo'
 import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
 // Format of values ( Date, Price, Quantity )
 import {
   formatDate,
+  formatDateToSend,
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
@@ -429,7 +454,8 @@ export default {
     BusinessPartner,
     ProductInfo,
     FastOrdesList,
-    fieldLine
+    fieldLine,
+    ImageProduct
   },
   mixins: [
     formMixin,
@@ -444,12 +470,19 @@ export default {
       pin: '',
       attributePin: {},
       validatePin: true,
-      visible: false
+      visible: false,
+      isEditQtyOrdered: false,
+      isEditLine: {},
+      fileColumnNameEdit: '',
+      showInfo: false
     }
   },
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'
+    },
+    isShowedPOSKeyLaout() {
+      return this.$store.getters.getShowPOSKeyLayout
     },
     classOrderFooter() {
       if (this.isMobile) {
@@ -482,7 +515,10 @@ export default {
       if (this.isEmptyValue(this.currentOrder)) {
         return 14
       }
-      return 11
+      if (this.isShowedPOSKeyLayout) {
+        return 10
+      }
+      return 12
     },
     shortsKey() {
       return {
@@ -631,6 +667,9 @@ export default {
     },
     currentDocumentType() {
       if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.documentType)) {
+        if (!this.isEmptyValue(this.currentOrder.documentType)) {
+          return this.currentOrder.documentType
+        }
         return this.$store.getters.getCurrentDocumentTypePos
       }
       return {}
@@ -642,8 +681,14 @@ export default {
       return []
     },
     listDocumentTypes() {
-      if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.documentTypesList)) {
-        return this.$store.getters.posAttributes.currentPointOfSales.documentTypesList
+      const listDocumentTypes = this.$store.getters.posAttributes.currentPointOfSales.documentTypesList
+      const templatePosDocumentTypes = this.$store.getters.posAttributes.currentPointOfSales.documentType
+      if (!this.isEmptyValue(listDocumentTypes)) {
+        const addDocumentType = listDocumentTypes.find(documentType => documentType.uuid === templatePosDocumentTypes.uuid)
+        if (this.isEmptyValue(addDocumentType)) {
+          listDocumentTypes.push(this.$store.getters.posAttributes.currentPointOfSales.documentType)
+        }
+        return listDocumentTypes
       }
       return []
     },
@@ -662,6 +707,9 @@ export default {
       this.visible = value
     },
     numberOfLines(value) {
+      if (this.isNewOrder) {
+        this.$refs.ProductValue[0].$refs.product.focus()
+      }
       if (value > 0) {
         this.convertedAmount()
       }
@@ -676,6 +724,28 @@ export default {
         }, 500)
       } else {
         this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: value })
+      }
+    },
+    orderDate(value) {
+      this.$store.state['pointOfSales/point/index'].conversionsList = []
+    },
+    isEditLine(value) {
+      if (!this.isEmptyValue(value.uuid) && this.isEditQtyOrdered && !this.isEmptyValue(this.$refs.editField)) {
+        setTimeout(() => {
+          this.$refs.editField[0].focus()
+          this.$refs.editField[0].select()
+        }, 500)
+      }
+    },
+    currentPriceList(value) {
+      if (!this.isEmptyValue(value)) {
+        this.$store.dispatch('updateOrder', {
+          orderUuid: this.$route.query.action,
+          posUuid: this.currentPointOfSales.uuid,
+          priceListUuid: value.uuid,
+          warehouseUuid: this.currentWarehouse.uuid,
+          documentTypeUuid: this.currentDocumentType.uuid
+        })
       }
     }
   },
@@ -694,11 +764,74 @@ export default {
         }
       })
     }
+    if (this.isNewOrder) {
+      this.$refs.ProductValue[0].$refs.product.focus()
+    }
   },
   methods: {
     formatDate,
+    formatDateToSend,
     formatPrice,
     formatQuantity,
+    focusProducto(value) {
+      this.$refs.ProductValue[0].$refs.product.focus()
+    },
+    editCell(row, column) {
+      switch (column.columnKey) {
+        case 'CurrentPrice':
+        case 'QtyEntered':
+        case 'Discount':
+          this.isEditQtyOrdered = true
+          this.fileColumnNameEdit = column.columnKey
+          this.isEditLine = row
+          setTimeout(() => {
+            this.$refs.editField[0].focus()
+            this.$refs.editField[0].select()
+          }, 100)
+          break
+      }
+    },
+    changeEdit(value, columnName) {
+      if (!this.allowsModifyQuantity && (columnName === 'QtyEntered')) {
+        const attributePin = {
+          containerUuid: 'line',
+          columnName,
+          value,
+          type: 'updateOrder',
+          label: this.$t('form.pos.pinMessage.qtyEntered')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+        return
+      } else if (!this.modifyPrice && (columnName === 'PriceEntered' || columnName === 'Discount')) {
+        const attributePin = {
+          containerUuid: 'line',
+          columnName,
+          value,
+          type: 'updateOrder',
+          label: columnName === 'PriceEntered' ? this.$t('form.pos.pinMessage.price') : this.$t('form.pos.pinMessage.discount')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+        return
+      }
+      const changeLine = { columnName, value }
+      this.updateOrderLine(changeLine)
+    },
+    theActionEdit(event) {
+      switch (event.srcKey) {
+        case 'enter':
+          this.$refs.editField[0].select()
+          break
+        case 'close':
+          this.exitEdit()
+          break
+      }
+    },
+    exitEdit() {
+      this.isEditLine = {}
+      this.isEditQtyOrdered = false
+    },
     keyActionClosePin(event) {
       this.visible = false
       this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
@@ -725,6 +858,19 @@ export default {
       return this.formatPrice(this.currentOrder.grandTotal - this.currentOrder.totalLines, currency)
     },
     newOrder() {
+      if (!this.allowsCreateOrder) {
+        const attributePin = {
+          withLine: false,
+          newOrder: true,
+          customer: this.currentPointOfSales.templateBusinessPartner.uuid,
+          action: 'newOrder',
+          type: 'actionPos',
+          label: this.$t('form.pos.pinMessage.newOrder')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+        return
+      }
       this.clearOrder()
       this.$store.commit('setShowPOSCollection', false)
       this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateBusinessPartner.uuid })
@@ -734,50 +880,58 @@ export default {
       this.clearOrder()
     },
     changeWarehouse(warehouse) {
-      if (warehouse.is_pos_required_pin) {
-        const attributePin = {
-          ...warehouse,
-          action: 'changeWarehouse',
-          type: 'actionPos',
-          label: this.$t('form.pos.pinMessage.warehouse')
+      if (warehouse.id !== this.currentWarehouse.id) {
+        if (warehouse.is_pos_required_pin) {
+          const attributePin = {
+            ...warehouse,
+            action: 'changeWarehouse',
+            type: 'actionPos',
+            label: this.$t('form.pos.pinMessage.warehouse')
+          }
+          const visible = true
+          this.visible = visible
+          this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        } else {
+          this.$store.commit('setCurrentWarehousePos', warehouse)
         }
-        const visible = true
-        this.visible = visible
-        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-      } else {
-        this.$store.commit('setCurrentWarehousePos', warehouse)
       }
     },
     changeDocumentType(documentType) {
-      if (!documentType.is_pos_required_pin) {
-        this.$store.dispatch('updateOrder', {
-          orderUuid: this.currentOrder.uuid,
-          posUuid: this.currentPointOfSales.uuid,
-          documentTypeUuid: documentType.uuid
-        })
-      } else {
-        const attributePin = {
-          ...documentType,
-          action: 'changeDocumentType',
-          type: 'actionPos',
-          label: this.$t('form.pos.pinMessage.documentType')
+      if (documentType.id !== this.currentDocumentType.id) {
+        if (!documentType.is_pos_required_pin) {
+          this.$store.dispatch('updateOrder', {
+            orderUuid: this.currentOrder.uuid,
+            posUuid: this.currentPointOfSales.uuid,
+            documentTypeUuid: documentType.uuid,
+            priceListUuid: this.currentPointOfSales.priceList.uuid,
+            warehouseUuid: this.currentPointOfSales.warehouse.uuid
+          })
+        } else {
+          const attributePin = {
+            ...documentType,
+            action: 'changeDocumentType',
+            type: 'actionPos',
+            label: this.$t('form.pos.pinMessage.documentType')
+          }
+          this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+          this.visible = true
         }
-        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-        this.visible = true
       }
     },
     changePriceList(priceList) {
-      if (priceList.is_pos_required_pin) {
-        const attributePin = {
-          ...priceList,
-          action: 'changePriceList',
-          type: 'actionPos',
-          label: this.$t('form.pos.pinMessage.priceList')
+      if (priceList.id !== this.currentPriceList.id) {
+        if (priceList.is_pos_required_pin) {
+          const attributePin = {
+            ...priceList,
+            action: 'changePriceList',
+            type: 'actionPos',
+            label: this.$t('form.pos.pinMessage.priceList')
+          }
+          this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+          this.visible = true
+        } else {
+          this.$store.commit('setCurrentPriceList', priceList)
         }
-        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-        this.visible = true
-      } else {
-        this.$store.commit('setCurrentPriceList', priceList)
       }
     },
     arrowTop() {
@@ -786,6 +940,13 @@ export default {
         this.$refs.linesTable.setCurrentRow(this.listOrderLine[this.currentTable])
         this.currentOrderLine = this.listOrderLine[this.currentTable]
       }
+    },
+    showInfoLine(line) {
+      this.$store.commit('setLine', line)
+      this.showInfo = true
+    },
+    closeInfo(line) {
+      this.showInfo = false
     },
     showEditLine(line) {
       this.$store.commit('setLine', line)
@@ -829,6 +990,7 @@ export default {
     padding-right: 9px;
     padding-bottom: 0px;
     padding-left: 9px;
+    overflow: auto;
     height: auto !important;
   }
   .keypad {

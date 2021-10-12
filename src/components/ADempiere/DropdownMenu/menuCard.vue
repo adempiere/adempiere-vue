@@ -45,7 +45,6 @@ export default {
   },
   methods: {
     redirect(item) {
-      console.log(item)
       this.openItemMenu(item)
 
       let tabParent

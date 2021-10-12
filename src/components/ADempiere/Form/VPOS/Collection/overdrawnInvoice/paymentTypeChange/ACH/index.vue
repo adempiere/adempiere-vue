@@ -32,26 +32,14 @@
             :metadata-field="field"
           />
         </el-col>
-        <el-col :span="6">
+        <el-col :span="3">
           <el-form-item :label="$t('form.pos.collect.change')">
-            <el-input v-model="amountRefund" disabled />
+            <b> {{ amountRefund }} </b>
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="3">
           <el-form-item :label="$t('form.pos.collect.Currency')">
-            <el-select
-              v-model="currencyReference.iso_code"
-              style="width: -webkit-fill-available;"
-              disabled
-              @change="changeCurrency"
-            >
-              <el-option
-                v-for="item in listCurrency"
-                :key="item.id"
-                :label="item.iso_code + '(' + item.currency_symbol + ')'"
-                :value="item.iso_code"
-              />
-            </el-select>
+            <b> {{ currencyReference.iso_code + '(' + currencyReference.currency_symbol + ')' }} </b>
           </el-form-item>
         </el-col>
       </el-row>
@@ -121,10 +109,13 @@ export default {
   },
   computed: {
     amountRefund() {
-      return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.key)
+      return this.formatPrice(this.change / this.dayRate.divideRate, this.currencyReference.iso_code)
     },
     currencyReference() {
       const reference = this.isEmptyValue(this.typeRefund.refund_reference_currency) ? this.defaultCurrency.id : this.typeRefund.refund_reference_currency.id
+      if (this.isEmptyValue(reference)) {
+        return ''
+      }
       const currency = this.listCurrency.find(currency => {
         if (currency.id === reference) {
           return currency
@@ -189,13 +180,12 @@ export default {
       return this.$store.state['pointOfSales/point/index'].conversionsList
     },
     dayRate() {
-      const currency = this.listCurrency.find(currency => currency.iso_code === this.currencyReference.iso_code)
+      const currency = this.listCurrency.find(currency => !this.isEmptyValue(this.currencyReference) && currency.iso_code === this.currencyReference.iso_code)
       const convert = this.convertionsList.find(convert => {
         if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
           return convert
         }
       })
-      console.log(convert)
       if (!this.isEmptyValue(convert)) {
         return convert
       }

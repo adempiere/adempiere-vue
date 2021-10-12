@@ -19,7 +19,9 @@ import {
   createPayment,
   deletePayment,
   updatePayment,
-  getPaymentsList
+  getPaymentsList,
+  // Customer Bank Account
+  createCustomerBankAccount
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
@@ -95,6 +97,7 @@ export default {
         .then(response => {
           const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
+          dispatch('updateOrder', { posUuid, orderUuid })
         })
         .catch(error => {
           console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -191,10 +194,11 @@ export default {
     convertedAmount,
     paymentDate,
     tenderTypeCode,
+    paymentMethodUuid,
     currencyUuid
   }) {
     const listPayments = getters.getListPayments.payments.find(payment => {
-      if ((payment.tenderTypeCode === tenderTypeCode) && (payment.tenderTypeCode === 'X') && (currencyUuid === payment.currencyUuid)) {
+      if ((payment.paymentMethodUuid === paymentMethodUuid) && (payment.tenderTypeCode === 'X') && (currencyUuid === payment.currencyUuid)) {
         return payment
       }
       return undefined
@@ -211,12 +215,14 @@ export default {
         convertedAmount,
         paymentDate,
         tenderTypeCode,
+        paymentMethodUuid,
         isRefund: false,
         currencyUuid
       })
         .then(response => {
           const orderUuid = response.orderUuid
           dispatch('listPayments', { orderUuid })
+          dispatch('updateOrder', { posUuid, orderUuid })
           return {
             ...response,
             type: 'Success'
@@ -242,11 +248,13 @@ export default {
         description,
         amount: listPayments.amount + amount,
         paymentDate,
+        paymentMethodUuid,
         tenderTypeCode
       })
         .then(response => {
           const orderUuid = response.order_uuid
           dispatch('listPayments', { orderUuid })
+          dispatch('updateOrder', { posUuid, orderUuid })
           return {
             ...response,
             type: 'Success'
@@ -267,6 +275,7 @@ export default {
     }
   },
   deletetPayments({ dispatch }, {
+    posUuid,
     orderUuid,
     paymentUuid
   }) {
@@ -275,6 +284,7 @@ export default {
     })
       .then(response => {
         dispatch('listPayments', { orderUuid })
+        dispatch('updateOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -292,6 +302,7 @@ export default {
       orderUuid
     })
       .then(response => {
+        commit('listRefund', response.listPayments)
         commit('setListPayments', {
           payments: response.listPayments.reverse(),
           isLoaded: true
@@ -322,6 +333,39 @@ export default {
   currencyRedund({ commit }, currency) {
     commit('setCurrencyRedund', currency)
   },
+  addCreateCustomerAccount({ commit }, {
+    customerAccount,
+    customer,
+    posUuid,
+    orderUuid,
+    invoiceUuid,
+    bankUuid,
+    referenceNo,
+    description,
+    amount,
+    convertedAmount,
+    paymentDate,
+    tenderTypeCode,
+    paymentMethodUuid,
+    currencyUuid
+  }) {
+    commit('setAddRefund', {
+      customerAccount,
+      customer,
+      posUuid,
+      orderUuid,
+      invoiceUuid,
+      bankUuid,
+      referenceNo,
+      description,
+      amount,
+      convertedAmount,
+      paymentDate,
+      tenderTypeCode,
+      paymentMethodUuid,
+      currencyUuid
+    })
+  },
   sendCreateCustomerAccount({ commit, dispatch }, {
     customerAccount,
     posUuid,
@@ -334,6 +378,7 @@ export default {
     convertedAmount,
     paymentDate,
     tenderTypeCode,
+    paymentMethodUuid,
     currencyUuid
   }) {
     return createPayment({
@@ -348,12 +393,126 @@ export default {
       convertedAmount,
       paymentDate,
       tenderTypeCode,
-      currencyUuid
+      paymentMethodUuid,
+      currencyUuid,
+      isRefund: true
     })
       .then(response => {
         const orderUuid = response.orderUuid
         dispatch('listPayments', { orderUuid })
-        return response
+        return {
+          ...response,
+          type: 'success'
+        }
       })
+      .catch(error => {
+        console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+        return { type: 'error' }
+      })
+  },
+  /**
+  * Refund payment at a later time
+  * customer_uuid - Customer UUID
+  * pos_uuid - Value
+  * city - City
+  * country - Country
+  * email - EMail
+  * driver_license - Driver Licence
+  * social_security_number - Social Security Number (SSN)
+  * name - Name
+  * state - State
+  * street - Strert
+  * zip - ZIP
+  * bank_account_type - Bank Accoubnt Type
+  * bank_uuid - Bank UUID
+  * is_ach - ACH
+  * address_verified - Address Verified
+  * zip_verified - ZIP Verified
+  * routing_no - Routing No
+  * iban - IBAN
+  */
+  customerBankAccount({ commit, dispatch }, {
+    customerUuid,
+    posUuid,
+    city,
+    country,
+    email,
+    driverLicense,
+    socialSecurityNumber,
+    name,
+    state,
+    street,
+    zip,
+    bankAccountType,
+    bankUuid,
+    paymentMethodUuid,
+    isAch,
+    addressVerified,
+    zipVerified,
+    routingNo,
+    iban
+  }) {
+    createCustomerBankAccount({
+      customerUuid,
+      posUuid,
+      city,
+      country,
+      email,
+      driverLicense,
+      socialSecurityNumber,
+      name,
+      state,
+      street,
+      zip,
+      bankAccountType,
+      paymentMethodUuid,
+      bankUuid,
+      isAch,
+      addressVerified,
+      zipVerified,
+      routingNo,
+      iban
+    })
+      .then(response => {
+        console.log(response)
+      })
+      .catch(error => {
+        console.warn(`conversionDivideRate: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+      })
+  },
+  addDeliveryList({ commit, state, getters }, product) {
+    const deliveryList = state.deliveryList
+    const addProduct = deliveryList.find(delivery => {
+      if (delivery.uuid === product.uuid) {
+        return delivery
+      }
+      return undefined
+    })
+    if (isEmptyValue(addProduct)) {
+      deliveryList.push(product)
+      commit('setDeliveryList', deliveryList)
+    } else {
+      deliveryList.map(delivery => {
+        if (delivery.uuid === product.uuid) {
+          return {
+            ...delivery,
+            quantity: delivery.quantity++
+          }
+        }
+        return delivery
+      })
+      commit('setDeliveryList', deliveryList)
+    }
   }
+
 }

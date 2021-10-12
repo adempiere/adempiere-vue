@@ -30,13 +30,15 @@
           <el-form-item label="No. del Documento">
             <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
           </el-form-item>
-          <el-form-item>
+          <el-form-item
+            v-for="(field) in metadataList"
+            :key="field.columnName"
+          >
             <field
-              v-if="!isEmptyValue(metadataList)"
-              :key="metadataList.columnName"
               :metadata-field="{
-                ...metadataList,
-                size: 24
+                ...field,
+                size: 6,
+                name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
               }"
             />
           </el-form-item>
@@ -48,8 +50,9 @@
           :data="ordersInvoiced"
           height="400"
           border
+          :empty-text="$t('form.byInvoice.emptyList')"
           fit
-          :highlight-current-row="highlightRow"
+          highlight-current-row
           @current-change="handleCurrentChange"
         >
           <el-table-column
@@ -114,8 +117,26 @@
           style="float: right;"
         />
       </el-footer>
+      <el-row :gutter="24">
+        <el-col :span="24">
+          <samp style="float: right; padding-right: 10px;">
+            <el-button
+              type="danger"
+              class="custom-button-create-bp"
+              icon="el-icon-close"
+              @click="clear"
+            />
+            <el-button
+              type="primary"
+              class="custom-button-create-bp"
+              icon="el-icon-check"
+              @click="selectionChangeOrder"
+            />
+          </samp>
+        </el-col>
+      </el-row>
     </el-container>
-    <el-button slot="reference" type="primary" plain>
+    <el-button slot="reference" type="primary" plain style="font-size: 12px;">
       <svg-icon icon-class="tree-table" />
       <b> {{ $t('form.byInvoice.label') }} </b>
     </el-button>
@@ -171,8 +192,10 @@ export default {
       isCustomForm: true,
       businessPartner: '',
       timeOut: null,
+      changeOrder: {},
       isloading: true,
       ordersInvoiced: [],
+      dateOrdered: '',
       openPopover: false
     }
   },
@@ -195,13 +218,29 @@ export default {
     },
     sortFieldsListOrder() {
       return this.fieldsList.find(field => field.columnName === 'C_BPartner_ID')
+    },
+    dateOrderedFrom() {
+      return this.fieldsList.find(field => {
+        if (field.columnName === 'DateOrdered') {
+          return field
+        }
+      })
     }
   },
   watch: {
     openPopover(value) {
+      const date = new Date()
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'Aisle-Vendor-List',
+        columnName: 'DateOrderedFrom',
+        value: date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
+      })
       if (value && this.isEmptyValue(this.ordersInvoiced)) {
         this.setFieldsList()
-        this.listOrdersInvoiced()
+        clearTimeout(this.timeOut)
+        this.timeOut = setTimeout(() => {
+          this.listOrdersInvoiced()
+        }, 1000)
       }
     }
   },
@@ -227,8 +266,13 @@ export default {
     handleCurrentChange(row) {
       // close popover
       this.$store.commit('showListOrders', false)
-      this.$store.dispatch('currentOrder', row)
-      if (!this.isEmptyValue(row)) {
+      this.changeOrder = row
+    },
+    selectionChangeOrder() {
+      const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      if (!this.isEmptyValue(this.changeOrder) && this.changeOrder.documentNo !== currentOrder.documentNo) {
+        this.$store.state['pointOfSales/point/index'].conversionsList = []
+        this.$store.dispatch('currentOrder', this.changeOrder)
         this.$store.dispatch('deleteAllCollectBox')
         this.$router.push({
           params: {
@@ -236,7 +280,7 @@ export default {
           },
           query: {
             ...this.$route.query,
-            action: row.uuid
+            action: this.changeOrder.uuid
           }
         }, () => {})
         const orderUuid = this.$route.query.action
@@ -248,6 +292,9 @@ export default {
       return this.$store.subscribe((mutation, state) => {
         if (mutation.type === 'updateValueOfField' && mutation.payload.columnName === 'C_BPartner_ID_UUID' && mutation.payload.containerUuid === 'Aisle-Vendor-List' && mutation.payload.value !== this.businessPartner) {
           this.businessPartner = mutation.payload.value
+        }
+        if (mutation.type === 'updateValueOfField' && mutation.payload.columnName === 'DateOrderedFrom' && mutation.payload.containerUuid === 'Aisle-Vendor-List' && mutation.payload.value !== this.dateOrdered) {
+          this.dateOrdered = mutation.payload.value
         }
         if (mutation.type === 'updateValueOfField' &&
           !mutation.payload.columnName.includes('DisplayColumn') &&
@@ -268,27 +315,38 @@ export default {
       this.$store.dispatch('addParametersProcessPos', parametersList)
     },
     setFieldsList() {
-      const list = {
-        ...this.sortFieldsListOrder,
-        containerUuid: 'Aisle-Vendor-List'
-      }
+      const fieldsList = [
+        {
+          ...this.sortFieldsListOrder,
+          containerUuid: 'Aisle-Vendor-List'
+        },
+        {
+          ...this.dateOrderedFrom,
+          containerUuid: 'Aisle-Vendor-List'
+        }
+      ]
+      const newfieldsList = []
       // Create Panel
       this.$store.dispatch('addPanel', {
         containerUuid: 'Aisle-Vendor-List',
-        isCustomForm: true,
-        uuid: this.metadata.uuid + 1,
-        fieldsList: [list]
+        isCustomForm: false,
+        uuid: this.metadata.uuid,
+        panelType: this.metadata.panelType,
+        fieldsList: fieldsList
       })
       // Product Code
-      this.createFieldFromDictionary(list)
-        .then(response => {
-          // this.metadataList = response
-          this.metadataList = {
-            ...response
-          }
-        }).catch(error => {
-          console.warn(`LookupFactory: Get Field From Server (State) - Error ${error.code}: ${error.message}.`)
-        })
+      fieldsList.forEach(element => {
+        this.createFieldFromDictionary(element)
+          .then(response => {
+            newfieldsList.push({
+              ...response,
+              containerUuid: 'Aisle-Vendor-List'
+            })
+          }).catch(error => {
+            console.warn(`LookupFactory: Get Field From Server (State) - Error ${error.code}: ${error.message}.`)
+          })
+      })
+      this.metadataList = newfieldsList
     },
     sortDate(listDate) {
       return listDate.sort((elementA, elementB) => {
@@ -302,6 +360,7 @@ export default {
         documentNo: this.input,
         isAisleSeller: true,
         pageToken: this.tokenPage,
+        dateOrderedFrom: this.dateOrdered,
         businessPartnerUuid: this.businessPartner
       })
         .then(response => {

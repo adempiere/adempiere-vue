@@ -35,10 +35,10 @@
       <el-button v-show="!isMenuMobile && isMobile" type="text" icon="el-icon-more" @click="isMenuOption()" />
       <el-popover
         placement="bottom"
-        width="245"
+        width="260"
         trigger="click"
       >
-        <div>
+        <div style="padding: 10px;">
           <profile-preview
             :user="user"
             :avatar="avatar"

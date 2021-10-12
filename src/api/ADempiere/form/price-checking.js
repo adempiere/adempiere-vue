@@ -28,7 +28,8 @@ export function getProductPrice({
   posUuid,
   businessPartnerUuid,
   validFrom,
-  priceListUuid
+  priceListUuid,
+  warehouseUuid
 }) {
   return request({
     url: `${config.priceChecking.endpoint}/product-price`,
@@ -41,7 +42,8 @@ export function getProductPrice({
       pos_uuid: posUuid,
       business_partner_uuid: businessPartnerUuid,
       valid_from: validFrom,
-      price_list_uuid: priceListUuid
+      price_list_uuid: priceListUuid,
+      warehouse_uuid: warehouseUuid
     }
   })
     .then(productPriceResponse => {

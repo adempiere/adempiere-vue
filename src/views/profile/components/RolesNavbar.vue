@@ -1,6 +1,6 @@
 <template>
   <el-form>
-    <label>{{ $t('route.role') }}</label>
+    <label> <b> {{ $t('route.role') }} </b> </label>
     <el-select
       v-model="currentRoleUuid"
       :filterable="isFiltrable"
@@ -15,7 +15,7 @@
       />
     </el-select>
 
-    <label>{{ $t('route.organization') }}</label>
+    <label> <b> {{ $t('route.organization') }} </b> </label>
     <el-select
       v-model="currentOrganizationUuid"
       :filterable="isFiltrable"
@@ -31,7 +31,7 @@
       />
     </el-select>
 
-    <label>{{ $t('route.warehouse') }}</label>
+    <label> <b> {{ $t('route.warehouse') }} </b> </label>
     <el-select
       v-model="currentWarehouseUuid"
       :filterable="isFiltrable"
@@ -75,6 +75,9 @@ export default {
       set(organizationToSet) {
         this.changeOrganization(organizationToSet)
       }
+    },
+    currentRole() {
+      return this.$store.getters['user/getRole']
     },
     organizationsList() {
       return this.$store.getters['user/getOrganizations']

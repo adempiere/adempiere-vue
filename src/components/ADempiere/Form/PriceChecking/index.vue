@@ -49,9 +49,10 @@
           />
         </el-form>
 
-        <div class="inquiry-product" style="z-index: 4;">
+        <div v-if="!isEmptyValue(productPrice)" class="inquiry-product" style="z-index: 4;">
           <div class="product-description">
-            <b> {{ productPrice.productName }} </b> <br> {{ productPrice.productDescription }}
+            <b> {{ productPrice.product.value }} {{ productPrice.productName }}</b>
+            <br> {{ productPrice.productDescription }}
           </div>
           <el-row v-if="!isEmptyValue(productPrice)" :gutter="20">
             <el-col :span="24" style="padding-left: 0px; padding-right: 0%;">
@@ -116,7 +117,7 @@
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldsList.js'
 import { getProductPrice } from '@/api/ADempiere/form/price-checking.js'
-import { formatPercent, formatPrice, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
+import { formatPercent, formatPrice, formatDateToSend, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
 import { getImagePath } from '@/utils/ADempiere/resource.js'
 
 export default {
@@ -197,6 +198,7 @@ export default {
   },
   methods: {
     formatPercent,
+    formatDateToSend,
     formatPrice,
     formatQuantity,
     focusProductValue() {
@@ -220,7 +222,8 @@ export default {
         this.$store.dispatch('searchConversion', {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
-          currencyToUuid: this.currentPointOfSales.displayCurrency.uuid
+          currencyToUuid: this.currentPointOfSales.displayCurrency.uuid,
+          conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
         })
       }
     },
@@ -235,7 +238,9 @@ export default {
           if (!this.isEmptyValue(this.search) && this.search.length >= 4) {
             getProductPrice({
               searchValue: mutation.payload.value,
-              posUuid: this.currentPointOfSales.uuid
+              posUuid: this.currentPointOfSales.uuid,
+              priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+              warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
             })
               .then(productPrice => {
                 this.messageError = true
@@ -250,6 +255,7 @@ export default {
                   productName: product.name,
                   productDescription: product.help,
                   priceBase,
+                  product,
                   priceStandard: productPrice.priceStandard,
                   priceList: productPrice.priceList,
                   priceLimit: productPrice.priceLimit,
@@ -288,7 +294,9 @@ export default {
             }
             getProductPrice({
               searchValue: mutation.payload.value,
-              posUuid: this.currentPointOfSales.uuid
+              posUuid: this.currentPointOfSales.uuid,
+              priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+              warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
             })
               .then(productPrice => {
                 this.messageError = true
@@ -302,6 +310,7 @@ export default {
                   productName: product.name,
                   productDescription: product.description,
                   priceBase,
+                  product,
                   priceStandard: productPrice.priceStandard,
                   priceList: productPrice.priceList,
                   priceLimit: productPrice.priceLimit,

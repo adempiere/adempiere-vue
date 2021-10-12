@@ -172,6 +172,9 @@ export default {
     },
     showOverdrawnInvoice() {
       return this.$store.getters.getOverdrawnInvoice.visible
+    },
+    isNewOrder() {
+      return this.$store.getters.getFocusNewOrder
     }
   },
   watch: {
@@ -245,6 +248,7 @@ export default {
             message: 'Acción a realizar',
             showClose: true
           })
+          this.exitEdit()
         })
         .catch(error => {
           console.error(error.message)
@@ -261,6 +265,7 @@ export default {
         })
     },
     pinAction(action) {
+      const { BankAccountType, A_Ident_SSN, C_Bank_ID_UUID, EMail, IsACH } = !this.isEmptyValue(this.$store.getters.getAddRefund) ? this.$store.getters.getAddRefund.customer.customerAccount : ''
       action = this.isEmptyValue(action) ? this.$store.getters.getOverdrawnInvoice.attributePin : action
       if (action.type === 'updateOrder') {
         switch (action.columnName) {
@@ -277,6 +282,8 @@ export default {
             this.$store.dispatch('updateOrder', {
               orderUuid: this.$route.query.action,
               posUuid: this.currentPointOfSales.uuid,
+              priceListUuid: this.currentPointOfSales.priceList.uuid,
+              warehouseUuid: this.currentPointOfSales.warehouse.uuid,
               documentTypeUuid
             })
             break
@@ -290,6 +297,8 @@ export default {
         })
           .then(response => {
             this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
+            this.$store.dispatch('changeFocusNewOrder', true)
+            this.$refs.ProductValue[0].$refs.product.focus()
           })
           .catch(error => {
             console.error(error.message)
@@ -309,13 +318,43 @@ export default {
           case 'changeDocumentType':
             this.$store.commit('setCurrentDocumentTypePos', action)
             break
+          case 'newOrder':
+            this.createOrder({ withLine: action.withLine, newOrder: action.newOrder, customer: action.customer })
+            break
           case 'changePriceList':
             this.$store.commit('setCurrentPriceList', action)
             break
           case 'openBalanceInvoice':
+            switch (action.typeRefund) {
+              case 0:
+                this.refundAllowed(this.currentPointOfSales.uuid, this.currentOrder.uuid, action.payment)
+                break
+              case 1:
+                this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
+                  .then(response => {
+                    if (response.type === 'success') {
+                      this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
+                    }
+                  })
+                break
+              case 3:
+                this.$store.dispatch('customerBankAccount', {
+                  customerUuid: this.currentOrder.businessPartner.uuid,
+                  posUuid: this.currentPointOfSales.uuid,
+                  email: EMail,
+                  socialSecurityNumber: A_Ident_SSN,
+                  name: this.currentOrder.businessPartner.name,
+                  bankAccountType: BankAccountType,
+                  bankUuid: C_Bank_ID_UUID,
+                  isAch: IsACH
+                })
+                  .then(response => {
+                    this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
+                  })
+                break
+            }
             this.$store.commit('dialogoInvoce', { show: true, type: 2 })
             this.$store.commit('dialogoInvoce', { show: false })
-            this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
             break
         }
       }
@@ -325,6 +364,9 @@ export default {
       this.pin = ''
       this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
       this.setDocumentType(this.currentOrder.documentType)
+      if (!this.isEmptyValue(this.currentOrder.uuid)) {
+        this.$store.dispatch('reloadOrder', { orderUuid: this.currentOrder.uuid })
+      }
     },
     refundAllowed(posUuid, orderUuid, payments) {
       this.$store.dispatch('updateOrderPos', true)
@@ -402,6 +444,8 @@ export default {
           orderUuid: this.$route.query.action,
           posUuid: this.currentPointOfSales.uuid,
           customerUuid: update.value,
+          priceListUuid: this.currentPointOfSales.priceList.uuid,
+          warehouseUuid: this.currentPointOfSales.warehouse.uuid,
           documentTypeUuid
         })
       }
@@ -453,8 +497,9 @@ export default {
       }
       findProduct({
         searchValue: searchProduct,
-        priceListUuid: this.curretnPriceList.uuid,
-        posUuid: this.currentPointOfSales.uuid
+        posUuid: this.currentPointOfSales.uuid,
+        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
       })
         .then(productPrice => {
           this.product = productPrice.product
@@ -508,6 +553,8 @@ export default {
           posUuid,
           customerUuid,
           salesRepresentativeUuid: this.currentPointOfSales.salesRepresentative.uuid,
+          priceListUuid: this.currentPointOfSales.priceList.uuid,
+          warehouseUuid: this.currentPointOfSales.warehouse.uuid,
           documentTypeUuid
         })
           .then(response => {
@@ -533,6 +580,7 @@ export default {
       } else {
         this.createOrderLine(orderUuid)
       }
+      this.$store.dispatch('changeFocusNewOrder', true)
     },
     reloadOrder(requery, orderUuid) {
       if (requery) {
@@ -577,6 +625,7 @@ export default {
         })
           .then(response => {
             this.$store.dispatch('reloadOrder', { orderUuid: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid })
+            this.$store.dispatch('changeFocusNewOrder', true)
           })
           .catch(error => {
             console.error(error.message)
@@ -665,6 +714,8 @@ export default {
                 this.$store.dispatch('updateOrder', {
                   orderUuid: this.$route.query.action,
                   posUuid: this.currentPointOfSales.uuid,
+                  priceListUuid: this.currentPointOfSales.priceList.uuid,
+                  warehouseUuid: this.currentPointOfSales.warehouse.uuid,
                   documentTypeUuid
                 })
               }
@@ -708,7 +759,9 @@ export default {
         case 'plus':
           updateOrderLine({
             orderLineUuid: this.currentOrderLine.uuid,
-            quantity: this.listOrderLine[this.currentTable].quantity + 1
+            quantity: this.listOrderLine[this.currentTable].quantity + 1,
+            priceListUuid: this.currentPointOfSales.priceList.uuid,
+            warehouseUuid: this.currentPointOfSales.warehouse.uuid
           })
             .then(response => {
               this.fillOrderLine(response)
@@ -727,7 +780,9 @@ export default {
         case 'minus':
           updateOrderLine({
             orderLineUuid: this.currentOrderLine.uuid,
-            quantity: this.listOrderLine[this.currentTable].quantity - 1
+            quantity: this.listOrderLine[this.currentTable].quantity - 1,
+            priceListUuid: this.currentPointOfSales.priceList.uuid,
+            warehouseUuid: this.currentPointOfSales.warehouse.uuid
           })
             .then(response => {
               this.fillOrderLine(response)

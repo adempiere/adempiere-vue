@@ -94,7 +94,7 @@ export default {
       return toPath(params)
     },
     handleLink(item) {
-      if (this.$route.name !== item.name) {
+      if (this.$route.name !== item.name && !this.isEmptyValue(item.meta.alwaysShow)) {
         this.$router.push({
           name: item.name,
           params: {

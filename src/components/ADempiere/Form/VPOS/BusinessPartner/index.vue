@@ -20,21 +20,20 @@
     <template slot="label">
       {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}
       <el-popover
-        v-model="showCreate"
-        placement="top-start"
-        width="600"
+        v-model="popoverCreateBusinessParnet"
+        placement="bottom-start"
+        width="1200"
         trigger="click"
         @hide="popoverClose"
       >
         <business-partner-create
           :parent-metadata="parentMetadata"
-          :show-field="showCreate"
+          :show-field="popoverCreateBusinessParnet"
         />
         <el-button
           slot="reference"
           type="text"
           :disabled="isDisabled"
-          @click="popoverOpen"
         >
           <i
             class="el-icon-circle-plus"
@@ -42,21 +41,20 @@
         </el-button>
       </el-popover>
       <el-popover
-        placement="top-start"
-        width="800"
+        v-model="popoverListBusinessParnet"
+        placement="bottom-start"
+        width="900"
         trigger="click"
-        :disabled="isDisabled"
-        @hide="showFieldList = !showFieldList"
       >
         <business-partners-list
           :parent-metadata="parentMetadata"
           :shows-popovers="showsPopovers"
-          :show-field="showFieldList"
+          :show-field="popoverListBusinessParnet"
+          :is-disabled="isDisabled"
         />
         <el-button
           slot="reference"
           type="text"
-          @click="showFieldList = !showFieldList"
         >
           <i
             class="el-icon-search"
@@ -64,10 +62,10 @@
         </el-button>
       </el-popover>
       <el-popover
-        v-if="!isEmptyValue(currentOrder.businessPartner.uuid)"
+        v-if="!isEmptyValue(currentOrder)"
         v-model="showUpdate"
         placement="right"
-        width="600"
+        width="1200"
         trigger="click"
       >
         <business-partner-update
@@ -76,6 +74,7 @@
         <el-button
           slot="reference"
           type="text"
+          :disabled="isDisabled"
         >
           <i
             class="el-icon-edit"
@@ -214,10 +213,32 @@ export default {
       }
     },
     currentOrder() {
-      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      const customer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      if (this.isEmptyValue(customer.businessPartner.value)) {
+        return this.$store.getters.getValueOfField({
+          containerUuid: this.parentMetadata.containerUuid,
+          columnName: 'C_BPartner_ID' // this.parentMetadata.columnName
+        })
+      }
+      return customer
     },
-    popoverCreateBusinessParnet() {
-      return this.$store.getters.getPopoverCreateBusinessParnet
+    popoverCreateBusinessParnet: {
+      get() {
+        return this.$store.getters.getPopoverCreateBusinessParnet
+      },
+      set(value) {
+        this.$store.commit('popoverCreateBusinessPartner', value)
+        return value
+      }
+    },
+    popoverListBusinessParnet: {
+      get() {
+        return this.$store.getters.getPopoverListBusinessParnet
+      },
+      set(value) {
+        this.$store.dispatch('changePopoverListBusinessPartner', value)
+        return value
+      }
     },
     showUpdateCustomer() {
       return this.$store.getters.getShowUpdateCustomer
@@ -230,9 +251,35 @@ export default {
         this.$store.dispatch('changeShowUpdateCustomer', value)
         return value
       }
+    },
+    copyShippingAddress() {
+      return this.$store.getters.getCopyShippingAddress
     }
   },
   watch: {
+    popoverListBusinessParnet(value) {
+      if (!value) {
+        this.$store.commit('updateValuesOfContainer', {
+          containerUuid: 'Business-Partner-List',
+          attributes: [{
+            columnName: 'Code',
+            value: undefined
+          }, {
+            columnName: 'Value',
+            value: undefined
+          }, {
+            columnName: 'Name',
+            value: undefined
+          }, {
+            columnName: 'EMail',
+            value: undefined
+          }, {
+            columnName: 'Phone',
+            value: undefined
+          }]
+        })
+      }
+    },
     popoverCreateBusinessParnet(value) {
       this.showCreate = value
     },
@@ -297,7 +344,7 @@ export default {
     remoteSearch(searchValue) {
       return new Promise(resolve => {
         const message = {
-          message: 'Sin resultados coincidentes con la busqueda',
+          message: this.$t('notifications.searchWithOutRecords'),
           type: 'info',
           showClose: true
         }

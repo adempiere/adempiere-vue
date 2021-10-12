@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import language from '@/lang'
+
 const tableName = 'C_Order'
 
 export default [
@@ -36,27 +38,6 @@ export default [
     overwriteDefinition: {
       size: 8,
       sequence: 1,
-      isMandatory: false
-    }
-  },
-  {
-    tableName,
-    columnName: 'GrandTotal',
-    elementColumnName: 'GrandTotal',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      size: 8,
-      sequence: 2,
-      isMandatory: false
-    }
-  },
-  {
-    tableName,
-    elementColumnName: 'OpenAmt',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      size: 8,
-      sequence: 3,
       isMandatory: false
     }
   },
@@ -109,6 +90,7 @@ export default [
     overwriteDefinition: {
       columnName: 'DateOrderedFrom',
       size: 8,
+      name: language.t('form.pos.optionsPoinSales.generalOptions.dateFrom'),
       sequence: 8,
       isMandatory: false
     }
@@ -121,6 +103,7 @@ export default [
     overwriteDefinition: {
       columnName: 'DateOrderedTo',
       size: 8,
+      name: language.t('form.pos.optionsPoinSales.generalOptions.dateTo'),
       sequence: 9,
       isMandatory: false
     }

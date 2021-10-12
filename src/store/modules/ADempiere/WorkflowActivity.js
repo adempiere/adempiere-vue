@@ -3,7 +3,6 @@ import {
 } from '@/api/ADempiere/workflow.js'
 import { isEmptyValue } from '@/utils/ADempiere'
 import { showMessage } from '@/utils/ADempiere/notification.js'
-import language from '@/lang'
 
 const activity = {
   listActivity: [],
@@ -23,7 +22,6 @@ export default {
   actions: {
     serverListActivity({ commit, state, dispatch, rootGetters }, params) {
       const userUuid = isEmptyValue(params) ? rootGetters['user/getUserUuid'] : params
-      const name = language.t('navbar.badge.activity')
       if (isEmptyValue(userUuid)) {
         return
       }
@@ -41,26 +39,6 @@ export default {
             message: error.message,
             showClose: true
           })
-        })
-        .finally(() => {
-          const notification = rootGetters.getNotificationProcess.find(notification => {
-            if (notification.typeActivity && notification.quantityActivities === state.listActivity.length) {
-              return notification
-            }
-          })
-          if (isEmptyValue(notification)) {
-            commit('addNotificationProcess', {
-              name,
-              typeActivity: true,
-              quantityActivities: state.listActivity.length
-            })
-          } else {
-            dispatch('updateNotifications', {
-              name,
-              typeActivity: true,
-              quantityActivities: state.listActivity.length
-            })
-          }
         })
     },
     selectedActivity({ commit }, activity) {

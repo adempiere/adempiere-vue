@@ -59,9 +59,8 @@ export default {
       }
     }
     const currentPointOfSales = rootGetters.posAttributes.currentPointOfSales
-    const { templateBusinessPartner } = currentPointOfSales
+    const { templateBusinessPartner, currentPriceList, currentWarehouse } = currentPointOfSales
     const { uuid: businessPartnerUuid } = templateBusinessPartner
-    const { uuid: warehouseUuid } = rootGetters['user/getWarehouse']
     if (isEmptyValue(searchValue)) {
       searchValue = rootGetters.getValueOfField({
         containerUuid,
@@ -73,6 +72,8 @@ export default {
         searchValue,
         posUuid,
         businessPartnerUuid,
+        priceListUuid: currentPriceList.uuid,
+        warehouseUuid: currentWarehouse.uuid,
         pageToken
       }).then(responseProductPrice => {
         if (isEmptyValue(token) || isEmptyValue(pageToken)) {
@@ -84,7 +85,7 @@ export default {
           isLoaded: true,
           isReload: false,
           businessPartnerUuid,
-          warehouseUuid,
+          warehouseUuid: currentWarehouse.uuid,
           token,
           pageNumber
         })
@@ -129,10 +130,9 @@ export default {
         pageToken = token + '-' + pageNumber
       }
     }
-
-    const { templateBusinessPartner } = rootGetters.posAttributes.currentPointOfSales
+    const currentPointOfSales = rootGetters.posAttributes.currentPointOfSales
+    const { templateBusinessPartner, currentPriceList, currentWarehouse } = currentPointOfSales
     const { uuid: businessPartnerUuid } = templateBusinessPartner
-    const { uuid: warehouseUuid } = rootGetters['user/getWarehouse']
 
     if (isEmptyValue(searchValue)) {
       searchValue = rootGetters.getValueOfField({
@@ -145,6 +145,8 @@ export default {
         searchValue,
         posUuid: posUuid,
         businessPartnerUuid,
+        priceListUuid: currentPriceList.uuid,
+        warehouseUuid: currentWarehouse.uuid,
         pageToken
       }).then(responseProductPrice => {
         if (isEmptyValue(token) || isEmptyValue(pageToken)) {
@@ -156,7 +158,7 @@ export default {
           isLoaded: true,
           isReload: false,
           businessPartnerUuid,
-          warehouseUuid,
+          warehouseUuid: currentWarehouse.uuid,
           token,
           pageNumber
         })

@@ -46,7 +46,7 @@ const businessPartner = {
       if (isEmptyValue(pageNumber)) {
         pageNumber = state.businessPartner.pageNumber
         if (isEmptyValue(pageNumber)) {
-          pageNumber = 1 // default page is 1
+          pageNumber = 0 // default page is 1
         }
 
         token = state.businessPartner.token
