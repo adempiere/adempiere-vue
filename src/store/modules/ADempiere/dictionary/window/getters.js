@@ -58,5 +58,11 @@ export default {
     const window = getters.getStoredWindow(windowUuid)
 
     return window.currentTab
+  },
+
+  getCurrentTabChild: (state, getters) => (windowUuid) => {
+    const window = getters.getStoredWindow(windowUuid)
+
+    return window.currentTabChild
   }
 }

@@ -156,8 +156,10 @@ export default defineComponent({
 
     // use getter to reactive properties
     const currentTabMetadata = computed(() => {
-      // return props.tabsList[currentTab.value]
-      return root.$store.getters.getCurrentTab(props.parentUuid)
+      if (props.isParentTabs) {
+        return root.$store.getters.getCurrentTab(props.parentUuid)
+      }
+      return root.$store.getters.getCurrentTabChild(props.parentUuid)
     })
 
     const isShowRecords = computed(() => {
@@ -175,8 +177,11 @@ export default defineComponent({
     }
 
     function setCurrentTab() {
-      console.info(props.tabsList[currentTab.value])
-      root.$store.commit('setCurrentTab', {
+      let tabMutation = 'setCurrentTab'
+      if (!props.isParentTabs) {
+        tabMutation = 'setCurrentTabChild'
+      }
+      root.$store.commit(tabMutation, {
         parentUuid: props.parentUuid,
         tab: props.tabsList[currentTab.value]
       })

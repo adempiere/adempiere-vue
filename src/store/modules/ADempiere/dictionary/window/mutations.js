@@ -58,5 +58,14 @@ export default {
    */
   setCurrentTab(state, { parentUuid, tab }) {
     Vue.set(state.storedWindows[parentUuid], 'currentTab', tab)
+  },
+
+  /**
+   * @param {*} state
+   * @param {string} parentUuid
+   * @param {object} tab
+   */
+  setCurrentTabChild(state, { parentUuid, tab }) {
+    Vue.set(state.storedWindows[parentUuid], 'currentTabChild', tab)
   }
 }

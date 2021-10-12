@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 export function generateWindow(responseWindow) {
   const {
@@ -25,10 +26,16 @@ export function generateWindow(responseWindow) {
     parentUuid: responseWindow.uuid
   })
 
+  let currentTabChild = {}
+  if (!isEmptyValue(tabsListChild)) {
+    currentTabChild = tabsListChild[0]
+  }
+
   const newWindow = {
     ...responseWindow,
     tabsList,
     currentTab: tabsListParent[0],
+    currentTabChild,
     tabsListChild,
     tabsListParent,
     // app attributes
