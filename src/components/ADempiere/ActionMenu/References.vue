@@ -80,6 +80,7 @@
 import { computed, defineComponent, ref, watch } from '@vue/composition-api'
 
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
+import Filters from '@/utils/ADempiere/filters.js'
 
 export default defineComponent({
   name: 'MenuReferences',
@@ -147,15 +148,17 @@ export default defineComponent({
         return
       }
 
-      if (referenceElement.windowUuid && referenceElement.recordUuid) {
+      if (!root.isEmptyValue(referenceElement.windowUuid)) {
+        const pairsValues = Filters.newInstance()
+          .setFiltersWithSQL(referenceElement.whereClause)
+          .getAsArray()
+
         zoomIn({
           uuid: referenceElement.windowUuid,
           query: {
-            action: referenceElement.type,
-            referenceUuid: referenceElement.uuid,
-            recordUuid: referenceElement.recordUuid,
-            // windowUuid: parentUuid,
-            tabParent: 0
+            action: 'zoomIn',
+            tabParent: 0,
+            filters: pairsValues
           }
         })
       }

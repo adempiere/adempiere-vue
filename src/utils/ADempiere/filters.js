@@ -131,6 +131,49 @@ class Filters {
   }
 
   /**
+   * Based on evaluator.js
+   * TODO: Add support to LIKE, NOT, IN
+   * @param {*} sqlWhere
+   */
+  setFiltersWithSQL(sqlWhere) {
+    const comparations = []
+    const conditions = sqlWhere.split(/(OR|AND)/)
+    conditions.forEach(condition => {
+      if (['AND', 'OR'].includes(condition.trim())) {
+        // break
+        return
+      }
+      const compare = condition.replace(/\(|\)|\s+/g, '')
+      comparations.push(compare)
+    })
+
+    comparations.forEach(compare => {
+      // TODO: Add support to <>!=
+      const values = compare.split('=')
+
+      const index = values[0].indexOf('.')
+      const columnName = values[0].substr(index + 1)
+
+      let type = 'STRING'
+      let value = values[1]
+      if (value.includes('\'')) {
+        value = value.replace(/'/g, '')
+      } else {
+        value = Number(value)
+        type = 'NUMBER'
+      }
+
+      this.filtersList.set(columnName, [
+        columnName,
+        type,
+        value
+      ])
+    })
+
+    return this
+  }
+
+  /**
    * Get array of objects, [{ columnName, value, operator }]
    * @returns array objects
    */
