@@ -265,12 +265,6 @@ const actions = {
       removeToken()
 
       commit('setIsSession', false)
-      dispatch('resetStateBusinessData', null, {
-        root: true
-      })
-      dispatch('dictionaryResetCache', null, {
-        root: true
-      })
 
       // reset visited views and cached views
       // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
@@ -424,13 +418,6 @@ const actions = {
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
 
-        dispatch('resetStateBusinessData', null, {
-          root: true
-        })
-        dispatch('dictionaryResetCache', null, {
-          root: true
-        })
-
         dispatch('getWarehousesList', organizationUuid)
 
         showMessage({
@@ -534,13 +521,6 @@ const actions = {
 
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
-
-        dispatch('resetStateBusinessData', null, {
-          root: true
-        })
-        dispatch('dictionaryResetCache', null, {
-          root: true
-        })
 
         showMessage({
           message: language.t('notifications.successChangeRole'),

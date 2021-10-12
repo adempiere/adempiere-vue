@@ -36,7 +36,11 @@ export default {
   },
   computed: {
     listDashboard() {
+      if (this.isEmptyValue(this.maindashboard)) {
+        return []
+      }
       const list = this.$store.getters.getDashboard
+
       return list.filter(dashboard => this.maindashboard.id !== dashboard.id)
     },
     currentRole() {
