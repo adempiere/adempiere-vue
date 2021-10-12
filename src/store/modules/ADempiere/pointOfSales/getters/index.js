@@ -55,6 +55,7 @@ export default {
         ...state.currentPointOfSales,
         listOrder: state.listOrder,
         warehousesList: state.warehousesList,
+        currentWarehouse: state.currentWarehousePos,
         documentTypesList: state.documentTypesList,
         pricesList: state.pricesList,
         currentPriceList: state.currentPriceList,
@@ -66,6 +67,9 @@ export default {
         }
       }
     }
+  },
+  getListRefund: (state) => {
+    return state.listRefund
   },
   /**
    * Product Price Getters
@@ -148,5 +152,8 @@ export default {
   // get Payment type list
   getPaymentTypeList: (state) => {
     return state.tenderTypes
+  },
+  getShowList: (state) => {
+    return state.listOrder.isShowPopover
   }
 }

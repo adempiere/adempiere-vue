@@ -25,7 +25,8 @@ A clear and concise description of what you expected to happen.
 - Your OS:
 - Web Browser:
 - Node.js version:
-- adempiere-vue version:
+- Yarn version:
+- adempiere-vue version: <!-- 4.4.0. -->
 
 #### Additional context
 Add any other context about the problem here.

@@ -42,6 +42,7 @@
       @focus="focusGained"
       @keydown.native="keyPressed"
       @keyup.native="keyReleased"
+      @keyup.native.enter="select"
     />
     <el-input
       v-else
@@ -180,6 +181,15 @@ export default {
     },
     customFocusGained(event) {
       this.isFocus = true
+      // this.focusGained(event)
+      this.$nextTick(() => {
+        this.$refs[this.metadata.columnName].focus()
+      })
+    },
+    select() {
+      this.$nextTick(() => {
+        this.$refs[this.metadata.columnName].select()
+      })
     },
     customFocusLost(event) {
       this.isFocus = false

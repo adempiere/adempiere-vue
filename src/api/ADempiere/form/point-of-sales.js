@@ -78,6 +78,7 @@ export function createOrder({
   customerUuid,
   documentTypeUuid,
   salesRepresentativeUuid,
+  priceListUuid,
   warehouseUuid
 }) {
   return request({
@@ -88,6 +89,7 @@ export function createOrder({
       customer_uuid: customerUuid,
       document_type_uuid: documentTypeUuid,
       sales_representative_uuid: salesRepresentativeUuid,
+      price_list_uuid: priceListUuid,
       warehouse_uuid: warehouseUuid
     }
   })
@@ -105,6 +107,7 @@ export function updateOrder({
   customerUuid,
   documentTypeUuid,
   description,
+  priceListUuid,
   warehouseUuid
 }) {
   return request({
@@ -116,6 +119,7 @@ export function updateOrder({
       customer_uuid: customerUuid,
       document_type_uuid: documentTypeUuid,
       description,
+      price_list_uuid: priceListUuid,
       warehouse_uuid: warehouseUuid
     }
   })
@@ -132,23 +136,10 @@ export function createCustomer({
   duns,
   naics,
   name,
-  name2,
+  lastName,
   description,
-  contactName,
-  eMail,
+  addresses,
   phone,
-  businessPartnerGroupUuid,
-  // Location
-  address1,
-  address2,
-  address3,
-  address4,
-  cityUuid,
-  cityName,
-  postalCode,
-  regionUuid,
-  regionName,
-  countryUuid,
   posUuid
 }) {
   return request({
@@ -157,26 +148,11 @@ export function createCustomer({
     data: {
       value,
       tax_id: taxId,
-      duns,
-      naics,
       name,
-      last_name: name2,
+      last_name: lastName,
       description,
-      contact_name: contactName,
-      e_mail: eMail,
       phone,
-      business_partner_group_uid: businessPartnerGroupUuid,
-      // Location
-      address1,
-      address2,
-      address3,
-      address4,
-      city_uuid: cityUuid,
-      city_name: cityName,
-      postal_code: postalCode,
-      region_uuid: regionUuid,
-      region_name: regionName,
-      country_uuid: countryUuid,
+      addresses,
       pos_uuid: posUuid
     }
   })
@@ -189,27 +165,14 @@ export function createCustomer({
 // Update Customer
 export function updateCustomer({
   uuid,
-  value,
-  taxId,
-  duns,
-  naics,
-  name,
-  lastName,
+  Value,
+  TaxId,
+  Duns,
+  Naics,
+  Name,
+  Name2,
   description,
-  contactName,
-  email,
-  phone,
-  addressUuid,
-  address1,
-  address2,
-  address3,
-  address4,
-  cityUuid,
-  cityName,
-  postalCode,
-  regionUuid,
-  regionName,
-  countryUuid,
+  addresses,
   posUuid
 }) {
   return request({
@@ -217,27 +180,14 @@ export function updateCustomer({
     method: 'post',
     data: {
       uuid,
-      value,
-      tax_id: taxId,
-      duns,
-      naics,
-      name,
-      last_name: lastName,
+      value: Value,
+      tax_id: TaxId,
+      duns: Duns,
+      naics: Naics,
+      name: Name,
+      last_name: Name2,
       description,
-      contact_name: contactName,
-      email,
-      phone,
-      address_uuid: addressUuid,
-      address1,
-      address2,
-      address3,
-      address4,
-      city_uuid: cityUuid,
-      city_name: cityName,
-      postal_code: postalCode,
-      region_uuid: regionUuid,
-      region_name: regionName,
-      country_uuid: countryUuid,
+      addresses,
       pos_uuid: posUuid
     }
   })
@@ -370,6 +320,7 @@ export function listOrders({
 // Create order line from order uuid and product
 export function createOrderLine({
   orderUuid,
+  priceListUuid,
   warehouseUuid,
   productUuid,
   chargeUuid,
@@ -389,6 +340,7 @@ export function createOrderLine({
       price,
       discount_rate: discountRate,
       charge_uuid: chargeUuid,
+      price_list_uuid: priceListUuid,
       warehouse_uuid: warehouseUuid
     }
   })
@@ -405,7 +357,9 @@ export function updateOrderLine({
   description,
   quantity,
   price,
-  discountRate
+  discountRate,
+  priceListUuid,
+  warehouseUuid
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/update-order-line`,
@@ -416,7 +370,9 @@ export function updateOrderLine({
       description,
       quantity,
       price,
-      discount_rate: discountRate
+      discount_rate: discountRate,
+      price_list_uuid: priceListUuid,
+      warehouse_uuid: warehouseUuid
     }
   })
     .then(createOrderLineResponse => {
@@ -490,6 +446,8 @@ export function getProductPriceList({
   businessPartnerUuid,
   posUuid,
   pageSize,
+  priceListUuid,
+  warehouseUuid,
   pageToken
 }) {
   return request({
@@ -499,6 +457,8 @@ export function getProductPriceList({
       pos_uuid: posUuid,
       search_value: searchValue,
       business_partner_uuid: businessPartnerUuid,
+      price_list_uuid: priceListUuid,
+      warehouse_uuid: warehouseUuid,
       page_size: pageSize,
       page_token: pageToken
     }
@@ -529,7 +489,7 @@ export function printTicket({
     }
   })
     .then(printTicketResponse => {
-      return camelizeObjectKeys(printTicketResponse)
+      return printTicketResponse
     })
 }
 
@@ -584,6 +544,7 @@ export function createPayment({
   amount,
   paymentDate,
   tenderTypeCode,
+  paymentMethodUuid,
   isRefund,
   currencyUuid
 }) {
@@ -600,6 +561,7 @@ export function createPayment({
       amount: amount,
       payment_date: paymentDate,
       tender_type_code: tenderTypeCode,
+      payment_method_uuid: paymentMethodUuid,
       is_refund: isRefund,
       currency_uuid: currencyUuid
     }
@@ -946,4 +908,81 @@ export function createCustomerAccount({
     .then(responseCustomerAccount => {
       return responseCustomerAccount
     })
+}
+/**
+ * Refund payment at a later time
+ * customer_uuid - Customer UUID
+ * pos_uuid - Value
+ * city - City
+ * country - Country
+ * email - EMail
+ * driver_license - Driver Licence
+ * social_security_number - Social Security Number (SSN)
+ * name - Name
+ * state - State
+ * street - Strert
+ * zip - ZIP
+ * bank_account_type - Bank Accoubnt Type
+ * bank_uuid - Bank UUID
+ * is_ach - ACH
+ * address_verified - Address Verified
+ * zip_verified - ZIP Verified
+ * routing_no - Routing No
+ * iban - IBAN
+ */
+export function createCustomerBankAccount({
+  posUuid,
+  customerUuid,
+  city,
+  country,
+  email,
+  driverLicense,
+  socialSecurityNumber,
+  name,
+  state,
+  street,
+  zip,
+  bankAccountType,
+  bankUuid,
+  isAch,
+  addressVerified,
+  zipVerified,
+  routingNo,
+  iban
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/create-customer-bank-account`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      customer_uuid: customerUuid,
+      city,
+      country,
+      email,
+      driver_license: driverLicense,
+      social_security_number: socialSecurityNumber,
+      name,
+      state,
+      street,
+      zip,
+      bank_account_type: bankAccountType,
+      bank_uuid: bankUuid,
+      is_ach: isAch,
+      address_verified: addressVerified,
+      zip_verified: zipVerified,
+      routing_no: routingNo,
+      iban
+    }
+  })
+    .then(responseCreateCustomerBankAccount => {
+      return responseCreateCustomerBankAccount
+    })
+}
+
+export function createShipment({
+  posUuid,
+  orderUuid,
+  listProduct
+}) {
+  console.info(`Create Shipment pos uuid ${posUuid}, order uuid ${orderUuid} and list prouct ${listProduct}`)
 }

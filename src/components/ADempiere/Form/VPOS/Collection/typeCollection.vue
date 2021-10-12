@@ -17,17 +17,18 @@
 -->
 <template>
   <el-container style="background: white; height: 100% !important;">
-    <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;">
+    <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; overflow: auto; padding-left: 0px;">
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
           <el-col v-if="!value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
             <el-card :body-style="{ padding: '0px' }">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img src="@/image/ADempiere/pos/no-image.jpg" fit="contain" class="image">
+                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
                 </el-col>
-                <el-col :span="18">
+                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
                   <el-button
+                    v-if="!isDisabled"
                     type="text"
                     icon="el-icon-close"
                     style="float: right; margin-right: 10px; color: red; padding-top: 10px;"
@@ -37,7 +38,7 @@
                     <div class="top clearfix">
                       <span>
                         {{
-                          labelTenderType(value.tenderTypeCode)
+                          labelTenderType(value)
                         }}
                       </span>
                     </div>
@@ -84,18 +85,19 @@
         </template>
       </el-row>
     </el-main>
-    <el-divider v-if="!isEmptyValue(listRefunds)" content-position="center"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
-    <el-footer style="height: 200px;padding: 0px;">
+    <el-divider v-if="!isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
+    <el-footer v-if="!isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
       <el-row :gutter="24">
-        <template v-for="(value, key) in listRefunds">
+        <template v-for="(value, key) in listRefund">
           <el-col v-if="value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
             <el-card :body-style="{ padding: '0px' }">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img src="@/image/ADempiere/pos/no-image.jpg" fit="contain" class="image">
+                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
                 </el-col>
-                <el-col :span="18">
+                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
                   <el-button
+                    v-if="!isDisabled"
                     type="text"
                     icon="el-icon-close"
                     style="float: right; margin-right: 10px; color: red; padding-top: 10px;"
@@ -105,7 +107,7 @@
                     <div class="top clearfix">
                       <span>
                         {{
-                          labelTenderType(value.tenderTypeCode)
+                          labelTenderType(value)
                         }}
                       </span>
                     </div>
@@ -139,7 +141,7 @@
                         <br>
                         <p class="total">
                           <b style="float: right;color: red;">
-                            {{ labelCurrency(value.currencyUuid) }} - {{ round(value.amount, 2) }}
+                            {{ formatPrice(value.amount, labelCurrency(value.currencyUuid)) }}
                           </b>
                         </p>
                       </div>
@@ -158,6 +160,7 @@
 <script>
 import {
   formatDate,
+  formatDateToSend,
   formatPrice
 } from '@/utils/ADempiere/valueFormat.js'
 import {
@@ -228,6 +231,13 @@ export default {
     },
     availablePaymentMethods() {
       return this.$store.getters.getPaymentTypeList
+    },
+    listRefund() {
+      const refund = this.$store.getters.getListRefund
+      if (this.isEmptyValue(refund)) {
+        return []
+      }
+      return refund.filter(refund => refund.isRefund)
     }
   },
   watch: {
@@ -253,40 +263,45 @@ export default {
   },
   methods: {
     formatDate,
+    formatDateToSend,
     formatPrice,
     labelCurrency(refunds) {
       const label = this.listCurrency.find(label => label.uuid === refunds)
       if (this.isEmptyValue(label)) {
         return ''
       }
-      return label.currency_symbol
+      return label.iso_code
     },
     labelTenderType(tenderType) {
-      const currentTenderType = this.availablePaymentMethods.find(label => label.tender_type === tenderType)
+      const currentTenderType = this.availablePaymentMethods.find(label => {
+        if (label.uuid === tenderType.paymentMethodUuid) {
+          return label
+        }
+      })
       if (currentTenderType) {
         return currentTenderType.name
       }
-      return tenderType
+      return ''
     },
     iSOCode(value) {
-      const currencyPay = this.convertionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === value.currencyUuid)
+      const currencyPay = this.listCurrency.find(currency => currency.uuid === value.currencyUuid)
       if (!currencyPay) {
         return ''
       }
-      return currencyPay.currencyTo.iSOCode
+      return currencyPay.iso_code
     },
     amountConvertion(value) {
-      const currencyPay = this.convertionsList.find(currency => currency.currencyTo.uuid === value.currencyUuid)
+      const currencyPay = this.convertionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === value.currencyUuid)
       if (!currencyPay) {
         this.$store.dispatch('searchConversion', {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currency.uuid,
-          currencyToUuid: value.currencyUuid
+          currencyToUuid: value.currencyUuid,
+          conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
         })
         return this.formatPrice(0)
       }
-      const rate = (currencyPay.divideRate > currencyPay.multiplyRate) ? currencyPay.divideRate : currencyPay.multiplyRate
-      return this.formatPrice(value.amount * rate, this.currency.iSOCode)
+      return this.formatPrice(value.amount * currencyPay.divideRate, this.currency.iSOCode)
     },
     // If there are payments in another currency, search for conversion
     convertingPaymentMethods() {
@@ -357,10 +372,38 @@ export default {
       }
       return require('@/image/' + image + '.jpg')
     },
+    imageCard(typePayment) {
+      let image
+      switch (typePayment) {
+        case 'D':
+          image = 'MobilePayment.jpg'
+          break
+        case 'P':
+          image = 'Mobile.jpg'
+          break
+        case 'X':
+          image = 'Cash.jpg'
+          break
+        case 'A':
+          image = 'ACH.jpg'
+          break
+        case 'M':
+          image = 'GiftCard.jpg'
+          break
+        case 'Z':
+          image = 'Zelle.jpg'
+          break
+        default:
+          image = 'Default.jpg'
+          break
+      }
+      return require('@/image/ADempiere/pos/typePayment/' + image)
+    },
     deleteCollect(key) {
       const orderUuid = key.orderUuid
       const paymentUuid = key.uuid
       this.$store.dispatch('deletetPayments', {
+        posUuid: this.currentPointOfSales.uuid,
         orderUuid,
         paymentUuid
       })

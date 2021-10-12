@@ -17,8 +17,8 @@
 -->
 <template>
   <el-main
-    v-shortkey="shortsKey"
-    @shortkey.native="keyAction"
+    v-shortkey="popoverListBusinessParnet ? {close: ['esc']} : {}"
+    @shortkey.native="actionList"
   >
     <el-collapse v-model="activeAccordion" accordion>
       <el-collapse-item name="query-criteria">
@@ -43,26 +43,23 @@
         </el-form>
       </el-collapse-item>
     </el-collapse>
-
     <el-table
       ref="businesPartnerTable"
+      v-loading="isLoadedList"
       :data="businessPartnersList"
       highlight-current-row
       border
       fit
       height="350"
-
       @current-change="handleCurrentChange"
     >
+      <p slot="empty" style="width: 100%;">
+        {{ $t('businessPartner.emptyBusinessPartner') }}
+      </p>
       <el-table-column
         :label="$t('form.productInfo.code')"
         prop="value"
         width="100"
-      />
-      <el-table-column
-        :label="$t('form.productInfo.id')"
-        prop="id"
-        width="90"
       />
       <el-table-column
         prop="name"
@@ -83,6 +80,25 @@
       :current-page="1"
       :handle-change-page="handleChangePage"
     />
+    <el-row :gutter="24">
+      <el-col :span="24">
+        <samp style="float: right; padding-right: 10px;">
+          <el-button
+            type="danger"
+            class="custom-button-create-bp"
+            icon="el-icon-close"
+            @click="closeListCustomer"
+          />
+          <el-button
+            type="primary"
+            class="custom-button-create-bp"
+            icon="el-icon-check"
+            :disabled="isDisabled"
+            @click="changeCustomer"
+          />
+        </samp>
+      </el-col>
+    </el-row>
     <!-- -->
   </el-main>
 </template>
@@ -126,6 +142,10 @@ export default {
         }
       }
     },
+    isDisabled: {
+      type: Boolean,
+      default: false
+    },
     showField: {
       type: Boolean,
       default: true
@@ -136,7 +156,9 @@ export default {
       isLoadedRecords: false,
       activeAccordion: 'query-criteria',
       fieldsList,
+      selectCustomer: {},
       metadataList: [],
+      isLoadedList: false,
       unsubscribe: () => {}
     }
   },
@@ -150,6 +172,9 @@ export default {
     isReadyFromGetData() {
       const { isLoaded, isReload } = this.businessParners
       return (!isLoaded || isReload) && this.showsPopovers.isShowList
+    },
+    popoverListBusinessParnet() {
+      return this.$store.getters.getPopoverListBusinessParnet
     }
   },
   watch: {
@@ -176,28 +201,20 @@ export default {
   },
   methods: {
     createFieldFromDictionary,
-    keyAction(event) {
-      switch (event.srcKey) {
-        case 'refreshList': {
-          const values = this.$store.getters.getValuesView({
-            containerUuid: this.metadata.containerUuid,
-            format: 'object'
-          })
-
-          this.searchBPartnerList(values)
-          break
-        }
-        case 'refreshListWithoutValues': {
-          this.searchBPartnerList({})
-          break
-        }
-        case 'closeForm':
-          this.closeForm()
-          break
-      }
+    actionList(event) {
+      this.$store.dispatch('changePopoverListBusinessPartner', false)
     },
     handleCurrentChange(row) {
-      this.setBusinessPartner(row)
+      this.selectCustomer = row
+    },
+    changeCustomer() {
+      if (!this.isEmptyValue(this.selectCustomer)) {
+        this.setBusinessPartner(this.selectCustomer)
+        this.closeListCustomer()
+      }
+    },
+    closeListCustomer() {
+      this.$store.dispatch('changePopoverListBusinessPartner', false)
     },
     handleChangePage(newPage) {
       this.$store.dispatch('setBPartnerPageNumber', newPage)
@@ -210,7 +227,10 @@ export default {
             containerUuid: mutation.payload.containerUuid,
             format: 'object'
           })
-          this.searchBPartnerList(values)
+          clearTimeout(this.timeOut)
+          this.timeOut = setTimeout(() => {
+            this.searchBPartnerList(values)
+          }, 1000)
         }
       })
     },
@@ -218,11 +238,20 @@ export default {
       if (isConvert && !this.isEmptyValue(values)) {
         values = this.convertValuesToSend(values)
       }
+      this.isLoadedList = true
       return this.$store.dispatch('listBPartnerFromServer', values)
         .then(response => {
+          if (this.isEmptyValue(response)) {
+            this.$message({
+              type: 'warning',
+              showClose: true,
+              message: this.$t('businessPartner.notFound')
+            })
+          }
           return response
         })
         .finally(() => {
+          this.isLoadedList = false
           this.isLoadedRecords = true
         })
     },
@@ -246,3 +275,10 @@ export default {
   }
 }
 </script>
+<style>
+.el-table__empty-text {
+  line-height: 60px;
+  width: 100%;
+  color: #909399;
+}
+</style>

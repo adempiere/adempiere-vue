@@ -13,7 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import language from '@/lang'
 const tableName = 'C_Payment'
 
 export default [
@@ -28,6 +28,7 @@ export default [
       sequence: 1,
       isCustomField: true,
       size: 24,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.name'),
       isMandatory: true
     }
   },
@@ -40,6 +41,7 @@ export default [
     overwriteDefinition: {
       sequence: 0,
       isCustomField: true,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.code'),
       size: 24,
       isMandatory: true
     }
@@ -54,8 +56,41 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       handleContentSelection: true,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.bank'),
       size: 24,
       isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // bank_account_type
+  {
+    tableName: 'C_BP_BankAccount',
+    columnName: 'BankAccountType',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 3,
+      handleActionKeyPerformed: true,
+      handleActionPerformed: true,
+      handleContentSelection: true,
+      size: 24,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.accountType'),
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // IsACH
+  {
+    tableName: 'C_BP_BankAccount',
+    columnName: 'IsACH',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 3,
+      handleActionKeyPerformed: true,
+      handleActionPerformed: true,
+      handleContentSelection: true,
+      size: 24,
+      isActiveLogics: true,
+      isReadOnly: true,
       isMandatory: true
     }
   },

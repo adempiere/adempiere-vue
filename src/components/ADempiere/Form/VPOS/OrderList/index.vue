@@ -55,11 +55,12 @@
     <el-table
       ref="orderTable"
       v-shortkey="shortsKey"
-      v-loading="!ordersList.isLoaded"
+      v-loading="!ordersList.isLoaded || isLoadRecord"
       :data="sortTableOrderList"
       border
+      :empty-text="$t('form.byInvoice.emptyList')"
       fit
-      :highlight-current-row="highlightRow"
+      highlight-current-row
       :height="heightTable"
       @shortkey.native="keyAction"
       @current-change="handleCurrentChange"
@@ -112,7 +113,7 @@
         width="120"
       >
         <template slot-scope="scope">
-          {{ formatQuantity(scope.row.grandTotal) }}
+          {{ formatPrice(scope.row.grandTotal) }}
         </template>
       </el-table-column>
     </el-table>
@@ -122,6 +123,24 @@
       :current-page="ordersList.pageNumber"
       :handle-change-page="handleChangePage"
     />
+    <el-row :gutter="24">
+      <el-col :span="24">
+        <samp style="float: right; padding-right: 10px;">
+          <el-button
+            type="danger"
+            class="custom-button-create-bp"
+            icon="el-icon-close"
+            @click="clear"
+          />
+          <el-button
+            type="primary"
+            class="custom-button-create-bp"
+            icon="el-icon-check"
+            @click="selectionChangeOrder"
+          />
+        </samp>
+      </el-col>
+    </el-row>
   </el-main>
 </template>
 
@@ -168,7 +187,9 @@ export default {
       defaultMaxPagination: 50,
       fieldsList: fieldsListOrders,
       metadataList: [],
+      isLoadRecord: false,
       isCustomForm: true,
+      changeOrder: {},
       activeAccordion: 'query-criteria',
       timeOut: null
     }
@@ -176,9 +197,9 @@ export default {
   computed: {
     heightTable() {
       if (this.isEmptyValue(this.activeAccordion)) {
-        return 500
+        return 600
       }
-      return 250
+      return 350
     },
     highlightRow() {
       if (!this.isEmptyValue(this.selectOrder)) {
@@ -221,6 +242,9 @@ export default {
       if (value && this.isEmptyValue(this.metadataList)) {
         this.setFieldsList()
       }
+    },
+    sortTableOrderList(value) {
+      this.isLoadRecord = false
     }
   },
   created() {
@@ -248,6 +272,7 @@ export default {
       }
     },
     loadOrdersList() {
+      this.isLoadRecord = true
       const point = this.$store.getters.posAttributes.currentPointOfSales.uuid
       if (!this.isEmptyValue(point)) {
         this.$store.dispatch('listOrdersFromServer', {
@@ -263,10 +288,13 @@ export default {
       })
     },
     handleCurrentChange(row) {
-      // close popover
-      this.$store.commit('showListOrders', false)
-      this.$store.dispatch('currentOrder', row)
-      if (!this.isEmptyValue(row)) {
+      this.changeOrder = row
+    },
+    selectionChangeOrder() {
+      const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      if (!this.isEmptyValue(this.changeOrder) && this.changeOrder.documentNo !== currentOrder.documentNo) {
+        this.$store.state['pointOfSales/point/index'].conversionsList = []
+        this.$store.dispatch('currentOrder', this.changeOrder)
         this.$store.dispatch('deleteAllCollectBox')
         this.$router.push({
           params: {
@@ -274,12 +302,16 @@ export default {
           },
           query: {
             ...this.$route.query,
-            action: row.uuid
+            action: this.changeOrder.uuid
           }
         }, () => {})
         const orderUuid = this.$route.query.action
         this.$store.dispatch('listPayments', { orderUuid })
       }
+      this.clear()
+    },
+    clear() {
+      this.$store.commit('showListOrders', false)
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
@@ -288,7 +320,9 @@ export default {
           !mutation.payload.columnName.includes('_UUID') &&
           mutation.payload.containerUuid === this.metadata.containerUuid) {
           clearTimeout(this.timeOut)
+          this.isLoadRecord = true
           this.timeOut = setTimeout(() => {
+            this.$store.dispatch('setOrdersListPageNumber', 1)
             this.loadOrdersList()
           }, 2000)
         }

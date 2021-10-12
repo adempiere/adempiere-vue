@@ -36,6 +36,12 @@ export default {
   setListPayments(state, list) {
     state.listPayments = list
   },
+  listRefund(state, list) {
+    state.listRefund = list
+  },
+  setAddRefund(state, refund) {
+    state.addRefund = refund
+  },
   setCurrencyDisplaye(state, currency) {
     state.currency = currency
   },
@@ -70,5 +76,8 @@ export default {
   },
   setCurrencyRedund(state, currency) {
     state.currentFieldCurrencyRedund = currency
+  },
+  setDeliveryList(state, delivery) {
+    state.deliveryList = delivery
   }
 }

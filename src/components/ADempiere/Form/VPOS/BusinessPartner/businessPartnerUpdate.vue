@@ -18,32 +18,45 @@
 <template>
   <el-main
     v-loading="loading"
-    v-shortkey="shortsKey"
-    @shortkey.native="keyAction"
+    v-shortkey="showCustomer ? {close: ['esc'], enter: ['enter']} : {}"
+    @shortkey.native="actionUpdate"
   >
     <el-form
       label-position="top"
       size="small"
       class="create-bp"
     >
-      <el-row>
-        <el-col :span="12">
-          <field-definition
-            v-for="(field) in datos"
-            :ref="field.columnName"
-            :key="field.columnName"
-            :metadata-field="field"
-          />
+      <el-row :gutter="24">
+        <el-col :span="24">
+          <el-card class="box-card" shadow="never" style="height: 150px;">
+            <div slot="header" class="clearfix">
+              <span>
+                {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
+              </span>
+            </div>
+            <div class="text item">
+              <field-definition
+                v-for="(field) in datos"
+                :ref="field.columnName"
+                :key="field.columnName"
+                :metadata-field="{
+                  ...field,
+                  isReadOnly: validateCustomerTemplate
+                }"
+              />
+            </div>
+          </el-card>
         </el-col>
-        <el-col :span="12">
-          <field-definition
-            v-for="(field) in fieldsListLocation"
-            :ref="field.columnName"
-            :key="field.columnName"
-            :metadata-field="field"
-          />
-        </el-col>
-
+      </el-row>
+      <el-row :gutter="24">
+        <billing-address
+          :disabled="validateCustomerTemplate"
+        />
+        <shipping-address
+          :disabled="validateCustomerTemplate"
+        />
+      </el-row>
+      <el-row :gutter="24">
         <el-col :span="24">
           <samp style="float: right; padding-right: 10px;">
             <el-button
@@ -70,11 +83,17 @@ import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
+import BillingAddress from './billingAddress.vue'
+import ShippingAddress from './shippingAddress.vue'
 // import { getSequenceAsList } from '@/utils/ADempiere/location'
 import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
 
 export default {
   name: 'BusinessPartnerUpdate',
+  components: {
+    ShippingAddress,
+    BillingAddress
+  },
   mixins: [
     formMixin,
     BParterMixin
@@ -104,6 +123,12 @@ export default {
       loading: true,
       index: 0,
       currentCustomer: {},
+      shipping: {
+        uuid: ''
+      },
+      billing: {
+        uuid: ''
+      },
       region: {
         id: '',
         uuid: '',
@@ -122,16 +147,47 @@ export default {
     datos() {
       return this.fieldsList.filter(field => field.tabindex <= 4)
     },
+    recordsBusinessPartners() {
+      return this.$store.getters.getBusinessPartnersList
+    },
     currentBusinessPartner() {
-      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
+      const customer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      const searchCustomer = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'C_BPartner_ID' // this.parentMetadata.columnName
+      })
+      if (this.isEmptyValue(customer.businessPartner)) {
+        const templateBusinessPartners = this.recordsBusinessPartners.find(businessPartners => businessPartners.id === searchCustomer)
+        if (this.isEmptyValue(templateBusinessPartners)) {
+          return ''
+        }
+        return templateBusinessPartners
+      }
+      return customer.businessPartner
+    },
+    isTemplateOfCustomer() {
+      const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      if (!this.isEmptyValue(currentOrder.listPayments.payments)) {
+        return !this.isEmptyValue(currentOrder.listPayments.payments)
+      }
+      return currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner.id
     },
     showCustomer() {
       return this.$store.getters.getShowUpdateCustomer
+    },
+    copyShippingAddress() {
+      return this.$store.getters.getCopyShippingAddress
+    },
+    validateCustomerTemplate() {
+      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner
+      if (this.isEmptyValue(templateCustomer) || this.isEmptyValue(this.currentBusinessPartner)) {
+        return false
+      }
+      return templateCustomer.value === this.currentBusinessPartner.value
     }
   },
   watch: {
     showCustomer(value) {
-      console.log(value)
       this.getCustomer()
     }
   },
@@ -140,6 +196,18 @@ export default {
   },
   methods: {
     requestGetCountryDefinition,
+    actionUpdate(commands) {
+      if (commands.srcKey) {
+        switch (commands.srcKey) {
+          case 'enter':
+            this.update()
+            break
+          case 'close':
+            this.clearValues()
+            break
+        }
+      }
+    },
     focusValue() {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
     },
@@ -148,102 +216,27 @@ export default {
         containerUuid: 'Business-Partner-Update',
         format: 'object'
       })
-      updateCustomer({
-        uuid: this.currentBusinessPartner.uuid,
-        value: values.Value,
-        taxId: values.TaxID,
-        name: values.Name,
-        lastName: values.Name2,
-        description: values.Description,
-        contactName: values.ContactName,
-        email: values.EMail,
-        phone: values.Phone,
-        addressUuid: this.currentCustomer.addresses[this.index].uuid,
-        address1: values.Address1,
-        address2: values.Address2,
-        address3: values.Address3,
-        address4: values.Address4,
-        cityUuid: values.C_City_ID_UUID,
-        cityName: values.DisplayColumn_C_City_ID,
-        postalCode: values.Postal,
-        regionUuid: values.C_Region_ID_UUID,
-        regionName: values.DisplayColumn_C_Region_ID,
-        countryUuid: values.C_Country_ID_UUID,
-        posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid
-      })
+      this.shippingAddress.uuid = this.isEmptyValue(this.shipping) ? '' : this.shipping.uuid
+      this.billingAddress.uuid = this.isEmptyValue(this.billing) ? '' : this.billing.uuid
+      values.addresses = [this.billingAddress, this.shippingAddress]
+      values.uuid = this.currentBusinessPartner.uuid
+      values.posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
+      updateCustomer(values)
         .then(response => {
           this.$store.dispatch('changeShowUpdateCustomer', false)
         })
     },
     getCustomer() {
+      this.$store.dispatch('changeCopyShippingAddress', false)
       customer({
         searchValue: this.currentBusinessPartner.value
       })
         .then(response => {
-          const { name, value, taxId, description, lastName, addresses } = response
-          let region = { id: '', uuid: '', name: '' }
-          let postal
-          if (!this.isEmptyValue(addresses[this.index].region)) {
-            region = addresses[this.index].region
-          }
-          if (!this.isEmptyValue(addresses[this.index].postal_code)) {
-            postal = addresses[this.index].postal_code
-          }
-          this.$store.commit('updateValuesOfContainer', {
-            containerUuid: this.containerUuid,
-            attributes: [{
-              columnName: 'TaxID',
-              value: taxId
-            }, {
-              columnName: 'Value',
-              value: value
-            }, {
-              columnName: 'Name',
-              value: name
-            }, {
-              columnName: 'Description',
-              value: description
-            }, {
-              columnName: 'Name2',
-              value: lastName
-            }, {
-              columnName: 'C_Country_ID_UUID',
-              value: undefined
-            }, {
-              columnName: 'Postal',
-              value: postal
-            }, {
-              columnName: 'C_Region_ID',
-              value: region.id
-            }, {
-              columnName: 'C_Region_ID_UUID',
-              value: region.uuid
-            }, {
-              columnName: 'DisplayColumn_C_Region_ID',
-              value: region.name
-            }, {
-              columnName: 'C_City_ID',
-              value: addresses[this.index].city.id
-            }, {
-              columnName: 'C_City_ID_UUID',
-              value: addresses[this.index].city.uuid
-            }, {
-              columnName: 'DisplayColumn_C_City_ID',
-              value: addresses[this.index].city.name
-            }, {
-              columnName: 'Address1',
-              value: addresses[this.index].address_1
-            }, {
-              columnName: 'Address2',
-              value: addresses[this.index].address_2
-            }, {
-              columnName: 'Address3',
-              value: addresses[this.index].address_3
-            }, {
-              columnName: 'Address4',
-              value: addresses[this.index].address_4
-            }]
-          })
+          this.billing = response.addresses.find(address => address.is_default_billing)
+          this.shipping = response.addresses.find(address => address.is_default_shipping)
+          this.loadAddresses(this.shipping, 'Shipping-Address')
+          this.loadAddresses(this.billing, 'Billing-Address')
+          this.loadDataCustomer(response, this.containerUuid)
           this.currentCustomer = response
           this.loading = false
         })
@@ -256,7 +249,124 @@ export default {
         containerUuid: this.containerUuid,
         panelType: this.panelType
       })
-      this.clearLocationValues()
+      this.clearAddresses('Billing-Address')
+      this.clearAddresses('Shipping-Address')
+      this.clearDataCustomer(this.containerUuid)
+    },
+    loadAddresses(address, containerUuid) {
+      if (this.isEmptyValue(address)) {
+        return
+      }
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [{
+          columnName: 'Name',
+          value: address.last_name
+        }, {
+          columnName: 'Description',
+          value: address.description
+        }, {
+          columnName: 'Name2',
+          value: address.first_name
+        }, {
+          columnName: 'Phone',
+          value: address.phone
+        }, {
+          columnName: 'EMail',
+          value: address.email
+        }, {
+          columnName: 'ContactName',
+          value: this.empty(address.contact_name)
+        }, {
+          columnName: 'C_Country_ID_UUID',
+          value: undefined
+        }, {
+          columnName: 'Postal',
+          value: this.empty(address.postal_code)
+        }, {
+          columnName: 'C_Region_ID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.id) : ''
+        }, {
+          columnName: 'C_Region_ID_UUID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.uuid) : ''
+        }, {
+          columnName: 'DisplayColumn_C_Region_ID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.name) : ''
+        }, {
+          columnName: 'C_City_ID',
+          value: this.empty(address.city.id)
+        }, {
+          columnName: 'C_City_ID_UUID',
+          value: this.empty(address.city.uuid)
+        }, {
+          columnName: 'DisplayColumn_C_City_ID',
+          value: this.empty(address.city.name)
+        }, {
+          columnName: 'Address1',
+          value: address.address_1
+        }, {
+          columnName: 'Address2',
+          value: address.address_2
+        }, {
+          columnName: 'Address3',
+          value: address.address_3
+        }, {
+          columnName: 'Address4',
+          value: address.address_4
+        }]
+      })
+    },
+    empty(value) {
+      if (this.isEmptyValue(value)) {
+        return ''
+      }
+      return value
+    },
+    loadDataCustomer(customer, containerUuid) {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [{
+          columnName: 'Name',
+          value: customer.name
+        }, {
+          columnName: 'Value',
+          value: customer.value
+        }, {
+          columnName: 'TaxID',
+          value: customer.value
+        }, {
+          columnName: 'Name2',
+          value: customer.last_name
+        }]
+      })
+    },
+    datesForm(values) {
+      const valuesToSend = {}
+      Object.keys(values).forEach(key => {
+        const value = values[key]
+        if (this.isEmptyValue(value)) {
+          return
+        }
+        switch (key) {
+          case 'Value':
+            valuesToSend['value'] = value
+            break
+          case 'Name':
+            valuesToSend['name'] = value
+            break
+          case 'Name2':
+            valuesToSend['lastName'] = value
+            break
+          case 'TaxID':
+            valuesToSend['taxId'] = value
+            break
+          case 'Phone':
+            valuesToSend['phone'] = value
+            break
+        }
+      })
+      valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
+      return valuesToSend
     },
     clearLocationValues() {
       this.$store.commit('updateValuesOfContainer', {
@@ -320,7 +430,6 @@ export default {
         margin-bottom: 0px !important;
     }
   }
-
   .custom-button-create-bp {
     float: right;
     margin-right: 10px;

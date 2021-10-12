@@ -13,6 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import language from '@/lang'
 
 export default [
   // Name
@@ -26,6 +27,7 @@ export default [
       sequence: 0,
       isCustomField: true,
       size: 24,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.name'),
       isMandatory: true
     }
   },

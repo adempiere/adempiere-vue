@@ -31,10 +31,10 @@
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.salesOrder.title')" name="salesOrder">
         <el-row :gutter="12" style="padding-right: 10px;">
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
-                @click="!allowsCreateOrder ? '' : newOrder"
+                @click="!allowsCreateOrder ? validateOption($t('form.pos.pinMessage.newOrder')) : newOrder()"
               >
                 <i class="el-icon-news" />
                 <br>
@@ -44,13 +44,13 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-popover
+                v-model="showListOrdes"
                 placement="right"
-                width="800"
+                width="900"
                 trigger="click"
                 @show="seeOrderList"
-                @hide="showFieldListOrder = !showFieldListOrder"
               >
                 <orders-list
                   :parent-metadata="metadata"
@@ -62,7 +62,7 @@
                 >
                   <el-button
                     type="text"
-                    @click="showFieldListOrder = !showFieldListOrder"
+                    @click="openListOrdes()"
                   >
                     <svg-icon icon-class="list" />
                     <br>
@@ -74,10 +74,10 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.generateImmediateInvoice')) : generateImmediateInvoice"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.generateImmediateInvoice')) : generateImmediateInvoice()"
               >
                 <i class="el-icon-document-add" />
                 <br>
@@ -87,10 +87,10 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.completePreparedOrder')) : completePreparedOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.completePreparedOrder')) : completePreparedOrder()"
               >
                 <i class="el-icon-success" />
                 <br>
@@ -100,10 +100,10 @@
           </el-col>
 
           <el-col v-if="allowsReturnOrder" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction')) : reverseSalesTransaction"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction')) : reverseSalesTransaction()"
               >
                 <i class="el-icon-error" />
                 <br>
@@ -113,10 +113,10 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createPos')) : withdrawal"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createPos')) : withdrawal()"
               >
                 <i class="el-icon-document-remove" />
                 <br>
@@ -126,10 +126,10 @@
           </el-col>
 
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="printTicket"
+                @click="printTicket()"
               >
                 <i class="el-icon-printer" />
                 <br>
@@ -138,10 +138,10 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder')) : createNewCustomerReturnOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.createNewReturnOrder')) : createNewCustomerReturnOrder()"
               >
                 <i class="el-icon-refresh-left" />
                 <br>
@@ -150,10 +150,10 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.copyOrder')) : copyOrder "
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.copyOrder')) : copyOrder()"
               >
                 <i class="el-icon-document-copy" />
                 <br>
@@ -162,15 +162,40 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelOrder')) : deleteOrder"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelOrder')) : deleteOrder()"
               >
                 <i class="el-icon-close" />
                 <br>
                 {{ $t('form.pos.optionsPoinSales.salesOrder.cancelOrder') }}
               </p>
+            </el-card>
+          </el-col>
+          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <el-popover
+                v-model="popoverConfirmDelivery"
+                placement="right"
+                trigger="click"
+                width="800"
+                :disabled="isEmptyValue(currentOrder.uuid)"
+              >
+                <confirm-delivery
+                  :is-selectable="false"
+                  popover-name="isShowPopoverMenu"
+                />
+                <div
+                  slot="reference"
+                  :style="blockOption"
+                  :disabled="true"
+                >
+                  <svg-icon icon-class="shopping" />
+                  <br>
+                  {{ $t('form.pos.optionsPoinSales.salesOrder.confirmDelivery') }}
+                </div>
+              </el-popover>
             </el-card>
           </el-col>
         </el-row>
@@ -179,7 +204,7 @@
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.cashManagement.title')" name="cashManagement">
         <el-row :gutter="12" style="padding-right: 10px;">
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
               >
@@ -190,7 +215,7 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
               >
@@ -201,7 +226,7 @@
             </el-card>
           </el-col>
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
                 @click="cashClosing"
@@ -218,7 +243,7 @@
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.generalOptions.title')" name="generalOptions">
         <el-row :gutter="24" style="padding-right: 10px;">
           <el-col :span="size">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="adviserPin ? validateOption($t('form.pos.optionsPoinSales.generalOptions.changePos')) : changePos">
                 <p
                   style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
@@ -241,7 +266,7 @@
           </el-col>
           <!-- Product List Price -->
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-popover
                 placement="right"
                 trigger="click"
@@ -265,7 +290,7 @@
           </el-col>
           <!-- List Warehouse -->
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
                 <p
                   style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
@@ -288,7 +313,7 @@
           </el-col>
           <!-- List Price -->
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover">
+            <el-card shadow="hover" style="height: 100px">
               <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
                 <p
                   style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
@@ -342,6 +367,7 @@
 <script>
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
 import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
+import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
 import {
   generateImmediateInvoice,
   withdrawal,
@@ -361,7 +387,8 @@ export default {
   components: {
     ListProductPrice,
     OrdersList,
-    ModalDialog
+    ModalDialog,
+    ConfirmDelivery
   },
   mixins: [
     orderLineMixin
@@ -381,6 +408,7 @@ export default {
       validatePin: true,
       visible: false,
       showFieldListOrder: false,
+      showConfirmDelivery: false,
       posProcess
     }
   },
@@ -476,9 +504,30 @@ export default {
         }
       }
       return this.currentPointOfSales.currentOrder
+    },
+    showListOrdes: {
+      get() {
+        return this.$store.getters.getShowList
+      },
+      set(value) {
+        this.$store.commit('showListOrders', value)
+      }
+    },
+    popoverConfirmDelivery: {
+      get() {
+        return this.$store.getters.getConfirmDelivery
+      },
+      set(value) {
+        if (!this.isEmptyValue(this.currentOrder.uuid)) {
+          this.$store.commit('setConfirmDelivery', value)
+        }
+      }
     }
   },
   watch: {
+    // popoverConfirmDelivery(value) {
+    //   this.showConfirmDelivery = value
+    // },
     visible(value) {
       if (value && !this.isEmptyValue(this.$refs)) {
         setTimeout(() => {
@@ -502,6 +551,9 @@ export default {
             break
         }
       }
+    },
+    openListOrdes() {
+      this.showFieldListOrder = true
     },
     closePin() {
       this.visible = false
@@ -578,6 +630,9 @@ export default {
         case this.$t('form.pos.optionsPoinSales.generalOptions.changePos'):
           this.changePos()
           break
+        case this.$t('form.pos.pinMessage.newOrder'):
+          this.newOrder()
+          break
       }
     },
     notSubmitForm(event) {
@@ -591,11 +646,13 @@ export default {
     },
     generateImmediateInvoice() {
       // TODO: Add BPartner
-      const { uuid: posUuid, id: posId } = this.getCurrentPOS
+      const { uuid: posUuid, id: posId } = this.currentPointOfSales
       generateImmediateInvoice({
         posId,
         posUuid
       })
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
     },
     completePreparedOrder() {
       if (this.isEmptyValue(this.currentOrder.uuid)) {
@@ -638,6 +695,8 @@ export default {
           })
           this.$store.dispatch('updateOrderPos', false)
           this.$store.dispatch('updatePaymentPos', false)
+          // close panel lef
+          this.$store.commit('setShowPOSOptions', false)
         })
     },
     reverseSalesTransaction() {
@@ -669,19 +728,25 @@ export default {
         }
       ]
       this.$store.dispatch('addParametersProcessPos', parametersList)
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
     },
     withdrawal() {
-      const { uuid: posUuid, id: posId } = this.getCurrentPOS
+      const { uuid: posUuid, id: posId } = this.currentPointOfSales
       // TODO: Add BParner, C_BankAccount_ID (caja), CashTransferBankAccount_ID, PAY_C_BankAccount_ID
       withdrawal({
         posId,
         posUuid
       })
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
     },
     createNewCustomerReturnOrder() {
       createNewReturnOrder({
         orderUuid: this.currentOrder.uuid
       })
+      // close panel lef
+      this.$store.commit('setShowPOSOptions', false)
     },
     showModal(action) {
       this.$store.dispatch('setShowDialog', {
@@ -706,7 +771,9 @@ export default {
       this.$store.dispatch('addParametersProcessPos', parametersList)
       createOrder({
         posUuid,
-        customerUuid: this.currentOrder.businessPartner.uuid
+        customerUuid: this.currentOrder.businessPartner.uuid,
+        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
+        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
       })
         .then(order => {
           this.$store.dispatch('currentOrder', order)
@@ -735,6 +802,8 @@ export default {
         .finally(() => {
           const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
           this.showModal(process)
+          // close panel lef
+          this.$store.commit('setShowPOSOptions', false)
         })
     },
     copyLineOrder() {
@@ -742,7 +811,7 @@ export default {
       this.showModal(process)
     },
     cashClosing() {
-      const { uuid: posUuid, id: posId } = this.getCurrentPOS
+      const { uuid: posUuid, id: posId } = this.currentPointOfSales
       cashClosing({
         posId,
         posUuid
@@ -769,6 +838,8 @@ export default {
             showClose: true
           })
           this.$store.dispatch('updateOrderPos', false)
+          // close panel lef
+          this.$store.commit('setShowPOSOptions', false)
         })
     },
     seeOrderList() {
@@ -828,6 +899,7 @@ export default {
             })
           }).catch(() => {})
         })
+      this.$store.dispatch('changeFocusNewOrder', true)
     },
     clearOrder() {
       this.$router.push({

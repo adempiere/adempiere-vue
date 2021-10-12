@@ -1,7 +1,7 @@
 const { notEmpty } = require('../../utils.js')
 
 module.exports = {
-  description: 'Generate a ADempiere View',
+  description: 'Generate a ADempiere View.vue',
   prompts: [{
     type: 'input',
     name: 'name',
@@ -41,7 +41,7 @@ module.exports = {
     const actions = [{
       type: 'add',
       path: `src/views/ADempiere/${name}/index.vue`,
-      templateFile: 'plop-templates/view/index.hbs',
+      templateFile: 'plop-templates/ADempiere/view/index.hbs',
       data: {
         name: name,
         template: data.blocks.includes('template'),

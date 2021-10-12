@@ -413,10 +413,11 @@ export default {
   quickAccess: {
     newRecord: 'Acceso Rápido para Crear Registro Nuevo',
     listRecords: 'Acceso Rápido para Listar los Registros',
-    searchWithEnter: 'Pulse enter para realizar la busqueda'
+    searchWithEnter: 'Pulse enter para realizar la busqueda del producto segun su Codigo, Nombre o UPC'
   },
   businessPartner: {
-    notFound: 'Socio de negocio no encontrado.'
+    notFound: 'Socio de negocio no encontrado.',
+    emptyBusinessPartner: 'Utilice los filtros para realizar la busqueda de socio de negocio según su Código, Nombre, Email y Teléfono'
   },
   form: {
     pos: {
@@ -436,7 +437,8 @@ export default {
           cancelOrder: 'Cancelar Orden',
           orderRemoved: 'Orden Borrada',
           copyOrder: 'Copiar Orden',
-          createNewReturnOrder: 'Crear una nueva orden de devolución'
+          createNewReturnOrder: 'Crear una nueva orden de devolución',
+          confirmDelivery: 'Confirmar Entrega'
         },
         cashManagement: {
           title: 'Gestión de Caja',
@@ -449,7 +451,10 @@ export default {
           changePos: 'Cambiar Punto de Venta',
           listProducts: 'Lista de Productos y Precios',
           changeWarehouseList: 'Cambiar de Almacén',
-          changePriceList: 'Cambiar Lista de Precio'
+          changePriceList: 'Cambiar Lista de Precio',
+          dateTo: 'Fecha Hasta',
+          dateOrder: 'Fecha Orden',
+          dateFrom: 'Fecha Desde'
         }
       },
       tableProduct: {
@@ -459,6 +464,9 @@ export default {
         editQuantities: 'Editar Cantidades',
         pin: 'Ingrese Pin',
         remove: 'Eliminar',
+        displayTaxAmount: 'Impuesto',
+        displayTaxIMP: '%Imp',
+        displayDiscuentAmount: 'Descuento',
         empty: 'Ingrese el nombre del producto, código o UPC'
       },
       order: {
@@ -467,7 +475,7 @@ export default {
         date: 'Fecha',
         subTotal: 'Sub-Total',
         type: 'Tipo',
-        discount: 'Descuento',
+        discount: '%Dcto',
         tax: 'Impuesto',
         total: 'Total',
         itemQuantity: 'Cantidad de Artículos',
@@ -478,6 +486,9 @@ export default {
         BusinessPartnerCreate: {
           businessPartner: 'Socio de Negocios',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
+          customerData: 'Datos del Cliente',
+          billingAddress: 'Dirección de Facturación',
+          shippingAddress: 'Dirección de Envió',
           taxId: 'Identificación Fiscal'
         }
       },
@@ -488,12 +499,14 @@ export default {
         change: 'Cambio',
         totalInvoiced: 'Total Facturado',
         convertAmount: 'Convertir Cantidad',
-        convertedAmount: 'Monto Convertido',
+        convertedAmount: 'Convertido',
         fullPayment: 'Cobro Completo',
         Currency: 'Moneda',
         dayRate: 'Tasa del Día',
         noDayRate: 'No se a generado una tasa del día para la moneda',
         refund: 'Reembolso',
+        paymentMethods: 'Métodos de Pago',
+        emptyRate: 'Sin tasa de conversión a la fecha',
         TenderType: {
           directDeposit: 'Depósito Directo',
           creditCard: 'Tarjeta de Crédito',
@@ -514,10 +527,17 @@ export default {
           returnMoney: 'Devolver dinero en otra forma de pago',
           adjustDocument: 'Desea Ajustar Documento',
           dailyLimit: 'Limite Diario',
-          customerLimit: 'Limite Order',
+          customerLimit: 'Limite Orden',
           available: 'Disponible',
           emptyPayment: 'Método de pago no soportado',
-          addPayment: 'Debe agregar un tipo de vuelto para completar la operación'
+          emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
+          addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
+          fieldList: {
+            code: 'Cedula',
+            name: 'Nombre del Titular',
+            accountType: 'Tipo de Cuenta',
+            bank: 'Banco'
+          }
         }
       },
       keyLayout: {
@@ -533,7 +553,8 @@ export default {
         discount: 'agregar descuento',
         delete: 'eliminar producto',
         addProduct: 'agregar producto',
-        invoiceOpen: 'generar factura con un saldo abierto'
+        invoiceOpen: 'generar factura con un saldo abierto',
+        newOrder: 'crear nueva orden'
       }
     },
     priceChecking: {
@@ -545,7 +566,9 @@ export default {
       label: 'Por Facturar',
       salesRepresentative: 'Agente Comercial',
       businessPartner: 'Socio de Negocio',
-      documentNo: 'Nro. Documento'
+      copyShippingAddress: 'Copiar dirección para el envío',
+      documentNo: 'Nro. Documento',
+      emptyList: 'Utilice los filtros para realizar la busqueda de las ordenes'
     },
     productInfo: {
       product: 'Producto',

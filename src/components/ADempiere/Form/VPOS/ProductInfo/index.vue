@@ -21,7 +21,7 @@
       <template slot="label">
         {{ $t('form.productInfo.codeProduct') }}
         <el-popover
-          v-model="visible"
+          v-model="showProductList"
           v-shortkey="keyShortcuts"
           placement="bottom-start"
           trigger="click"
@@ -41,16 +41,17 @@
       </template>
 
       <el-autocomplete
-        v-model="value"
+        ref="product"
+        v-model="sendProduct"
         v-shortkey="keyShortcuts"
         :placeholder="$t('quickAccess.searchWithEnter')"
         clearable
-        style="width: 100%;"
+        style="width: 100%; height: 600px;"
         popper-class="custom-field-prodcut-info"
-        :trigger-on-focus="true"
+        :trigger-on-focus="false"
         :fetch-suggestions="localSearch"
         :select-when-unmatched="true"
-        :highlight-first-item="true"
+        :highlight-first-item="false"
         @shortkey.native="shortcutKeyMethod"
         @select="handleSelect"
       >
@@ -62,18 +63,18 @@
         </template>
 
         <template slot-scope="props">
-          <div class="header">
+          <div class="header" style="margin: 0px">
             <b> {{ props.item.product.value }} - {{ props.item.product.name }} </b>
           </div>
-          <div>
-            <div style="float: left;width: 70%;">
-              <p style="overflow: hidden;text-overflow: ellipsis;text-align: inherit;">
+          <div style="margin: 0px">
+            <div style="float: left;width: 70%;margin: 0px">
+              <p style="overflow: hidden;text-overflow: ellipsis;text-align: inherit;margin: 0px">
                 {{ props.item.product.upc }} <br>
                 {{ props.item.product.description }}
               </p>
             </div>
-            <div style="width: 30%;float: right;">
-              <p style="overflow: hidden;text-overflow: ellipsis;text-align: end;">
+            <div style="width: 30%;float: right;margin: 0px">
+              <p style="overflow: hidden;text-overflow: ellipsis;text-align: end;margin: 0px">
                 {{ formatPrice(props.item.priceStandard, props.item.currency.iSOCode) }}
                 <br>
                 {{ formatQuantity(props.item.quantityAvailable) }}
@@ -114,6 +115,7 @@ export default {
   data() {
     return {
       visible: false,
+      sendProduct: '',
       timeOut: null
     }
   },
@@ -144,6 +146,32 @@ export default {
         refreshList2: ['shift', 'f5'],
         closeProductList: ['esc']
       }
+    },
+    showProductList: {
+      get() {
+        return this.$store.getters.getShowProductList
+      },
+      set(value) {
+        this.$store.commit('setShowProductList', value)
+      }
+    },
+    getProductValue() {
+      return this.$store.getters.getValueOfField({
+        containerUuid: 'POS',
+        columnName: 'ProductValue'
+      })
+    }
+  },
+  watch: {
+    getProductValue(value) {
+      this.sendProduct = value
+    },
+    sendProduct(value) {
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'POS',
+        columnName: 'ProductValue',
+        value
+      })
     }
   },
   methods: {
@@ -193,24 +221,23 @@ export default {
 
                 if (this.isEmptyValue(recordsList)) {
                   this.$message({
-                    message: 'Sin resultados coincidentes con la busqueda',
+                    message: this.$t('notifications.searchWithOutRecords'),
                     type: 'info',
                     showClose: true
                   })
                 }
 
-                callBack(recordsList)
+                callBack(this.orderedByProduct(recordsList))
               })
-          }, 2000)
+          }, 1500)
           return
         }
       }
-
       // call callback function to return suggestions
-      callBack(results)
+      callBack(this.orderedByProduct(results))
     },
     close() {
-      this.visible = false
+      this.$store.commit('setShowProductList', false)
     },
     handleSelect(elementSelected) {
       const valueProduct = this.isEmptyValue(elementSelected.product) ? elementSelected.value : elementSelected.product.value
@@ -219,6 +246,20 @@ export default {
         columnName: 'ProductValue',
         // TODO: Verify with 'value' or 'searchValue' attribute
         value: valueProduct
+      })
+      this.sendProduct = ''
+      this.$refs.product.focus()
+    },
+    orderedByProduct(productList) {
+      return productList.sort((element, item) => {
+        if (element.product.name > item.product.name) {
+          return 1
+        }
+        if (element.product.name < item.product.name) {
+          return -1
+        }
+        // a must be equal to b
+        return 0
       })
     }
   }
@@ -232,10 +273,22 @@ export default {
     width: 800px;
     left: 15%;
   }
+  .el-autocomplete-suggestion {
+    position: absolute;
+    top: 179px;
+    left: 105px;
+    transform-origin: center top;
+    z-index: 2033;
+    width: 849px;
+    max-height: 400px;
+  }
   .custom-field-prodcut-info {
     li {
       line-height: normal;
-      padding: 15px;
+      padding-bottom: 15px;
+      padding-top: 5px;
+      padding-right: 15px;
+      padding-left: 15px;
 
       .header {
         text-overflow: ellipsis;

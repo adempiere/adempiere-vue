@@ -20,12 +20,16 @@ const initStateUtils = {
   updateOrder: false,
   updatePayment: false,
   createBusinessPartner: false,
-
+  listBusinessPartner: false,
+  copyShippingAddress: true,
   step: 0,
   updateCustomer: false,
   overdrawnInvoice: {
     visible: false
-  }
+  },
+  isNewOrder: false,
+  showProductList: false,
+  confirmDelivery: false
 }
 
 export default {
@@ -95,12 +99,26 @@ export default {
     popoverCreateBusinessPartner(state, createBusinessPartner) {
       state.createBusinessPartner = createBusinessPartner
     },
-
+    popoverListBusinessPartner(state, payload) {
+      state.listBusinessPartner = payload
+    },
     popoverOverdrawnInvoice(state, payload) {
       state.overdrawnInvoice = payload
     },
     showUpdateCustomer(state, show) {
       state.updateCustomer = show
+    },
+    focusNewOrder(state, payload) {
+      state.isNewOrder = payload
+    },
+    setCopyShippingAddress(state, payload) {
+      state.copyShippingAddress = payload
+    },
+    setShowProductList(state, payload) {
+      state.showProductList = payload
+    },
+    setConfirmDelivery(state, payload) {
+      state.confirmDelivery = payload
     }
   },
   actions: {
@@ -164,6 +182,9 @@ export default {
     changePopover({ commit }, params) {
       commit('popoverCreateBusinessPartner', params)
     },
+    changePopoverListBusinessPartner({ commit }, params) {
+      commit('popoverListBusinessPartner', params)
+    },
     changePopoverOverdrawnInvoice({ commit }, { attributePin, visible }) {
       const overdrawn = {
         attributePin,
@@ -173,6 +194,12 @@ export default {
     },
     changeShowUpdateCustomer({ commit }, show) {
       commit('showUpdateCustomer', show)
+    },
+    changeFocusNewOrder({ commit }, params) {
+      commit('focusNewOrder', params)
+    },
+    changeCopyShippingAddress({ commit }, params) {
+      commit('setCopyShippingAddress', params)
     }
   },
   getters: {
@@ -244,7 +271,12 @@ export default {
     getPopoverCreateBusinessParnet: (state) => {
       return state.createBusinessPartner
     },
-
+    getPopoverListBusinessParnet: (state) => {
+      return state.listBusinessPartner
+    },
+    getCopyShippingAddress: (state) => {
+      return state.copyShippingAddress
+    },
     getStepCurrent: (state) => {
       return state.step
     },
@@ -253,6 +285,15 @@ export default {
     },
     getShowUpdateCustomer: (state) => {
       return state.updateCustomer
+    },
+    getFocusNewOrder: (state) => {
+      return state.isNewOrder
+    },
+    getShowProductList: (state) => {
+      return state.showProductList
+    },
+    getConfirmDelivery: (state) => {
+      return state.confirmDelivery
     }
   }
 }

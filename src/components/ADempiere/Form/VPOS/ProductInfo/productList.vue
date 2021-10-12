@@ -28,22 +28,21 @@
       @shortkey.native="keyAction"
       @submit.native.prevent="notSubmitForm"
     >
-      <field-definition
-        v-for="(field) in fieldsList"
-        :key="field.columnName"
-        :metadata-field="field"
-      />
+      <el-form-item label="Código Producto">
+        <el-input v-model="input" :placeholder="$t('quickAccess.searchWithEnter')" @input="searchProduct" />
+      </el-form-item>
     </el-form>
     <el-table
       ref="listProducto"
       v-shortkey="shortsKey"
-      v-loading="isEmptyValue(listWithPrice) || isLoadedServer"
+      v-loading="isLoadedServer"
       :data="localTableSearch(listWithPrice)"
+      :empty-text="$t('quickAccess.searchWithEnter')"
       border
       fit
       height="450"
       highlight-current-row
-      @row-click="findlistProductWithRow"
+      @row-click="selectProduct"
       @shortkey.native="keyAction"
     >
       <el-table-column
@@ -60,19 +59,19 @@
         align="right"
       />
       <el-table-column
+        :label="$t('form.productInfo.price')"
+        align="right"
+      >
+        <template slot-scope="scope">
+          {{ formatPrice(scope.row.priceStandard, scope.row.currency.iSOCode) }}
+        </template>
+      </el-table-column>
+      <el-table-column
         :label="$t('form.pos.collect.convertedAmount')"
         align="right"
       >
         <template slot-scope="scope">
           {{ formatPrice(scope.row.schemaPriceStandard, scope.row.schemaCurrency.iSOCode) }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('form.productInfo.price')"
-        align="right"
-      >
-        <template slot-scope="scope">
-          {{ formatPrice(scope.row.priceStandard) }}
         </template>
       </el-table-column>
     </el-table>
@@ -81,6 +80,24 @@
       :current-page="productPrice.pageNumber"
       :handle-change-page="handleChangePage"
     />
+    <el-row :gutter="24">
+      <el-col :span="24">
+        <samp style="float: right; padding-right: 10px;">
+          <el-button
+            type="danger"
+            class="custom-button-create-bp"
+            icon="el-icon-close"
+            @click="close"
+          />
+          <el-button
+            type="primary"
+            class="custom-button-create-bp"
+            icon="el-icon-check"
+            @click="addProductFromList"
+          />
+        </samp>
+      </el-col>
+    </el-row>
   </el-main>
 </template>
 
@@ -123,6 +140,9 @@ export default {
       fieldsList: fieldsListProductPrice,
       isLoadedServer: false,
       isCustomForm: true,
+      currentProduct: {},
+      isSearchProduct: false,
+      input: '',
       timeOut: null
     }
   },
@@ -161,7 +181,6 @@ export default {
     }
   },
   created() {
-    this.unsubscribe = this.subscribeChanges()
     this.$store.commit('setListProductPrice', {
       isLoaded: false
     })
@@ -169,39 +188,43 @@ export default {
       this.validatePos(this.currentPointOfSales)
     }, 3000)
   },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
   methods: {
     formatPrice,
     localTableSearch(listWithPrice) {
       let filtersProduct = []
-      if (!this.isEmptyValue(this.searchValue)) {
+      if (!this.isEmptyValue(this.searchValue) && this.isSearchProduct) {
         filtersProduct = listWithPrice.filter(data => data.product.name.toLowerCase().includes(this.searchValue.toLowerCase()) || data.product.value.toLowerCase().includes(this.searchValue.toLowerCase()))
         if (!this.isEmptyValue(filtersProduct)) {
+          this.isSearchProduct = true
           return filtersProduct
         }
         this.isLoadedServer = true
-        this.timeOut = setTimeout(() => {
-          this.$store.dispatch('listProductPriceFromServer', {
-            containerUuid: 'Products-Price-List',
-            pageNumber: 1,
-            searchValue: this.searchValue
-          })
-            .then(() => {
-              const recordsList = this.listWithPrice
-
-              if (this.isEmptyValue(recordsList)) {
-                this.$message({
-                  message: 'Sin resultados coincidentes con la busqueda',
-                  type: 'info',
-                  showClose: true
-                })
-              }
-              this.isLoadedServer = false
-              return recordsList
+        if (this.isSearchProduct) {
+          this.timeOut = setTimeout(() => {
+            this.$store.dispatch('listProductPriceFromServer', {
+              containerUuid: 'Products-Price-List',
+              pageNumber: 1,
+              searchValue: this.searchValue
             })
-        }, 2000)
+              .then(() => {
+                const recordsList = this.listWithPrice
+
+                if (this.isEmptyValue(recordsList)) {
+                  this.$message({
+                    message: this.$t('notifications.searchWithOutRecords'),
+                    type: 'info',
+                    showClose: true
+                  })
+                  this.isSearchProduct = false
+                  this.isLoadedServer = false
+                  return recordsList
+                }
+                this.isSearchProduct = false
+                this.isLoadedServer = false
+                return recordsList
+              })
+          }, 2000)
+        }
       }
       return listWithPrice
     },
@@ -233,7 +256,13 @@ export default {
       this.$store.dispatch('setProductPicePageNumber', newPage)
       this.$store.dispatch('listProductPriceFromServer', {})
     },
-    findlistProductWithRow(row) {
+    selectProduct(row) {
+      this.currentProduct = row
+    },
+    close() {
+      this.$store.commit('setShowProductList', false)
+    },
+    addProductFromList() {
       if (!this.isSelectable) {
         return
       }
@@ -242,32 +271,26 @@ export default {
         containerUuid: 'POS',
         columnName: 'ProductValue',
         // TODO: Verify with 'value' or 'searchValue' attribute
-        value: row.product.name
+        value: this.currentProduct.product.name
       })
 
       // close popover of list product price
+      this.close()
       this.$store.commit('showListProductPrice', {
         attribute: this.popoverName,
         isShowed: false
       })
     },
-    subscribeChanges() {
-      return this.$store.subscribe((mutation, state) => {
-        if (mutation.type === 'updateValueOfField' &&
-          !mutation.payload.columnName.includes('DisplayColumn') &&
-          mutation.payload.containerUuid === this.metadata.containerUuid) {
-          clearTimeout(this.timeOut)
-          this.timeOut = setTimeout(() => {
-            this.$store.commit('setIsReloadProductPrice')
-          }, 1000)
-        } else if (mutation.type === 'addActionKeyPerformed' && mutation.payload.containerUuid === this.metadata.containerUuid) {
-          this.$store.dispatch('listProductPriceFromServer', {
-            containerUuid: mutation.payload.containerUuid,
-            pageNumber: 1,
-            searchValue: mutation.payload.value
-          })
-        }
-      })
+    searchProduct(value) {
+      clearTimeout(this.timeOut)
+      this.timeOut = setTimeout(() => {
+        this.isSearchProduct = true
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Products-Price-List',
+          columnName: 'ProductValue',
+          value: value
+        })
+      }, 500)
     },
     /**
      * @param {object} PointOfSales

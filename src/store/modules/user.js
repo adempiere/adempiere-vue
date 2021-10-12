@@ -41,6 +41,7 @@ const state = {
   role: {}, // info current role
   rolesList: [],
   roles: [],
+  userInfo: {},
   organizationsList: [],
   organization: {},
   warehousesList: [],
@@ -90,6 +91,9 @@ const mutations = {
   },
   SET_ROLE: (state, role) => {
     state.role = role
+  },
+  SET_USER: (state, payload) => {
+    state.userInfo = payload
   },
   SET_USER_UUID: (state, payload) => {
     state.userUuid = payload
@@ -154,6 +158,7 @@ const actions = {
           commit('SET_NAME', sessionInfo.name)
           commit('SET_INTRODUCTION', userInfo.description)
           commit('SET_USER_UUID', userInfo.uuid)
+          commit('SET_USER', userInfo)
           const avatar = userInfo.image
           commit('SET_AVATAR', avatar)
 
@@ -588,6 +593,9 @@ const getters = {
   },
   getUserUuid: (state) => {
     return state.userUuid
+  },
+  userInfo: (state) => {
+    return state.userInfo
   },
   getIsPersonalLock: (state) => {
     return state.role.isPersonalLock
