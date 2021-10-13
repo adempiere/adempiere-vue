@@ -716,7 +716,7 @@ export default {
         },
         {
           columnName: 'IsCancelled',
-          value: false
+          value: true
         },
         {
           columnName: 'IsShipConfirm',

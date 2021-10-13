@@ -175,6 +175,7 @@ export default {
       this.$router.push({
         path: '/login'
       }, () => {})
+      this.$store.commit('setPointOfSalesList', [])
     },
     handleClick() {
       this.$router.push({

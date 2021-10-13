@@ -44,7 +44,7 @@ export default {
         })
         .finally(() => {
           const notification = rootGetters.getNotificationProcess.find(notification => {
-            if (notification.typeActivity && notification.quantityActivities === state.listActivity.length) {
+            if (!isEmptyValue(notification) && notification.typeActivity && notification.quantityActivities === state.listActivity.length) {
               return notification
             }
           })
