@@ -9,7 +9,28 @@
   </el-tag>
 
   <span v-else key="info-value">
-    {{ displayedValue }}
+    <p v-if="displayedValue.length >= 23" style="max-height: 40px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+      <el-popover
+        placement="top-start"
+        width="300"
+        trigger="hover"
+        :open-delay="400"
+      >
+        <el-row>
+          <el-col :span="24" style="word-break: normal;padding: 5%">
+            {{ displayedValue }}
+          </el-col>
+        </el-row>
+        <el-row slot="reference">
+          <el-col :span="24" style="max-height: 40px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+            {{ displayedValue }}
+          </el-col>
+        </el-row>
+      </el-popover>
+    </p>
+    <p v-else>
+      {{ displayedValue }}
+    </p>
   </span>
 </template>
 
