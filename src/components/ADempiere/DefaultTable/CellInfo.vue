@@ -9,7 +9,7 @@
   </el-tag>
 
   <span v-else key="info-value">
-    <p v-if="displayedValue.length >= 23" style="max-height: 40px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+    <p v-if="!isEmptyValue(displayedValue) && displayedValue.length >= 23" style="max-height: 40px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
       <el-popover
         placement="top-start"
         width="300"
@@ -28,6 +28,7 @@
         </el-row>
       </el-popover>
     </p>
+
     <p v-else>
       {{ displayedValue }}
     </p>

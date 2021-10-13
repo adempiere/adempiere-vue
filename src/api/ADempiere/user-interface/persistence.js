@@ -56,6 +56,7 @@ export function getEntities({
       }
     })
   }
+
   let sortingDefinition
   if (sorting) {
     sortingDefinition = sorting.map(sortValue => {
@@ -78,8 +79,8 @@ export function getEntities({
       attributes: attributesValues,
       sorting: sortingDefinition,
       // Page Data
-      pageToken,
-      pageSize
+      page_token: pageToken,
+      page_size: pageSize
     }
   })
     .then(response => {

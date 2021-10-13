@@ -147,11 +147,29 @@ export function castValueWithType({
  * @returns {string}
  */
 export function extractPagingToken(token) {
+  if (isEmptyValue(token)) {
+    return ''
+  }
+
   let onlyToken = token.slice(0, -2)
   if (onlyToken.substr(-1, 1) === '-') {
+    // removes end hyphen
     onlyToken = onlyToken.slice(0, -1)
   }
   return onlyToken
+}
+
+export function generatePageToken({ pageNumber = 1, token }) {
+  if (pageNumber < 1) {
+    pageNumber = 1
+  }
+
+  const onlyToken = extractPagingToken(token)
+  if (isEmptyValue(onlyToken)) {
+    return ''
+  }
+
+  return onlyToken + '-' + pageNumber
 }
 
 /**

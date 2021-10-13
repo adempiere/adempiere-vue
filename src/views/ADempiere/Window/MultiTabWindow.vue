@@ -143,6 +143,17 @@ export default defineComponent({
       },
 
       // To Default Table
+      setPage: ({
+        parentUuid,
+        containerUuid,
+        pageNumber = 0
+      }) => {
+        root.$store.dispatch('dataManager/getEntities', {
+          parentUuid,
+          containerUuid,
+          pageNumber
+        })
+      },
       setSelection: ({ containerUuid, recordsSelected }) => {
         console.info('setSelection callback', containerUuid, recordsSelected)
       },

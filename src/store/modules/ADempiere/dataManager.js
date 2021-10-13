@@ -22,7 +22,7 @@ import {
   deleteEntity
 } from '@/api/ADempiere/common/persistence'
 import router from '@/router'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils'
 
 const dataManager = {
   namespaced: true,
@@ -142,29 +142,37 @@ const dataManager = {
     },
 
     getEntities({
-      commit
+      commit,
+      getters
     }, {
       parentUuid,
       containerUuid,
-      pageToken,
-      pageSize
+      pageNumber
     }) {
+      let pageToken
+      if (!isEmptyValue(pageNumber)) {
+        pageNumber-- // TODO: Remove with fix in backend
+        const token = getters.getPageToken({ containerUuid })
+        pageToken = generatePageToken({ pageNumber, token })
+      }
+
       return new Promise(resolve => {
         getEntities({
           windowUuid: parentUuid,
           tabUuid: containerUuid,
-          pageToken,
-          pageSize
+          pageToken
         })
-          .then(data => {
-            const dataToStored = data.recordsList.map(record => {
+          .then(dataResponse => {
+            const dataToStored = dataResponse.recordsList.map(record => {
               return record.attributes
             })
 
             commit('setContainerData', {
               parentUuid,
               containerUuid,
-              recordsList: dataToStored
+              recordsList: dataToStored,
+              nextPageToken: dataResponse.nextPageToken,
+              recordCount: dataResponse.recordCount
             })
 
             resolve(dataToStored)
@@ -234,6 +242,17 @@ const dataManager = {
       return state.containerData.find(dataStored => {
         return dataStored.containerUuid === containerUuid
       })
+    },
+
+    getPageToken: (state, getters) => ({
+      containerUuid
+    }) => {
+      const dataAll = getters.getContainerData({ containerUuid })
+      if (!isEmptyValue(dataAll)) {
+        return dataAll.nextPageToken
+      }
+
+      return undefined
     }
   }
 }
