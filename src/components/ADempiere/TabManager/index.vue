@@ -79,17 +79,19 @@
           :data-table="recordsList"
           :panel-metadata="tabAttributes"
         />
-        <!-- fields in panel to single record -->
-        <panel-definition
-          v-show="isParentTabs || (!isParentTabs && !isShowMultiRecords)"
-          key="panel-definition"
-          :parent-uuid="parentUuid"
-          :container-uuid="tabAttributes.uuid"
-          :container-manager="containerManager"
-          :panel-metadata="tabAttributes"
-          :group-tab="tabAttributes.tabGroup"
-        />
-
+        <!-- Close table when clicking on group of fields -->
+        <div @click="close()">
+          <!-- fields in panel to single record -->
+          <panel-definition
+            v-show="isParentTabs || (!isParentTabs && !isShowMultiRecords)"
+            key="panel-definition"
+            :parent-uuid="parentUuid"
+            :container-uuid="tabAttributes.uuid"
+            :container-manager="containerManager"
+            :panel-metadata="tabAttributes"
+            :group-tab="tabAttributes.tabGroup"
+          />
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -290,6 +292,18 @@ export default defineComponent({
       })
     }
 
+    /**
+     * Close table when clicking on group of fields
+     */
+    const close = () => {
+      root.$store.dispatch('changeTabAttribute', {
+        parentUuid: props.parentUuid,
+        containerUuid: tabUuid.value,
+        attributeName: 'isShowedTableRecords',
+        attributeValue: false
+      })
+    }
+
     const openContainer = () => {
       if (props.isParentTabs) {
         root.$store.dispatch('changeTabAttribute', {
@@ -319,6 +333,7 @@ export default defineComponent({
       tabStyle,
       // methods
       handleClick,
+      close,
       openContainer,
       isDisabledTab
     }
