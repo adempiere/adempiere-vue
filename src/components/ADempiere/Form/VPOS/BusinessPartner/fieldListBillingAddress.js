@@ -40,18 +40,6 @@ export default [
     }
   },
   {
-    elementColumnName: 'Name2',
-    columnName: 'Name2',
-    tableName,
-    isFromDictionary: true,
-    overwriteDefinition: {
-      tabindex: 2,
-      isCustomField: true,
-      sequence: 2,
-      size: 6
-    }
-  },
-  {
     elementColumnName: 'ContactName',
     columnName: 'ContactName',
     tableName,

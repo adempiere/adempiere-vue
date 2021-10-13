@@ -219,7 +219,10 @@ export default {
       this.shippingAddress.uuid = this.isEmptyValue(this.shipping) ? '' : this.shipping.uuid
       this.billingAddress.uuid = this.isEmptyValue(this.billing) ? '' : this.billing.uuid
       values.addresses = [this.billingAddress, this.shippingAddress]
-      values.uuid = this.currentBusinessPartner.uuid
+      values.uuid = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'C_BPartner_ID_UUID' // this.parentMetadata.columnName
+      })
       values.posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
       updateCustomer(values)
         .then(response => {
@@ -228,8 +231,13 @@ export default {
     },
     getCustomer() {
       this.$store.dispatch('changeCopyShippingAddress', false)
+      const displayCustomer = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.columnName
+      }).split(['-'])
+      const searchValue = this.isEmptyValue(this.currentBusinessPartner.value) ? displayCustomer[0] : this.currentBusinessPartner.value
       customer({
-        searchValue: this.currentBusinessPartner.value
+        searchValue
       })
         .then(response => {
           this.billing = response.addresses.find(address => address.is_default_billing)
@@ -261,13 +269,10 @@ export default {
         containerUuid,
         attributes: [{
           columnName: 'Name',
-          value: address.last_name
+          value: address.first_name
         }, {
           columnName: 'Description',
           value: address.description
-        }, {
-          columnName: 'Name2',
-          value: address.first_name
         }, {
           columnName: 'Phone',
           value: address.phone
@@ -334,9 +339,6 @@ export default {
         }, {
           columnName: 'TaxID',
           value: customer.value
-        }, {
-          columnName: 'Name2',
-          value: customer.last_name
         }]
       })
     },

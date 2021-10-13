@@ -199,8 +199,7 @@ export default {
         format: 'object'
       }))
       const billingAddress = this.billingAddress
-      if (this.isEmptyValue(billingAddress.last_name)) {
-        billingAddress.last_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
+      if (this.isEmptyValue(billingAddress.first_name)) {
         billingAddress.first_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
       }
       values.addresses = [this.billingAddress, this.shippingAddress]

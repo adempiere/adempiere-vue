@@ -46,7 +46,7 @@ export default {
         format: 'object'
       }))
       billingAddress.is_default_billing = true
-      billingAddress.is_default_shipping = this.copyShippingAddress
+      billingAddress.is_default_shipping = false
       const region = this.$store.getters.getValueOfField({
         containerUuid: 'Billing-Address',
         columnName: 'C_Region_ID_UUID'
@@ -57,16 +57,44 @@ export default {
       return billingAddress
     },
     shippingAddress() {
-      const shippingAddress = this.addressForm(this.$store.getters.getValuesView({
+      let shippingAddress = this.addressForm(this.$store.getters.getValuesView({
         containerUuid: 'Shipping-Address',
         format: 'object'
       }))
       shippingAddress.is_default_shipping = true
-      shippingAddress.is_default_billing = this.copyShippingAddress
+      shippingAddress.is_default_billing = false
       if (this.copyShippingAddress) {
-        return this.billingAddress
+        shippingAddress = {
+          ...this.billingAddress,
+          is_default_billing: false,
+          is_default_shipping: true
+        }
+        return shippingAddress
       }
       return shippingAddress
+    },
+    showCustomer() {
+      return this.$store.getters.getPopoverCreateBusinessParnet
+    },
+    showPopover() {
+      if (this.$store.getters.getPopoverCreateBusinessParnet || this.$store.getters.getShowUpdateCustomer) {
+        return true
+      }
+      return false
+    }
+  },
+  watch: {
+    showPopover(value) {
+      if (!value) {
+        this.clearAddresses('Billing-Address')
+        this.clearAddresses('Shipping-Address')
+      }
+    },
+    showCustomer(value) {
+      if (value) {
+        this.clearAddresses('Billing-Address')
+        this.clearAddresses('Shipping-Address')
+      }
     }
   },
   methods: {
@@ -90,9 +118,6 @@ export default {
         }
         switch (key) {
           case 'Name':
-            valuesToSend['last_name'] = value
-            break
-          case 'Name2':
             valuesToSend['first_name'] = value
             break
           case 'Description':
@@ -108,22 +133,22 @@ export default {
             valuesToSend['contact_name'] = value
             break
           case 'C_Country_ID_UUID':
-            valuesToSend['countryUuid'] = value
+            valuesToSend['country_uuid'] = value
             break
           case 'DisplayColumn_C_Country_ID':
-            valuesToSend['countryName'] = value
+            valuesToSend['country_name'] = value
             break
           case 'C_Region_ID_UUID':
-            valuesToSend['regionUuid'] = value
+            valuesToSend['region_uuid'] = value
             break
           case 'DisplayColumn_C_Region_ID':
-            valuesToSend['regionName'] = value
+            valuesToSend['region_name'] = value
             break
           case 'C_City_ID_UUID':
-            valuesToSend['cityUuid'] = value
+            valuesToSend['city_uuid'] = value
             break
           case 'DisplayColumn_C_City_ID':
-            valuesToSend['cityName'] = value
+            valuesToSend['city_name'] = value
             break
           case 'Address1':
             valuesToSend['address1'] = value
@@ -138,7 +163,7 @@ export default {
             valuesToSend['address4'] = value
             break
           case 'Postal':
-            valuesToSend['postalCode'] = value
+            valuesToSend['postal_code'] = value
             break
         }
       })
@@ -229,7 +254,7 @@ export default {
         containerUuid,
         // DisplayColumn_'ColumnName'
         columnName: 'DisplayColumn_C_BPartner_ID', // this.parentMetadata.displayColumnName,
-        value: value + ' - ' + name
+        value: value + '-' + name
       })
 
       // set UUID value
