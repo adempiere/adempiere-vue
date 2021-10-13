@@ -1,10 +1,10 @@
 <template>
-  <div :style="labelStyle">
+  <div :style="labelStyle" class="label-field">
     <span>
       {{ label }}
     </span>
 
-    <span v-if="isMandatory" :style="'color: #f34b4b'">*</span>
+    <span v-if="isMandatory" :style="'color: #f34b4b'"> * </span>
 
     <i class="el-icon-info" :style="iconStyle" />
   </div>
@@ -53,9 +53,11 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-.el-icon-info {
+<style lang="scss" scoped>
+.label-field {
+  .el-icon-info {
     font-size: 11px;
     color: #008fd3;
+  }
 }
 </style>

@@ -69,9 +69,20 @@ export default {
   },
   computed: {
     cssClassStyle() {
-      let styleClass = ' custom-field-text '
-      if (!this.isEmptyValue(this.metadata.cssClassName)) {
-        styleClass += this.metadata.cssClassName
+      const { cssClassName, displayType, inTable } = this.metadata
+      let styleClass = ''
+      if (!this.isEmptyValue(cssClassName)) {
+        styleClass += cssClassName
+      }
+
+      if (displayType === TEXT.id) {
+        styleClass += ' custom-field-textarea '
+      } else {
+        styleClass += ' custom-field-text '
+      }
+
+      if (inTable) {
+        styleClass += ' field-in-table '
       }
       return styleClass
     },
@@ -110,11 +121,15 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
   .custom-field-text {
     max-height: 36px;
   }
+
+  // indicates if the textarea is adjustable
   .el-textarea__inner {
-    resize: none !important;
+    &.field-in-table {
+      resize: none !important;
+    }
   }
 </style>

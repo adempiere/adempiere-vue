@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>
+  <div class="field-options">
     <el-dropdown
       v-if="isMobile"
       key="options-mobile"
@@ -28,7 +28,8 @@
       @command="handleCommand"
       @click="false"
     >
-      <label-field :is-mandatory="metadata.required && isEmptyValue(valueField)" :label="metadata.name" :is-mobile="true" />
+      <label-field :is-mandatory="metadata.required" :label="metadata.name" :is-mobile="true" />
+
       <el-dropdown-menu slot="dropdown">
         <template
           v-for="(option, key) in optionsList"
@@ -45,10 +46,10 @@
       </el-dropdown-menu>
     </el-dropdown>
 
+    <!-- Desktop menu -->
     <el-menu
       v-else-if="!isMobile && metadata.panelType !== 'form'"
       key="options-desktop"
-      class="el-menu-demo"
       mode="horizontal"
       unique-opened
       style="z-index: 0"
@@ -59,8 +60,9 @@
     >
       <el-submenu index="menu">
         <template slot="title">
-          <label-field :is-mandatory="metadata.required && isEmptyValue(valueField)" :label="metadata.name" />
+          <label-field :is-mandatory="metadata.required" :label="metadata.name" />
         </template>
+
         <el-menu-item
           v-for="(option, key) in optionsList"
           :key="key"
@@ -97,13 +99,15 @@
 
 <script>
 import { defineComponent, computed, ref, watch } from '@vue/composition-api'
+
+import LabelField from './LabelField.vue'
+import LabelPopoverOption from './LabelPopoverOption.vue'
+
 import {
   optionsListStandad, optionsListAdvancedQuery,
   documentStatusOptionItem, translateOptionItem,
   zoomInOptionItem, calculatorOptionItem
 } from '@/components/ADempiere/Field/FieldOptions/fieldOptionsList.js'
-import LabelField from './LabelField.vue'
-import LabelPopoverOption from './LabelPopoverOption.vue'
 import { recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
 
 export default defineComponent({
@@ -390,7 +394,44 @@ export default defineComponent({
 })
 </script>
 
+<style lang="scss">
+.field-options {
+  .el-menu--horizontal {
+    // transparent background color of the field label
+    &.el-menu {
+      background: #FFF0;
+    }
+    &.el-menu:hover {
+      background: #FFF0;
+    }
+
+    // height of the field label
+    .el-submenu .el-submenu__title {
+      height: 30px;
+      line-height: 30px;
+    }
+    .el-submenu__title {
+      height: 30px;
+      line-height: 30px;
+      // left spacing of field name
+      padding: 0px;
+    }
+  }
+
+  // hidde arrow icon
+  .el-submenu .el-submenu__icon-arrow  {
+    visibility: hidden;
+  }
+
+  // hide bottom line in label
+  .el-menu.el-menu--horizontal {
+    border-bottom: solid 0px #E6E6E6;
+  }
+}
+</style>
+
 <style>
+/*
 .el-popover {
   position: fixed;
   padding: 0px;
@@ -408,8 +449,10 @@ export default defineComponent({
   border-bottom: 2px solid transparent;
   color: #535457e3;
 }
+*/
 </style>
-<style scoped>
+<style lang="scss" scoped>
+/*
 .el-form--label-top .el-form-item__label {
   padding-bottom: 0px !important;
   display: block;
@@ -454,7 +497,7 @@ export default defineComponent({
 }
 .el-dropdown-menu__item--divided {
   position: relative;
-  /* margin-top: 6px; */
+  // margin-top: 6px;
   border-top: 1px solid #e6ebf5;
 }
 .label {
@@ -471,4 +514,5 @@ export default defineComponent({
 .contents {
   display: inline-flex;
 }
+*/
 </style>
