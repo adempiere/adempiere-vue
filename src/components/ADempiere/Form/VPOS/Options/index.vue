@@ -724,7 +724,7 @@ export default {
         },
         {
           columnName: 'C_DocTypeRMA_ID',
-          value: this.currentOrder.documentType.id
+          value: this.currentPointOfSales.returnDocumentType.id
         }
       ]
       this.$store.dispatch('addParametersProcessPos', parametersList)

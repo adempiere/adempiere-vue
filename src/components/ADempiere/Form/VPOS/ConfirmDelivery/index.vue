@@ -166,6 +166,7 @@
             @click="close"
           />
           <el-button
+            v-if="allowsConfirmShipment"
             type="primary"
             class="custom-button-create-bp"
             icon="el-icon-check"
@@ -261,6 +262,9 @@ export default {
     },
     productPrice() {
       return this.$store.getters.getProductPrice
+    },
+    allowsConfirmShipment() {
+      return this.currentPointOfSales.isAllowsConfirmShipment
     },
     listWithPrice() {
       const { productPricesList } = this.productPrice

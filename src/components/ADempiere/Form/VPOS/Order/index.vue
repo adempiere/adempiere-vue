@@ -846,7 +846,7 @@ export default {
       this.isShowedPOSKeyLayout = this.isMobile ? !this.isShowedPOSKeyLayout : true
       this.$store.commit('setShowPOSCollection', true)
       const orderUuid = this.$route.query.action
-      this.$store.dispatch('listPayments', { orderUuid })
+      this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid })
       this.$store.commit('setShowPOSOptions', false)
     },
     open() {
@@ -874,6 +874,7 @@ export default {
       this.clearOrder()
       this.$store.commit('setShowPOSCollection', false)
       this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateBusinessPartner.uuid })
+      this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
     },
     changePos(pointOfSales) {
       this.$store.dispatch('setCurrentPOS', pointOfSales)

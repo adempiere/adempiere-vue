@@ -6,6 +6,7 @@
           <el-avatar shape="circle" :size="100" fit="fill" :src="avatarResize" />
           <br>
           <b> {{ userName }} </b>
+          <br>
           <el-button round style="margin-top: 3%;"> {{ currentRole.name }} </el-button>
         </el-col>
       </el-row>
