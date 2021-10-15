@@ -160,7 +160,6 @@ export default {
     dispatch('listTenderTypesFromServer', posToSet.uuid)
     dispatch('listPricesFromServer', posToSet)
     commit('setCurrentPriceList', posToSet.priceList)
-    // commit('setCurrentDocumentTypePos', posToSet.documentType)
     commit('setCurrentWarehousePos', posToSet.warehouse)
     commit('resetConversionRate', [])
     commit('setIsReloadKeyLayout')
