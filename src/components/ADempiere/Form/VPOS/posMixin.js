@@ -320,6 +320,7 @@ export default {
             break
           case 'newOrder':
             this.createOrder({ withLine: action.withLine, newOrder: action.newOrder, customer: action.customer })
+            this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
             break
           case 'changePriceList':
             this.$store.commit('setCurrentPriceList', action)

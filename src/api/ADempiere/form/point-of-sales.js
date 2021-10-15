@@ -978,10 +978,98 @@ export function createCustomerBankAccount({
     })
 }
 
+/**
+ * Create Shipment
+ * @param {string} posUuidd - POS UUID reference
+ * @param {string} orderUuid - Order UUID reference
+ * @param {string} salesRepresentativeUuid - Sales Representative UUID reference
+ */
 export function createShipment({
   posUuid,
   orderUuid,
-  listProduct
+  salesRepresentativeUuid
 }) {
-  console.info(`Create Shipment pos uuid ${posUuid}, order uuid ${orderUuid} and list prouct ${listProduct}`)
+  return request({
+    url: `${config.pointOfSales.endpoint}/create-shipment`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      order_uuid: orderUuid,
+      sales_representative_uuid: salesRepresentativeUuid
+    }
+  })
+    .then(responseShipment => {
+      return camelizeObjectKeys(responseShipment)
+    })
+}
+
+/**
+ * Create Shipment Line
+ * @param {string} posUuidd - POS UUID reference
+ * @param {string} orderUuid - Order UUID reference
+ * @param {string} salesRepresentativeUuid - Sales Representative UUID reference
+ */
+export function createShipmentLine({
+  shipmentUuid,
+  orderLineUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/create-shipment-line`,
+    method: 'post',
+    data: {
+      shipment_uuid: shipmentUuid,
+      order_line_uuid: orderLineUuid
+    }
+  })
+    .then(responseShipmentLine => {
+      return camelizeObjectKeys(responseShipmentLine)
+    })
+}
+
+// Delete Shipment
+export function deleteShipment({
+  shipmentLineUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/delete-shipment-line`,
+    method: 'post',
+    data: {
+      shipment_line_uuid: shipmentLineUuid
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+// List Shipment
+export function shipments({
+  shipmentUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/shipment-lines`,
+    method: 'get',
+    params: {
+      shipment_uuid: shipmentUuid
+    }
+  })
+    .then(response => {
+      return camelizeObjectKeys(response)
+    })
+}
+
+// Confirm Shipment
+export function confirmShipment({
+  shipmentUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/confirm-shipment`,
+    method: 'post',
+    data: {
+      shipment_uuid: shipmentUuid
+    }
+  })
+    .then(response => {
+      return response
+    })
 }

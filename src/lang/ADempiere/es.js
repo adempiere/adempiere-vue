@@ -404,7 +404,8 @@ export default {
           orderRemoved: 'Orden Borrada',
           copyOrder: 'Copiar Orden',
           createNewReturnOrder: 'Crear una nueva orden de devolución',
-          confirmDelivery: 'Confirmar Entrega'
+          confirmDelivery: 'Confirmar Entrega',
+          emptyProductDelivery: 'Producto no disponible para entregar'
         },
         cashManagement: {
           title: 'Gestión de Caja',

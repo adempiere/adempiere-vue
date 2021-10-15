@@ -96,7 +96,7 @@ export default {
       })
         .then(response => {
           const orderUuid = response.orderUuid
-          dispatch('listPayments', { orderUuid })
+          dispatch('listPayments', { posUuid, orderUuid })
           dispatch('updateOrder', { posUuid, orderUuid })
         })
         .catch(error => {
@@ -221,7 +221,7 @@ export default {
       })
         .then(response => {
           const orderUuid = response.orderUuid
-          dispatch('listPayments', { orderUuid })
+          dispatch('listPayments', { posUuid, orderUuid })
           dispatch('updateOrder', { posUuid, orderUuid })
           return {
             ...response,
@@ -253,7 +253,7 @@ export default {
       })
         .then(response => {
           const orderUuid = response.order_uuid
-          dispatch('listPayments', { orderUuid })
+          dispatch('listPayments', { posUuid, orderUuid })
           dispatch('updateOrder', { posUuid, orderUuid })
           return {
             ...response,
@@ -283,7 +283,7 @@ export default {
       paymentUuid
     })
       .then(response => {
-        dispatch('listPayments', { orderUuid })
+        dispatch('listPayments', { posUuid, orderUuid })
         dispatch('updateOrder', { posUuid, orderUuid })
       })
       .catch(error => {
@@ -399,7 +399,7 @@ export default {
     })
       .then(response => {
         const orderUuid = response.orderUuid
-        dispatch('listPayments', { orderUuid })
+        dispatch('listPayments', { posUuid, orderUuid })
         return {
           ...response,
           type: 'success'

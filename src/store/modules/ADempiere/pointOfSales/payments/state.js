@@ -40,5 +40,6 @@ export default {
     show: false,
     type: 0,
     success: false
-  }
+  },
+  shipment: {}
 }

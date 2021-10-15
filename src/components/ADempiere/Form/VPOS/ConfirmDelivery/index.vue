@@ -45,11 +45,11 @@
       @shortkey.native="keyAction"
     >
       <el-table-column
-        prop="value"
+        prop="product.value"
         :label="$t('form.productInfo.code')"
       />
       <el-table-column
-        prop="name"
+        prop="product.name"
         :label="$t('form.pos.tableProduct.product')"
       />
       <el-table-column
@@ -89,8 +89,8 @@
                   </div>
                 </el-col>
                 <el-col :span="18">
-                  {{ $t('form.productInfo.code') }}: <b>{{ scope.row.value }}</b><br>
-                  {{ $t('form.productInfo.name') }}: <b>{{ scope.row.name }}</b><br>
+                  {{ $t('form.productInfo.code') }}: <b>{{ scope.row.product.value }}</b><br>
+                  {{ $t('form.productInfo.name') }}: <b>{{ scope.row.product.name }}</b><br>
                   {{ $t('form.productInfo.description') }}: <b>{{ scope.row.description }}</b><br>
                   {{ $t('form.productInfo.UM') }}: <b>{{ scope.row.uomName }}</b><br>
                   {{ $t('form.pos.tableProduct.quantity') }}: <b>{{ scope.row.quantity }}</b><br>
@@ -99,7 +99,7 @@
             </el-form>
             <el-button slot="reference" type="primary" icon="el-icon-info" size="mini" style="margin-right: 3%;" @click="showInfoLine(scope.row)" />
           </el-popover>
-          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteOrderLine(scope.row)" />
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteLine(scope.row)" />
         </template>
       </el-table-column>
     </el-table>
@@ -166,6 +166,7 @@
             @click="close"
           />
           <el-button
+            v-if="allowsConfirmShipment"
             type="primary"
             class="custom-button-create-bp"
             icon="el-icon-check"
@@ -180,7 +181,13 @@
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
-import { findProduct, createShipment } from '@/api/ADempiere/form/point-of-sales.js'
+import {
+  createShipmentLine,
+  createShipment,
+  deleteShipment,
+  shipments,
+  confirmShipment
+} from '@/api/ADempiere/form/point-of-sales.js'
 import ImageProduct from '@/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
 
 export default {
@@ -212,12 +219,10 @@ export default {
   },
   data() {
     return {
-      defaultMaxPagination: 50,
       isLoadedServer: false,
-      isCustomForm: true,
-      currentProduct: {},
       isSearchProduct: false,
       input: '',
+      shipment: {},
       dialogVisible: false,
       deliveryList: [],
       showInfo: false,
@@ -250,34 +255,23 @@ export default {
     currentOrder() {
       return this.$store.getters.posAttributes.currentPointOfSales.currentOrder
     },
+    currentOrderLine() {
+      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.lineOrder
+    },
     productdeliveryList() {
       return this.$store.getters.getDeliveryList
-    },
-    isShowProductsPriceList() {
-      return this.$store.state['pointOfSales/listProductPrice'].productPrice[this.attribute]
     },
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
     },
-    productPrice() {
-      return this.$store.getters.getProductPrice
-    },
-    listWithPrice() {
-      const { productPricesList } = this.productPrice
-      if (!this.isEmptyValue(productPricesList)) {
-        return []
-      }
-      return []
+    allowsConfirmShipment() {
+      return this.currentPointOfSales.isAllowsConfirmShipment
     },
     shortsKey() {
       return {
         closeProductList: ['esc'],
         refreshList: ['f5']
       }
-    },
-    isReadyFromGetData() {
-      const { isLoaded, isReload } = this.productPrice
-      return (!isLoaded || isReload) // && this.isShowProductsPriceList
     },
     searchValue() {
       return this.$store.getters.getValueOfField({
@@ -291,6 +285,9 @@ export default {
         return ''
       }
       return currentLine.uuid
+    },
+    currentShipment() {
+      return this.$store.getters.getShipment
     }
   },
   watch: {
@@ -335,60 +332,89 @@ export default {
     close() {
       this.$store.commit('setConfirmDelivery', false)
     },
-    addProductFromList() {
-      if (!this.isSelectable) {
-        return
-      }
-      // TODO: Change this dispatch for set values with local methods, to delete subscripton
-      this.$store.dispatch('notifyActionKeyPerformed', {
-        containerUuid: 'POS',
-        columnName: 'ProductValue',
-        // TODO: Verify with 'value' or 'searchValue' attribute
-        value: this.currentProduct.product.name
-      })
-
-      // close popover of list product price
-      this.close()
-      this.$store.commit('showListProductPrice', {
-        attribute: this.popoverName,
-        isShowed: false
-      })
-    },
-    searchProduct(value) {
-      clearTimeout(this.timeOut)
-      this.timeOut = setTimeout(() => {
-        this.isSearchProduct = true
-        this.findProductToShipping(value)
-      }, 500)
-    },
-    deleteOrderLine(line) {
-      const index = this.productdeliveryList.findIndex(product => product.uuid === line.uuid)
-      this.productdeliveryList.splice(index, 1)
-    },
-    findProductToShipping(searchValue) {
-      findProduct({
-        searchValue,
-        posUuid: this.currentPointOfSales.uuid,
-        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
-        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
-      })
+    listShipments({ shipmentUuid }) {
+      shipments({ shipmentUuid })
         .then(response => {
-          const product = {
-            ...response.product,
-            quantity: 1
-          }
-          this.$store.dispatch('addDeliveryList', product)
+          this.$store.commit('setDeliveryList', response.records)
         })
-        .catch((error) => {
-          console.error(error.message)
+        .catch(error => {
           this.$message({
             type: 'error',
             message: error.message,
+            duration: 1500,
+            showClose: true
+          })
+        })
+    },
+    searchProduct(value) {
+      const posUuid = this.currentPointOfSales.uuid
+      const orderUuid = this.currentOrder.uuid
+      const salesRepresentativeUuid = this.currentPointOfSales.salesRepresentative.uuid
+      if (this.isEmptyValue(this.shipment)) {
+        this.createDelivery({ posUuid, orderUuid, salesRepresentativeUuid })
+      }
+      clearTimeout(this.timeOut)
+      this.timeOut = setTimeout(() => {
+        this.isSearchProduct = true
+        const product = this.findProductFromOrder(value)
+        if (product) {
+          this.addLineShipment({ shipmentUuid: this.shipment.uuid, orderLineUuid: product.uuid })
+        } else {
+          this.$message({
+            type: 'error',
+            message: this.$t('form.pos.optionsPoinSales.salesOrder.emptyProductDelivery'),
+            duration: 1500,
+            showClose: true
+          })
+        }
+        this.input = ''
+      }, 500)
+    },
+    addLineShipment({ shipmentUuid, orderLineUuid }) {
+      createShipmentLine({
+        shipmentUuid,
+        orderLineUuid
+      })
+        .then(response => {
+          return response
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: error.message,
+            duration: 1500,
             showClose: true
           })
         })
         .finally(() => {
-          this.input = ''
+          this.listShipments({ shipmentUuid })
+        })
+    },
+    findProductFromOrder(value) {
+      return this.currentOrderLine.find(line => line.product.name === value || line.product.value === value || line.product.upc === value)
+    },
+    deleteLine(line) {
+      deleteShipment({
+        shipmentLineUuid: line.uuid
+      })
+        .then(response => {
+          this.$message({
+            type: 'success',
+            message: response,
+            duration: 1500,
+            showClose: true
+          })
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: error.message,
+            duration: 1500,
+            showClose: true
+          })
+        })
+        .finally(() => {
+          this.listShipments({ shipmentUuid: this.shipment.uuid })
         })
     },
     /**
@@ -409,24 +435,47 @@ export default {
         })
       }
     },
-    makeDelivery() {
-      const posUuid = this.currentPointOfSales.uuid
-      const orderUuid = this.currentOrder.uuid
-      const listProduct = this.productdeliveryList.map(product => {
-        return {
-          orderLineUuid: product.uuid,
-          quantity: product.quantity
-        }
-      })
+    createDelivery({ posUuid, orderUuid, salesRepresentativeUuid }) {
       createShipment({
         posUuid,
         orderUuid,
-        listProduct
+        salesRepresentativeUuid
       })
-      this.dialogVisible = false
-      // close panel lef
-      this.$store.commit('setShowPOSOptions', false)
-      this.$store.commit('setConfirmDelivery', false)
+        .then(shipment => {
+          this.$store.commit('setShipment', shipment)
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: error.message,
+            duration: 1500,
+            showClose: true
+          })
+        })
+    },
+    makeDelivery() {
+      if (this.isEmptyValue(this.currentShipment)) {
+        return
+      }
+      confirmShipment({
+        shipmentUuid: this.currentShipment.uuid
+      })
+        .then(response => {
+          return response
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: error.message,
+            duration: 1500,
+            showClose: true
+          })
+        })
+        .finally(() => {
+          this.dialogVisible = false
+          this.$store.commit('setShowPOSOptions', false)
+          this.$store.commit('setConfirmDelivery', false)
+        })
     },
     closeInfo(line) {
       this.showInfo = false

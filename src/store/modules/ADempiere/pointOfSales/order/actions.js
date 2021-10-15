@@ -76,6 +76,10 @@ export default {
     customerUuid,
     documentTypeUuid
   }) {
+    const isCompleted = rootGetters.posAttributes.currentPointOfSales.currentOrder.isProcessed
+    if (isCompleted) {
+      return
+    }
     const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
     updateOrder({
       orderUuid,
