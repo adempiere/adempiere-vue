@@ -79,5 +79,8 @@ export default {
   },
   setDeliveryList(state, delivery) {
     state.deliveryList = delivery
+  },
+  setShipment(state, shipment) {
+    state.shipment = shipment
   }
 }

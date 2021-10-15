@@ -281,9 +281,13 @@ export default {
       return ''
     },
     iSOCode(value) {
-      const currencyPay = this.listCurrency.find(currency => currency.uuid === value.currencyUuid)
-      if (!currencyPay) {
-        return ''
+      const currencyPay = this.listCurrency.find(currency => {
+        if (currency.uuid === value.currencyUuid) {
+          return currency
+        }
+      })
+      if (this.isEmptyValue(currencyPay)) {
+        return this.currency.iSOCode
       }
       return currencyPay.iso_code
     },

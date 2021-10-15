@@ -740,7 +740,7 @@ export default {
     currentPriceList(value) {
       if (!this.isEmptyValue(value)) {
         this.$store.dispatch('updateOrder', {
-          orderUuid: this.$route.query.action,
+          orderUuid: this.currentOrder.uuid,
           posUuid: this.currentPointOfSales.uuid,
           priceListUuid: value.uuid,
           warehouseUuid: this.currentWarehouse.uuid,

@@ -60,5 +60,8 @@ export default {
   },
   getDeliveryList: (state) => {
     return state.deliveryList
+  },
+  getShipment: (state) => {
+    return state.shipment
   }
 }

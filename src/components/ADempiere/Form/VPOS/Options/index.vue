@@ -190,6 +190,7 @@
                   slot="reference"
                   :style="blockOption"
                   :disabled="true"
+                  @click="openDelivery()"
                 >
                   <svg-icon icon-class="shopping" />
                   <br>
@@ -377,6 +378,7 @@ import {
   createOrder,
   processOrder
 } from '@/api/ADempiere/form/point-of-sales.js'
+import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
 import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 import ModalDialog from '@/components/ADempiere/Dialog'
 import posProcess from '@/utils/ADempiere/constants/posProcess'
@@ -540,6 +542,28 @@ export default {
     this.findProcess(this.posProcess)
   },
   methods: {
+    openDelivery() {
+      createShipment({
+        posUuid: this.currentPointOfSales.uuid,
+        orderUuid: this.currentOrder.uuid,
+        salesRepresentativeUuid: this.currentPointOfSales.salesRepresentative.uuid
+      })
+        .then(shipment => {
+          this.$store.commit('setShipment', shipment)
+          shipments({ shipmentUuid: shipment.uuid })
+            .then(response => {
+              this.$store.commit('setDeliveryList', response.records)
+            })
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: error.message,
+            duration: 1500,
+            showClose: true
+          })
+        })
+    },
     theAction(event) {
       if (this.visible) {
         switch (event.srcKey) {
