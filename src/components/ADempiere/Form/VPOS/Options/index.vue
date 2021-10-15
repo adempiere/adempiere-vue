@@ -180,7 +180,7 @@
                 placement="right"
                 trigger="click"
                 width="800"
-                :disabled="isEmptyValue(currentOrder.uuid)"
+                :disabled="!isProcessed"
               >
                 <confirm-delivery
                   :is-selectable="false"
@@ -189,7 +189,6 @@
                 <div
                   slot="reference"
                   :style="blockOption"
-                  :disabled="true"
                   @click="openDelivery()"
                 >
                   <svg-icon icon-class="shopping" />
@@ -524,6 +523,9 @@ export default {
           this.$store.commit('setConfirmDelivery', value)
         }
       }
+    },
+    isProcessed() {
+      return this.currentPointOfSales.currentOrder.isProcessed
     }
   },
   watch: {

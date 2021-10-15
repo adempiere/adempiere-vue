@@ -362,7 +362,7 @@ export default {
         } else {
           this.$message({
             type: 'error',
-            message: 'Product not available for delivery',
+            message: this.$t('form.pos.optionsPoinSales.salesOrder.emptyProductDelivery'),
             duration: 1500,
             showClose: true
           })
