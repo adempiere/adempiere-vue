@@ -42,9 +42,6 @@ export default {
     })
       .then(response => {
         pontOfSalesList = response.sellingPointsList
-        if (!isEmptyValue(posToSet)) {
-          pos = pontOfSalesList.find(itemPOS => itemPOS.id === parseInt(posToSet))
-        }
         if (isEmptyValue(pos) && isEmptyValue(posToSet)) {
           pos = pontOfSalesList.find(itemPOS => itemPOS.salesRepresentative.uuid === userUuid)
         }
@@ -163,7 +160,7 @@ export default {
     dispatch('listTenderTypesFromServer', posToSet.uuid)
     dispatch('listPricesFromServer', posToSet)
     commit('setCurrentPriceList', posToSet.priceList)
-    commit('setCurrentDocumentTypePos', posToSet.documentType)
+    // commit('setCurrentDocumentTypePos', posToSet.documentType)
     commit('setCurrentWarehousePos', posToSet.warehouse)
     commit('resetConversionRate', [])
     commit('setIsReloadKeyLayout')

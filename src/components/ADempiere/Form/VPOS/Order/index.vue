@@ -666,6 +666,9 @@ export default {
       return {}
     },
     currentDocumentType() {
+      if (this.isEmptyValue(this.$store.getters.getCurrentDocumentTypePo)) {
+        return this.$store.getters.posAttributes.currentPointOfSales.documentType
+      }
       if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.documentType)) {
         if (!this.isEmptyValue(this.currentOrder.documentType)) {
           return this.currentOrder.documentType
@@ -747,6 +750,9 @@ export default {
           documentTypeUuid: this.currentDocumentType.uuid
         })
       }
+    },
+    currentDocumentType(value) {
+      this.$store.commit('setCurrentDocumentTypePos', value)
     }
   },
   mounted() {
