@@ -1058,15 +1058,29 @@ export function shipments({
     })
 }
 
-// Confirm Shipment
-export function confirmShipment({
-  shipmentUuid
+/**
+ * POST Process Shipment
+ *
+ * req.query.token - user token
+ * Body:
+ * req.body.shipment_uuid - POS UUID shipment uuid
+ * req.body.description - POS UUID description
+ * req.body.document_action - Sales Representative UUID reference
+ * Details:
+ */
+
+export function processShipment({
+  shipmentUuid,
+  description,
+  documentAction
 }) {
   return request({
-    url: `${config.pointOfSales.endpoint}/confirm-shipment`,
+    url: `${config.pointOfSales.endpoint}/process-shipment`,
     method: 'post',
     data: {
-      shipment_uuid: shipmentUuid
+      shipment_uuid: shipmentUuid,
+      description,
+      document_action: documentAction
     }
   })
     .then(response => {

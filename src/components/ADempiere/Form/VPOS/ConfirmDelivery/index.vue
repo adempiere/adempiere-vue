@@ -186,7 +186,7 @@ import {
   createShipment,
   deleteShipment,
   shipments,
-  confirmShipment
+  processShipment
 } from '@/api/ADempiere/form/point-of-sales.js'
 import ImageProduct from '@/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
 
@@ -457,7 +457,7 @@ export default {
       if (this.isEmptyValue(this.currentShipment)) {
         return
       }
-      confirmShipment({
+      processShipment({
         shipmentUuid: this.currentShipment.uuid
       })
         .then(response => {
