@@ -19,6 +19,7 @@
 <template>
   <component
     :is="componentRender"
+    :parent-uuid="parentUuid"
     :container-uuid="containerUuid"
     :container-manager="containerManager"
     :panel-metadata="metadata"

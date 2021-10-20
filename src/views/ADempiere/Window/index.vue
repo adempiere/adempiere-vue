@@ -145,6 +145,14 @@ export default defineComponent({
         return (
           field.isReadOnly || field.isReadOnlyFromLogic || field.isReadOnlyFromForm
         )
+      },
+
+      changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
+        root.$store.dispatch('changeTabFieldShowedFromUser', {
+          parentUuid,
+          containerUuid,
+          fieldsShowed
+        })
       }
     }
 
