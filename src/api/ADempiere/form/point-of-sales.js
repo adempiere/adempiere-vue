@@ -1071,8 +1071,7 @@ export function shipments({
 
 export function processShipment({
   shipmentUuid,
-  description,
-  documentAction
+  description
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/process-shipment`,
@@ -1080,7 +1079,37 @@ export function processShipment({
     data: {
       shipment_uuid: shipmentUuid,
       description,
-      document_action: documentAction
+      document_action: 'CO'
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+/**
+ * POST Reverse Sales
+ *
+ * req.query.token - user token
+ * Body:
+ * req.body.order_uuid - Order UUID
+ * req.body.pos_uuid - POS UUID
+ * req.body.description - POS UUID description
+ * Details:
+ */
+
+export function reverseSales({
+  posUuid,
+  orderUuid,
+  description
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/reverse-sales`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      order_uuid: orderUuid,
+      description
     }
   })
     .then(response => {

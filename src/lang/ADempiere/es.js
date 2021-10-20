@@ -328,6 +328,7 @@ export default {
     exportRecord: 'Exportar Registro',
     lockRecord: 'Registro Bloqueado',
     noDescription: 'Sin Descripción',
+    addDescription: 'Agregue una Descripción',
     recordAccess: {
       modeMobile: {
         accessRoles: 'Roles con Acceso',

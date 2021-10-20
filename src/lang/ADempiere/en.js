@@ -352,6 +352,7 @@ export default {
     exportRecord: 'Export Record',
     lockRecord: 'Lock Record',
     noDescription: 'No Description',
+    addDescription: 'Add Description',
     recordAccess: {
       modeMobile: {
         accessRoles: 'Access Roles',

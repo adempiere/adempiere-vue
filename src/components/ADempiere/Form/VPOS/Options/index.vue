@@ -62,6 +62,7 @@
                 >
                   <el-button
                     type="text"
+                    style="min-height: 50px;width: -webkit-fill-available;white-space: normal;"
                     @click="openListOrdes()"
                   >
                     <svg-icon icon-class="list" />
@@ -101,14 +102,52 @@
 
           <el-col v-if="allowsReturnOrder" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
-              <p
-                :style="blockOption"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction')) : reverseSalesTransaction()"
+              <el-popover
+                v-model="visibleReverse"
+                placement="top"
+                width="450"
+                :disabled="!isProcessed"
               >
-                <i class="el-icon-error" />
-                <br>
-                {{ $t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction') }}
-              </p>
+                <el-row :gutter="24" class="container-reverse">
+                  <el-col :span="24" class="container-reverse">
+                    <p class="container-popover">
+                      <b class="container-popover">
+                        {{ $t('data.addDescription') }}
+                      </b>
+                    </p>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-input
+                      v-model="messageReverseSales"
+                      type="textarea"
+                      :rows="2"
+                      :placeholder="$t('data.addDescription')"
+                      style=""
+                    />
+                  </el-col>
+                  <el-col :span="24">
+                    <samp class="spam-button">
+                      <el-button
+                        type="danger"
+                        icon="el-icon-close"
+                        style="background: #ff6d6d;border-color: #ff6d6d;background-color: #ff6d6d;"
+                        @click="messageReverseSales = false"
+                      />
+                      <el-button
+                        type="primary"
+                        style="background: #46a6ff;border-color: #46a6ff;background-color: #46a6ff;"
+                        icon="el-icon-check"
+                        @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction')) : reverseSalesTransaction()"
+                      />
+                    </samp>
+                  </el-col>
+                </el-row>
+                <el-button slot="reference" type="text" style="min-height: 50px;width: -webkit-fill-available;white-space: normal;">
+                  <i class="el-icon-error" />
+                  <br>
+                  {{ $t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction') }}
+                </el-button>
+              </el-popover>
             </el-card>
           </el-col>
 
@@ -375,6 +414,7 @@ import {
   cashClosing,
   deleteOrder,
   createOrder,
+  reverseSales,
   processOrder
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
@@ -408,7 +448,9 @@ export default {
       attributePin: {},
       validatePin: true,
       visible: false,
+      visibleReverse: false,
       showFieldListOrder: false,
+      messageReverseSales: '',
       showConfirmDelivery: false,
       posProcess
     }
@@ -525,7 +567,10 @@ export default {
       }
     },
     isProcessed() {
-      return this.currentPointOfSales.currentOrder.isProcessed
+      if (!this.isEmptyValue(this.currentOrder.documentStatus.value) && this.currentOrder.documentStatus.value === 'CO') {
+        return true
+      }
+      return false
     }
   },
   watch: {
@@ -545,6 +590,9 @@ export default {
   },
   methods: {
     openDelivery() {
+      if (!this.isProcessed) {
+        return
+      }
       createShipment({
         posUuid: this.currentPointOfSales.uuid,
         orderUuid: this.currentOrder.uuid,
@@ -726,36 +774,27 @@ export default {
         })
     },
     reverseSalesTransaction() {
-      if (this.isEmptyValue(this.currentOrder.uuid)) {
-        return ''
-      }
-      const process = this.$store.getters.getProcess(posProcess[0].uuid)
-      this.showModal(process)
-      const parametersList = [
-        {
-          columnName: 'C_Order_ID',
-          value: this.currentOrder.id
-        },
-        {
-          columnName: 'Bill_BPartner_ID',
-          value: this.currentOrder.businessPartner.id
-        },
-        {
-          columnName: 'IsCancelled',
-          value: true
-        },
-        {
-          columnName: 'IsShipConfirm',
-          value: true
-        },
-        {
-          columnName: 'C_DocTypeRMA_ID',
-          value: this.currentPointOfSales.returnDocumentType.id
-        }
-      ]
-      this.$store.dispatch('addParametersProcessPos', parametersList)
-      // close panel lef
-      this.$store.commit('setShowPOSOptions', false)
+      reverseSales({
+        posUuid: this.currentPointOfSales.uuid,
+        orderUuid: this.currentOrder.uuid,
+        description: this.messageReverseSales
+      })
+        .then(response => {
+          const orderUuid = this.currentOrder.uuid
+          this.$store.dispatch('reloadOrder', { orderUuid })
+        })
+        .catch(error => {
+          console.error(error.message)
+          this.$message({
+            type: 'error',
+            message: error.message,
+            showClose: true
+          })
+        })
+        .finally(() => {
+          this.visibleReverse = false
+          this.messageReverseSales = ''
+        })
     },
     withdrawal() {
       const { uuid: posUuid, id: posId } = this.currentPointOfSales
@@ -1002,5 +1041,25 @@ export default {
   .title-of-option {
     cursor: pointer;
     text-align: center !important;
+  }
+  .spam-button {
+    float: right;
+    padding-top: 5px;
+    background-color:white;
+    background:white;
+  }
+  .container-reverse {
+    background-color:white;
+    background:white;
+  }
+  .container-popover {
+    padding-right: 10px;
+    background-color:white;
+    background:white;
+  }
+</style>
+<style>
+  .el-textarea__inner:hover {
+    background-color: #FFFFFF!important;
   }
 </style>

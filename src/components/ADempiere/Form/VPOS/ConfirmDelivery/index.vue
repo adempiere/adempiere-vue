@@ -166,7 +166,6 @@
             @click="close"
           />
           <el-button
-            v-if="allowsConfirmShipment"
             type="primary"
             class="custom-button-create-bp"
             icon="el-icon-check"
@@ -347,18 +346,12 @@ export default {
         })
     },
     searchProduct(value) {
-      const posUuid = this.currentPointOfSales.uuid
-      const orderUuid = this.currentOrder.uuid
-      const salesRepresentativeUuid = this.currentPointOfSales.salesRepresentative.uuid
-      if (this.isEmptyValue(this.shipment)) {
-        this.createDelivery({ posUuid, orderUuid, salesRepresentativeUuid })
-      }
       clearTimeout(this.timeOut)
       this.timeOut = setTimeout(() => {
         this.isSearchProduct = true
         const product = this.findProductFromOrder(value)
         if (product) {
-          this.addLineShipment({ shipmentUuid: this.shipment.uuid, orderLineUuid: product.uuid })
+          this.addLineShipment({ shipmentUuid: this.currentShipment.uuid, orderLineUuid: product.uuid })
         } else {
           this.$message({
             type: 'error',
@@ -414,7 +407,7 @@ export default {
           })
         })
         .finally(() => {
-          this.listShipments({ shipmentUuid: this.shipment.uuid })
+          this.listShipments({ shipmentUuid: this.currentShipment.uuid })
         })
     },
     /**
@@ -461,6 +454,12 @@ export default {
         shipmentUuid: this.currentShipment.uuid
       })
         .then(response => {
+          this.$message({
+            type: 'success',
+            message: 'OK',
+            duration: 1500,
+            showClose: true
+          })
           return response
         })
         .catch(error => {
