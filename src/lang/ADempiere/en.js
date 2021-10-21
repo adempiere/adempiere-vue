@@ -574,6 +574,7 @@ export default {
       price: 'Price',
       quantityOnHand: 'Quantity On Hand',
       taxAmount: 'Tax Amount',
+      totalIncludingTax: 'Total Including Tax',
       grandTotal: 'Grand Total',
       grandTotalConverted: 'Grand Total Converted',
       quantityAvailable: 'Available',

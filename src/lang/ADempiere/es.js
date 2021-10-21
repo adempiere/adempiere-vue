@@ -551,6 +551,7 @@ export default {
       quantityOnHand: 'Existencia',
       price: 'Precio',
       taxAmount: 'Monto de Impuesto',
+      totalIncludingTax: 'Total con Impuesto',
       grandTotal: 'Total General',
       grandTotalConverted: 'Gran Total Convertido',
       quantityAvailable: 'Disponible',

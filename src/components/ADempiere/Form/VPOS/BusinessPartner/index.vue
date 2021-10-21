@@ -208,7 +208,8 @@ export default {
       return {
         uuid: undefined,
         id: undefined,
-        name: undefined
+        name: undefined,
+        value: undefined
       }
     },
     currentOrder() {
@@ -374,6 +375,7 @@ export default {
       if (this.isEmptyValue(businessPartner)) {
         businessPartner = this.blankBPartner
       }
+      businessPartner.name = businessPartner.value + '-' + businessPartner.name
       this.setBusinessPartner(businessPartner, false)
     },
     onClose() {
@@ -400,6 +402,7 @@ export default {
 
         this.showsPopovers.isShowList = false
         this.showsPopovers.isShowCreate = true
+        this.$store.commit('popoverCreateBusinessPartner', true)
       }
 
       this.searchBPartnerList({

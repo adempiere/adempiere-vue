@@ -166,6 +166,7 @@
             @click="close"
           />
           <el-button
+            v-if="allowsConfirmShipment"
             type="primary"
             class="custom-button-create-bp"
             icon="el-icon-check"

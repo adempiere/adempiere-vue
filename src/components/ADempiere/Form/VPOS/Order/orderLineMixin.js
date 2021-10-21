@@ -127,6 +127,12 @@ export default {
     },
     isDisplayDiscount() {
       return this.currentPointOfSales.isDisplayDiscount
+    },
+    isDisplayIncludingTax() {
+      if (this.isEmptyValue(this.currentPointOfSales.isDisplayIncludingTax)) {
+        return true
+      }
+      return this.currentPointOfSales.isDisplayIncludingTax
     }
   },
   watch: {
@@ -275,6 +281,11 @@ export default {
         return this.currentPointOfSales.isDisplayTaxAmount
       } else if (row.columnName === 'DisplayTaxAmount') {
         return this.currentPointOfSales.isDisplayTaxAmount
+      } else if (row.columnName === 'GrandTotal') {
+        if (this.isDisplayIncludingTax) {
+          this.orderLineDefinition.grandTotal.label = this.$t('form.productInfo.totalIncludingTax')
+        }
+        return true
       }
       return true
     },
@@ -299,8 +310,14 @@ export default {
       } else if (columnName === 'taxIndicator') {
         return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
+        if (this.isDisplayIncludingTax) {
+          return this.formatPrice((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal, currency)
+        }
         return this.formatPrice(row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {
+        if (this.isDisplayIncludingTax) {
+          return this.formatPrice(((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal) / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
+        }
         return this.formatPrice(row.grandTotal / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       } else if (columnName === 'DiscountTotal') {
         return this.formatPrice((row.priceList * row.quantityOrdered) * (row.discountRate / 100), currency)
