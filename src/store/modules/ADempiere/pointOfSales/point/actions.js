@@ -16,6 +16,7 @@
 
 import router from '@/router'
 import {
+  getPointOfSales,
   listPointOfSales,
   listWarehouses,
   listDocumentTypes,
@@ -30,6 +31,36 @@ import { showMessage } from '@/utils/ADempiere/notification.js'
  * Pos Actions
  */
 export default {
+  /**
+   * Load Point of Sale Data from Server
+   */
+  loadDataFromServer({ dispatch, getters }) {
+    const PointOfSales = getters.posAttributes.currentPointOfSales
+    if (!isEmptyValue(PointOfSales.uuid)) {
+      dispatch('findPointOfSales', PointOfSales.uuid)
+    }
+    dispatch('listPointOfSalesFromServer')
+  },
+  /**
+   * GET Point of Sales
+   * @param {string} posUuid POS UUID reference
+   */
+  findPointOfSales({ commit }, posUuid) {
+    getPointOfSales({
+      posUuid
+    })
+      .then(response => {
+        commit('setCurrentPointOfSales', response)
+      })
+      .catch(error => {
+        console.warn(`listPointOfSalesFromServer: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+      })
+  },
   /**
    * List point of sales terminal
    * @param {number} posToSet id to set

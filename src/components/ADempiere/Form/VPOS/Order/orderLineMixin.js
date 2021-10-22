@@ -275,6 +275,8 @@ export default {
     displayLabel(row) {
       if (row.columnName === 'ConvertedAmount') {
         return !this.isEmptyValue(this.currentPointOfSales.displayCurrency)
+      } else if (row.columnName === 'Discount') {
+        return this.currentPointOfSales.isDisplayDiscount
       } else if (row.columnName === 'DiscountTotal') {
         return this.currentPointOfSales.isDisplayDiscount
       } else if (row.columnName === 'taxIndicator') {
@@ -302,7 +304,7 @@ export default {
       }
       const currency = this.pointOfSalesCurrency.iSOCode
       if (columnName === 'CurrentPrice') {
-        return this.formatPrice(row.priceList, currency)
+        return this.formatPrice((row.priceActual * row.taxRate.rate / 100) + row.priceActual, currency)
       } else if (columnName === 'QtyEntered') {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {

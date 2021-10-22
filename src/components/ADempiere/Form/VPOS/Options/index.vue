@@ -283,7 +283,7 @@
         <el-row :gutter="24" style="padding-right: 10px;">
           <el-col :span="size">
             <el-card shadow="hover" style="height: 100px">
-              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="adviserPin ? validateOption($t('form.pos.optionsPoinSales.generalOptions.changePos')) : changePos">
+              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="adviserPin ? validateOption($t('form.pos.optionsPoinSales.generalOptions.changePos')) : changePos()">
                 <p
                   style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
                 >

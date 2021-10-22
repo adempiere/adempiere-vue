@@ -34,7 +34,7 @@ export function getPointOfSales({
     url: `${config.pointOfSales.endpoint}/point-of-sales`,
     method: 'get',
     params: {
-      point_of_sales_uuid: posUuid
+      pos_uuid: posUuid
     }
   })
     .then(posResponse => {
