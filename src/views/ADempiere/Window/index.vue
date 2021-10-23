@@ -147,6 +147,13 @@ export default defineComponent({
         )
       },
 
+      isMandatoryField({
+        isMandatory,
+        isMandatoryFromLogic
+      }) {
+        return isMandatory || isMandatoryFromLogic
+      },
+
       changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
         root.$store.dispatch('changeTabFieldShowedFromUser', {
           parentUuid,

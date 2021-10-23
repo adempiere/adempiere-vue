@@ -193,7 +193,7 @@ export default defineComponent({
         return isMandatoryFromLogic
       },
 
-      validateReadOnly({ field }) {
+      isReadOnlyField({ field }) {
         return field.isReadOnlyFromLogic
       }
     }
