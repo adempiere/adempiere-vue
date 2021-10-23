@@ -14,15 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+
 /**
  * Dictionary Process Getters
  */
-
 export default {
   getStoredProcesses: (state) => {
     return state.storedProcesses
   },
+
   getStoredProcess: (state) => (processUuid) => {
-    return state.storedProcesses.find(process => process.uuid === processUuid)
+    return state.storedProcesses[processUuid]
+  },
+
+  getStoredFieldsFromProcess: (state, getters) => (processUuid) => {
+    const process = getters.getStoredProcess(processUuid)
+    if (!isEmptyValue(process)) {
+      return process.fieldsList
+    }
+    return undefined
   }
 }

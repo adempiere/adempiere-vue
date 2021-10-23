@@ -54,7 +54,6 @@ export default {
     fieldsList = []
   }) {
     if (isEmptyValue(fieldsList)) {
-      console.log(parentUuid, 1, containerUuid)
       fieldsList = getters.getStoredFieldsFromTab(parentUuid, containerUuid)
     }
 

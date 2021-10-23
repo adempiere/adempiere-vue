@@ -69,7 +69,7 @@
 <script>
 import FieldOptions from '@/components/ADempiere/Field/FieldOptions/index.vue'
 
-import { evalutateTypeField, fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
+import { evalutateTypeField } from '@/utils/ADempiere/dictionaryUtils'
 import { TEXT } from '@/utils/ADempiere/references'
 import {
   ACTIVE, CLIENT, PROCESSING, PROCESSED
@@ -234,32 +234,35 @@ export default {
 
     isDisplayedField() {
       // validate with container manager
-      if (!this.isEmptyValue(this.containerManager) &&
-        this.containerManager.isDisplayedField) {
-        return this.containerManager.isDisplayedField(this.field) &&
-          (this.isMandatory || this.field.isShowedFromUser)
-      }
-
-      if (this.isAdvancedQuery) {
-        return this.field.isShowedFromUser
-      }
-
-      return fieldIsDisplayed(this.field) &&
+      return this.containerManager.isDisplayedField(this.field) &&
         (this.isMandatory || this.field.isShowedFromUser || this.inTable)
     },
+    /**
+     * Idicate if field is read only
+     */
+    isReadOnly() {
+      // TODO: Add validate method to record uuid uuid without route.action
+      // edit mode is diferent to create new
+      const isWithRecord = this.recordUuid !== 'create-new' &&
+        !this.isEmptyValue(this.recordUuid)
 
+      // validate with container manager
+      return this.containerManager.isReadOnlyField({
+        field: this.field,
+        preferenceClientId: this.preferenceClientId,
+        // record values
+        clientId: this.containerClientId,
+        isActive: this.containerIsActive,
+        isProcessing: this.containerIsProcessing,
+        isProcessed: this.containerIsProcessed,
+        isWithRecord
+      })
+    },
     isMandatory() {
       // validate with container manager
-      if (!this.isEmptyValue(this.containerManager) &&
-        this.containerManager.validateMandatory) {
-        return this.containerManager.isMandatoryField(this.field)
-      }
-
-      if (this.isAdvancedQuery) {
-        return false
-      }
-      return this.field.isMandatory || this.field.isMandatoryFromLogic
+      return this.containerManager.isMandatoryField(this.field)
     },
+
     isPanelWindow() {
       return this.field.panelType === 'window'
     },
@@ -306,73 +309,6 @@ export default {
     },
     preferenceClientId() {
       return this.$store.getters.getPreferenceClientId
-    },
-
-    /**
-     * Idicate if field is read only
-     * TODO: Create common method to evaluate isReadOnly
-     */
-    isReadOnly() {
-      if (this.isAdvancedQuery) {
-        if (['NULL', 'NOT_NULL'].includes(this.field.operator)) {
-          return true
-        }
-        return false
-      }
-
-      // validate with container manager
-      if (!this.isEmptyValue(this.containerManager) &&
-        this.containerManager.validateReadOnly) {
-        // TODO: Add validate method to record uuid uuid without route.action
-        // edit mode is diferent to create new
-        const isWithRecord = this.recordUuid !== 'create-new' &&
-          !this.isEmptyValue(this.recordUuid)
-        return this.containerManager.validateReadOnly({
-          field: this.field,
-          preferenceClientId: this.preferenceClientId,
-          // record values
-          clientId: this.containerClientId,
-          isActive: this.containerIsActive,
-          isProcessing: this.containerIsProcessing,
-          isProcessed: this.containerIsProcessed,
-          isWithRecord
-        })
-      }
-
-      const isUpdateableAllFields = this.field.isReadOnly || this.field.isReadOnlyFromLogic
-
-      if (this.isPanelWindow) {
-        // TODO: Evaluate record uuid without route.action
-        // edit mode is diferent to create new
-        let isWithRecord = this.field.recordUuid !== 'create-new'
-        // evaluate context
-        if ((this.preferenceClientId !== this.metadataField.clientId) && isWithRecord) {
-          return true
-        }
-
-        if (this.field.isAlwaysUpdateable) {
-          return false
-        }
-        if (this.field.isProcessingContext || this.field.isProcessedContext) {
-          return true
-        }
-
-        if (this.inTable) {
-          isWithRecord = !this.isEmptyValue(this.field.recordUuid)
-        }
-
-        return (!this.field.isUpdateable && isWithRecord) ||
-          (isUpdateableAllFields || this.field.isReadOnlyFromForm)
-      } else if (this.field.panelType === 'browser') {
-        if (this.inTable) {
-          // browser result
-          return this.field.isReadOnly
-        }
-        // query criteria
-        return this.field.isReadOnlyFromLogic
-      }
-      // other type of panels (process/report)
-      return Boolean(isUpdateableAllFields)
     },
 
     isFieldOnly() {

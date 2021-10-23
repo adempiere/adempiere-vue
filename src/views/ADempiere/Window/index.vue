@@ -113,7 +113,7 @@ export default defineComponent({
         return isDisplayed && isDisplayedFromLogic
       },
 
-      validateReadOnly({
+      isReadOnlyField({
         field,
         // records values
         preferenceClientId,

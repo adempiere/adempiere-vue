@@ -14,21 +14,81 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import router from '@/router'
+
 import { requestProcessMetadata } from '@/api/ADempiere/dictionary/process.js'
+import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 export default {
-  getProcessDefinitionFromServer({ commit }, uuid) {
+  addProcessToList({ commit }, processResponse) {
     return new Promise(resolve => {
+      commit('addProcessToList', processResponse)
+
+      resolve(processResponse)
+    })
+  },
+
+  getProcessDefinitionFromServer({ dispatch, getters }, {
+    uuid
+  }) {
+    return new Promise((resolve, reject) => {
       requestProcessMetadata({
         uuid
       })
-        .then(process => {
-          // parameters as fields in panel
-          process.fields = process.parameters
+        .then(processResponse => {
+          const { processDefinition } = generateProcess({
+            processToGenerate: processResponse
+          })
 
-          commit('addProcessToList', process)
-          resolve(process)
+          const currentRoute = router.app._route
+          const defaultAttributes = getters.getParsedDefaultValues({
+            containerUuid: processDefinition.uuid,
+            isSOTrxMenu: currentRoute.meta.isSalesTransaction,
+            fieldsList: processDefinition.fieldsList
+          })
+
+          dispatch('updateValuesOfContainer', {
+            containerUuid: processDefinition.uuid,
+            isOverWriteParent: true,
+            attributes: defaultAttributes
+          })
+
+          dispatch('addProcessToList', processDefinition)
+          resolve(processDefinition)
         })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  },
+
+  /**
+   * Used by components/fields/filterFields
+   */
+  changeProcessFieldShowedFromUser({ commit, getters }, {
+    containerUuid,
+    groupField,
+    fieldsShowed,
+    fieldsList = []
+  }) {
+    if (isEmptyValue(fieldsList)) {
+      fieldsList = getters.getStoredFieldsFromProcess(containerUuid)
+    }
+
+    fieldsList.forEach(itemField => {
+      if (groupField === itemField.groupAssigned) {
+        let isShowedFromUser = false
+        if (fieldsShowed.includes(itemField.columnName)) {
+          isShowedFromUser = true
+        }
+
+        commit('changeProcessFieldAttribute', {
+          field: itemField,
+          attributeName: 'isShowedFromUser',
+          attributeValue: isShowedFromUser
+        })
+      }
     })
   }
 }
