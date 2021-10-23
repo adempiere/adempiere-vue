@@ -29,7 +29,7 @@ export default {
     })
   },
 
-  getProcessDefinitionFromServer({ dispatch, getters }, {
+  getProcessDefinitionFromServer({ dispatch }, {
     uuid
   }) {
     return new Promise((resolve, reject) => {
@@ -41,17 +41,9 @@ export default {
             processToGenerate: processResponse
           })
 
-          const currentRoute = router.app._route
-          const defaultAttributes = getters.getParsedDefaultValues({
+          dispatch('setProcessDefaultValues', {
             containerUuid: processDefinition.uuid,
-            isSOTrxMenu: currentRoute.meta.isSalesTransaction,
             fieldsList: processDefinition.fieldsList
-          })
-
-          dispatch('updateValuesOfContainer', {
-            containerUuid: processDefinition.uuid,
-            isOverWriteParent: true,
-            attributes: defaultAttributes
           })
 
           dispatch('addProcessToList', processDefinition)
@@ -89,6 +81,37 @@ export default {
           attributeValue: isShowedFromUser
         })
       }
+    })
+  },
+
+  /**
+   * Set default values to panel
+   * @param {string}  parentUuid
+   * @param {string}  containerUuid
+   */
+  setProcessDefaultValues({ dispatch, getters }, {
+    containerUuid,
+    fieldsList = []
+  }) {
+    return new Promise(resolve => {
+      if (isEmptyValue(fieldsList)) {
+        fieldsList = getters.getStoredFieldsFromProcess(containerUuid)
+      }
+
+      const currentRoute = router.app._route
+      const defaultAttributes = getters.getParsedDefaultValues({
+        containerUuid,
+        isSOTrxMenu: currentRoute.meta.isSalesTransaction,
+        fieldsList
+      })
+
+      dispatch('updateValuesOfContainer', {
+        containerUuid,
+        isOverWriteParent: true,
+        attributes: defaultAttributes
+      })
+
+      resolve(defaultAttributes)
     })
   }
 }
