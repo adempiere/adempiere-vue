@@ -78,7 +78,7 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 
-import { BUTTON } from '@/utils/ADempiere/references'
+import { isHiddenField } from '@/utils/ADempiere/references'
 import { sharedLink } from '@/utils/ADempiere/constants/actionsMenuList'
 
 export default defineComponent({
@@ -182,7 +182,7 @@ export default defineComponent({
        */
       isDisplayedField({ displayType, isActive, isQueryCriteria }) {
         // button field not showed
-        if (displayType === BUTTON.id) {
+        if (isHiddenField(displayType)) {
           return false
         }
 
@@ -205,8 +205,8 @@ export default defineComponent({
        * Is displayed column in table multi record
        */
       isDisplayedColumn({ displayType, isActive, isDisplayed, isDisplayedFromLogic, isKey }) {
-        // button field not showed
-        if (isKey || displayType === BUTTON.id) {
+        // column check to selection or button field not showed
+        if (isKey || isHiddenField(displayType)) {
           return false
         }
 
@@ -217,7 +217,7 @@ export default defineComponent({
         return isMandatory || isMandatoryFromLogic
       },
 
-      validateReadOnly({ field }) {
+      isReadOnlyColumn({ field }) {
         return field.isReadOnly
       }
     }

@@ -67,6 +67,7 @@ import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 import { convertProcess } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
 import { sharedLink } from '@/utils/ADempiere/constants/actionsMenuList'
+import { isHiddenField } from '@/utils/ADempiere/references'
 
 export default defineComponent({
   name: 'ProcessView',
@@ -160,7 +161,12 @@ export default defineComponent({
         // })
       },
 
-      isDisplayedField: ({ isDisplayed, isDisplayedFromLogic, isActive }) => {
+      isDisplayedField: ({ displayType, isDisplayed, isDisplayedFromLogic, isActive }) => {
+        // button field not showed
+        if (isHiddenField(displayType)) {
+          return false
+        }
+
         // verify if field is active
         if (!isActive) {
           return false

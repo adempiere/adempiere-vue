@@ -223,8 +223,8 @@ export default {
         isPanelWindow: this.isPanelWindow,
         isAdvancedQuery: this.isAdvancedQuery,
         // DOM properties
-        required: this.isMandatory,
-        readonly: this.isReadOnly,
+        required: this.isMandatoryField,
+        readonly: this.isReadOnlyField,
         displayed: this.isDisplayedField,
         disabled: !this.field.isActive,
         isSelectCreated: this.isSelectCreated,
@@ -235,12 +235,12 @@ export default {
     isDisplayedField() {
       // validate with container manager
       return this.containerManager.isDisplayedField(this.field) &&
-        (this.isMandatory || this.field.isShowedFromUser || this.inTable)
+        (this.isMandatoryField || this.field.isShowedFromUser || this.inTable)
     },
     /**
      * Idicate if field is read only
      */
-    isReadOnly() {
+    isReadOnlyField() {
       // TODO: Add validate method to record uuid uuid without route.action
       // edit mode is diferent to create new
       const isWithRecord = this.recordUuid !== 'create-new' &&
@@ -258,7 +258,7 @@ export default {
         isWithRecord
       })
     },
-    isMandatory() {
+    isMandatoryField() {
       // validate with container manager
       return this.containerManager.isMandatoryField(this.field)
     },

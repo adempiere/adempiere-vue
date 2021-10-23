@@ -596,8 +596,17 @@ export const FIELDS_RANGE = [
  * Fields not showed in panel's
  */
 export const FIELDS_HIDDEN = [
-  BUTTON
+  BUTTON.id
 ]
+
+/**
+ * Hidden field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isHiddenField(displayType) {
+  FIELDS_HIDDEN.includes(displayType)
+}
 
 export const COLUMN_IS_ACTIVE = {
   columnName: 'IsActive', // column name of field
