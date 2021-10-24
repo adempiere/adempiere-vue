@@ -85,7 +85,9 @@ export function generateTabs({
     return generatePanelAndFields({
       parentUuid,
       containerUuid: tabItem.uuid,
-      panelMetadata: tab
+      panelMetadata: tab,
+      isAddFieldUuid: true,
+      isAddLinkColumn: true
     })
   })
 

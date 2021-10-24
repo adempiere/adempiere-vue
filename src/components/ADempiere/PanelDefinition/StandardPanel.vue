@@ -56,7 +56,7 @@
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
 
-import FieldDefinition from '@/components/ADempiere/Field'
+import FieldDefinition from '@/components/ADempiere/Field/index.vue'
 import FilterFields from '@/components/ADempiere/FilterFields'
 
 export default defineComponent({

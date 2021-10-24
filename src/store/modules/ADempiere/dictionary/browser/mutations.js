@@ -38,6 +38,18 @@ export default {
     }
 
     state.storedBrowsers[uuid][attributeName] = value
+  },
+
+  /**
+   * Change field browser attribute
+   * @param {object} field
+   * @param {string} attributeName
+   * @param {mixed} attributeValue
+   */
+  changeBrowserFieldAttribute(state, payload) {
+    const { attributeName, attributeValue } = payload
+
+    payload.field[attributeName] = attributeValue
   }
 
 }

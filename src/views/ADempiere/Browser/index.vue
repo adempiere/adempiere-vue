@@ -20,7 +20,7 @@
   <el-container
     v-if="isLoadedMetadata"
     key="browser-loaded"
-    class="view-base"
+    class="view-base browser-view"
     style="height: 86vh;"
   >
     <el-header v-if="isShowContextMenu">
@@ -41,10 +41,11 @@
     <el-main>
       <el-collapse
         v-model="openedCriteria"
-        class="container-collasep-open"
+        class="browser-collapse"
       >
         <el-collapse-item :title="$t('views.searchCriteria')" name="opened-criteria">
           <panel-definition
+            class="browser-query-criteria"
             :container-uuid="browserUuid"
             :panel-metadata="browserMetadata"
             :container-manager="containerManager"
@@ -54,6 +55,7 @@
 
       <!-- result of records in the table -->
       <default-table
+        class="browser-table-result"
         :container-uuid="browserUuid"
         :container-manager="containerManagerTable"
         :panel-metadata="browserMetadata"
@@ -195,6 +197,13 @@ export default defineComponent({
 
       isReadOnlyField({ field }) {
         return field.isReadOnlyFromLogic
+      },
+
+      changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
+        root.$store.dispatch('changeBrowserFieldShowedFromUser', {
+          containerUuid,
+          fieldsShowed
+        })
       }
     }
 
@@ -251,10 +260,16 @@ export default defineComponent({
 })
 </script>
 
-<style>
+<style lang="scss">
 /* removes the title link effect on collapse */
 .el-collapse-item__header:hover {
   background-color: #fcfcfc;
+}
+
+.browser-view {
+  .browser-collapse {
+    margin-bottom: 10px;
+  }
 }
 </style>
 <style scoped>

@@ -62,7 +62,7 @@ export default defineComponent({
     }
 
     const componentRender = computed(() => {
-      return () => import('@/components/ADempiere/PanelDefinition/StandardPanel')
+      return () => import('@/components/ADempiere/PanelDefinition/StandardPanel.vue')
     })
 
     /**
