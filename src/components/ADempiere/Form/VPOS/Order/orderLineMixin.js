@@ -135,15 +135,6 @@ export default {
       return this.currentPointOfSales.isDisplayIncludingTax
     }
   },
-  watch: {
-    isShowKeyLayout(value) {
-      if (!value) {
-        this.orderLineDefinition.lineDescription.size = 'auto'
-      } else {
-        this.orderLineDefinition.lineDescription.size = '250px'
-      }
-    }
-  },
   methods: {
     formatPercent,
     formatDateToSend,
@@ -318,7 +309,8 @@ export default {
         return this.formatPrice(row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {
         if (this.isDisplayIncludingTax) {
-          return this.formatPrice(((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal) / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
+          const price = ((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal).toFixed(2)
+          return this.formatPrice(price / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
         }
         return this.formatPrice(row.grandTotal / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       } else if (columnName === 'DiscountTotal') {
