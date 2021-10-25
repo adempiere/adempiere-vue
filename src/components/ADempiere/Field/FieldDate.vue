@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-date-picker
     :ref="metadata.columnName"
@@ -42,10 +43,18 @@
 <script>
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 import { DATE_PLUS_TIME } from '@/utils/ADempiere/references'
+import { OPERATORS_MULTIPLE_VALUES } from '@/utils/ADempiere/dataUtils'
 
+/**
+ * TODO: Improves set values into store and set in vales in component
+ */
 export default {
   name: 'FieldDate',
-  mixins: [fieldMixin],
+
+  mixins: [
+    fieldMixin
+  ],
+
   data() {
     return {
       pickerOptionsDate: {
@@ -112,10 +121,11 @@ export default {
       }
     }
   },
+
   computed: {
     typePicker() {
       let picker = 'date'
-      if (['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery) {
+      if (this.isMultipleValues) {
         picker += 's'
         return picker
       }
@@ -134,6 +144,10 @@ export default {
         styleClass += this.metadata.cssClassName
       }
       return styleClass
+    },
+    isMultipleValues() {
+      return this.metadata.isAdvancedQuery &&
+        OPERATORS_MULTIPLE_VALUES.includes(this.metadata.operator)
     },
     /**
      * Parse the date format to be compatible with element-ui
@@ -201,22 +215,34 @@ export default {
         return value
       },
       set(value) {
-        let startValue = value
-        if (Array.isArray(value)) {
+        let startValue, endValue
+        startValue = value
+
+        if (this.metadata.isRange && !this.metadata.inTable && Array.isArray(value)) {
           startValue = value[0]
+          endValue = value[1]
         }
+
+        if (startValue === null) {
+          startValue = undefined
+          endValue = undefined
+        }
+
+        if (typeof startValue !== 'object' && startValue !== undefined) {
+          startValue = new Date(startValue)
+          endValue = new Date(endValue)
+        }
+
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           columnName: this.metadata.columnName,
           value: startValue
         })
+
         if (!this.metadata.isRange) {
           return
         }
-
-        const endValue = value[1]
-
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
@@ -226,17 +252,18 @@ export default {
       }
     }
   },
+
   methods: {
     parseValue(value) {
       // not return undefined to v-model
       if (this.isEmptyValue(value)) {
-        if (['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery) {
+        if (this.isMultipleValues) {
           return []
         }
         return null
       }
 
-      if (['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery) {
+      if (this.isMultipleValues) {
         if (Array.isArray(value)) {
           value = value.map(itemValue => {
             if (typeof itemValue === 'object') {
@@ -261,7 +288,7 @@ export default {
 
       // generate range value
       if (this.metadata.isRange && !this.metadata.inTable) {
-        let valueTo // = this.metadata.valueTo
+        let valueTo
         if (Array.isArray(value)) {
           valueTo = value[1]
           value = value[0]

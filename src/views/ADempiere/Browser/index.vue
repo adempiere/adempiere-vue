@@ -24,18 +24,19 @@
     style="height: 86vh;"
   >
     <el-header v-if="isShowContextMenu">
-      <action-menu
-        :parent-uuid="browserUuid"
-        :actions-manager="actionsManager"
-        :relations-manager="relationsManager"
-      />
-
       <div class="center" style="width: 100%">
+        <!-- TODO: Correct when the title is large -->
         <title-and-help
           :name="browserMetadata.name"
           :help="browserMetadata.help"
         />
       </div>
+
+      <action-menu
+        :container-uuid="browserUuid"
+        :actions-manager="actionsManager"
+        :relations-manager="relationsManager"
+      />
     </el-header>
 
     <el-main>
@@ -74,14 +75,23 @@
 <script>
 import { computed, defineComponent, ref } from '@vue/composition-api'
 
+// componets
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 
-import { isHiddenField } from '@/utils/ADempiere/references'
-import { sharedLink } from '@/utils/ADempiere/constants/actionsMenuList'
+// utils and helpers methods
+import {
+  refreshBrowserSearh,
+  sharedLink
+} from '@/utils/ADempiere/constants/actionsMenuList'
+import {
+  isDisplayedField, isDisplayedColumn,
+  isMandatoryField, isMandatoryColumn,
+  isReadOnlyField, isReadOnlyColumn
+} from '@/utils/ADempiere/dictionary/browser.js'
 
 export default defineComponent({
   name: 'BrowserView',
@@ -127,11 +137,20 @@ export default defineComponent({
       return root.$store.state.settings.showContextMenu
     })
 
+    const isReadyToSearch = computed(() => {
+      if (browserMetadata.value.awaitForValuesToQuery) {
+        return false
+      }
+      return root.isEmptyValue(root.$store.getters.getBrowserFieldsEmptyMandatory({
+        containerUuid: browserUuid
+      }))
+    })
+
     const openedCriteria = computed({
       get() {
         // by default criteria if closed
         const openCriteria = []
-        const browser = browserMetadata.value
+        const browser = storedBrowser.value
         if (!root.isEmptyValue(browser)) {
           if (browser.isShowedCriteria) {
             // open criteria
@@ -155,7 +174,7 @@ export default defineComponent({
     })
 
     const tableHeader = computed(() => {
-      return browserMetadata.value.fieldsList
+      return storedBrowser.value.fieldsList
     })
 
     function getBrowserDefinition() {
@@ -169,34 +188,58 @@ export default defineComponent({
       root.$store.dispatch('getBrowserDefinitionFromServer', browserUuid)
         .then(browserResponse => {
           browserMetadata.value = browserResponse
+
+          defaultSearch()
         }).finally(() => {
           isLoadedMetadata.value = true
         })
     }
 
+    function defaultSearch() {
+      // if (this.isLoadedRecords) {
+      //   // not research
+      //   return
+      // }
+      if (isReadyToSearch.value) {
+        // first search by default
+        root.$store.dispatch('getBrowserSearch', {
+          containerUuid: browserUuid
+        })
+
+        // hide showed criteria
+        root.$store.commit('changeBrowserAttribute', {
+          uuid: browserUuid,
+          attributeName: 'isShowedCriteria',
+          attributeValue: false
+        })
+        return
+      }
+      // set default values into data
+      // this.$store.dispatch('setRecordSelection', {
+      //   containerUuid: this.browserUuid,
+      //   panelType: this.panelType
+      // })
+    }
+
     const containerManager = {
-      actionPerformed({ field, value }) {
-        console.log(value)
+      actionPerformed({ field, value, valueTo, containerUuid }) {
+        root.$store.dispatch('browserActionPerformed', {
+          containerUuid,
+          field,
+          value,
+          valueTo
+        })
       },
 
       /**
        * Is displayed field in panel single record
        */
-      isDisplayedField({ displayType, isActive, isQueryCriteria }) {
-        // button field not showed
-        if (isHiddenField(displayType)) {
-          return false
-        }
+      isDisplayedField,
 
-        return isActive && isQueryCriteria
-      },
-
-      isMandatoryField({ isMandatoryFromLogic }) {
-        return isMandatoryFromLogic
-      },
+      isMandatoryField,
 
       isReadOnlyField({ field }) {
-        return field.isReadOnlyFromLogic
+        return isReadOnlyField(field)
       },
 
       changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
@@ -213,26 +256,18 @@ export default defineComponent({
       /**
        * Is displayed column in table multi record
        */
-      isDisplayedColumn({ displayType, isActive, isDisplayed, isDisplayedFromLogic, isKey }) {
-        // column check to selection or button field not showed
-        if (isKey || isHiddenField(displayType)) {
-          return false
-        }
+      isDisplayedColumn,
 
-        return isActive && isDisplayed && isDisplayedFromLogic
-      },
+      isMandatoryColumn,
 
-      isMandatoryColumn({ isMandatory, isMandatoryFromLogic }) {
-        return isMandatory || isMandatoryFromLogic
-      },
-
-      isReadOnlyColumn({ field }) {
-        return field.isReadOnly
-      }
+      isReadOnlyColumn
     }
 
     const actionsManager = ref({
+      containerUuid: browserUuid,
+
       getActionList: () => [
+        refreshBrowserSearh,
         sharedLink
       ]
     })

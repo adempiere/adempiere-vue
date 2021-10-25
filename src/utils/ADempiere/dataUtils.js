@@ -207,3 +207,13 @@ export const FIELD_OPERATORS_LIST = [
   OPERATORS_FIELD_TIME,
   OPERATORS_FIELD_YES_NO
 ]
+
+export const OPERATORS_MULTIPLE_VALUES = [
+  OPERATOR_IN.operator,
+  OPERATOR_NOT_IN.operator
+]
+
+export const OPERATORS_IGNORE_VALUE = [
+  OPERATOR_NULL.operator,
+  OPERATOR_NOT_NULL.operator
+]

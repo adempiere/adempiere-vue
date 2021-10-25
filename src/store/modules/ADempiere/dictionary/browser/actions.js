@@ -19,6 +19,7 @@ import router from '@/router'
 import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser.js'
 import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { isDisplayedField, isMandatoryField } from '@/utils/ADempiere/dictionary/browser.js'
 
 export default {
   getBrowserDefinitionFromServer({ commit, dispatch }, uuid) {
@@ -29,7 +30,10 @@ export default {
         .then(browserResponse => {
           const browserDefinition = generatePanelAndFields({
             containerUuid: uuid,
-            panelMetadata: browserResponse,
+            panelMetadata: {
+              ...browserResponse,
+              isShowedCriteria: true
+            },
             isAddFieldsRange: true,
             fieldOverwrite: {
               isShowedFromUser: false
@@ -81,9 +85,8 @@ export default {
   /**
    * Used by components/fields/filterFields
    */
-  changeBrowserFieldShowedFromUser({ commit, getters }, {
+  changeBrowserFieldShowedFromUser({ commit, dispatch, getters, rootGetters }, {
     containerUuid,
-    groupField,
     fieldsShowed,
     fieldsList = []
   }) {
@@ -91,20 +94,47 @@ export default {
       fieldsList = getters.getStoredFieldsFromBrowser(containerUuid)
     }
 
-    fieldsList.forEach(itemField => {
-      if (groupField === itemField.groupAssigned) {
-        let isShowedFromUser = false
-        if (fieldsShowed.includes(itemField.columnName)) {
-          isShowedFromUser = true
-        }
+    let isChangedDisplayedWithValue = false
 
-        commit('changeBrowserFieldAttribute', {
-          field: itemField,
-          attributeName: 'isShowedFromUser',
-          attributeValue: isShowedFromUser
+    fieldsList.forEach(itemField => {
+      const { isShowedFromUser: isShowedOriginal, columnName } = itemField
+
+      let isShowedFromUser = false
+      if (fieldsShowed.includes(columnName)) {
+        isShowedFromUser = true
+      }
+
+      // not query criteria or mandatory (user display is not affected)
+      if (isShowedOriginal === isShowedFromUser ||
+        !isDisplayedField(itemField) || isMandatoryField(itemField)) {
+        return
+      }
+
+      commit('changeBrowserFieldAttribute', {
+        field: itemField,
+        attributeName: 'isShowedFromUser',
+        attributeValue: isShowedFromUser
+      })
+
+      if (!isChangedDisplayedWithValue) {
+        const value = rootGetters.getValueOfField({
+          containerUuid,
+          columnName
         })
+        // if isShowedFromUser was changed with value, the SmartBrowser
+        // must send the parameters to update the search result
+        if (!isEmptyValue(value)) {
+          isChangedDisplayedWithValue = true
+        }
       }
     })
+
+    if (isChangedDisplayedWithValue) {
+      dispatch('getBrowserSearch', {
+        containerUuid,
+        isClearSelection: true
+      })
+    }
   }
 
 }

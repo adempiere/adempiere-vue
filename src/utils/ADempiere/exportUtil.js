@@ -17,7 +17,7 @@
 import { export_json_to_excel } from '@/vendor/Export2Excel'
 import { export_txt_to_zip } from '@/vendor/Export2Zip'
 import language from '@/lang'
-import { convertBooleanToTranslationLang } from '@/utils/ADempiere/valueFormat.js'
+import { convertBooleanToTranslationLang } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 export const reportFormatsList = [

@@ -582,15 +582,38 @@ const REFERENCES = [
 export default REFERENCES
 
 export const FIELDS_RANGE = [
-  AMOUNT,
-  COSTS_PLUS_PRICES,
-  DATE,
-  DATE_PLUS_TIME,
-  INTEGER,
-  NUMBER,
-  QUANTITY,
-  TIME
+  AMOUNT.id,
+  COSTS_PLUS_PRICES.id,
+  DATE.id,
+  DATE_PLUS_TIME.id,
+  INTEGER.id,
+  NUMBER.id,
+  QUANTITY.id,
+  TIME.id
 ]
+
+/**
+ * Is range field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isRangeField(displayType) {
+  return FIELDS_RANGE.includes(displayType)
+}
+
+/**
+ * Is manage range to in other field
+ * @param {boolean} isRange
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isAddRangeField({ isRange, displayType }) {
+  if (!isRange) {
+    return false
+  }
+
+  return isNumberField(displayType)
+}
 
 /**
  * Fields not showed in panel's
@@ -671,3 +694,12 @@ export const FIELDS_CURRENCY = [
   AMOUNT.id,
   COSTS_PLUS_PRICES.id
 ]
+
+/**
+ * Is number field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isNumberField(displayType) {
+  return FIELDS_QUANTITY.includes(displayType)
+}

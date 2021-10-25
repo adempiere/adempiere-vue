@@ -37,7 +37,7 @@ export default {
       value = state.storedBrowsers[uuid][attributeNameControl]
     }
 
-    state.storedBrowsers[uuid][attributeName] = value
+    Vue.set(state.storedBrowsers[uuid], attributeName, value)
   },
 
   /**

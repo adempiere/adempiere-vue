@@ -41,8 +41,9 @@ import { defineComponent, computed } from '@vue/composition-api'
 import { COLUMNS_NAME_DOCUMENT_STATUS, FIELDS_CURRENCY } from '@/utils/ADempiere/references.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 import {
-  formatField, formatPrice, formatQuantity, convertBooleanToTranslationLang
+  formatField, formatPrice, formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
+import { convertBooleanToTranslationLang } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
 export default defineComponent({
   name: 'CellInfo',
