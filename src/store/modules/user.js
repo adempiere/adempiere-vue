@@ -343,6 +343,11 @@ const actions = {
     })
   },
 
+  /**
+   * Get list of organizations
+   * @param {string} roleUuid
+   * @returns
+   */
   getOrganizationsListFromServer({ commit, dispatch, getters }, roleUuid) {
     if (isEmptyValue(roleUuid)) {
       roleUuid = getCurrentRole()
