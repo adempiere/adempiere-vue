@@ -48,7 +48,7 @@ const state = {
   isSession: false,
   sessionInfo: {},
   corporateBrandingImage: '',
-  currentOrganization: 0
+  currentOrganizationId: 0
 }
 
 const mutations = {
@@ -73,8 +73,8 @@ const mutations = {
   SET_ORGANIZATIONS_LIST: (state, payload) => {
     state.organizationsList = payload
   },
-  SET_CURRENT_ORGANIZATIONS: (state, payload) => {
-    state.currentOrganization = payload
+  SET_CURRENT_ORGANIZATION_ID: (state, payload) => {
+    state.currentOrganizationId = payload
   },
   SET_ORGANIZATION: (state, organization) => {
     state.organization = organization
@@ -176,12 +176,12 @@ const actions = {
           const { role } = sessionInfo
           commit('SET_ROLE', role)
           setCurrentRole(role.uuid)
-          const currentOrganizationSession = sessionInfo.defaultContext.find(context => {
+          const organizationIdOfSession = sessionInfo.defaultContext.find(context => {
             if (context.key === '#AD_Org_ID') {
               return context
             }
           })
-          commit('SET_CURRENT_ORGANIZATIONS', currentOrganizationSession.value)
+          commit('SET_CURRENT_ORGANIZATION_ID', organizationIdOfSession.value)
 
           // wait to establish the client and organization to generate the menu
           await dispatch('getOrganizationsListFromServer', role.uuid)
@@ -274,7 +274,10 @@ const actions = {
       // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
       dispatch('tagsView/delAllViews', null, { root: true })
 
+      // clear sesion cookies
       removeCurrentRole()
+      removeCurrentOrganization()
+      removeCurrentWarehouse()
       resetRouter()
       logout(token).catch(error => {
         console.warn(error)
@@ -344,32 +347,39 @@ const actions = {
     if (isEmptyValue(roleUuid)) {
       roleUuid = getCurrentRole()
     }
+
+    const currentOrganizationId = getters.getCurrentOrgId
+    const currentOrganizationUuid = getCurrentOrganization()
+
     return requestOrganizationsList({ roleUuid })
       .then(response => {
         commit('SET_ORGANIZATIONS_LIST', response.organizationsList)
-        let organization = response.organizationsList.find(item => {
-          if (item.uuid === getCurrentOrganization()) {
-            return item
-          }
-        })
-        if (isEmptyValue(organization)) {
-          organization = response.organizationsList[0]
-        }
-        if (isEmptyValue(organization)) {
-          removeCurrentOrganization()
-          organization = undefined
-        } else {
-          setCurrentOrganization(organization.uuid)
-        }
-        const currentOrganization = getters.getCurrentOrg
-        if (!isEmptyValue(currentOrganization)) {
+
+        let organization
+        // set with uuid
+        if (!isEmptyValue(currentOrganizationUuid)) {
           organization = response.organizationsList.find(item => {
-            if (item.id === currentOrganization) {
+            if (item.uuid === currentOrganizationUuid) {
               return item
             }
           })
         }
+        // set with id
+        if (isEmptyValue(organization) && !isEmptyValue(currentOrganizationId)) {
+          organization = response.organizationsList.find(item => {
+            if (item.id === currentOrganizationId) {
+              return item
+            }
+          })
+        }
+        // set first of list
+        if (isEmptyValue(organization)) {
+          organization = response.organizationsList[0]
+        }
+
+        setCurrentOrganization(organization.uuid)
         commit('SET_ORGANIZATION', organization)
+        commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
         commit('setPreferenceContext', {
           columnName: '#AD_Org_ID',
           value: organization.id
@@ -411,13 +421,13 @@ const actions = {
         setCurrentOrganization(organizationUuid)
         const organization = getters.getOrganizations.find(org => org.uuid === organizationUuid)
         commit('SET_ORGANIZATION', organization)
-
-        // commit('setPreferenceContext', {
-        //   columnName: '#AD_Org_ID',
-        //   value: organizationId
-        // }, {
-        //   root: true
-        // })
+        commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
+        commit('setPreferenceContext', {
+          columnName: '#AD_Org_ID',
+          value: organization.id
+        }, {
+          root: true
+        })
 
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
@@ -598,8 +608,8 @@ const getters = {
   getIsPersonalLock: (state) => {
     return state.role.isPersonalLock
   },
-  getCurrentOrg: (state) => {
-    return state.currentOrganization
+  getCurrentOrgId: (state) => {
+    return state.currentOrganizationId
   }
 }
 
