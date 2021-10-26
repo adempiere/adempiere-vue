@@ -29,7 +29,13 @@
       @submit.native.prevent="notSubmitForm"
     >
       <el-form-item label="Código Producto">
-        <el-input v-model="input" :placeholder="$t('quickAccess.searchWithEnter')" @input="searchProduct" />
+        <el-input
+          ref="inputFindProduct"
+          v-model="input"
+          :autofocus="true"
+          :placeholder="$t('quickAccess.searchWithEnter')"
+          @input="searchProduct"
+        />
       </el-form-item>
     </el-form>
     <el-table
@@ -215,6 +221,10 @@ export default {
     popoverName: {
       type: String,
       default: 'isShowPopoverField'
+    },
+    isVisible: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -295,6 +305,13 @@ export default {
       if (!this.isEmptyValue(this.$refs.open)) {
         this.$refs.open.showPopper = false
         this.$refs.open.destroyPopper()
+      }
+    },
+    isVisible(value) {
+      if (value) {
+        this.timeOut = setTimeout(() => {
+          this.$refs.inputFindProduct.focus()
+        }, 500)
       }
     }
   },

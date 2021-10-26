@@ -26,5 +26,6 @@ export {
   formatConversionCurrenty,
   round,
   convertValuesToSend,
-  typeValue
+  typeValue,
+  checkDigitCalculation
 } from '@/utils/ADempiere/valueUtils.js'

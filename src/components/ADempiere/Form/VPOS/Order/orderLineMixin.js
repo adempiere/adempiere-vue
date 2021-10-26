@@ -162,10 +162,11 @@ export default {
       this.$store.dispatch('updateOrderLines', orderLine)
     },
     createOrderLine(orderUuid) {
-      const productUuid = this.product.uuid
+      const productUuid = this.product.product.uuid
       createOrderLine({
         orderUuid,
         productUuid,
+        quantity: this.product.weight,
         priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
         warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
       })
@@ -275,7 +276,7 @@ export default {
       } else if (row.columnName === 'DisplayTaxAmount') {
         return this.currentPointOfSales.isDisplayTaxAmount
       } else if (row.columnName === 'GrandTotal') {
-        if (this.isDisplayIncludingTax) {
+        if (!this.isDisplayDiscount && !this.isDisplayTaxAmount) {
           this.orderLineDefinition.grandTotal.label = this.$t('form.productInfo.totalIncludingTax')
         }
         return true
@@ -303,12 +304,12 @@ export default {
       } else if (columnName === 'taxIndicator') {
         return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
-        if (this.isDisplayIncludingTax) {
+        if (!this.isDisplayDiscount && !this.isDisplayTaxAmount) {
           return this.formatPrice((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal, currency)
         }
         return this.formatPrice(row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {
-        if (this.isDisplayIncludingTax) {
+        if (!this.isDisplayDiscount && !this.isDisplayTaxAmount) {
           const price = ((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal).toFixed(2)
           return this.formatPrice(price / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
         }

@@ -552,6 +552,9 @@ export function convertValuesToSendListOrders(values) {
   })
   return valuesToSend
 }
+export function checkDigitCalculation(upc) {
+  return { code: upc.slice(1, 6), weight: upc.slice(6, 11) }
+}
 /**
  * Search in the currency lists for the current currency
  * @author Elsio Sanchez <elsiosanches@gmail.com>

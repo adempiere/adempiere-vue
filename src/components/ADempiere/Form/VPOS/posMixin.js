@@ -41,7 +41,10 @@ export default {
   },
   data() {
     return {
-      product: {},
+      product: {
+        product: '',
+        quantity: 0
+      },
       currentTable: 0,
       orderLines: [],
       products: {
@@ -486,12 +489,18 @@ export default {
         value: uuid
       })
     },
+    findScale(UPC) {
+      if (this.currentPointOfSales.scale && UPC.length <= 12) {
+        return this.checkDigitCalculation(UPC)
+      }
+      return UPC
+    },
     findProduct(searchValue) {
       if (this.withoutPOSTerminal()) {
         return
       }
-
-      const searchProduct = (typeof searchValue === 'object') ? searchValue.value : searchValue
+      this.product = this.findScale(searchValue)
+      const searchProduct = (typeof this.findScale(searchValue) === 'object') ? this.product.code : ((typeof searchValue === 'object') ? searchValue.value : searchValue)
       if (this.isEmptyValue(this.curretnPriceList)) {
         return
       }
@@ -502,7 +511,7 @@ export default {
         warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
       })
         .then(productPrice => {
-          this.product = productPrice.product
+          this.product.product = productPrice.product
           this.createOrder({ withLine: true })
         })
         .catch(error => {
