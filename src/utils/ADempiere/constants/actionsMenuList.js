@@ -121,7 +121,8 @@ export const deleteRecord = {
 }
 
 /**
- * Delete record (entity) with record
+ * Zoom in on the window associated with the smart browser
+ * @param {string} uuid of window
  */
 export const zoomWindow = {
   name: language.t('actionMenu.zoomWindow'),
