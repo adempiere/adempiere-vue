@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,11 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
-import { ACCOUNTING_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'
-import evaluator from '@/utils/ADempiere/evaluator'
 import store from '@/store'
+
+// constants
+import { ACCOUNTING_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'
+
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+import evaluator from '@/utils/ADempiere/evaluator'
 
 export default evaluator
 

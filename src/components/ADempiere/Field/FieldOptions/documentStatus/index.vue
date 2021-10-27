@@ -39,7 +39,7 @@
       v-if="isEmptyValue(valueActionDocument)"
       :type="tagStatus(fieldAttributes.value)"
     >
-      {{ fieldAttributes.displayColumn }}
+      {{ fieldAttributes.displayColumnName }}
     </el-tag>
     <el-tag
       v-else
@@ -73,6 +73,7 @@ export default {
       valueActionDocument: ''
     }
   },
+
   computed: {
     withoutRecord() {
       // TODO: Validate with record attribute
@@ -114,6 +115,7 @@ export default {
       return this.$store.getters.getOrders
     }
   },
+
   methods: {
     listActionDocument(isShowList) {
       if (isShowList) {

@@ -193,7 +193,6 @@
                       :in-table="true"
                       :metadata-field="{
                         ...fieldAttributes,
-                        displayColumn: scope.row[fieldAttributes.displayColumnName],
                         tableIndex: scope.$index,
                         rowKey: scope.row[panelMetadata.keyColumn],
                         keyColumn: panelMetadata.keyColumn,

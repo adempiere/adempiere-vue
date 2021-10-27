@@ -43,8 +43,11 @@
 </template>
 
 <script>
+// mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import { convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
+
+// utils and helper methods
+import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
 /**
  * This component is a lookup type field, use as a replacement for fields:
@@ -58,7 +61,11 @@ import { convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
  */
 export default {
   name: 'FieldSelect',
-  mixins: [fieldMixin],
+
+  mixins: [
+    fieldMixin
+  ],
+
   data() {
     // label with '' value is assumed to be undefined non-existent
     const label = ' '
@@ -75,6 +82,7 @@ export default {
       blankOption
     }
   },
+
   computed: {
     isPanelWindow() {
       return this.metadata.panelType === 'window'
@@ -231,6 +239,7 @@ export default {
       }
     }
   },
+
   watch: {
     isSelectMultiple(isMultiple) {
       let value = this.value
@@ -259,9 +268,11 @@ export default {
       }
     }
   },
+
   created() {
     this.changeBlankOption()
   },
+
   beforeMount() {
     if (this.metadata.displayed) {
       this.optionsList = this.getterLookupAll
@@ -272,13 +283,12 @@ export default {
           this.displayedValue = option.label
           this.uuidValue = option.uuid
         } else {
-          // TODO: Property displayColumn is @deprecated
-          if (!this.isEmptyValue(this.metadata.displayColumn)) {
+          if (!this.isEmptyValue(this.metadata.displayColumnName)) {
             // verify if exists to add
             this.optionsList.push({
               id: value,
               // TODO: Add uuid
-              label: this.metadata.displayColumn
+              label: this.metadata.displayColumnName
             })
           } else {
             if (!this.isPanelWindow || (this.isPanelWindow &&
@@ -291,6 +301,7 @@ export default {
       }
     }
   },
+
   methods: {
     parseValue(value) {
       if (typeof value === 'boolean') {

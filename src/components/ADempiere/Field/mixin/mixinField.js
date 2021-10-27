@@ -186,7 +186,7 @@ export default {
     /**
      * @param {mixed} value, main value in component
      * @param {mixed} valueTo, used in end value in range
-     * @param {string} label, or displayColumn to show in select
+     * @param {string} label, or displayColumnName to show in select
      */
     handleFieldChange({
       value,

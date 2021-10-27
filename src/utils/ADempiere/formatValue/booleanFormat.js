@@ -28,3 +28,16 @@ export const convertBooleanToTranslationLang = (booleanValue) => {
 
   return language.t('components.switchInactiveText')
 }
+
+/**
+ * Convert boolean value to string value
+ * @param {boolean} booleanValue
+ * @returns {strin}
+ */
+export const convertBooleanToString = (booleanValue) => {
+  if (booleanValue === true || booleanValue === 'true' || booleanValue === 'Y') {
+    return 'Y'
+  }
+
+  return 'N'
+}

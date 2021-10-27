@@ -216,12 +216,12 @@ const getters = {
         attributesObject[fieldItem.columnName] = valueToReturn
 
         // Add display columns if field has value
-        if (fieldItem[propertyName] && fieldItem.displayColumn) {
-          // TODO: Verify displayColumn attribute, or get dispay column to fieldValue store
-          attributesObject[fieldItem.displayColumnName] = fieldItem.displayColumn
+        if (fieldItem[propertyName] && fieldItem.displayColumnName) {
+          // TODO: Verify displayColumnName attribute, or get dispay column to fieldValue store
+          attributesObject[fieldItem.displayColumnName] = fieldItem.displayColumnName
           displayColumnsList.push({
             columnName: fieldItem.displayColumnName,
-            value: fieldItem.displayColumn
+            value: fieldItem.displayColumnName
           })
         }
 
@@ -313,8 +313,8 @@ const getters = {
 
         // add display column to default
         if (fieldItem.componentPath === 'FieldSelect' && fieldItem.value === parsedDefaultValue) {
-          // TODO: Verify displayColumn attribute, or get dispay column to fieldValue store
-          attributesObject[fieldItem.displayColumnName] = fieldItem.displayColumn
+          // TODO: Verify displayColumnName attribute, or get dispay column to fieldValue store
+          attributesObject[fieldItem.displayColumnName] = fieldItem.displayColumnName
         }
 
         return {

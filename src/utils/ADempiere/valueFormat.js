@@ -49,13 +49,6 @@ export const convertStringToBoolean = (valueToParsed) => {
   return valReturn
 }
 
-export const convertBooleanToString = (booleanValue) => {
-  if (booleanValue || booleanValue === 'true') {
-    return 'Y'
-  }
-  return 'N'
-}
-
 /**
  * Convert a object to array pairs
  * @param {object} object, object to convert

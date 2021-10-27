@@ -1,4 +1,25 @@
+// ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
+// Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import language from '@/lang'
+
+// constants
+import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references'
+
+// api request methods
 import {
   getEntity
 } from '@/api/ADempiere/common/persistence.js'
@@ -11,6 +32,8 @@ import {
   lockPrivateAccess,
   unlockPrivateAccess
 } from '@/api/ADempiere/actions/private-access'
+
+// utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertArrayKeyValueToObject } from '@/utils/ADempiere/valueFormat.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
@@ -19,8 +42,6 @@ import {
   getPreference
 } from '@/utils/ADempiere/contextUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
-import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references'
-import language from '@/lang'
 
 const actions = {
   /**
@@ -490,7 +511,7 @@ const actions = {
     isSendToServer = true,
     isSendCallout = true,
     newValue,
-    displayColumn,
+    displayColumnName,
     withOutColumnNames = []
   }) {
     // dispatch('setPreferenceContext', {
@@ -519,7 +540,7 @@ const actions = {
       row,
       value: newValue,
       columnName,
-      displayColumn
+      displayColumnName
     })
 
     if (panelType === 'browser') {
@@ -530,7 +551,7 @@ const actions = {
         row: rowSelection,
         value: newValue,
         columnName,
-        displayColumn
+        displayColumnName
       })
     } else if (panelType === 'window') {
       // request callouts

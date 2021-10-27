@@ -14,9 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { convertStringToBoolean, convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
-import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
 import language from '@/lang'
+
+// constants
+import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
+
+// utils and helper methods
+import { convertStringToBoolean } from '@/utils/ADempiere/valueFormat.js'
+import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
 /**
  * Checks if value is empty. Deep-checks arrays and objects
