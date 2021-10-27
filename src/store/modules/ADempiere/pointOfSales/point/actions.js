@@ -19,6 +19,7 @@ import {
   getPointOfSales,
   listPointOfSales,
   listWarehouses,
+  listDiscount,
   listDocumentTypes,
   listTenderTypes,
   listPrices,
@@ -100,6 +101,22 @@ export default {
       })
       .catch(error => {
         console.warn(`listWarehousesFromServer: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+      })
+  },
+  listDiscountFromServer({ commit }, posUuid) {
+    listDiscount({
+      posUuid
+    })
+      .then(response => {
+        commit('setDiscountList', response.records)
+      })
+      .catch(error => {
+        console.warn(`listDiscountFromServer: ${error.message}. Code: ${error.code}.`)
         showMessage({
           type: 'error',
           message: error.message,

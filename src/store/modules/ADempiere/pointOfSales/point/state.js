@@ -30,6 +30,8 @@ export default {
   pointOfSalesList: {},
   warehousesList: {},
   documentTypesList: {},
+  discountList: {},
+  currentDiscountList: {},
   pricesList: {},
   currentPriceList: {},
   currentWarehousePos: {},

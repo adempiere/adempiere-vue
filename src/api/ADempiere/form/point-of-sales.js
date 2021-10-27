@@ -1116,3 +1116,22 @@ export function reverseSales({
       return response
     })
 }
+
+/**
+ * Discount List
+ * @param {string} posUuidd - POS UUID reference
+ */
+export function listDiscount({
+  posUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/available-discount`,
+    method: 'get',
+    params: {
+      pos_uuid: posUuid
+    }
+  })
+    .then(listDiscountResponse => {
+      return listDiscountResponse
+    })
+}

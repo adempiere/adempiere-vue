@@ -334,6 +334,28 @@
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
+                <br>
+                <el-dropdown
+                  v-if="!isEmptyValue(currentDiscountList)"
+                  trigger="click"
+                  class="info-pos"
+                  @command="changeDiscountList"
+                >
+                  <span>
+                    <svg-icon icon-class="list" />
+                    {{ $t('form.pos.discountList') }}: <b style="cursor: pointer"> {{ currentDiscountList.name }} </b>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      v-for="item in pointDiscountList"
+                      :key="item.uuid"
+                      :command="item"
+                      :disabled="isDisabled"
+                    >
+                      {{ item.name }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </p>
             </div>
             <span v-if="isMobile" style="float: right;padding-right: 3%;">
@@ -652,6 +674,19 @@ export default {
       }
       return {}
     },
+    currentDiscountList() {
+      if (!this.isEmptyValue(this.$store.getters.currentDiscountList)) {
+        return this.$store.getters.currentDiscountList
+      }
+      return {}
+    },
+    pointDiscountList() {
+      const discount = this.$store.getters.posAttributes.currentPointOfSales.discountList
+      if (this.isEmptyValue(discount)) {
+        return []
+      }
+      return discount
+    },
     pointPriceList() {
       const list = this.$store.getters.posAttributes.currentPointOfSales.pricesList
       if (this.isEmptyValue(list)) {
@@ -940,6 +975,9 @@ export default {
           this.$store.commit('setCurrentPriceList', priceList)
         }
       }
+    },
+    changeDiscountList(discountList) {
+      console.log(discountList)
     },
     arrowTop() {
       if (this.currentTable > 0) {

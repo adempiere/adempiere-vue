@@ -25,6 +25,12 @@ export default {
   setWarehousesList(state, warehousesList) {
     state.warehousesList = warehousesList
   },
+  setDiscountList(state, discountList) {
+    state.discountList = discountList
+  },
+  setCurrentDiscountList(state, currentDiscountList) {
+    state.currentDiscountList = currentDiscountList
+  },
   setDocumentTypesList(state, documentTypesList) {
     state.documentTypesList = documentTypesList
   },

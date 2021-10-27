@@ -390,6 +390,7 @@ export default {
     pos: {
       title: 'Punto de Venta',
       priceList: 'Lista de Precio',
+      discountList: 'Lista de Descuento',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
         salesOrder: {

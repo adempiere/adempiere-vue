@@ -55,6 +55,7 @@ export default {
         ...state.currentPointOfSales,
         listOrder: state.listOrder,
         warehousesList: state.warehousesList,
+        discountList: state.discount,
         currentWarehouse: state.currentWarehousePos,
         documentTypesList: state.documentTypesList,
         pricesList: state.pricesList,
@@ -123,6 +124,15 @@ export default {
   currentPriceList: (state) => {
     if (!isEmptyValue(state.currentPriceList)) {
       return state.currentPriceList
+    }
+    return {}
+  },
+  /**
+   * Current Discount List
+   */
+  currentDiscountList: (state) => {
+    if (!isEmptyValue(state.currentDiscountList)) {
+      return state.currentDiscountList
     }
     return {}
   },
