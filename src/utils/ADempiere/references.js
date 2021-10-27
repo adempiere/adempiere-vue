@@ -658,11 +658,6 @@ export const COLUMNS_NAME_READ_ONLY = [
   COLUMN_PROCESSING.columnName
 ]
 
-export const COLUMNS_NAME_DOCUMENT_STATUS = [
-  'DocStatus',
-  'O_DocStatus'
-]
-
 /**
  * Fields with this column name, changed all fields is read only
  */

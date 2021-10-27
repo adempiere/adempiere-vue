@@ -68,3 +68,11 @@ export const ACCOUNTING_COLUMNS = [
   'C_Currency_ID',
   'C_Convertion_Type_ID'
 ]
+
+/**
+ * Documents status columns list
+ */
+export const DOCUMENT_STATUS_COLUMNS_LIST = [
+  'DocStatus',
+  'O_DocStatus'
+]

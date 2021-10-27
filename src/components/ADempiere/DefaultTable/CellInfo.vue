@@ -38,12 +38,16 @@
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
 
-import { COLUMNS_NAME_DOCUMENT_STATUS, FIELDS_CURRENCY } from '@/utils/ADempiere/references.js'
+// utils and helpers methods
+import { FIELDS_CURRENCY } from '@/utils/ADempiere/references.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 import {
   formatField, formatPrice, formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 import { convertBooleanToTranslationLang } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+
+// constants
+import { DOCUMENT_STATUS_COLUMNS_LIST } from '@/utils/ADempiere/constants/systemColumns.js'
 
 export default defineComponent({
   name: 'CellInfo',
@@ -64,7 +68,7 @@ export default defineComponent({
     const fieldValue = props.dataRow[columnName]
 
     const isDocumentStatus = computed(() => {
-      return COLUMNS_NAME_DOCUMENT_STATUS.includes(columnName)
+      return DOCUMENT_STATUS_COLUMNS_LIST.includes(columnName)
     })
 
     const displayedValue = computed(() => {
