@@ -70,6 +70,11 @@ export default {
             ...viewSearch,
             hidden: false
           }
+        } else if (menu.path === '/ProductInfo') {
+          return {
+            ...viewSearch,
+            hidden: !this.$store.state['user'].role.isAllowInfoProduct
+          }
         }
         return menu
       })
