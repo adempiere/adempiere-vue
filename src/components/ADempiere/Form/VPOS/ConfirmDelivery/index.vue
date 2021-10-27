@@ -29,7 +29,13 @@
       @submit.native.prevent="notSubmitForm"
     >
       <el-form-item label="Código Producto">
-        <el-input ref="searchValue" v-model="input" :placeholder="$t('quickAccess.searchWithEnter')" @input="searchProduct" />
+        <el-autocomplete
+          v-model="input"
+          :fetch-suggestions="querySearchAsync"
+          :placeholder="$t('quickAccess.searchWithEnter')"
+          class="search-delivery"
+          @select="searchProduct"
+        />
       </el-form-item>
     </el-form>
     <el-table
@@ -361,17 +367,8 @@ export default {
       clearTimeout(this.timeOut)
       this.timeOut = setTimeout(() => {
         this.isSearchProduct = true
-        const product = this.findProductFromOrder(value)
-        if (product) {
-          this.addLineShipment({ shipmentUuid: this.currentShipment.uuid, orderLineUuid: product.uuid })
-        } else {
-          this.$message({
-            type: 'error',
-            message: this.$t('form.pos.optionsPoinSales.salesOrder.emptyProductDelivery'),
-            duration: 1500,
-            showClose: true
-          })
-        }
+        const product = this.findProductFromOrder(value.link)
+        this.addLineShipment({ shipmentUuid: this.currentShipment.uuid, orderLineUuid: product.uuid })
         this.input = ''
       }, 500)
     },
@@ -394,6 +391,34 @@ export default {
         .finally(() => {
           this.listShipments({ shipmentUuid })
         })
+    },
+    createFilter(queryString) {
+      return (link) => {
+        const search = queryString.toLowerCase()
+        return link.product.value.toLowerCase().includes(search) || link.product.name.toLowerCase().includes(search) || link.product.upc.toLowerCase().includes(search)
+      }
+    },
+    querySearchAsync(queryString, callBack) {
+      let results = queryString ? this.currentOrderLine.filter(this.createFilter(queryString)) : this.currentOrderLine
+      const searchStructure = results.map(product => {
+        return {
+          value: product.product.name,
+          link: product.product.value
+        }
+      })
+      results = searchStructure
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        if (this.isEmptyValue(results)) {
+          this.$message({
+            type: 'error',
+            message: this.$t('form.pos.optionsPoinSales.salesOrder.emptyProductDelivery'),
+            duration: 3500,
+            showClose: true
+          })
+        }
+        callBack(results)
+      }, 500)
     },
     findProductFromOrder(value) {
       return this.currentOrderLine.find(line => line.product.name === value || line.product.value === value || line.product.upc === value)
@@ -501,3 +526,9 @@ export default {
   }
 }
 </script>
+<style scoped>
+  .search-delivery {
+    position: relative;
+    display: contents;
+  }
+</style>

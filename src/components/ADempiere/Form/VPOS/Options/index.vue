@@ -212,7 +212,7 @@
               </p>
             </el-card>
           </el-col>
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="allowsConfirmShipment" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
                 v-model="popoverConfirmDelivery"
@@ -457,6 +457,9 @@ export default {
     }
   },
   computed: {
+    allowsConfirmShipment() {
+      return this.currentPointOfSales.isAllowsConfirmShipment
+    },
     infowOverdrawnInvoice() {
       if (this.$store.getters.getOverdrawnInvoice.attributePin) {
         return this.$store.getters.getOverdrawnInvoice.attributePin

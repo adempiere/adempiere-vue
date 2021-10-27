@@ -406,7 +406,7 @@ export default {
           copyOrder: 'Copiar Orden',
           createNewReturnOrder: 'Crear una nueva orden de devolución',
           confirmDelivery: 'Confirmar Entrega',
-          emptyProductDelivery: 'Producto no disponible para entregar'
+          emptyProductDelivery: 'Producto no se Encuentra en la Orden'
         },
         cashManagement: {
           title: 'Gestión de Caja',

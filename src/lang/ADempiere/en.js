@@ -430,7 +430,7 @@ export default {
           copyOrder: 'Copy Order',
           createNewReturnOrder: 'Create a new return order',
           confirmDelivery: 'Confirmar Entrega',
-          emptyProductDelivery: 'Product not available for delivery'
+          emptyProductDelivery: 'Product Not in Order'
         },
         cashManagement: {
           title: 'Cash Management',
