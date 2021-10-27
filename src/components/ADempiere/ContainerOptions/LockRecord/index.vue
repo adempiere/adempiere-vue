@@ -71,6 +71,10 @@ export default defineComponent({
     tableName: {
       type: String,
       required: true
+    },
+    isActiveTab: {
+      type: Boolean,
+      required: true
     }
   },
 
@@ -156,8 +160,16 @@ export default defineComponent({
       }
     }
 
+    const isGettingRecordAccess = ref(false)
+
     const getPrivateAccess = () => {
       const { recordId, recordUuid } = getRecordId()
+
+      if (root.isEmptyValue(recordId) && root.isEmptyValue(recordUuid)) {
+        return
+      }
+
+      isGettingRecordAccess.value = true
 
       root.$store.dispatch('getPrivateAccessFromServer', {
         tableName,
@@ -171,11 +183,22 @@ export default defineComponent({
             isLocked.value = false
           }
         })
+        .finally(() => {
+          isGettingRecordAccess.value = false
+        })
     }
 
-    watch(() => root.$route.query.action, (newValue) => {
-      if (isValidUuid(newValue)) {
-        getPrivateAccess()
+    // timer to execute the request between times
+    const timeOut = ref(() => {})
+
+    watch(() => root.$route.query.action, (newValue, oldValue) => {
+      if (props.isActiveTab && isValidUuid(newValue) && !isGettingRecordAccess.value) {
+        clearTimeout(timeOut.value)
+
+        timeOut.value = setTimeout(() => {
+          // get records
+          getPrivateAccess()
+        }, 1000)
       }
     })
 

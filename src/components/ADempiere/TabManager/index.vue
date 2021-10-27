@@ -52,6 +52,7 @@
       >
         <lock-record
           slot="label"
+          :is-active-tab="tabAttributes.uuid === tabUuid"
           :tab-position="isParentTabs ? key : 1"
           :tab-uuid="tabAttributes.uuid"
           :table-name="tabAttributes.tableName"
@@ -100,11 +101,12 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import AuxiliaryPanel from '@/components/ADempiere/AuxiliaryPanel'
-import DefaultTable from '@/components/ADempiere/DefaultTable'
-import LockRecord from '@/components/ADempiere/ContainerOptions/LockRecord'
-import PanelDefinition from '@/components/ADempiere/PanelDefinition'
-import RecordNavigation from '@/components/ADempiere/RecordNavigation'
+// components
+import AuxiliaryPanel from '@/components/ADempiere/AuxiliaryPanel/index.vue'
+import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
+import LockRecord from '@/components/ADempiere/ContainerOptions/LockRecord/index.vue'
+import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
+import RecordNavigation from '@/components/ADempiere/RecordNavigation/index.vue'
 
 export default defineComponent({
   name: 'TabManager',
