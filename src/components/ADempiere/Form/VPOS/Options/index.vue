@@ -223,6 +223,7 @@
               >
                 <confirm-delivery
                   :is-selectable="false"
+                  :is-visible="popoverConfirmDelivery"
                   popover-name="isShowPopoverMenu"
                 />
                 <div
