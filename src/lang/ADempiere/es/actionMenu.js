@@ -21,10 +21,11 @@ const actionMenu = {
   createNewRecord: 'Nuevo Registro',
   shareLink: 'Compartir Enlace',
   withoutActions: 'Sin Actiones',
+  zoomWindow: 'Acercar Ventana',
   // relations
   relations: 'Relaciones',
   withoutRelations: 'Sin Relaciones',
-  // refeerences
+  // references
   references: 'Referencias',
   withoutReferences: 'Sin referencias para el registro'
 }

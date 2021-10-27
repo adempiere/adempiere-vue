@@ -82,16 +82,19 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 
-// utils and helpers methods
-import {
-  refreshBrowserSearh,
-  sharedLink
-} from '@/utils/ADempiere/constants/actionsMenuList'
+// utils and helper methods
 import {
   isDisplayedField, isDisplayedColumn,
   isMandatoryField, isMandatoryColumn,
   isReadOnlyField, isReadOnlyColumn
 } from '@/utils/ADempiere/dictionary/browser.js'
+
+// constants
+import {
+  refreshBrowserSearh,
+  sharedLink,
+  zoomWindow
+} from '@/utils/ADempiere/constants/actionsMenuList'
 
 export default defineComponent({
   name: 'BrowserView',
@@ -268,6 +271,13 @@ export default defineComponent({
 
       getActionList: () => [
         refreshBrowserSearh,
+        {
+          ...zoomWindow,
+          uuid: root.isEmptyValue(storedBrowser.value)
+            ? null
+            : storedBrowser.value.window.uuid
+        },
+
         sharedLink
       ]
     })

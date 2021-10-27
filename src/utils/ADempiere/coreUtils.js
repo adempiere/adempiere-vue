@@ -14,17 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { isEmptyValue, recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
-import { showMessage } from '@/utils/ADempiere/notification'
 import router from '@/router'
 import language from '@/lang'
 import store from '@/store'
+
+import { showMessage } from '@/utils/ADempiere/notification'
+import { isEmptyValue, recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
 
 export function zoomIn({
   uuid,
   params = {},
   query = {}
 }) {
+  if (isEmptyValue(uuid)) {
+    showMessage({
+      type: 'error',
+      showClose: true,
+      message: language.t('notifications.emptyValues')
+    })
+    return
+  }
+
   const menuTree = store.getters.permission_routes
 
   const viewSearch = recursiveTreeSearch({

@@ -16,7 +16,7 @@
 
 import language from '@/lang'
 import { showMessage } from '@/utils/ADempiere/notification.js'
-import { copyToClipboard } from '@/utils/ADempiere/coreUtils'
+import { copyToClipboard, zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 /**
  * Create new record
@@ -117,6 +117,23 @@ export const deleteRecord = {
         })
         console.warn(`Delete Entity - Error ${error.message}, Code: ${error.code}.`)
       })
+  }
+}
+
+/**
+ * Delete record (entity) with record
+ */
+export const zoomWindow = {
+  name: language.t('actionMenu.zoomWindow'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-zoom-in',
+  type: 'zoom',
+  actionName: 'zoomWindow',
+  zoomWindow: ({ uuid }) => {
+    zoomIn({
+      uuid
+    })
   }
 }
 

@@ -21,6 +21,7 @@ const actionMenu = {
   createNewRecord: 'New Record',
   shareLink: 'Share Link',
   withoutActions: 'Without Actions',
+  zoomWindow: 'Zoom Window',
   // relations
   relations: 'Relations',
   withoutRelations: 'Without Relations',
