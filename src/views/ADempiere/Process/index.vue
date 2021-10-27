@@ -20,7 +20,7 @@
   <el-container
     v-if="isLoadedMetadata"
     key="process-loaded"
-    class="view-base"
+    class="view-base process-view"
     style="height: 84vh;"
   >
     <el-header
@@ -35,19 +35,17 @@
     </el-header>
 
     <el-main>
-      <el-card class="content-collapse">
+      <el-card class="content-collapse card-process">
         <title-and-help
           :name="processMetadata.name"
           :help="processMetadata.help"
         />
 
-        <el-scrollbar wrap-class="scroll-child">
-          <panel-definition
-            :container-uuid="processUuid"
-            :panel-metadata="processMetadata"
-            :container-manager="containerManager"
-          />
-        </el-scrollbar>
+        <panel-definition
+          :container-uuid="processUuid"
+          :panel-metadata="processMetadata"
+          :container-manager="containerManager"
+        />
       </el-card>
     </el-main>
   </el-container>
@@ -65,7 +63,11 @@ import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
+
+import { convertProcess } from '@/utils/ADempiere/apiConverts/dictionary.js'
+import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
 import { sharedLink } from '@/utils/ADempiere/constants/actionsMenuList'
+import { isHiddenField } from '@/utils/ADempiere/references'
 
 export default defineComponent({
   name: 'ProcessView',
@@ -109,17 +111,39 @@ export default defineComponent({
       value: true
     })
 
+    // get process/report from vuex store or request from server
     const getProcess = async() => {
-      const process = storedProcess.value
+      let process = storedProcess.value
       if (process) {
         processMetadata.value = process
         isLoadedMetadata.value = true
         return
       }
 
-      root.$store.dispatch('getProcessDefinitionFromServer', processUuid)
+      // metadata props use for test
+      if (!root.isEmptyValue(props.metadata)) {
+        // from server response
+        process = convertProcess(props.metadata)
+        // add apps properties
+        process = generateProcess(process)
+        // add into store
+        return root.$store.dispatch('addProcess', process)
+          .then(processResponse => {
+            // to obtain the load effect
+            setTimeout(() => {
+              processMetadata.value = processResponse
+              isLoadedMetadata.value = true
+            }, 1000)
+          })
+      }
+
+      root.$store.dispatch('getProcessDefinitionFromServer', {
+        uuid: processUuid
+      })
         .then(processResponse => {
           processMetadata.value = processResponse
+        }).catch(error => {
+          console.warn(error)
         }).finally(() => {
           isLoadedMetadata.value = true
         })
@@ -135,6 +159,39 @@ export default defineComponent({
         //   field,
         //   value
         // })
+      },
+
+      isDisplayedField: ({ displayType, isDisplayed, isDisplayedFromLogic, isActive }) => {
+        // button field not showed
+        if (isHiddenField(displayType)) {
+          return false
+        }
+
+        // verify if field is active
+        if (!isActive) {
+          return false
+        }
+
+        return isDisplayed && isDisplayedFromLogic
+      },
+
+      isReadOnlyField({
+        field
+      }) {
+        return (
+          field.isReadOnly || field.isReadOnlyFromLogic
+        )
+      },
+
+      isMandatoryField({ isMandatory, isMandatoryFromLogic }) {
+        return isMandatory || isMandatoryFromLogic
+      },
+
+      changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
+        root.$store.dispatch('changeProcessFieldShowedFromUser', {
+          containerUuid,
+          fieldsShowed
+        })
       }
     }
 
@@ -167,14 +224,18 @@ export default defineComponent({
 })
 </script>
 
-<style>
-  .el-card__body {
-    padding-top: 0px !important;
-    padding-right: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
-    height: 100%;
+<style lang="scss">
+.process-view {
+  .card-process {
+    >.el-card__body {
+      padding-top: 0px;
+      padding-right: 20px;
+      padding-bottom: 20px;
+      padding-left: 20px;
+      height: 100%;
+    }
   }
+}
 </style>
 <style scoped >
   .el-card {

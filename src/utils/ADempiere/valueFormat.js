@@ -17,7 +17,7 @@
 // A util class for handle format for time, date and others values to beused to display information
 // Note that this file use moment library for a easy conversion
 import moment from 'moment'
-import language from '@/lang'
+
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import store from '@/store'
 import { DATE, DATE_PLUS_TIME, TIME, AMOUNT, COSTS_PLUS_PRICES, NUMBER, QUANTITY } from '@/utils/ADempiere/references.js'
@@ -27,14 +27,26 @@ import { DATE, DATE_PLUS_TIME, TIME, AMOUNT, COSTS_PLUS_PRICES, NUMBER, QUANTITY
  * @param {mixed} valueToParsed
  */
 export const convertStringToBoolean = (valueToParsed) => {
-  const valueString = String(valueToParsed).trim()
-  if (valueString === 'N' || valueString === 'false') {
-    return false
-  } else if (valueString === 'Y' || valueString === 'true') {
-    return true
+  let valReturn = valueToParsed
+
+  // TODO: Add lang values
+  switch (String(valueToParsed).trim()) {
+    case 'N':
+    case 'false':
+      valReturn = false
+      break
+
+    case 'Y':
+    case 'true':
+      valReturn = true
+      break
+
+    default:
+      valReturn = valueToParsed
+      break
   }
 
-  return valueToParsed
+  return valReturn
 }
 
 export const convertBooleanToString = (booleanValue) => {
@@ -42,18 +54,6 @@ export const convertBooleanToString = (booleanValue) => {
     return 'Y'
   }
   return 'N'
-}
-
-/**
- * Convert boolean value to current translation language
- * @param {boolean} booleanValue
- * @returns {string} true => 'Yes' or 'Si', false => 'Not' or 'No'
- */
-export const convertBooleanToTranslationLang = (booleanValue) => {
-  if (booleanValue || booleanValue === 'true') {
-    return language.t('components.switchActiveText')
-  }
-  return language.t('components.switchInactiveText')
 }
 
 /**
@@ -299,6 +299,7 @@ export function trimPercentage(stringToParsed) {
   }
   return stringToParsed
 }
+
 export function formatDateToSend(date) {
   if (isEmptyValue(date)) {
     return undefined

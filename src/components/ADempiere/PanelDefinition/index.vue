@@ -19,6 +19,7 @@
 <template>
   <component
     :is="componentRender"
+    :parent-uuid="parentUuid"
     :container-uuid="containerUuid"
     :container-manager="containerManager"
     :panel-metadata="metadata"
@@ -61,7 +62,7 @@ export default defineComponent({
     }
 
     const componentRender = computed(() => {
-      return () => import('@/components/ADempiere/PanelDefinition/StandardPanel')
+      return () => import('@/components/ADempiere/PanelDefinition/StandardPanel.vue')
     })
 
     /**

@@ -26,6 +26,7 @@
       :panel-metadata="panelMetadata"
       :header="tableheaders"
       :data-table="recordsList"
+      :record-count="recordCount"
     />
   </el-container>
 </template>
@@ -88,6 +89,7 @@ export default defineComponent({
     const panelMetadata = computed(() => {
       return props.currentTab
     })
+
     // create the table header
     const tableheaders = computed(() => {
       const panel = panelMetadata.value
@@ -110,6 +112,17 @@ export default defineComponent({
       }
       return []
     })
+
+    const recordCount = computed(() => {
+      const data = root.$store.getters[vuexStore + '/getContainerData']({
+        containerUuid: props.containerUuid
+      })
+      if (data && data.recordCount) {
+        return data.recordCount
+      }
+      return 0
+    })
+
     const actionAdvancedQuery = () => {
       const activeNames = []
       if (!activeName.value.length) {
@@ -125,6 +138,7 @@ export default defineComponent({
       activeName,
       // computeds
       recordsList,
+      recordCount,
       recordNavigationManager,
       isLoadedPanel,
       panelMetadata,

@@ -19,10 +19,9 @@
   <el-switch
     :ref="metadata.columnName"
     v-model="value"
-    :active-text="value ? $t('components.switchActiveText') : $t('components.switchInactiveText')"
+    :active-text="$t('components.switchActiveText')"
+    :inactive-text="$t('components.switchInactiveText')"
     :class="cssClassStyle"
-    :true-value="true"
-    :false-value="false"
     :disabled="isDisabled"
     @change="preHandleChange"
     @blur="focusLost"

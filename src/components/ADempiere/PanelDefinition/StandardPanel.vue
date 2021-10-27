@@ -25,8 +25,10 @@
       <div class="cards-not-group">
         <div class="card">
           <filter-fields
+            :parent-uuid="parentUuid"
             :container-uuid="containerUuid"
-            :panel-type="panelType"
+            :fields-list="fieldsList"
+            :filter-manager="containerManager.changeFieldShowedFromUser"
           />
           <el-card
             :shadow="shadowGroup"
@@ -52,9 +54,9 @@
 </template>
 
 <script>
-import { defineComponent, computed, ref } from '@vue/composition-api'
+import { defineComponent, computed } from '@vue/composition-api'
 
-import FieldDefinition from '@/components/ADempiere/Field'
+import FieldDefinition from '@/components/ADempiere/Field/index.vue'
 import FilterFields from '@/components/ADempiere/FilterFields'
 
 export default defineComponent({
@@ -85,7 +87,6 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const panelType = ref(props.panelMetadata.panelType)
     let fieldsList = []
 
     const generatePanel = () => {
@@ -106,7 +107,6 @@ export default defineComponent({
 
     return {
       fieldsList,
-      panelType,
       shadowGroup
     }
   }

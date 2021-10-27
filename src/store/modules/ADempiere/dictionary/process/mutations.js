@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import Vue from 'vue'
 
 /**
  * Process Mutations
@@ -22,10 +22,18 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  */
 export default {
   addProcessToList(state, process) {
-    if (!isEmptyValue(process)) {
-      if (!state.storedProcesses.find(processToFind => processToFind.uuid === process.uuid)) {
-        state.storedProcesses.push(process)
-      }
-    }
+    Vue.set(state.storedProcesses, process.uuid, process)
+  },
+
+  /**
+   * Change field process attribute
+   * @param {object} field
+   * @param {string} attributeName
+   * @param {mixed} attributeValue
+   */
+  changeProcessFieldAttribute(state, payload) {
+    const { attributeName, attributeValue } = payload
+
+    payload.field[attributeName] = attributeValue
   }
 }

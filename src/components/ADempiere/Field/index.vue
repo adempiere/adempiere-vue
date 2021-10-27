@@ -15,10 +15,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
-  <div v-if="!inTable">
+  <div v-if="isDisplayedField" class="field-definition">
     <el-col
-      v-if="isDisplayedField"
+      v-if="!inTable"
       key="is-panel-template"
       :xs="sizeField.xs"
       :sm="sizeField.sm"
@@ -47,29 +48,32 @@
         />
       </el-form-item>
     </el-col>
+
+    <component
+      :is="componentRender"
+      v-else
+      :id="field.panelType !== 'form' ? field.columnName : ''"
+      key="is-table-template"
+      :class="classField"
+      :parent-uuid="parentUuid"
+      :container-uuid="containerUuid"
+      :container-manager="containerManager"
+      :field-metadata="fieldAttributes"
+      :metadata="fieldAttributes"
+      :value-model="recordDataFields"
+      :in-table="true"
+    />
   </div>
-  <component
-    :is="componentRender"
-    v-else
-    :id="field.panelType !== 'form' ? field.columnName : ''"
-    key="is-table-template"
-    :class="classField"
-    :parent-uuid="parentUuid"
-    :container-uuid="containerUuid"
-    :container-manager="containerManager"
-    :field-metadata="fieldAttributes"
-    :metadata="fieldAttributes"
-    :value-model="recordDataFields"
-    :in-table="true"
-  />
 </template>
 
 <script>
-import { evalutateTypeField, fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
+import FieldOptions from '@/components/ADempiere/Field/FieldOptions/index.vue'
+
+import { evalutateTypeField } from '@/utils/ADempiere/dictionaryUtils'
+import { TEXT } from '@/utils/ADempiere/references'
 import {
   ACTIVE, CLIENT, PROCESSING, PROCESSED
 } from '@/utils/ADempiere/constants/systemColumns'
-import FieldOptions from '@/components/ADempiere/Field/FieldOptions'
 
 /**
  * This is the base component for linking the components according to the
@@ -131,10 +135,13 @@ export default {
       return this.$store.state.app.device === 'mobile'
     },
     classFrom() {
-      if (this.field.componentPath === 'FieldTextLong' || this.field.componentPath === 'FieldImage') {
-        return 'from-text-long'
+      if (['FieldTextLong', 'FieldImage'].includes(this.field.componentPath)) {
+        return 'field-text-long'
       }
-      return 'from-field'
+      if ([TEXT.id].includes(this.field.displayType)) {
+        return 'field-text-area'
+      }
+      return 'field-standard'
     },
     sizeField() {
       if (this.field.isShowedRecordNavigation) {
@@ -216,8 +223,8 @@ export default {
         isPanelWindow: this.isPanelWindow,
         isAdvancedQuery: this.isAdvancedQuery,
         // DOM properties
-        required: this.isMandatory,
-        readonly: this.isReadOnly,
+        required: this.isMandatoryField,
+        readonly: this.isReadOnlyField,
         displayed: this.isDisplayedField,
         disabled: !this.field.isActive,
         isSelectCreated: this.isSelectCreated,
@@ -227,32 +234,35 @@ export default {
 
     isDisplayedField() {
       // validate with container manager
-      if (!this.isEmptyValue(this.containerManager) &&
-        this.containerManager.isDisplayedField) {
-        return this.containerManager.isDisplayedField(this.field) &&
-          (this.isMandatory || this.field.isShowedFromUser)
-      }
-
-      if (this.isAdvancedQuery) {
-        return this.field.isShowedFromUser
-      }
-
-      return fieldIsDisplayed(this.field) &&
-        (this.isMandatory || this.field.isShowedFromUser || this.inTable)
+      return this.containerManager.isDisplayedField(this.field) &&
+        (this.isMandatoryField || this.field.isShowedFromUser || this.inTable)
     },
+    /**
+     * Idicate if field is read only
+     */
+    isReadOnlyField() {
+      // TODO: Add validate method to record uuid uuid without route.action
+      // edit mode is diferent to create new
+      const isWithRecord = this.recordUuid !== 'create-new' &&
+        !this.isEmptyValue(this.recordUuid)
 
-    isMandatory() {
       // validate with container manager
-      if (!this.isEmptyValue(this.containerManager) &&
-        this.containerManager.validateMandatory) {
-        return this.containerManager.isMandatoryField(this.field)
-      }
-
-      if (this.isAdvancedQuery) {
-        return false
-      }
-      return this.field.isMandatory || this.field.isMandatoryFromLogic
+      return this.containerManager.isReadOnlyField({
+        field: this.field,
+        preferenceClientId: this.preferenceClientId,
+        // record values
+        clientId: this.containerClientId,
+        isActive: this.containerIsActive,
+        isProcessing: this.containerIsProcessing,
+        isProcessed: this.containerIsProcessed,
+        isWithRecord
+      })
     },
+    isMandatoryField() {
+      // validate with container manager
+      return this.containerManager.isMandatoryField(this.field)
+    },
+
     isPanelWindow() {
       return this.field.panelType === 'window'
     },
@@ -299,73 +309,6 @@ export default {
     },
     preferenceClientId() {
       return this.$store.getters.getPreferenceClientId
-    },
-
-    /**
-     * Idicate if field is read only
-     * TODO: Create common method to evaluate isReadOnly
-     */
-    isReadOnly() {
-      if (this.isAdvancedQuery) {
-        if (['NULL', 'NOT_NULL'].includes(this.field.operator)) {
-          return true
-        }
-        return false
-      }
-
-      // validate with container manager
-      if (!this.isEmptyValue(this.containerManager) &&
-        this.containerManager.validateReadOnly) {
-        // TODO: Add validate method to record uuid uuid without route.action
-        // edit mode is diferent to create new
-        const isWithRecord = this.recordUuid !== 'create-new' &&
-          !this.isEmptyValue(this.recordUuid)
-        return this.containerManager.validateReadOnly({
-          field: this.field,
-          preferenceClientId: this.preferenceClientId,
-          // record values
-          clientId: this.containerClientId,
-          isActive: this.containerIsActive,
-          isProcessing: this.containerIsProcessing,
-          isProcessed: this.containerIsProcessed,
-          isWithRecord
-        })
-      }
-
-      const isUpdateableAllFields = this.field.isReadOnly || this.field.isReadOnlyFromLogic
-
-      if (this.isPanelWindow) {
-        // TODO: Evaluate record uuid without route.action
-        // edit mode is diferent to create new
-        let isWithRecord = this.field.recordUuid !== 'create-new'
-        // evaluate context
-        if ((this.preferenceClientId !== this.metadataField.clientId) && isWithRecord) {
-          return true
-        }
-
-        if (this.field.isAlwaysUpdateable) {
-          return false
-        }
-        if (this.field.isProcessingContext || this.field.isProcessedContext) {
-          return true
-        }
-
-        if (this.inTable) {
-          isWithRecord = !this.isEmptyValue(this.field.recordUuid)
-        }
-
-        return (!this.field.isUpdateable && isWithRecord) ||
-          (isUpdateableAllFields || this.field.isReadOnlyFromForm)
-      } else if (this.field.panelType === 'browser') {
-        if (this.inTable) {
-          // browser result
-          return this.field.isReadOnly
-        }
-        // query criteria
-        return this.field.isReadOnlyFromLogic
-      }
-      // other type of panels (process/report)
-      return Boolean(isUpdateableAllFields)
     },
 
     isFieldOnly() {
@@ -426,66 +369,61 @@ export default {
 </script>
 
 <style lang="scss">
+.field-definition {
   /**
    * Separation between elements (item) of the form
    */
-  .from-text-long {
-    max-height: 300px;
-    min-height: 250px;
-  }
-  .from-field {
-    max-height: 65px;
-  }
   .el-form-item {
-    margin-bottom: 10px !important;
+    margin-bottom: 12px !important;
     margin-left: 10px;
     margin-right: 10px;
+  }
+  .field-text-long {
+    max-height: 300px;
+    min-height: 250px;
   }
 
   /**
    * Maximum height to avoid distorting the field list
    */
-  .el-form-item__content {
-    max-height: 36px !important;
+  .field-standard {
+    &:not(.in-table) {
+      max-height: 79px;
+    }
+
+    .el-form-item__content {
+      max-height: 36px !important;
+    }
   }
 
-  /**
-   * Reduce the spacing between the form element and its label
-   */
-  .el-form--label-top .el-form-item__label {
-    padding-bottom: 0px !important;
-  }
-
+  /*
   .in-table {
     margin-bottom: 0px !important;
     margin-left: 0px;
     margin-right: 0px;
   }
+  */
 
   /**
    * Min height all text area, not into table
    */
   .el-textarea__inner:not(.in-table) {
     min-height: 36px !important;
-    /*
-    height: 36px auto !important;
-    max-height: 54.2333px !important;
-    */
+    // height: 36px auto !important;
+    // max-height: 54.2333px !important;
   }
 
   /**
    * Reduce the spacing between the form element and its label
    */
-  .el-form--label-top .el-form-item__label {
-    padding-bottom: 0px !important;
+  .el-form-item__label {
+    padding-bottom: 0px;
   }
+
+  /*
   .pre-formatted {
     white-space: pre;
   }
-  .el-submenu__title {
-    padding: 0;
-  }
-  .el-submenu .el-submenu__icon-arrow  {
-    visibility: hidden;
-  }
+  */
+}
 </style>

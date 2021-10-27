@@ -58,5 +58,26 @@ export default {
    */
   setCurrentTab(state, { parentUuid, tab }) {
     Vue.set(state.storedWindows[parentUuid], 'currentTab', tab)
+  },
+
+  /**
+   * @param {*} state
+   * @param {string} parentUuid
+   * @param {object} tab
+   */
+  setCurrentTabChild(state, { parentUuid, tab }) {
+    Vue.set(state.storedWindows[parentUuid], 'currentTabChild', tab)
+  },
+
+  /**
+   * Change field tab attribute
+   * @param {object} field
+   * @param {string} attributeName
+   * @param {mixed} attributeValue
+   */
+  changeTabFieldAttribute(state, payload) {
+    const { attributeName, attributeValue } = payload
+
+    payload.field[attributeName] = attributeValue
   }
 }

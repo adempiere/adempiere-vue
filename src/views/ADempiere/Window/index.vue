@@ -42,7 +42,7 @@ import LoadingView from '@/components/ADempiere/LoadingView'
 
 import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import { generateWindow } from './windowUtils'
-import { BUTTON } from '@/utils/ADempiere/references'
+import { isHiddenField } from '@/utils/ADempiere/references'
 
 export default defineComponent({
   name: 'Window',
@@ -86,7 +86,7 @@ export default defineComponent({
 
       isDisplayedColumn: ({ isDisplayedGrid, isDisplayedFromLogic, isActive, isKey, displayType }) => {
         // button field not showed
-        if (displayType === BUTTON.id) {
+        if (isHiddenField(displayType)) {
           return false
         }
 
@@ -101,7 +101,7 @@ export default defineComponent({
 
       isDisplayedField: ({ isDisplayed, isDisplayedFromLogic, isActive, displayType }) => {
         // button field not showed
-        if (displayType === BUTTON.id) {
+        if (isHiddenField(displayType)) {
           return false
         }
 
@@ -113,7 +113,7 @@ export default defineComponent({
         return isDisplayed && isDisplayedFromLogic
       },
 
-      validateReadOnly({
+      isReadOnlyField({
         field,
         // records values
         preferenceClientId,
@@ -145,6 +145,21 @@ export default defineComponent({
         return (
           field.isReadOnly || field.isReadOnlyFromLogic || field.isReadOnlyFromForm
         )
+      },
+
+      isMandatoryField({
+        isMandatory,
+        isMandatoryFromLogic
+      }) {
+        return isMandatory || isMandatoryFromLogic
+      },
+
+      changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
+        root.$store.dispatch('changeTabFieldShowedFromUser', {
+          parentUuid,
+          containerUuid,
+          fieldsShowed
+        })
       }
     }
 

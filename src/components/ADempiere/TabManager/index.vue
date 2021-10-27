@@ -79,17 +79,19 @@
           :data-table="recordsList"
           :panel-metadata="tabAttributes"
         />
-        <!-- fields in panel to single record -->
-        <panel-definition
-          v-show="isParentTabs || (!isParentTabs && !isShowMultiRecords)"
-          key="panel-definition"
-          :parent-uuid="parentUuid"
-          :container-uuid="tabAttributes.uuid"
-          :container-manager="containerManager"
-          :panel-metadata="tabAttributes"
-          :group-tab="tabAttributes.tabGroup"
-        />
-
+        <!-- Close table when clicking on group of fields -->
+        <div @click="close()">
+          <!-- fields in panel to single record -->
+          <panel-definition
+            v-show="isParentTabs || (!isParentTabs && !isShowMultiRecords)"
+            key="panel-definition"
+            :parent-uuid="parentUuid"
+            :container-uuid="tabAttributes.uuid"
+            :container-manager="containerManager"
+            :panel-metadata="tabAttributes"
+            :group-tab="tabAttributes.tabGroup"
+          />
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -156,8 +158,10 @@ export default defineComponent({
 
     // use getter to reactive properties
     const currentTabMetadata = computed(() => {
-      // return props.tabsList[currentTab.value]
-      return root.$store.getters.getCurrentTab(props.parentUuid)
+      if (props.isParentTabs) {
+        return root.$store.getters.getCurrentTab(props.parentUuid)
+      }
+      return root.$store.getters.getCurrentTabChild(props.parentUuid)
     })
 
     const isShowRecords = computed(() => {
@@ -175,8 +179,11 @@ export default defineComponent({
     }
 
     function setCurrentTab() {
-      console.info(props.tabsList[currentTab.value])
-      root.$store.commit('setCurrentTab', {
+      let tabMutation = 'setCurrentTab'
+      if (!props.isParentTabs) {
+        tabMutation = 'setCurrentTabChild'
+      }
+      root.$store.commit(tabMutation, {
         parentUuid: props.parentUuid,
         tab: props.tabsList[currentTab.value]
       })
@@ -297,6 +304,18 @@ export default defineComponent({
       })
     }
 
+    /**
+     * Close table when clicking on group of fields
+     */
+    const close = () => {
+      root.$store.dispatch('changeTabAttribute', {
+        parentUuid: props.parentUuid,
+        containerUuid: tabUuid.value,
+        attributeName: 'isShowedTableRecords',
+        attributeValue: false
+      })
+    }
+
     const openContainer = () => {
       if (props.isParentTabs) {
         root.$store.dispatch('changeTabAttribute', {
@@ -326,6 +345,7 @@ export default defineComponent({
       tabStyle,
       // methods
       handleClick,
+      close,
       openContainer,
       isDisabledTab
     }

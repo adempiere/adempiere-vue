@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Yamel Senih ysenih@erpya.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,25 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
-
 /**
- * Dictionary Process Getters
+ * Capitalize value
+ * @param {string} str
+ * @returns {string}
  */
-export default {
-  getStoredProcesses: (state) => {
-    return state.storedProcesses
-  },
-
-  getStoredProcess: (state) => (processUuid) => {
-    return state.storedProcesses[processUuid]
-  },
-
-  getStoredFieldsFromProcess: (state, getters) => (processUuid) => {
-    const process = getters.getStoredProcess(processUuid)
-    if (!isEmptyValue(process)) {
-      return process.fieldsList
-    }
-    return undefined
-  }
+export function capitalize(str) {
+  // str is the argument passed to the helper when called
+  str = str || ''
+  return str.slice(0, 1).toUpperCase() + str.slice(1)
 }

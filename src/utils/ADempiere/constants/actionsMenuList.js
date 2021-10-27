@@ -128,9 +128,33 @@ export const refreshRecords = {
   actionName: 'refreshRecords',
   refreshRecords: ({ root, parentUuid, containerUuid, tableName }) => {
     // used to window
-    // TODO: implement to browser
     root.$store.dispatch('dataManager/getEntities', {
       parentUuid,
+      containerUuid
+    })
+  }
+}
+
+export const refreshBrowserSearh = {
+  name: language.t('actionMenu.refreshRecords'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-refresh',
+  actionName: 'refreshRecords',
+  refreshRecords: ({ root, containerUuid }) => {
+    const fieldsEmpty = root.$store.getters.getBrowserFieldsEmptyMandatory({
+      containerUuid
+    })
+    if (!root.isEmptyValue(fieldsEmpty)) {
+      root.$message({
+        message: language.t('notifications.mandatoryFieldMissing') + fieldsEmpty,
+        type: 'info'
+      })
+      return
+    }
+
+    // used to browser
+    root.$store.dispatch('getBrowserSearch', {
       containerUuid
     })
   }

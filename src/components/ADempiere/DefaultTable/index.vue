@@ -86,7 +86,7 @@
 
     <!-- pagination table, set custom or use default change page method -->
     <custom-pagination
-      :total="recordsWithFilter.length"
+      :total="recordCount"
       :current-page="1"
       :selection="0"
       :handle-change-page="handleChangePage"
@@ -139,6 +139,10 @@ export default defineComponent({
       type: Array,
       required: true,
       default: () => []
+    },
+    recordCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -202,8 +206,12 @@ export default defineComponent({
     /**
      * custom method to handle change page
      */
-    const handleChangePage = () => {
-      return
+    const handleChangePage = (pageNumber) => {
+      props.containerManager.setPage({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        pageNumber
+      })
     }
 
     // get table data

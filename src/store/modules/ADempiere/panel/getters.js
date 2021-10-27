@@ -139,10 +139,15 @@ const getters = {
   getFieldsListNotMandatory: (state, getters) => ({
     containerUuid,
     isTable = false,
+    fieldsList = [],
     isEvaluateShowed = true
   }) => {
+    if (isEmptyValue(fieldsList)) {
+      fieldsList = getters.getFieldsListFromPanel(containerUuid)
+    }
+
     // all optionals (not mandatory) fields
-    return getters.getFieldsListFromPanel(containerUuid)
+    return fieldsList
       .filter(fieldItem => {
         const isMandatory = fieldItem.isMandatory || fieldItem.isMandatoryFromLogic
         if (isMandatory && !isTable) {

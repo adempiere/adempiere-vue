@@ -40,6 +40,14 @@
           :value="item.columnName"
         />
       </el-select>
+
+      <fields-display-option
+        :parent-uuid="parentUuid"
+        :container-uuid="containerUuid"
+        :available-fields="fieldsListAvailable"
+        :showed-fields="fieldsListShowed"
+        :filter-manager="filterManager"
+      />
     </el-form-item>
   </el-form>
 </template>
@@ -47,10 +55,20 @@
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
 
+import FieldsDisplayOption from './fieldsDisplayOptions.vue'
+
 export default defineComponent({
   name: 'FilterFields',
 
+  components: {
+    FieldsDisplayOption
+  },
+
   props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
     containerUuid: {
       type: String,
       required: true
@@ -58,6 +76,14 @@ export default defineComponent({
     groupField: {
       type: String,
       default: ''
+    },
+    fieldsList: {
+      type: Array,
+      default: () => []
+    },
+    filterManager: {
+      type: Function,
+      default: ({ filterList }) => {}
     },
     panelType: {
       type: String,
@@ -73,8 +99,6 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const isAdvancedQuery = props.panelType === 'table'
-
     const size = props.inTable
       ? 'mini'
       : 'small'
@@ -92,18 +116,22 @@ export default defineComponent({
     })
 
     const fieldsListAvailable = computed(() => {
+      /*
       if (!props.inTable && props.panelType === 'window' && !root.isEmptyValue(props.groupField)) {
         // compare group fields to window
         return root.$store.getters.getFieldsListNotMandatory({
-          containerUuid: props.containerUuid
+          containerUuid: props.containerUuid,
+          fieldsList: props.fieldsList
         })
           .filter(fieldItem => {
             return fieldItem.groupAssigned === props.groupField
           })
       }
+      */
       // get fields not mandatory
       return root.$store.getters.getFieldsListNotMandatory({
         containerUuid: props.containerUuid,
+        fieldsList: props.fieldsList,
         isTable: props.inTable
       })
     })
@@ -137,12 +165,11 @@ export default defineComponent({
      * @param {array} selectedValues
      */
     const changeShowedPanel = (selectedValues) => {
-      root.$store.dispatch('changeFieldShowedFromUser', {
+      props.filterManager({
+        parentUuid: props.parentUuid,
         containerUuid: props.containerUuid,
-        fieldsUser: selectedValues,
-        show: true,
-        groupField: props.groupField,
-        isAdvancedQuery
+        fieldsShowed: selectedValues,
+        fieldsList: fieldsListAvailable.value
       })
     }
 

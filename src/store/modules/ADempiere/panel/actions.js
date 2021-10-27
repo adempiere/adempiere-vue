@@ -20,7 +20,8 @@ import {
 } from '@/utils/ADempiere/valueUtils.js'
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
 import evaluator, { getContext, parseContext } from '@/utils/ADempiere/contextUtils.js'
-import { assignedGroup, fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils.js'
+import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils.js'
+import { assignedGroup } from '@/utils/ADempiere/dictionary/panel'
 import router from '@/router'
 
 const actions = {
@@ -127,60 +128,6 @@ const actions = {
     }
 
     return params
-  },
-  /**
-   * Used by components/fields/filterFields
-   */
-  changeFieldShowedFromUser({ commit, dispatch, getters, rootGetters }, {
-    containerUuid,
-    isAdvancedQuery,
-    fieldsUser,
-    groupField
-  }) {
-    const panel = getters.getPanel(containerUuid)
-    let isChangedDisplayedWithValue = false
-    const fieldsList = panel.fieldsList.map(itemField => {
-      const isShowedOriginal = itemField.isShowedFromUser
-      if (groupField === itemField.groupAssigned) {
-        itemField.isShowedFromUser = false
-        if (fieldsUser.includes(itemField.columnName)) {
-          itemField.isShowedFromUser = true
-        }
-      }
-
-      if (!isChangedDisplayedWithValue) {
-        const value = rootGetters.getValueOfField({
-          parentUuid: itemField.parentUuid,
-          containerUuid: containerUuid,
-          columnName: itemField.columnName
-        })
-        // if isShowedFromUser was changed, and field has some value, the SmartBrowser
-        // or AdvancedQuery  must send the parameters to update the search result
-        if ((isShowedOriginal !== itemField.isShowedFromUser && !isEmptyValue(value)) ||
-          (isAdvancedQuery && ['NULL', 'NOT_NULL'].includes(itemField.operator))) {
-          isChangedDisplayedWithValue = true
-        }
-      }
-      return itemField
-    })
-
-    commit('changePanelAttribute', {
-      panel,
-      attributeName: 'fieldsList',
-      attributeValue: fieldsList
-    })
-
-    if (isChangedDisplayedWithValue) {
-      // Updated record result
-      if (panel.panelType === 'browser') {
-        dispatch('getBrowserSearch', {
-          containerUuid,
-          isClearSelection: true
-        })
-      } else if (panel.panelType === 'table' || panel.isAdvancedQuery) {
-        // get entities
-      }
-    }
   },
 
   /**

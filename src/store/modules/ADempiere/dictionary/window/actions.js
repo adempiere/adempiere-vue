@@ -16,6 +16,7 @@
 
 import { requestWindowMetadata } from '@/api/ADempiere/dictionary/window'
 import { generateWindow } from '@/views/ADempiere/Window/windowUtils'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 export default {
   addWindow({ commit }, windowResponse) {
@@ -39,6 +40,36 @@ export default {
 
           resolve(window)
         })
+    })
+  },
+
+  /**
+   * Used by components/fields/filterFields
+   */
+  changeTabFieldShowedFromUser({ commit, getters }, {
+    parentUuid,
+    containerUuid,
+    groupField,
+    fieldsShowed,
+    fieldsList = []
+  }) {
+    if (isEmptyValue(fieldsList)) {
+      fieldsList = getters.getStoredFieldsFromTab(parentUuid, containerUuid)
+    }
+
+    fieldsList.forEach(itemField => {
+      if (groupField === itemField.groupAssigned) {
+        let isShowedFromUser = false
+        if (fieldsShowed.includes(itemField.columnName)) {
+          isShowedFromUser = true
+        }
+
+        commit('changeTabFieldAttribute', {
+          field: itemField,
+          attributeName: 'isShowedFromUser',
+          attributeValue: isShowedFromUser
+        })
+      }
     })
   },
 
