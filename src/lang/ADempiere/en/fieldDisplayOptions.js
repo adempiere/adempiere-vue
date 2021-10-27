@@ -16,8 +16,9 @@
 
 const fieldsDisplayOptions = {
   // fields showed options
-  hideOptionalFields: 'Hide Optional Fields',
-  showOptionalFields: 'Show Opcional Fields'
+  hideOptionalFields: 'Hide All Optional Fields.',
+  showOptionalFields: 'Show All Opcional Fields.',
+  showOptionalFieldsWithValue: 'Show Only Optional Fields With Default Value.'
 }
 
 export default fieldsDisplayOptions

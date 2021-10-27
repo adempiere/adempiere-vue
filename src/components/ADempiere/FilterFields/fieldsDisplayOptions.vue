@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <el-dropdown trigger="click" class="fields-display-options" @command="handleCommand">
+  <el-dropdown trigger="click" class="fields-display-options" size="small" @command="handleCommand">
     <span class="el-dropdown-link">
       <svg-icon icon-class="list" />
     </span>
@@ -37,6 +37,14 @@
       >
         <svg-icon icon-class="eye-open" />
         {{ $t('fieldDisplayOptions.showOptionalFields') }}
+      </el-dropdown-item>
+
+      <el-dropdown-item
+        :disabled="!isShowFieldsWithValue"
+        command="showOptionalsValue"
+      >
+        <svg-icon icon-class="eye-open" />
+        {{ $t('fieldDisplayOptions.showOptionalFieldsWithValue') }}
       </el-dropdown-item>
     </el-dropdown-menu>
   </el-dropdown>
@@ -61,6 +69,10 @@ export default defineComponent({
       type: Array,
       required: true
     },
+    availableFieldsWithValue: {
+      type: Array,
+      required: true
+    },
     showedFields: {
       type: Array,
       required: true
@@ -78,14 +90,25 @@ export default defineComponent({
         props.availableFields.length > props.showedFields.length
     })
 
+    // enabled showed optionals with value and mandatory fields
+    const isShowFieldsWithValue = computed(() => {
+      return props.availableFieldsWithValue.length > 0
+    })
+
     // enabled hidden optionals fields (only mandatory))
     const isHiddenFields = computed(() => {
       return props.showedFields.length > 0 &&
         props.availableFields.length > 0
     })
 
-    const fieldsList = computed(() => {
+    const fieldsListAvailable = computed(() => {
       return props.availableFields.map(field => {
+        return field.columnName
+      })
+    })
+
+    const fieldsListAvailableWithValue = computed(() => {
+      return props.availableFieldsWithValue.map(field => {
         return field.columnName
       })
     })
@@ -93,7 +116,10 @@ export default defineComponent({
     const handleCommand = (command) => {
       let fieldsShowed = []
       if (command === 'showOptionals') {
-        fieldsShowed = fieldsList.value
+        fieldsShowed = fieldsListAvailable.value
+      }
+      if (command === 'showOptionalsValue') {
+        fieldsShowed = fieldsListAvailableWithValue.value
       }
 
       props.filterManager({
@@ -107,6 +133,7 @@ export default defineComponent({
     return {
       // computeds
       isShowFields,
+      isShowFieldsWithValue,
       isHiddenFields,
       // methods
       handleCommand

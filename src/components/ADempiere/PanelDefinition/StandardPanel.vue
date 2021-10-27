@@ -29,6 +29,7 @@
             :container-uuid="containerUuid"
             :fields-list="fieldsList"
             :filter-manager="containerManager.changeFieldShowedFromUser"
+            :showed-manager="containerManager.isDisplayedField"
           />
           <el-card
             :shadow="shadowGroup"

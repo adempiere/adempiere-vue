@@ -134,12 +134,17 @@ const getters = {
    * Show all available fields not mandatory and not button
    * to show, used in components FilterFields
    * @param {string} containerUuid
+   * @param {array} fieldsList
+   * @param {function} showedMethod
    * @param {boolean} isEvaluateShowed
+   * @param {boolean} isEvaluateDefaultValue
    */
-  getFieldsListNotMandatory: (state, getters) => ({
+  getFieldsListNotMandatory: (state, getters, rootState, rootGetters) => ({
     containerUuid,
     isTable = false,
     fieldsList = [],
+    showedMethod,
+    isEvaluateDefaultValue = false,
     isEvaluateShowed = true
   }) => {
     if (isEmptyValue(fieldsList)) {
@@ -154,8 +159,18 @@ const getters = {
           return false
         }
 
+        const { defaultValue } = fieldItem
+        if (isEvaluateDefaultValue && isEvaluateShowed) {
+          return showedMethod(fieldItem) &&
+            !isEmptyValue(defaultValue)
+        }
+
+        if (isEvaluateDefaultValue) {
+          return !isEmptyValue(defaultValue)
+        }
+
         if (isEvaluateShowed) {
-          return fieldIsDisplayed(fieldItem, isTable)
+          return showedMethod(fieldItem)
         }
 
         return true

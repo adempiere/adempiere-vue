@@ -45,6 +45,7 @@
         :parent-uuid="parentUuid"
         :container-uuid="containerUuid"
         :available-fields="fieldsListAvailable"
+        :available-fields-with-value="fieldsListAvailableWithValue"
         :showed-fields="fieldsListShowed"
         :filter-manager="filterManager"
       />
@@ -84,6 +85,11 @@ export default defineComponent({
     filterManager: {
       type: Function,
       default: ({ filterList }) => {}
+    },
+    // isDisplayedField or isDisplayedColumn
+    showedManager: {
+      type: Function,
+      default: (field) => {}
     },
     panelType: {
       type: String,
@@ -132,6 +138,18 @@ export default defineComponent({
       return root.$store.getters.getFieldsListNotMandatory({
         containerUuid: props.containerUuid,
         fieldsList: props.fieldsList,
+        showedMethod: props.showedManager,
+        isTable: props.inTable
+      })
+    })
+
+    const fieldsListAvailableWithValue = computed(() => {
+      // get fields not mandatory with default value
+      return root.$store.getters.getFieldsListNotMandatory({
+        containerUuid: props.containerUuid,
+        fieldsList: fieldsListAvailable.value,
+        isEvaluateDefaultValue: true,
+        showedMethod: props.showedManager,
         isTable: props.inTable
       })
     })
@@ -193,6 +211,7 @@ export default defineComponent({
       size,
       fieldsListShowed,
       fieldsListAvailable,
+      fieldsListAvailableWithValue,
       // methods
       changeShowed
     }
