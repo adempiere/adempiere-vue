@@ -128,7 +128,13 @@ const actions = {
           resolve()
         })
         .catch(error => {
-          reject(error)
+          showMessage({
+            message: error.message,
+            type: 'error',
+            showClose: true
+          })
+          console.warn(`Error change role: ${error.message}. Code: ${error.code}.`)
+          reject()
         })
     })
   },
