@@ -48,6 +48,7 @@ import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 // utils and helper methods
 import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
  * This component is a lookup type field, use as a replacement for fields:
@@ -149,26 +150,6 @@ export default {
           })
         }
 
-        if (this.isEmptyValue(value)) {
-          /* eslint-disable */
-          this.displayedValue = undefined
-          this.uuidValue = undefined
-          /* eslint-disable */
-          return value
-        }
-
-        const option = this.findOption(value)
-        if (!option.label) {
-          const label = this.displayedValue
-          /* eslint-disable */
-          this.optionsList.push({
-            // TODO: Add uuid
-            id: value,
-            label
-          })
-          /* eslint-disable */
-        }
-
         return value
       },
       set(value) {
@@ -193,7 +174,7 @@ export default {
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           // 'ColumnName'_UUID
-          columnName: this.metadata.columnName + '_UUID',
+          columnName: this.metadata.columnName + '_UUID'
         })
       },
       set(value) {
@@ -265,6 +246,27 @@ export default {
       if (value) {
         // if is field showed, search into store all options to list
         this.optionsList = this.getterLookupAll
+      }
+    },
+    value(newValue) {
+      if (isEmptyValue(newValue)) {
+        this.displayedValue = undefined
+        this.uuidValue = undefined
+      } else {
+        const option = this.findOption(newValue)
+        if (!option.label) {
+          const label = this.displayedValue
+          if (!isEmptyValue(label)) {
+            this.optionsList.push({
+              // TODO: Add uuid
+              id: newValue,
+              label
+            })
+          } else {
+            // request lookup
+            this.getDataLookupItem()
+          }
+        }
       }
     }
   },
