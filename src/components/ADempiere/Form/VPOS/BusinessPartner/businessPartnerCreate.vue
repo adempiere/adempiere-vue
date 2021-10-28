@@ -149,6 +149,9 @@ export default {
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
     },
+    currentCustomerTemplatePointOfSales() {
+      return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
+    },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
     },
@@ -166,6 +169,7 @@ export default {
       if (value) {
         setTimeout(() => {
           this.focusValue()
+          this.defaultTemplateAddress(this.currentCustomerTemplatePointOfSales)
         }, 1500)
       }
     },
@@ -191,6 +195,79 @@ export default {
     },
     focusValue() {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
+    },
+    defaultTemplateAddress(customer) {
+      if (this.isEmptyValue(customer)) {
+        return
+      }
+      this.loadAddresses(customer.addresses[0], 'Shipping-Address')
+      this.loadAddresses(customer.addresses[0], 'Billing-Address')
+    },
+    loadAddresses(address, containerUuid) {
+      if (this.isEmptyValue(address)) {
+        return
+      }
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [{
+          columnName: 'Name',
+          value: address.first_name
+        }, {
+          columnName: 'Description',
+          value: address.description
+        }, {
+          columnName: 'Phone',
+          value: address.phone
+        }, {
+          columnName: 'EMail',
+          value: address.email
+        }, {
+          columnName: 'ContactName',
+          value: this.empty(address.contact_name)
+        }, {
+          columnName: 'C_Country_ID_UUID',
+          value: undefined
+        }, {
+          columnName: 'Postal',
+          value: this.empty(address.postal_code)
+        }, {
+          columnName: 'C_Region_ID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.id) : ''
+        }, {
+          columnName: 'C_Region_ID_UUID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.uuid) : ''
+        }, {
+          columnName: 'DisplayColumn_C_Region_ID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.name) : ''
+        }, {
+          columnName: 'C_City_ID',
+          value: this.empty(address.city.id)
+        }, {
+          columnName: 'C_City_ID_UUID',
+          value: this.empty(address.city.uuid)
+        }, {
+          columnName: 'DisplayColumn_C_City_ID',
+          value: this.empty(address.city.name)
+        }, {
+          columnName: 'Address1',
+          value: address.address_1
+        }, {
+          columnName: 'Address2',
+          value: address.address_2
+        }, {
+          columnName: 'Address3',
+          value: address.address_3
+        }, {
+          columnName: 'Address4',
+          value: address.address_4
+        }]
+      })
+    },
+    empty(value) {
+      if (this.isEmptyValue(value)) {
+        return ''
+      }
+      return value
     },
     // TODO: Get locations values.
     createBusinessParter() {

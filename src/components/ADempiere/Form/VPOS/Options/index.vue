@@ -943,7 +943,7 @@ export default {
         columnName: 'C_DocTypeTarget_ID_UUID'
       })
       if (this.isEmptyValue(customerUuid) || id === 1000006) {
-        customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+        customerUuid = this.currentPointOfSales.templateCustomer.uuid
       }
       this.$store.dispatch('createOrder', {
         posUuid,

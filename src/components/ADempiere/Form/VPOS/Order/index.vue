@@ -865,7 +865,7 @@ export default {
         const attributePin = {
           withLine: false,
           newOrder: true,
-          customer: this.currentPointOfSales.templateBusinessPartner.uuid,
+          customer: this.currentPointOfSales.templateCustomer.uuid,
           action: 'newOrder',
           type: 'actionPos',
           label: this.$t('form.pos.pinMessage.newOrder')
@@ -876,7 +876,7 @@ export default {
       }
       this.clearOrder()
       this.$store.commit('setShowPOSCollection', false)
-      this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateBusinessPartner.uuid })
+      this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
       this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
     },
     changePos(pointOfSales) {

@@ -170,7 +170,7 @@ export default {
       if (!this.isEmptyValue(currentOrder.listPayments.payments)) {
         return !this.isEmptyValue(currentOrder.listPayments.payments)
       }
-      return currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner.id
+      return currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateCustomer.id
     },
     showCustomer() {
       return this.$store.getters.getShowUpdateCustomer
@@ -179,7 +179,7 @@ export default {
       return this.$store.getters.getCopyShippingAddress
     },
     validateCustomerTemplate() {
-      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner
+      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
       if (this.isEmptyValue(templateCustomer) || this.isEmptyValue(this.currentBusinessPartner)) {
         return false
       }

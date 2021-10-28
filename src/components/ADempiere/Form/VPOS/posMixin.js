@@ -78,9 +78,9 @@ export default {
     isSetTemplateBP() {
       const currentPOS = this.currentPointOfSales
       if (!this.isEmptyValue(currentPOS) &&
-        !this.isEmptyValue(currentPOS.templateBusinessPartner) &&
+        !this.isEmptyValue(currentPOS.templateCustomer) &&
         this.isEmptyValue(this.$route.query.action)) {
-        return currentPOS.templateBusinessPartner
+        return currentPOS.templateCustomer
       }
       return false
     },
@@ -543,7 +543,7 @@ export default {
           columnName: 'C_DocTypeTarget_ID_UUID'
         })
         if (this.isEmptyValue(customerUuid) || id === 1000006) {
-          customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+          customerUuid = this.currentPointOfSales.templateCustomer.uuid
         }
         if (customer) {
           customerUuid = customer
@@ -731,8 +731,8 @@ export default {
               break
             case 'C_BPartner_ID_UUID': {
               const bPartnerValue = mutation.payload.value
-              if (!this.isEmptyValue(this.currentPointOfSales.templateBusinessPartner) && this.$route.meta.uuid === mutation.payload.containerUuid) {
-                const bPartnerPOS = this.currentPointOfSales.templateBusinessPartner.uuid
+              if (!this.isEmptyValue(this.currentPointOfSales.templateCustomer) && this.$route.meta.uuid === mutation.payload.containerUuid) {
+                const bPartnerPOS = this.currentPointOfSales.templateCustomer.uuid
                 this.updateOrder(mutation.payload)
                 // Does not send values to server, when empty values are set or
                 // if BPartner set equal to BPartner POS template
