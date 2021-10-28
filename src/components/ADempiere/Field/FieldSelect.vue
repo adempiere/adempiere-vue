@@ -134,23 +134,19 @@ export default {
     value: {
       get() {
         const { columnName, containerUuid } = this.metadata
-        let value
         // table records values
         if (this.metadata.inTable) {
           const row = this.$store.getters.getRowData({
             containerUuid,
             index: this.metadata.tableIndex
           })
-          value = row[columnName]
-        } else {
-          value = this.$store.getters.getValueOfField({
-            parentUuid: this.metadata.parentUuid,
-            containerUuid,
-            columnName
-          })
+          return row[columnName]
         }
-
-        return value
+        return this.$store.getters.getValueOfField({
+          parentUuid: this.metadata.parentUuid,
+          containerUuid,
+          columnName
+        })
       },
       set(value) {
         const option = this.findOption(value)
@@ -192,6 +188,7 @@ export default {
     },
     displayedValue: {
       get() {
+        // DisplayColumn_'ColumnName'
         const { displayColumnName: columnName, containerUuid } = this.metadata
         // table records values
         if (this.metadata.inTable) {
@@ -199,13 +196,11 @@ export default {
             containerUuid,
             index: this.metadata.tableIndex
           })
-          // DisplayColumn_'ColumnName'
           return row[columnName]
         }
         return this.$store.getters.getValueOfField({
           parentUuid: this.metadata.parentUuid,
           containerUuid,
-          // DisplayColumn_'ColumnName'
           columnName
         })
       },
@@ -252,20 +247,21 @@ export default {
       if (isEmptyValue(newValue)) {
         this.displayedValue = undefined
         this.uuidValue = undefined
-      } else {
-        const option = this.findOption(newValue)
-        if (!option.label) {
-          const label = this.displayedValue
-          if (!isEmptyValue(label)) {
-            this.optionsList.push({
-              // TODO: Add uuid
-              id: newValue,
-              label
-            })
-          } else {
-            // request lookup
-            this.getDataLookupItem()
-          }
+        return
+      }
+
+      const option = this.findOption(newValue)
+      if (!option.label) {
+        const label = this.displayedValue
+        if (!isEmptyValue(label)) {
+          this.optionsList.push({
+            // TODO: Add uuid
+            id: newValue,
+            label
+          })
+        } else {
+          // request lookup
+          this.getDataLookupItem()
         }
       }
     }
