@@ -103,7 +103,7 @@
             width="150"
           >
             <template slot-scope="scope">
-              {{ formatPrice(scope.row.grandTotal) }}
+              {{ formatPrice(scope.row.grandTotal, scope.row.priceList.currency.iso_code) }}
             </template>
           </el-table-column>
         </el-table>
