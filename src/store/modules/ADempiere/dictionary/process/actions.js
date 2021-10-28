@@ -86,8 +86,8 @@ export default {
 
   /**
    * Set default values to panel
-   * @param {string}  parentUuid
    * @param {string}  containerUuid
+   * @param {array}  fieldsList
    */
   setProcessDefaultValues({ dispatch, getters }, {
     containerUuid,
@@ -113,5 +113,15 @@ export default {
 
       resolve(defaultAttributes)
     })
+  },
+  setReportDefaultValues({ dispatch }, {
+    containerUuid,
+    fieldsList = []
+  }) {
+    dispatch('setProcessDefaultValues', {
+      containerUuid,
+      fieldsList
+    })
   }
+
 }
