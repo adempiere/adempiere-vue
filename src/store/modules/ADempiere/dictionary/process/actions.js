@@ -16,7 +16,10 @@
 
 import router from '@/router'
 
+// api request methods
 import { requestProcessMetadata } from '@/api/ADempiere/dictionary/process.js'
+
+// utils and helper methods
 import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
