@@ -58,13 +58,13 @@ export default {
         },
         discounDisplayTaxIndicator: {
           columnName: 'taxIndicator',
-          label: this.$t('form.pos.tableProduct.TaxRate'),
+          label: this.$t('form.pos.tableProduct.taxRate'),
           isNumeric: true,
           size: '60px'
         },
         discounDisplayTaxAmounttTotal: {
           columnName: 'DisplayTaxAmount',
-          label: this.$t('form.pos.tableProduct.TaxAmount'),
+          label: this.$t('form.pos.tableProduct.taxAmount'),
           isNumeric: true,
           size: '150px'
         },

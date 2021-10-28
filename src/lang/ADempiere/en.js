@@ -456,8 +456,8 @@ export default {
         editQuantities: 'Edit Quantities',
         pin: 'Insert Pin',
         remove: 'Remove',
-        TaxAmount: 'Tax',
-        TaxRate: '% Imp',
+        taxAmount: 'Tax',
+        taxRate: '% Imp',
         displayDiscountAmount: 'Discount',
         empty: 'Enter the product name, code or UPC'
       },
