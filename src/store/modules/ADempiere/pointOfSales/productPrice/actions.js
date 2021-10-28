@@ -59,8 +59,8 @@ export default {
       }
     }
     const currentPointOfSales = rootGetters.posAttributes.currentPointOfSales
-    const { templateBusinessPartner, currentPriceList, currentWarehouse } = currentPointOfSales
-    const { uuid: businessPartnerUuid } = templateBusinessPartner
+    const { templateCustomer, currentPriceList, currentWarehouse } = currentPointOfSales
+    const { uuid: businessPartnerUuid } = templateCustomer
     if (isEmptyValue(searchValue)) {
       searchValue = rootGetters.getValueOfField({
         containerUuid,
@@ -131,8 +131,8 @@ export default {
       }
     }
     const currentPointOfSales = rootGetters.posAttributes.currentPointOfSales
-    const { templateBusinessPartner, currentPriceList, currentWarehouse } = currentPointOfSales
-    const { uuid: businessPartnerUuid } = templateBusinessPartner
+    const { templateCustomer, currentPriceList, currentWarehouse } = currentPointOfSales
+    const { uuid: businessPartnerUuid } = templateCustomer
 
     if (isEmptyValue(searchValue)) {
       searchValue = rootGetters.getValueOfField({

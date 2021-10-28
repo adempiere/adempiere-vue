@@ -84,7 +84,7 @@
     "bankAccountTypeName": "bank account  bank_account_type_name"
   },
   "salesRepresentative": "sales_representative",
-  "templateBusinessPartner": {
+  "templateCustomer": {
     "uuid": "uuid",
     "id": "id",
     "value": "value",

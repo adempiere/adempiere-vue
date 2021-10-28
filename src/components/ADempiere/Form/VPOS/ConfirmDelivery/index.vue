@@ -30,8 +30,9 @@
     >
       <el-form-item label="Código Producto">
         <el-autocomplete
+          ref="searchValue"
           v-model="input"
-          :fetch-suggestions="querySearchAsync"
+          :fetch-suggestions="querySearchAsyncDelivery"
           :placeholder="$t('quickAccess.searchWithEnter')"
           class="search-delivery"
           @select="searchProduct"
@@ -398,7 +399,7 @@ export default {
         return link.product.value.toLowerCase().includes(search) || link.product.name.toLowerCase().includes(search) || link.product.upc.toLowerCase().includes(search)
       }
     },
-    querySearchAsync(queryString, callBack) {
+    querySearchAsyncDelivery(queryString, callBack) {
       let results = queryString ? this.currentOrderLine.filter(this.createFilter(queryString)) : this.currentOrderLine
       const searchStructure = results.map(product => {
         return {

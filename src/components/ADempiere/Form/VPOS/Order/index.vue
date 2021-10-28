@@ -100,11 +100,11 @@
                     <template v-if="isEditQtyOrdered && fileColumnNameEdit === 'CurrentPrice' && valueOrder.columnName === 'CurrentPrice' && !isEmptyValue(isEditLine.uuid) && isEditLine.uuid === scope.row.uuid">
                       <el-input-number
                         ref="editField"
-                        v-model="scope.row.priceList"
+                        v-model="currentEditLine"
                         v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
                         :autofocus="true"
                         controls-position="right"
-                        @change="changeEdit(scope.row.priceList, 'PriceEntered')"
+                        @change="changeEdit(currentValuePriceLine(scope.row), 'PriceEntered')"
                         @shortkey.native="theActionEdit"
                       />
                     </template>
@@ -646,6 +646,17 @@ export default {
       }
       return {}
     },
+    currentEditLine: {
+      get() {
+        if (this.isEmptyValue(this.currentLineOrder)) {
+          return {}
+        }
+        return this.currentValuePriceLine(this.currentLineOrder)
+      },
+      set(val) {
+        return val
+      }
+    },
     currentPriceList() {
       if (!this.isEmptyValue(this.$store.getters.currentPriceList)) {
         return this.$store.getters.currentPriceList
@@ -750,9 +761,6 @@ export default {
           documentTypeUuid: this.currentDocumentType.uuid
         })
       }
-    },
-    currentDocumentType(value) {
-      this.$store.commit('setCurrentDocumentTypePos', value)
     }
   },
   mounted() {

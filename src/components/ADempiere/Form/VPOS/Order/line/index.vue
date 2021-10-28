@@ -126,6 +126,12 @@ export default {
         return this.currentPointOfSales.priceList.currency
       }
       return {}
+    },
+    isDisplayTaxAmount() {
+      return this.currentPointOfSales.isDisplayTaxAmount
+    },
+    isDisplayDiscount() {
+      return this.currentPointOfSales.isDisplayDiscount
     }
   },
 
@@ -137,10 +143,23 @@ export default {
         this.isLoadedField = true
       }
       if (value) {
+        let price
+        if (this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
+          price = this.currentLine.price
+        }
+        if (!this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
+          price = this.currentLine.priceListWithTax
+        }
+        if (!this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
+          price = this.currentLine.priceList
+        }
+        if (this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
+          price = this.currentLine.price
+        }
         this.fillOrderLineQuantities({
-          currentPrice: this.currentLine.priceList,
+          currentPrice: price,
           quantityOrdered: this.currentLine.quantity,
-          discount: this.currentLine.discountRate
+          discount: this.currentLine.discount
         })
         this.isLoadedField = true
       }

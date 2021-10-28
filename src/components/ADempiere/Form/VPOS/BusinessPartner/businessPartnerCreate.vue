@@ -210,21 +210,6 @@ export default {
       this.$store.commit('updateValuesOfContainer', {
         containerUuid,
         attributes: [{
-          columnName: 'Name',
-          value: address.first_name
-        }, {
-          columnName: 'Description',
-          value: address.description
-        }, {
-          columnName: 'Phone',
-          value: address.phone
-        }, {
-          columnName: 'EMail',
-          value: address.email
-        }, {
-          columnName: 'ContactName',
-          value: this.empty(address.contact_name)
-        }, {
           columnName: 'C_Country_ID_UUID',
           value: undefined
         }, {
