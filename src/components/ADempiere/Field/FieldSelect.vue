@@ -283,17 +283,18 @@ export default {
           this.displayedValue = option.label
           this.uuidValue = option.uuid
         } else {
-          if (!this.isEmptyValue(this.metadata.displayColumnName)) {
+          if (!this.isEmptyValue(this.displayedValue)) {
             // verify if exists to add
             this.optionsList.push({
               id: value,
               // TODO: Add uuid
-              label: this.metadata.displayColumnName
+              label: this.displayedValue
             })
           } else {
             if (!this.isPanelWindow || (this.isPanelWindow &&
               !this.isEmptyValue(this.$route.query) &&
               this.$route.query.action === 'create-new')) {
+              // request lookup
               this.getDataLookupItem()
             }
           }
