@@ -666,14 +666,14 @@ export default {
       return {}
     },
     currentDocumentType() {
-      if (this.isEmptyValue(this.$store.getters.getCurrentDocumentTypePo)) {
-        return {}
-      }
       if (!this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.documentType)) {
         if (!this.isEmptyValue(this.currentOrder.documentType)) {
           return this.currentOrder.documentType
         }
         return this.$store.getters.getCurrentDocumentTypePos
+      }
+      if (this.isEmptyValue(this.$store.getters.getCurrentDocumentTypePos)) {
+        return {}
       }
       return {}
     },
