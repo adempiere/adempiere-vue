@@ -344,7 +344,7 @@
                   {{ orderDate }}
                 </b>
               </p>
-              <p class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
+              <p v-if="!isEmptyValue(currentOrder.documentType.name)" class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.itemQuantity') }}
                 <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
@@ -381,7 +381,7 @@
                   {{ orderDate }}
                 </b>
               </p>
-              <p class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
+              <p v-if="!isEmptyValue(currentOrder.documentType.name)" class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.itemQuantity') }}:
                 <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">

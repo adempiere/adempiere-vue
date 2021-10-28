@@ -310,15 +310,14 @@ export default {
           return this.formatPrice(row.price, currency)
         }
         if (!this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
-          return this.formatPrice(row.priceListWithTax, currency)
+          return this.formatPrice(row.priceWithTax, currency)
         }
         if (!this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
           return this.formatPrice(row.priceList, currency)
         }
         if (this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
-          return this.formatPrice(row.price, currency)
+          return this.formatPrice(row.priceList, currency)
         }
-        return this.formatPrice(row.priceListWithTax, currency)
       } else if (columnName === 'QtyEntered') {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {
@@ -326,9 +325,9 @@ export default {
       } else if (columnName === 'taxIndicator') {
         return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
-        return this.formatPrice(row.totalBaseAmountWithTax, currency)
+        return this.formatPrice(row.totalAmountWithTax, currency)
       } else if (columnName === 'ConvertedAmount') {
-        return this.formatPrice(row.totalBaseAmountWithTax / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
+        return this.formatPrice(row.totalAmountWithTax / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       } else if (columnName === 'DiscountTotal') {
         return this.formatPrice(row.totalDiscountAmount, currency)
       } else if (columnName === 'DisplayTaxAmount') {
