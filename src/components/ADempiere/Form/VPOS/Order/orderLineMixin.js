@@ -302,7 +302,7 @@ export default {
       } else if (columnName === 'GrandTotal') {
         return this.formatPrice((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal, currency)
       } else if (columnName === 'ConvertedAmount') {
-        const price = ((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal).toFixed(2)
+        const price = ((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal)
         return this.formatPrice(price / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       } else if (columnName === 'DiscountTotal') {
         return this.formatPrice((row.priceList * row.quantityOrdered) * (row.discountRate / 100), currency)
