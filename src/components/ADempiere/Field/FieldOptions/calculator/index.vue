@@ -1,7 +1,7 @@
 <!--
  ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
  Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
- Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+ Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -15,95 +15,114 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
-  <el-card class="box-card" style="padding: 1%;">
+  <el-card class="box-card calculator-option">
     <div slot="header" class="clearfix">
       <span>
-        {{ $t('field.field') }}
+        {{ $t('fieldOptions.field') }}:
         <b> {{ fieldAttributes.name }} </b>
       </span>
     </div>
-    <el-form ref="form" label-position="top" label-width="120px" @submit.native.prevent="notSubmitForm">
-      <el-form-item label="Valor">
+
+    <el-form
+      ref="formCalculator"
+      class="calculator-form"
+      label-position="top"
+      label-width="120px"
+      @submit.native.prevent="notSubmitForm"
+    >
+      <el-form-item>
+        <template slot="label">
+          {{ $t('fieldOptions.value') }}: {{ valueToDisplay }}
+        </template>
+
         <el-input
           ref="calculatorInput"
           v-model="calcValue"
           class="calculator-input"
           size="mini"
           readonly
-          @keydown.native="calculateValue"
+          clearable
+          @input="validateInput"
+          @keydown.native="calculateDisplayedValue"
           @keyup.enter.native="changeValue"
         />
       </el-form-item>
     </el-form>
+
     <el-table
       ref="calculator"
-      :data="tableData"
+      :data="tableButtons"
       style="width: 100%"
       border
       size="mini"
       :show-header="false"
       :span-method="spanMethod"
       class="calculator-table"
-      @cell-click="sendValue"
+      @cell-click="clickValue"
     >
       <el-table-column
         align="center"
         prop="row1"
-        height="15"
-        width="45"
+        :height="columnHeight"
+        :width="columnWidth"
       >
         <template slot-scope="{ row, column }">
           <el-button type="text" :disabled="isDisabled(row, column)">
-            {{ row.row1.value }}
+            {{ row.row1.dispayed || row.row1.value }}
           </el-button>
         </template>
       </el-table-column>
+
       <el-table-column
         align="center"
         prop="row2"
-        height="15"
-        width="45"
+        :height="columnHeight"
+        :width="columnWidth"
       >
         <template slot-scope="{ row, column }">
           <el-button type="text" :disabled="isDisabled(row, column)">
-            {{ row.row2.value }}
+            {{ row.row2.dispayed || row.row2.value }}
           </el-button>
         </template>
       </el-table-column>
+
       <el-table-column
         align="center"
         prop="row3"
-        height="15"
-        width="45"
+        :height="columnHeight"
+        :width="columnWidth"
       >
         <template slot-scope="{ row, column }">
           <el-button type="text" :disabled="isDisabled(row, column)">
-            {{ row.row3.value }}
+            {{ row.row3.dispayed || row.row3.value }}
           </el-button>
         </template>
       </el-table-column>
+
       <el-table-column
         align="center"
         prop="row4"
-        height="15"
-        width="45"
+        :height="columnHeight"
+        :width="columnWidth"
       >
         <template slot-scope="{ row, column }">
           <el-button type="text" :disabled="isDisabled(row, column)">
-            {{ row.row4.value }}
+            {{ row.row4.dispayed || row.row4.value }}
           </el-button>
         </template>
       </el-table-column>
+
       <el-table-column
         align="center"
         prop="row5"
-        height="15"
-        width="45"
+        :height="columnHeight"
+        :width="columnWidth"
       >
         <template slot-scope="{ row, column }">
           <el-button type="text" :disabled="isDisabled(row, column)">
-            {{ row.row5.value }}
+            {{ row.row5.dispayed || row.row5.value }}
           </el-button>
         </template>
       </el-table-column>
@@ -112,58 +131,137 @@
 </template>
 
 <script>
-import { ID, INTEGER } from '@/utils/ADempiere/references'
+import { calculationValue, INPUT_NUMBER_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
+import { isIntegerField } from '@/utils/ADempiere/references'
+
 import buttons from './buttons.js'
 
 export default {
   name: 'FieldCalc',
+
   props: {
     fieldAttributes: {
       type: Object,
       required: true
     },
-    fieldValue: {
-      type: Number,
-      default: undefined
+    containerManager: {
+      type: Object,
+      default: () => ({})
     }
   },
+
   data() {
     return {
-      calcValue: this.valueField,
-      valueToDisplay: ''
+      columnHeight: 15,
+      columnWidth: 35,
+      calcValue: this.value,
+      valueToDisplay: this.value
     }
   },
+
   computed: {
-    tableData() {
-      return buttons
-    },
-    valueField() {
+    value() {
+      const { columnName, containerUuid, inTable } = this.fieldAttributes
+
+      // table records values
+      if (inTable) {
+        const row = this.$store.getters.getRowData({
+          containerUuid,
+          index: this.fieldAttributes.tableIndex
+        })
+        return row[columnName]
+      }
+
+      // main panel values
       return this.$store.getters.getValueOfField({
         parentUuid: this.fieldAttributes.parentUuid,
-        containerUuid: this.fieldAttributes.containerUuid,
-        columnName: this.fieldAttributes.columnName
+        containerUuid,
+        columnName
       })
-    }
-  },
-  watch: {
-    valueField(value) {
-      console.log(value)
     },
-    fieldValue(value) {
-      this.calcValue = value
+    tableButtons() {
+      return buttons
+    },
+    // Integer or ID
+    isInteger() {
+      return isIntegerField(this.fieldAttributes.displayType)
     }
   },
-  created() {
-    this.calcValue = this.valueField
+
+  watch: {
+    value(newValue) {
+      this.calcValue = newValue
+    }
   },
+
+  created() {
+    // focus calculator
+    this.$nextTick(() => {
+      this.focusCalc(true)
+    })
+  },
+
   methods: {
-    sendValue(row, column) {
+    clickValue(row, column) {
+      const isAcceptedType = ['result', 'clear'].includes(row[column.property].type)
+      if (!isAcceptedType && !this.isDisabled(row, column)) {
+        if (this.isEmptyValue(this.calcValue)) {
+          this.calcValue = row[column.property].value
+        } else {
+          const { selectionStart, selectionEnd } = this.$refs.calculatorInput.$refs.input
+          let text = row[column.property].value // char clicked
+          // separate positions
+          const firstText = String(this.calcValue).slice(0, selectionStart)
+          const secondText = String(this.calcValue).slice(selectionEnd)
+          text = firstText.concat(text).concat(secondText) // insert char clicked
+          this.calcValue = text
+        }
+        const result = calculationValue(this.calcValue, event)
+        if (!this.isEmptyValue(result)) {
+          this.valueToDisplay = result
+        } else {
+          this.valueToDisplay = '...'
+        }
+      }
+      if (row[column.property].type === 'clear') {
+        if (row[column.property].value === 'C') {
+          let { selectionStart, selectionEnd } = this.$refs.calculatorInput.$refs.input
+          if (selectionStart === String(this.calcValue).length) {
+            // cursor in end line, without selection
+            selectionStart = 0
+            selectionEnd = -1
+            this.calcValue = String(this.calcValue).slice(selectionStart, selectionEnd)
+          } else if (selectionStart === selectionEnd) {
+            // cursor into line without selection
+            selectionStart--
+            const firstText = String(this.calcValue).slice(0, selectionStart)
+            const secondText = String(this.calcValue).slice(selectionEnd)
+            this.calcValue = firstText.concat(secondText)
+          } else {
+            // cursor with selection
+            const firstText = String(this.calcValue).slice(0, selectionStart)
+            const secondText = String(this.calcValue).slice(selectionEnd)
+            this.calcValue = firstText.concat(secondText)
+          }
+          this.valueToDisplay = this.calcValue
+        } else if (row[column.property].value === 'AC') {
+          this.calcValue = ''
+          this.valueToDisplay = ''
+        }
+      }
+      if (row[column.property].value === '=') {
+        this.changeValue()
+      }
+    },
+    sendValue2(row, column) {
       const button = row[column.property]
       const { value, type } = button
       const isAcceptedType = ['result', 'clear'].includes(type)
       if (!isAcceptedType && !this.isDisabled(row, column)) {
-        this.isEmptyValue(this.calcValue) ? this.calcValue = value : this.calcValue += value
-        const result = this.calculationValue(this.calcValue, event)
+        this.isEmptyValue(this.calcValue)
+          ? this.calcValue = value
+          : this.calcValue += value
+        const result = calculationValue(this.calcValue, event)
         if (!this.isEmptyValue(result)) {
           this.valueToDisplay = result
         } else {
@@ -181,53 +279,43 @@ export default {
       if (value === '=') {
         this.changeValue()
       }
+
+      this.focusInputCalculator()
+    },
+    validateInput(value) {
+      this.calcValue = String(value)
+        .replace(INPUT_NUMBER_PATTERN, '')
     },
     changeValue() {
-      const newValue = Number(this.valueToDisplay)
-      let isSendCallout = true
-      const isSendToServer = true
-      const isChangedOldValue = false
-      if (this.fieldAttributes.isAdvancedQuery) {
-        isSendCallout = false
+      if (this.fieldAttributes.readonly) {
+        return
       }
 
-      const sendParameters = {
+      let newValue
+      if (!this.isEmptyValue(this.valueToDisplay)) {
+        newValue = Number(this.valueToDisplay)
+      }
+
+      this.$store.commit('updateValueOfField', {
         parentUuid: this.fieldAttributes.parentUuid,
         containerUuid: this.fieldAttributes.containerUuid,
-        field: this.fieldAttributes,
-        panelType: this.fieldAttributes.panelType,
         columnName: this.fieldAttributes.columnName,
-        newValue,
-        isAdvancedQuery: this.fieldAttributes.isAdvancedQuery,
-        isSendToServer,
-        isSendCallout,
-        isChangedOldValue
-      }
-      if (this.fieldAttributes.panelType === 'form') {
-        this.$store.commit('updateValueOfField', {
-          containerUuid: this.fieldAttributes.containerUuid,
-          columnName: this.fieldAttributes.columnName,
-          value: newValue
-        })
-      }
+        value: newValue
+      })
       this.$store.dispatch('notifyFieldChange', {
-        ...sendParameters
+        parentUuid: this.fieldAttributes.parentUuid,
+        containerUuid: this.fieldAttributes.containerUuid,
+        containerManager: this.containerManager,
+        field: this.fieldAttributes,
+        columnName: this.fieldAttributes.columnName,
+        value: newValue
       })
         .finally(() => {
-          this.clearVariables()
+          // hidden calc dropdown
           this.$children[0].visible = false
+
           this.$store.commit('changeShowRigthPanel', false)
           this.$store.commit('changeShowOptionField', false)
-          if (!this.isEmptyValue(this.$route.query.fieldColumnName)) {
-            this.$router.push({
-              name: this.$route.name,
-              query: {
-                ...this.$route.query,
-                typeAction: '',
-                fieldColumnName: ''
-              }
-            }, () => {})
-          }
         })
     },
     spanMethod({ row, column }) {
@@ -258,30 +346,59 @@ export default {
       }
     },
     isDisabled(row, column) {
-      // Integer or ID
-      const isInteger = [ID.id, INTEGER.id].includes(this.fieldAttributes.displayType)
       const { value } = row[column.property]
-      if (isInteger && value === ',') {
+      // dont set value or change value
+      if (this.fieldAttributes.readonly && value === '=') {
+        return true
+      }
+      if (this.isInteger && value === ',') {
         return true
       }
       return false
     },
-    calculateValue(event) {
-      const result = this.calculationValue(this.valueField, event)
-      if (!this.isEmptyValue(result)) {
-        this.valueToDisplay = result
-      } else {
-        this.valueToDisplay = '...'
+    calculateDisplayedValue(event) {
+      let result = calculationValue(this.value, event)
+      if (this.isEmptyValue(result)) {
+        result = '...'
+      }
+
+      this.valueToDisplay = result
+    },
+    focusCalc(isShowed) {
+      if (isShowed) {
+        this.calcValue = this.value
+        this.valueToDisplay = this.calcValue
+        this.focusInputCalculator()
       }
     },
-    focusCalc() {
+    focusInputCalculator() {
       this.$refs.calculatorInput.focus()
     }
   }
+
 }
 </script>
 
-<style>
+<style lang="scss">
+.calculator-option {
+  .el-card__header {
+    padding: 10px;
+  }
+
+  .calculator-form {
+    .el-form-item {
+      margin-bottom: 5px;
+    }
+    .el-form-item__label {
+      padding: 0px;
+    }
+  }
+
+  .el-card__body {
+    padding: 12px;
+    padding-top: 0px;
+  }
+
   .calculator-input > .el-input__inner,
   .calculator-input .el-input__inner {
     border-radius: 0px !important;
@@ -326,4 +443,5 @@ export default {
   .calculator-table .el-table th.is-leaf, .el-table td {
     border-bottom: 0px solid #dfe6ec !important;
   }
+}
 </style>

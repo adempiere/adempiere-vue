@@ -698,3 +698,21 @@ export const FIELDS_CURRENCY = [
 export function isNumberField(displayType) {
   return FIELDS_QUANTITY.includes(displayType)
 }
+
+/**
+ * Is intenger number field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isIntegerField(displayType) {
+  return [ID.id, INTEGER.id].includes(displayType)
+}
+
+/**
+ * Is decimal number field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isDecimalField(displayType) {
+  return FIELDS_DECIMALS.includes(displayType)
+}

@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-tooltip
     v-model="isShowed"
@@ -40,10 +41,12 @@
       autofocus
       @change="preHandleChange"
       @focus="focusGained"
+      @blur="customFocusLost"
       @keydown.native="keyPressed"
       @keyup.native="keyReleased"
       @keyup.native.enter="select"
     />
+
     <el-input
       v-else
       key="number-displayed-blur"
@@ -61,21 +64,30 @@
 
 <script>
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import { FIELDS_CURRENCY, FIELDS_DECIMALS } from '@/utils/ADempiere/references'
+
+// constants
+import { FIELDS_CURRENCY, isDecimalField } from '@/utils/ADempiere/references'
+
+// utils and helper methods
+import { calculationValue, INPUT_NUMBER_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
 
 export default {
   name: 'FieldNumber',
-  mixins: [fieldMixin],
+
+  mixins: [
+    fieldMixin
+  ],
+
   data() {
     return {
       showControls: true,
       isFocus: false,
       operation: '',
-      expression: /[\d\/.()%\*\+\-]/gim,
       valueToDisplay: '',
       isShowed: false
     }
   },
+
   computed: {
     cssClassStyle() {
       let styleClass = ' custom-field-number '
@@ -122,7 +134,7 @@ export default {
       return 'right'
     },
     isDecimal() {
-      return FIELDS_DECIMALS.includes(this.metadata.displayType)
+      return isDecimalField(this.metadata.displayType)
     },
     isCurrency() {
       return FIELDS_CURRENCY.includes(this.metadata.displayType)
@@ -172,6 +184,7 @@ export default {
       return this.$store.getters.getCurrency
     }
   },
+
   methods: {
     parseValue(value) {
       if (this.isEmptyValue(value)) {
@@ -180,6 +193,10 @@ export default {
       return Number(value)
     },
     customFocusGained(event) {
+      if (this.metadata.readonly) {
+        this.isFocus = false
+        return
+      }
       this.isFocus = true
       // this.focusGained(event)
       this.$nextTick(() => {
@@ -195,10 +212,10 @@ export default {
       this.isFocus = false
       // this.focusLost(event)
     },
-    calculateValue(event) {
-      const isAllowed = event.key.match(this.expression)
+    calculateDisplayedValue(event) {
+      const isAllowed = event.key.match(INPUT_NUMBER_PATTERN)
       if (isAllowed) {
-        const result = this.calculationValue(this.value, event)
+        const result = calculationValue(this.value, event)
         if (!this.isEmptyValue(result)) {
           this.valueToDisplay = result
           this.isShowed = true
@@ -210,7 +227,7 @@ export default {
         if (String(this.value).slice(0, -1) > 0) {
           event.preventDefault()
           const newValue = String(this.value).slice(0, -1)
-          const result = this.calculationValue(newValue, event)
+          const result = calculationValue(newValue, event)
           if (!this.isEmptyValue(result)) {
             this.value = this.parseValue(result)
             this.valueToDisplay = result
@@ -224,7 +241,7 @@ export default {
         if (String(this.value).slice(-1) > 0) {
           event.preventDefault()
           const newValue = String(this.value).slice(-1)
-          const result = this.calculationValue(newValue, event)
+          const result = calculationValue(newValue, event)
           if (!this.isEmptyValue(result)) {
             this.value = this.parseValue(result)
             this.valueToDisplay = result
@@ -238,12 +255,71 @@ export default {
         event.preventDefault()
       }
     },
+    calculateValue(event) {
+      const result = calculationValue(this.value, event)
+      if (!this.isEmptyValue(result)) {
+        this.valueToDisplay = result
+      } else {
+        this.valueToDisplay = '...'
+      }
+      this.isShowed = true
+
+      /**
+      const isAllowed = event.key.match(oeprationPattern)
+      if (isAllowed) {
+        const result = this.calculationValue(this.value, event)
+        if (!this.isEmptyValue(result)) {
+          this.valueToDisplay = result
+        } else {
+          this.valueToDisplay = '...'
+        }
+        this.isShowed = true
+      } else {
+        const { selectionStart, selectionEnd } = event.target
+        if (event.key === 'Backspace') {
+          const newValue = this.deleteChar({ value: this.value, selectionStart, selectionEnd })
+          if (newValue > 0) {
+            event.preventDefault()
+            const result = this.calculationValue(newValue, event)
+            if (!this.isEmptyValue(result)) {
+              this.value = this.validateValue(result)
+              this.valueToDisplay = result
+            } else {
+              this.valueToDisplay = '...'
+            }
+            this.isShowed = true
+          }
+        } else if (event.key === 'Delete') {
+          const newValue = this.deleteChar({ value: this.value, selectionStart, selectionEnd, isReverse: false })
+          if (String(this.value).slice(-1) > 0) {
+            event.preventDefault()
+            const newValue = String(this.value).slice(-1)
+            const result = this.calculationValue(newValue, event)
+            if (!this.isEmptyValue(result)) {
+              this.value = this.validateValue(result)
+              this.valueToDisplay = result
+            } else {
+              this.valueToDisplay = '...'
+            }
+            this.isShowed = true
+          }
+        } else {
+          event.preventDefault()
+        }
+      }
+      */
+    },
+    validateInput(event) {
+      const value = String(event.target.value)
+        .replace(INPUT_NUMBER_PATTERN, '')
+      this.value = value
+    },
     changeValue() {
       if (!this.isEmptyValue(this.valueToDisplay) && this.valueToDisplay !== '...') {
         const result = this.parseValue(this.valueToDisplay)
         this.preHandleChange(result)
       }
-      this.clearVariables()
+
       this.isShowed = false
     }
   }

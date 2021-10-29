@@ -32,6 +32,7 @@
         <template slot="label">
           <field-options
             :metadata="fieldAttributes"
+            :container-manager="containerManager"
           />
         </template>
 

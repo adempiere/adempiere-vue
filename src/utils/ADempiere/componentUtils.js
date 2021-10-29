@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Yamel Senih ysenih@erpya.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,23 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export {
-  tagStatus,
-  iconStatus,
-  isEmptyValue,
-  currencyFind,
-  tenderTypeFind,
-  formatConversionCurrenty,
-  round,
-  convertValuesToSend,
-  typeValue,
-  tableColumnDataType
-} from '@/utils/ADempiere/valueUtils.js'
-
-export {
-  zeroPad
-} from '@/utils/ADempiere/formatValue/numberFormat.js'
-
-export {
-  notSubmitForm
-} from '@/utils/ADempiere/componentUtils.js'
+/**
+ * Using forms and events with the enter key prevents the page from reloading
+ * with @submit.native.prevent="notSubmitForm" in el-form component
+ */
+export function notSubmitForm(event) {
+  event.preventDefault()
+  return false
+}

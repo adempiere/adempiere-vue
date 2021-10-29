@@ -22,6 +22,7 @@ import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
 // utils and helper methods
 import { convertStringToBoolean } from '@/utils/ADempiere/valueFormat.js'
 import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+import { OPERATION_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
 
 /**
  * Checks if value is empty. Deep-checks arrays and objects
@@ -530,44 +531,25 @@ export function iconStatus(iconElment) {
   return icon
 }
 
-let partialValue = ''
-export function calculationValue(value, event) {
-  const isZero = Number(value) === 0
-  const VALIDATE_EXPRESSION = /[\d\/.()%\*\+\-]/gim
-  const isValidKey = VALIDATE_EXPRESSION.test(event.key)
-  if (event.type === 'keydown' && isValidKey) {
-    partialValue += event.key
-    const operation = isEmptyValue(value) || isZero ? partialValue : String(value) + partialValue
-    if (!isEmptyValue(operation)) {
-      try {
-        // eslint-disable-next-line no-eval
-        return eval(operation) + ''
-      } catch (error) {
-        return null
-      }
-    }
-  } else if (event.type === 'click') {
-    if (!isEmptyValue(value)) {
-      try {
-        // eslint-disable-next-line no-eval
-        return eval(value) + ''
-      } catch (error) {
-        return null
-      }
-    }
-  } else {
-    if ((event.key === 'Backspace' || event.key === 'Delete') && !isEmptyValue(value)) {
-      try {
-        // eslint-disable-next-line no-eval
-        return eval(value) + ''
-      } catch (error) {
-        return null
-      }
-    } else {
-      return null
-    }
+/**
+ * Insert char in positions text
+ * @author Edwin Betancourt <EdwinBetanc0urt@oulook.com>
+ * @param {number|string} value
+ * @param {number|string} char
+ * @param {number} selectionStart
+ * @param {number} selectionEnd
+ */
+export function charInText({ value, char, selectionStart, selectionEnd }) {
+  if (OPERATION_PATTERN.test(char)) {
+    // separate positions
+    const firstText = String(value).slice(0, selectionStart)
+    const secondText = String(value).slice(selectionEnd)
+    const text = firstText.concat(char).concat(secondText) // insert char clicked
+    return text
   }
+  return null
 }
+
 export function convertValuesToSendListOrders(values) {
   const valuesToSend = {}
 
@@ -673,10 +655,6 @@ export function tenderTypeFind({
     return payment.label
   }
   return currentPayment
-}
-
-export function clearVariables() {
-  partialValue = ''
 }
 
 export function formatConversionCurrenty(params) {

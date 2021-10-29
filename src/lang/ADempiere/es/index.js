@@ -1,11 +1,13 @@
 
 import actionMenu from './actionMenu'
 import fieldDisplayOptions from './fieldDisplayOptions'
+import fieldOptions from './fieldOptions'
 import recordManager from './recordManager'
 
 export default {
   actionMenu,
   fieldDisplayOptions,
+  fieldOptions,
   recordManager,
 
   language: 'Idioma',

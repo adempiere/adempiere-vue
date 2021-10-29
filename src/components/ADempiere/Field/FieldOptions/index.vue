@@ -81,6 +81,7 @@
                 && option.name === currentFieldOption.name"
               :field-attributes="fieldAttributes"
               :field-value="valueField"
+              :container-manager="containerManager"
             />
 
             <el-button slot="reference" type="text" style="color: #606266;">
@@ -93,7 +94,7 @@
 
     <span v-else key="options-form">
       <!-- label or name of field in form -->
-      {{ metadata.name }}
+      <label-field :is-mandatory="metadata.required" :label="metadata.name" />
     </span>
   </div>
 </template>
@@ -128,6 +129,10 @@ export default defineComponent({
   props: {
     metadata: {
       type: Object
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({})
     }
   },
 
@@ -294,6 +299,7 @@ export default defineComponent({
       set(value) {
         if (!value) {
           showPopoverPath.value = false
+          /*
           root.$router.push({
             name: root.$route.name,
             query: {
@@ -302,11 +308,16 @@ export default defineComponent({
               fieldColumnName: ''
             }
           }, () => {})
+          */
         }
       }
     })
 
     const closePopover = () => {
+      visibleForDesktop.value = false
+      // root.$store.commit('changeShowRigthPanel', false)
+      // root.$store.commit('changeShowPopoverField', true)
+      /*
       root.$router.push({
         name: root.$route.name,
         query: {
@@ -315,6 +326,7 @@ export default defineComponent({
           fieldColumnName: ''
         }
       }, () => {})
+      */
     }
 
     const handleOpen = (key, keyPath) => {
