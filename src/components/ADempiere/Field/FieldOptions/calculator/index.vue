@@ -312,10 +312,10 @@ export default {
       })
         .finally(() => {
           // hidden calc dropdown
-          this.$children[0].visible = false
+          // this.$children[0].visible = false
 
-          this.$store.commit('changeShowRigthPanel', false)
-          this.$store.commit('changeShowOptionField', false)
+          // this.$store.commit('changeShowRigthPanel', false)
+          // this.$store.commit('changeShowOptionField', false)
         })
     },
     spanMethod({ row, column }) {
