@@ -137,7 +137,7 @@ import { isIntegerField } from '@/utils/ADempiere/references'
 import buttons from './buttons.js'
 
 export default {
-  name: 'FieldCalc',
+  name: 'CalculatorField',
 
   props: {
     fieldAttributes: {

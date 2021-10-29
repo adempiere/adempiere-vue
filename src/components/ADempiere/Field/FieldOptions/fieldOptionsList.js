@@ -68,7 +68,7 @@ export const calculatorOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-s-operation',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/calculator')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/CalculatorField')
 }
 
 export const preferenceValueOptionItem = {
