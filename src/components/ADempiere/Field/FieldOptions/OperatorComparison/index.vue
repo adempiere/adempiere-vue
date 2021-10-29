@@ -40,7 +40,7 @@
 import { computed, defineComponent, ref } from '@vue/composition-api'
 
 export default defineComponent({
-  name: 'FieldOperatorComparison',
+  name: 'OperatorComparisonField',
 
   props: {
     fieldAttributes: {

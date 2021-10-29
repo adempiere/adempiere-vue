@@ -81,7 +81,8 @@
 <script>
 
 export default {
-  name: 'FieldChangeLogs',
+  name: 'ChangeLogsField',
+
   props: {
     fieldAttributes: {
       type: Object,
@@ -92,6 +93,7 @@ export default {
       default: undefined
     }
   },
+
   data() {
     return {
       isLoading: false,
@@ -99,6 +101,7 @@ export default {
       typeAction: 0
     }
   },
+
   computed: {
     language() {
       return this.$store.getters.language
@@ -135,6 +138,7 @@ export default {
       return 'scroll-child'
     }
   },
+
   methods: {
     sortSequence(itemA, itemB) {
       return new Date().setTime(new Date(itemB.logDate).getTime()) - new Date().setTime(new Date(itemA.logDate).getTime())
@@ -151,6 +155,7 @@ export default {
       }
     }
   }
+
 }
 </script>
 

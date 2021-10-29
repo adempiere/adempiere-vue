@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-popover
     v-if="(fieldAttributes.columnName === 'DocStatus') && (!isEmptyValue(processOrderUuid))"
@@ -59,7 +60,7 @@
 
 <script>
 export default {
-  name: 'FieldDocumentStatus',
+  name: 'DocumentStatusField',
 
   props: {
     fieldAttributes: {
@@ -159,5 +160,6 @@ export default {
       this.valueActionDocument = ''
     }
   }
+
 }
 </script>

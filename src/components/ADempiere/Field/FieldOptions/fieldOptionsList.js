@@ -46,7 +46,7 @@ export const operatorOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-rank',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/operatorComparison')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/OperatorComparison')
 }
 
 /**
@@ -84,7 +84,7 @@ export const logsOptionItem = {
   enabled: true,
   svg: true,
   icon: 'tree-table',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/changeLogs')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/ChangeLogs')
 }
 
 /**
@@ -95,7 +95,7 @@ export const documentStatusOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-set-up',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/documentStatus')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/DocumentStatus')
 }
 
 export const optionsListStandad = [
