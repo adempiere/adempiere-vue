@@ -1,7 +1,7 @@
 <!--
  ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
  Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
- Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+ Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -15,9 +15,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
-  <el-card class="box-card" style="padding: 1%;">
-    <div slot="header" class="clearfix">
+  <el-card class="field-option-card translated-field">
+    <div slot="header">
       <span>
         {{ $t('field.field') }}
         <b> {{ fieldAttributes.name }} </b>
@@ -93,7 +94,8 @@
 import { getLanguage } from '@/lang/index'
 
 export default {
-  name: 'FieldTranslated',
+  name: 'TranslatedField',
+
   props: {
     fieldAttributes: {
       type: Object,
@@ -104,6 +106,7 @@ export default {
       default: undefined
     }
   },
+
   data() {
     return {
       langValue: undefined,
@@ -111,6 +114,7 @@ export default {
       isLoading: false
     }
   },
+
   computed: {
     languageList() {
       return this.$store.getters.getLanguagesList.filter(itemLanguage => {
@@ -142,11 +146,13 @@ export default {
       return values[this.fieldAttributes.columnName]
     }
   },
+
   watch: {
     gettterValue(newValue, oldValue) {
       this.translatedValue = newValue
     }
   },
+
   created() {
     this.getTranslation()
     let langMatch = this.languageList.find(itemLanguage => {
@@ -159,6 +165,7 @@ export default {
     }
     this.langValue = langMatch
   },
+
   methods: {
     getTranslation() {
       if (this.isEmptyValue(this.getterTranslationValues)) {
@@ -193,9 +200,12 @@ export default {
       this.$store.commit('changeShowOptionField', false)
     }
   }
+
 }
 </script>
 
+<style lang="scss" src="../common-style.scss">
+</style>
 <style lang="scss" scoped>
   .custom-tittle-popover {
     font-size: 14px;

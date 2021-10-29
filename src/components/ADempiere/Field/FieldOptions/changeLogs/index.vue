@@ -15,14 +15,16 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
-  <el-card class="box-card">
-    <div slot="header" class="clearfix">
+  <el-card class="field-option-card change-log">
+    <div slot="header">
       <span>
         {{ $t('field.logsField') }}
         <b> {{ fieldAttributes.name }} </b>
       </span>
     </div>
+
     <div>
       <el-scrollbar v-if="!isEmptyValue(listLogsField)" :wrap-class="classIsMobilePanel">
         <el-timeline>
@@ -152,6 +154,8 @@ export default {
 }
 </script>
 
+<style lang="scss" src="../common-style.scss">
+</style>
 <style lang="scss" scoped>
   .custom-tittle-popover {
     font-size: 14px;

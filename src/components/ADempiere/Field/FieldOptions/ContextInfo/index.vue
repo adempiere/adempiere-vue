@@ -17,52 +17,65 @@
 -->
 
 <template>
-  <div>
-    <el-card class="box-card" style="padding: 1%;">
-      <div slot="header" class="clearfix">
-        <span>
-          {{ $t('field.field') }}
-          <b> {{ fieldAttributes.name }} </b>
-        </span>
-      </div>
-      <el-scrollbar wrap-class="scroll-child">
-        <el-form
-          ref="form"
-          label-position="top"
-          label-width="120px"
-          style="overflow: auto;"
-          @submit.native.prevent="notSubmitForm"
+  <el-card class="field-option-card context-info">
+    <div slot="header">
+      <span>
+        {{ $t('field.field') }}
+        <b> {{ fieldAttributes.name }} </b>
+      </span>
+    </div>
+
+    <el-scrollbar wrap-class="scroll-child">
+      <el-form
+        ref="form"
+        class="form-context-info"
+        label-position="top"
+        label-width="120px"
+        style="overflow: auto;"
+        @submit.native.prevent="notSubmitForm"
+      >
+        <el-form-item
+          v-if="!isEmptyValue(messageText)"
+          :label="$t('field.contextInfo')"
+          class="justify-text"
         >
-          <el-form-item v-if="!isEmptyValue(messageText)" :label="$t('field.contextInfo')">
-            {{ messageText }}
-          </el-form-item>
+          {{ messageText }}
+        </el-form-item>
 
-          <el-form-item :label="$t('field.container.description')">
-            {{ fieldAttributes.description }}
-          </el-form-item>
-
-          <el-form-item :label="$t('field.container.help')" style="word-break: normal">
-            {{ fieldAttributes.help }}
-          </el-form-item>
-        </el-form>
-      </el-scrollbar>
-
-      <template v-for="(zoomItem, index) in fieldAttributes.reference.zoomWindows">
-        <el-button
-          :key="index"
-          type="text"
-          @click="redirect({ window: zoomItem })"
+        <el-form-item
+          :label="$t('field.container.description')"
+          class="justify-text"
         >
-          {{ $t('table.ProcessActivity.zoomIn') }}
-          {{ zoomItem.name }}
-        </el-button>
-      </template>
-    </el-card>
-  </div>
+          {{ fieldAttributes.description }}
+        </el-form-item>
+
+        <el-form-item
+          v-if="!isEmptyValue(fieldAttributes.help)"
+          :label="$t('field.container.help')"
+          class="justify-text"
+        >
+          {{ fieldAttributes.help }}
+        </el-form-item>
+      </el-form>
+    </el-scrollbar>
+
+    <template v-for="(zoomItem, index) in fieldAttributes.reference.zoomWindows">
+      <el-button
+        :key="index"
+        type="text"
+        @click="redirect({ window: zoomItem })"
+      >
+        {{ $t('table.ProcessActivity.zoomIn') }}
+        {{ zoomItem.name }}
+      </el-button>
+    </template>
+  </el-card>
 </template>
 
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
+
+// utils and helper methods
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 import { parseContext } from '@/utils/ADempiere/contextUtils'
 
@@ -95,11 +108,6 @@ export default defineComponent({
       }
       return ''
     })
-
-    function notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    }
 
     function redirect({ window }) {
       const { columnName } = props.fieldAttributes
@@ -147,9 +155,30 @@ export default defineComponent({
       // computeds
       messageText,
       // methods
-      notSubmitForm,
       redirect
     }
   }
 })
 </script>
+
+<style lang="scss" src="../common-style.scss">
+</style>
+<style lang="scss">
+.context-info {
+  &.el-card {
+    max-width: 300px;
+
+    .form-context-info {
+      .el-form-item {
+        // spacing between form items
+        padding-bottom: 10px;
+
+        .el-form-item__content {
+          // text content interline
+          line-height: 20px;
+        }
+      }
+    }
+  }
+}
+</style>

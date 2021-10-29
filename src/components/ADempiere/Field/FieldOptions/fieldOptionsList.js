@@ -57,7 +57,7 @@ export const translateOptionItem = {
   enabled: true,
   svg: true,
   icon: 'language',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/translated')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/TranslatedField')
 }
 
 /**

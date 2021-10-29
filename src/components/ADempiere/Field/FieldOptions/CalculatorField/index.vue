@@ -17,8 +17,8 @@
 -->
 
 <template>
-  <el-card class="box-card calculator-option">
-    <div slot="header" class="clearfix">
+  <el-card class="field-option-card calculator-option">
+    <div slot="header">
       <span>
         {{ $t('fieldOptions.field') }}:
         <b> {{ fieldAttributes.name }} </b>
@@ -379,6 +379,8 @@ export default {
 }
 </script>
 
+<style lang="scss" src="../common-style.scss">
+</style>
 <style lang="scss">
 .calculator-option {
   .el-card__header {

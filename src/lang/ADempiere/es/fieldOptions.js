@@ -17,7 +17,9 @@
 const fieldOptions = {
   // calculator
   field: 'Campo',
-  value: 'Valor'
+  value: 'Valor',
+  // preference value
+  currentValue: 'Valor Actual'
 }
 
 export default fieldOptions

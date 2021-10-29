@@ -19,55 +19,68 @@
 <template>
   <el-card
     v-if="!isEmptyValue(metadataList)"
-    class="box-card"
-    style="padding: 1%;"
+    class="field-option-card preference-value"
+    style="min-width: 430px;"
   >
-    <div slot="header" class="clearfix">
+    <div slot="header">
       <span>
-        {{ $t('components.preference.title') }}
+        {{ $t('components.preference.title') }}:
         <b>
           {{ fieldAttributes.name }}
-          {{ fieldValue }}
         </b>
       </span>
     </div>
-    <div class="text item">
+    <div class="justify-text">
       {{ getDescriptionOfPreference }}
     </div>
-    <br>
 
-    <div class="text item">
-      <el-form
-        :inline="true"
-      >
-        <el-form-item>
-          <p slot="label">
-            {{ fieldAttributes.name }}: {{ fieldValue }}
-          </p>
-        </el-form-item>
-      </el-form>
+    <div style="margin-top: 10px;">
+      <ul>
+        <li>
+          {{ $t('fieldOptions.currentValue') }}:
+          <b>
+            <!-- TODO: Add parsed value to boolean and date -->
+            <template v-if="!isEmptyValue(displayedValue)">
+              {{ value }} - {{ displayedValue }}
+            </template>
+            <template v-else>
+              {{ value }}
+            </template>
+          </b>
+        </li>
+      </ul>
+
+      <hr>
       <el-form
         label-position="top"
         :inline="true"
-        class="demo-form-inline"
+        class="form-values"
         size="medium"
       >
-        <el-form-item
-          v-for="(field) in metadataList"
-          :key="field.sequence"
-        >
-          <p slot="label">
-            {{ field.name }}
-          </p>
-          <el-switch
-            v-model="field.value"
-          />
-        </el-form-item>
+        <el-row>
+          <el-col
+            v-for="(field) in metadataList"
+            :key="field.sequence"
+            :xs="6"
+            :sm="6"
+            :md="6"
+            :lg="6"
+            :xl="6"
+          >
+            <el-form-item>
+              <p slot="label" style="margin-bottom: 0px;margin-top: 0px;">
+                {{ field.name }}
+              </p>
+              <el-switch
+                v-model="field.value"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
     </div>
-    <br>
 
-    <el-row>
+    <el-row class="footer">
       <el-col :span="24">
         <samp style="float: left; padding-right: 10px;">
           <el-button
@@ -114,21 +127,19 @@ import { setPreference, deletePreference } from '@/api/ADempiere/field/preferenc
 
 export default {
   name: 'PreferenceValue',
+
   mixins: [
     formMixin
   ],
+
   props: {
     fieldAttributes: {
       type: [Object],
       required: true,
       default: null
-    },
-    fieldValue: {
-      type: [String, Number, Boolean, Date, Array, Object],
-      required: true,
-      default: ''
     }
   },
+
   data() {
     return {
       preferenceFields,
@@ -138,6 +149,7 @@ export default {
       isActive: false
     }
   },
+
   computed: {
     fieldsListPreference() {
       return this.metadataList.map(item => {
@@ -147,6 +159,39 @@ export default {
           columnName: item.columnName,
           sequence: item.sequence
         }
+      })
+    },
+    value() {
+      const { columnName, containerUuid, inTable } = this.fieldAttributes
+      // table records values
+      if (inTable) {
+        const row = this.$store.getters.getRowData({
+          containerUuid,
+          index: this.fieldAttributes.tableIndex
+        })
+        return row[columnName]
+      }
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.fieldAttributes.parentUuid,
+        containerUuid,
+        columnName
+      })
+    },
+    displayedValue() {
+      // DisplayColumn_'ColumnName'
+      const { displayColumnName: columnName, containerUuid, inTable } = this.fieldAttributes
+      // table records values
+      if (inTable) {
+        const row = this.$store.getters.getRowData({
+          containerUuid,
+          index: this.fieldAttributes.tableIndex
+        })
+        return row[columnName]
+      }
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.fieldAttributes.parentUuid,
+        containerUuid,
+        columnName
       })
     },
 
@@ -209,10 +254,11 @@ export default {
       return expl
     }
   },
+
   watch: {
-    isActive(value) {
-      const preferenceValue = this.fieldValue
-      if (value && this.isEmptyValue(this.metadataList)) {
+    isActive(newValue) {
+      const preferenceValue = this.value
+      if (newValue && this.isEmptyValue(this.metadataList)) {
         this.setFieldsList()
       }
       if (!this.isEmptyValue(preferenceValue)) {
@@ -224,14 +270,17 @@ export default {
       }
     }
   },
+
   beforeMount() {
     if (this.isEmptyValue(this.metadataList)) {
       this.setFieldsList()
     }
   },
+
   methods: {
     close() {
       if (!this.isEmptyValue(this.$route.query.fieldColumnName)) {
+        /*
         this.$router.push({
           name: this.$route.name,
           query: {
@@ -240,6 +289,7 @@ export default {
             fieldColumnName: ''
           }
         }, () => {})
+        */
         this.$children[0].visible = false
         this.$store.commit('changeShowRigthPanel', false)
         this.$store.commit('changeShowOptionField', false)
@@ -278,8 +328,9 @@ export default {
             const data = metadata
             fieldsList.push({
               ...data,
-              containerUuid: 'field-reference'
+              containerUuid: `field-preference`
             })
+
             if (data.value) {
               this.description.push(data.name)
             }
@@ -294,7 +345,7 @@ export default {
       setPreference({
         parentUuid: this.fieldAttributes.parentUuid,
         attribute: this.fieldAttributes.columnName,
-        value: this.fieldValue,
+        value: this.value,
         isForCurrentClient: this.clientField.value,
         isForCurrentOrganization: this.organizationField.value,
         isForCurrentUser: this.userField.value,
@@ -316,5 +367,30 @@ export default {
         })
     }
   }
+
 }
 </script>
+
+<style lang="scss" src="../common-style.scss">
+</style>
+<style lang="scss">
+.preference-value {
+  >.el-card__body {
+    padding-top: 5px !important;
+
+    .el-form-item {
+      margin-bottom: 0px !important;
+    }
+
+    .form-values {
+      padding-bottom: 10px;
+    }
+
+    .footer {
+      // line footer
+      border-top: 1px solid #e6ebf5 !important;
+      padding-top: 10px;
+    }
+  }
+}
+</style>
