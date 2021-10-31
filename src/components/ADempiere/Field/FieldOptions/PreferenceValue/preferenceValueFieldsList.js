@@ -22,6 +22,7 @@ export default [
     overwriteDefinition: {
       size: 24,
       sequence: 0,
+      isActiveLogics: true, // enable logics
       isReadOnly: true,
       handleActionPerformed: true,
       handleContentSelection: true,
@@ -37,10 +38,12 @@ export default [
     overwriteDefinition: {
       size: 24,
       sequence: 1,
+      isActiveLogics: true, // enable logics
       handleActionPerformed: true,
       handleContentSelection: true,
       handleActionKeyPerformed: true,
       componentPath: 'FieldYesNo',
+      readOnlyLogic: `@AD_Client_ID@='N'`,
       value: false
     }
   },
@@ -51,6 +54,7 @@ export default [
     overwriteDefinition: {
       size: 24,
       sequence: 2,
+      isActiveLogics: true, // enable logics
       isReadOnly: true,
       handleActionPerformed: true,
       handleContentSelection: true,
@@ -66,6 +70,7 @@ export default [
     overwriteDefinition: {
       size: 24,
       sequence: 3,
+      isActiveLogics: true, // enable logics
       isReadOnly: true,
       handleActionPerformed: true,
       handleContentSelection: true,

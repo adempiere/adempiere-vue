@@ -169,26 +169,7 @@ export default {
     resetAllFilters: 'Reiniciar todos los filtros',
     switchActiveText: 'Si',
     switchInactiveText: 'No',
-    contextFieldTitle: 'Información de Contexto',
-    preference: {
-      title: 'Valor de Preferencia',
-      attribute: 'Atributo',
-      code: 'Codigo',
-      yes: 'Si',
-      no: 'No',
-      defaultMessage: 'Aplica para Esta ',
-      defaultMessageUser: 'Aplica para Este ',
-      preferenceIsOk: 'Preferencia guardada',
-      preferenceRemoved: 'Preferencia Eliminada',
-      for: 'Para ',
-      clientAndOrganization: 'esta Compañía y Organización',
-      allOrganizationOfClient: 'todas las Organizaciones de esta Compañía',
-      entireSystem: 'todo el Sistema',
-      thisUser: ', este Usuario',
-      allUsers: ', todos los Usuarios',
-      thisWindow: ' y esta Ventana',
-      allWindows: ' y todas las Ventanas'
-    }
+    contextFieldTitle: 'Información de Contexto'
   },
   grid: {
     recordAccess: {

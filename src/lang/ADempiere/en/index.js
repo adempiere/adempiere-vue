@@ -68,6 +68,7 @@ export default {
   navbar: {
     badge: {
       Notifications: 'Notifications',
+      activity: 'Worflow for Approval',
       link: 'Go to Procces Logs'
     },
     dashboard: 'Dashboard',
@@ -168,26 +169,7 @@ export default {
     resetAllFilters: 'Reset all filters',
     switchActiveText: 'Yes',
     switchInactiveText: 'Not',
-    contextFieldTitle: 'Context Information',
-    preference: {
-      title: 'Preference Value',
-      attribute: 'Attribute',
-      code: 'Code',
-      yes: 'Yes',
-      no: 'No',
-      defaultMessage: 'Applies for this ',
-      defaultMessageUser: 'Applies for this ',
-      preferenceIsOk: 'The preference is saved',
-      preferenceRemoved: 'Preference Removed',
-      for: 'For ',
-      clientAndOrganization: 'this Client and Organization',
-      allOrganizationOfClient: 'all Organizations of this Client',
-      entireSystem: 'entire System',
-      thisUser: ', this User',
-      allUsers: ', all Users',
-      thisWindow: ' and this Window',
-      allWindows: ' and all Windows'
-    }
+    contextFieldTitle: 'Context Information'
   },
   grid: {
     recordAccess: {

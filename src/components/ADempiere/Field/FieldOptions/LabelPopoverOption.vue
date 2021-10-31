@@ -1,7 +1,16 @@
 <template>
-  <div :style="textStyle">
-    <i v-if="!option.svg" :class="option.icon" style="font-weight: bolder;" />
-    <svg-icon v-else :icon-class="option.icon" :style="iconWrapperStyle" />
+  <div class="label-popover-option" :style="textStyle">
+    <i
+      v-if="!option.svg"
+      :class="option.icon"
+      style="font-weight: bolder;"
+    />
+    <svg-icon
+      v-else
+      :icon-class="option.icon"
+      :style="iconWrapperStyle"
+    />
+
     <span>
       <b class="label">
         {{ option.name }}
@@ -11,7 +20,11 @@
 </template>
 
 <script>
-export default {
+import { defineComponent, computed } from '@vue/composition-api'
+
+export default defineComponent({
+  name: 'LabelPopoverOption',
+
   props: {
     option: {
       type: Object,
@@ -22,29 +35,44 @@ export default {
       default: false
     }
   },
-  computed: {
-    iconWrapperStyle() {
-      if (this.isMobile) {
-        return { 'margin-right': '6px' }
+
+  setup(props) {
+    const iconWrapperStyle = computed(() => {
+      if (props.isMobile) {
+        return {
+          'margin-right': '6px'
+        }
       }
       return {
         'margin-left': '5px',
         'margin-right': '13px'
       }
-    },
-    textStyle() {
-      if (!this.isMobile) {
-        return ''
+    })
+
+    const textStyle = computed(() => {
+      if (props.isMobile) {
+        return {
+          'font-size': '130%',
+          'margin': '7px'
+        }
       }
-      return { 'font-size': '130%', 'margin': '7px' }
+      return ''
+    })
+
+    return {
+      iconWrapperStyle,
+      textStyle
     }
   }
-}
+
+})
 </script>
 
-<style >
-.svg-icon-wrapper {
+<style lang="scss">
+.label-popover-option {
+  .svg-icon-wrapper {
     margin-left: 5px;
     margin-right: 13px;
+  }
 }
 </style>

@@ -24,22 +24,25 @@ export default defineComponent({
     label: {
       type: String,
       default: ''
-    },
-    isMobile: {
-      type: Boolean,
-      default: false
     }
   },
 
-  setup(props) {
+  setup(props, { root }) {
+    const isMobile = computed(() => {
+      return root.$store.state.app.device === 'mobile'
+    })
+
     const labelStyle = computed(() => {
-      let displayStyle
-      props.isMobile ? displayStyle = 'display: flex; width: auto;' : 'display: block;'
+      let displayStyle = 'display: block;'
+      if (isMobile.value) {
+        displayStyle = 'display: flex; width: auto;'
+      }
+
       return displayStyle + ' margin-left: 3px;'
     })
 
     const iconStyle = computed(() => {
-      if (props.isMobile) {
+      if (isMobile.value) {
         return 'margin-left: 5px; margin-top: 7px;'
       }
       return 'margin-left: -5px; padding-bottom: 6px;'

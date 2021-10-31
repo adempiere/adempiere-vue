@@ -24,7 +24,7 @@
   >
     <div slot="header">
       <span>
-        {{ $t('components.preference.title') }}:
+        {{ $t('fieldOptions.preference.title') }}:
         <b>
           {{ fieldAttributes.name }}
         </b>
@@ -121,9 +121,13 @@
 
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin'
+
 import preferenceFields from './preferenceValueFieldsList.js'
 import { CLIENT, ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
+
 import { setPreference, deletePreference } from '@/api/ADempiere/field/preference.js'
+
+const containerUuid = `field-preference`
 
 export default {
   name: 'PreferenceValue',
@@ -144,9 +148,9 @@ export default {
     return {
       preferenceFields,
       metadataList: [],
-      code: '',
       description: [],
-      isActive: false
+      isCustomForm: true,
+      containerUuid
     }
   },
 
@@ -217,57 +221,39 @@ export default {
     },
 
     getDescriptionOfPreference() {
-      if (this.isEmptyValue(this.metadataList)) {
-        return ''
-      }
-      if (!this.clientField) {
+      if (this.isEmptyValue(this.metadataList) || !this.clientField) {
         return ''
       }
 
       // Create Message
-      let expl = this.$t('components.preference.for')
-      if (this.clientField && this.organizationField) {
-        if (this.clientField.value && this.organizationField.value) {
-          expl = expl.concat(this.$t('components.preference.clientAndOrganization'))
-        } else if (this.clientField.value && !this.organizationField.value) {
-          expl = expl.concat(this.$t('components.preference.allOrganizationOfClient'))
-        } else if (!this.clientField.value && this.organizationField.value) {
-          expl = expl.concat(this.$t('components.preference.entireSystem'))
+      let expl = this.$t('fieldOptions.preference.for')
+      if (this.organizationField) {
+        if (this.clientField.value) {
+          if (this.organizationField.value) {
+            expl += this.$t('fieldOptions.preference.clientAndOrganization')
+          } else {
+            expl += this.$t('fieldOptions.preference.allOrganizationOfClient')
+          }
         } else {
-          expl = expl.concat(this.$t('components.preference.entireSystem'))
+          expl += this.$t('fieldOptions.preference.entireSystem')
         }
       }
 
       if (this.userField && this.containerField) {
         if (this.userField.value) {
-          expl = expl.concat(this.$t('components.preference.thisUser'))
+          expl += this.$t('fieldOptions.preference.thisUser')
         } else {
-          expl = expl.concat(this.$t('components.preference.allUsers'))
+          expl += this.$t('fieldOptions.preference.allUsers')
         }
 
         if (this.containerField.value) {
-          expl = expl.concat(this.$t('components.preference.thisWindow'))
+          expl += this.$t('fieldOptions.preference.thisWindow')
         } else {
-          expl = expl.concat(this.$t('components.preference.allWindows'))
+          expl += this.$t('fieldOptions.preference.allWindows')
         }
       }
-      return expl
-    }
-  },
 
-  watch: {
-    isActive(newValue) {
-      const preferenceValue = this.value
-      if (newValue && this.isEmptyValue(this.metadataList)) {
-        this.setFieldsList()
-      }
-      if (!this.isEmptyValue(preferenceValue)) {
-        if ((typeof preferenceValue !== 'string') && (this.fieldAttributes.componentPath !== 'FieldYesNo')) {
-          this.code = preferenceValue
-        } else {
-          this.code = preferenceValue
-        }
-      }
+      return expl
     }
   },
 
@@ -306,7 +292,7 @@ export default {
       })
         .then(() => {
           this.$message({
-            message: this.$t('components.preference.preferenceRemoved')
+            message: this.$t('fieldOptions.preference.preferenceRemoved')
           })
           this.close()
         })
@@ -324,15 +310,14 @@ export default {
       // Product Code
       this.preferenceFields.forEach(element => {
         this.createFieldFromDictionary(element)
-          .then(metadata => {
-            const data = metadata
+          .then(fieldResponse => {
             fieldsList.push({
-              ...data,
-              containerUuid: `field-preference`
+              ...fieldResponse,
+              containerUuid: this.containerUuid
             })
 
-            if (data.value) {
-              this.description.push(data.name)
+            if (fieldResponse.value) {
+              this.description.push(fieldResponse.name)
             }
           }).catch(error => {
             console.warn(`LookupFactory: Get Field From Server (State) - Error ${error.code}: ${error.message}.`)
@@ -353,17 +338,18 @@ export default {
       })
         .then(() => {
           this.$message({
-            message: this.$t('components.preference.preferenceIsOk')
+            message: this.$t('fieldOptions.preference.preferenceIsOk')
           })
-          this.close()
         })
         .catch(error => {
           this.$message({
             message: error.message,
             type: 'error'
           })
-          this.close()
           console.warn(`setPreference error: ${error.message}.`)
+        })
+        .finally(() => {
+          this.close()
         })
     }
   }
