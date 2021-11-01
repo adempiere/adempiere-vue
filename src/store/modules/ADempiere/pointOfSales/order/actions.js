@@ -192,6 +192,7 @@ export default {
       documentType: attribute.documentType, // name, printName
       salesRepresentative: attribute.salesRepresentative, // id, uuid, name, description,
       totalLines: attribute.totalLines,
+      isDelivered: attribute.isDelivered,
       grandTotal: attribute.grandTotal
     }
     // if (setToStore) {

@@ -33,6 +33,8 @@
           ref="searchValue"
           v-model="input"
           :fetch-suggestions="querySearchAsyncDelivery"
+          :select-when-unmatched="true"
+          :trigger-on-focus="false"
           :placeholder="$t('quickAccess.searchWithEnter')"
           class="search-delivery"
           @select="searchProduct"
@@ -365,10 +367,11 @@ export default {
         })
     },
     searchProduct(value) {
+      const searchValue = this.isEmptyValue(value.link) ? value : value.link
       clearTimeout(this.timeOut)
       this.timeOut = setTimeout(() => {
         this.isSearchProduct = true
-        const product = this.findProductFromOrder(value.link)
+        const product = this.findProductFromOrder(searchValue)
         this.addLineShipment({ shipmentUuid: this.currentShipment.uuid, orderLineUuid: product.uuid })
         this.input = ''
       }, 500)
@@ -391,6 +394,7 @@ export default {
         })
         .finally(() => {
           this.listShipments({ shipmentUuid })
+          this.$refs.searchValue.focus()
         })
     },
     createFilter(queryString) {
@@ -422,7 +426,8 @@ export default {
       }, 500)
     },
     findProductFromOrder(value) {
-      return this.currentOrderLine.find(line => line.product.name === value || line.product.value === value || line.product.upc === value)
+      const search = typeof value === 'string' ? value : value.value
+      return this.currentOrderLine.find(line => line.product.name === search || line.product.value === search || line.product.upc === search)
     },
     deleteLine(line) {
       deleteShipment({

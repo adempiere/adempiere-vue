@@ -458,7 +458,7 @@ export default {
   },
   computed: {
     allowsConfirmShipment() {
-      return this.currentPointOfSales.isAllowsConfirmShipment
+      return this.currentPointOfSales.isAllowsConfirmShipment && !this.currentOrder.isDelivered
     },
     infowOverdrawnInvoice() {
       if (this.$store.getters.getOverdrawnInvoice.attributePin) {
