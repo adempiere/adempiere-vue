@@ -143,13 +143,13 @@ export default {
         return line.price
       }
       if (!this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
-        return line.priceListWithTax
+        return line.priceWithTax
       }
       if (!this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
         return line.priceList
       }
       if (this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
-        return line.price
+        return line.priceList
       }
     },
     changeLine(command) {
