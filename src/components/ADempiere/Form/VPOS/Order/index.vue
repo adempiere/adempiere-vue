@@ -101,7 +101,7 @@
                       <el-input-number
                         ref="editField"
                         v-model="currentEditLine"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc'], enter: ['enter']} : {}"
                         :autofocus="true"
                         controls-position="right"
                         @change="changeEdit(currentValuePriceLine(scope.row), 'PriceEntered')"
@@ -112,7 +112,7 @@
                       <el-input-number
                         ref="editField"
                         v-model="scope.row.quantityOrdered"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc'], enter: ['enter']} : {}"
                         :autofocus="true"
                         controls-position="right"
                         @change="changeEdit(scope.row.quantityOrdered, valueOrder.columnName)"
@@ -123,7 +123,7 @@
                       <el-input-number
                         ref="editField"
                         v-model="scope.row.discount"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        v-shortkey="isEditQtyOrdered ? {close: ['esc'], enter: ['enter']} : {}"
                         :autofocus="true"
                         controls-position="right"
                         @change="changeEdit(scope.row.discount, valueOrder.columnName)"
@@ -836,6 +836,8 @@ export default {
       switch (event.srcKey) {
         case 'enter':
           this.$refs.editField[0].select()
+          this.exitEdit()
+          this.focusProducto()
           break
         case 'close':
           this.exitEdit()
