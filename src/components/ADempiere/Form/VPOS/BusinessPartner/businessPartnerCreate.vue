@@ -262,7 +262,15 @@ export default {
       }))
       const billingAddress = this.billingAddress
       if (this.isEmptyValue(billingAddress.first_name)) {
-        billingAddress.first_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
+        const region = this.$store.getters.getValueOfField({
+          containerUuid: 'Billing-Address',
+          columnName: 'DisplayColumn_C_Region_ID'
+        })
+        const city = this.$store.getters.getValueOfField({
+          containerUuid: 'Billing-Address',
+          columnName: 'DisplayColumn_C_City_ID'
+        })
+        billingAddress.first_name = region + '/' + city
       }
       values.addresses = [this.billingAddress, this.shippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
