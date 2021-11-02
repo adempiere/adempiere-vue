@@ -43,6 +43,7 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 2,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.bank'),
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       handleContentSelection: true,

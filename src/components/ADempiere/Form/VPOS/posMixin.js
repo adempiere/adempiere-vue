@@ -61,7 +61,10 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
     },
     allowsCollectOrder() {
-      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCollectOrder
+      if (this.isValidForDeleteLine(this.listOrderLine)) {
+        return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCollectOrder
+      }
+      return false
     },
     allowsModifyQuantity() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsModifyQuantity

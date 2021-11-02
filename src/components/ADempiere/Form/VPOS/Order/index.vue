@@ -238,7 +238,7 @@
                 <el-button type="primary" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
                 <el-button v-show="isValidForDeleteLine(listOrderLine)" type="danger" icon="el-icon-delete" :disabled="isDisabled" @click="deleteOrderLine(currentOrderLine)" />
                 <el-button
-                  v-show="isValidForDeleteLine(listOrderLine) && allowsCollectOrder"
+                  v-show="allowsCollectOrder"
                   type="success"
                   icon="el-icon-bank-card"
                   :disabled="!allowsCollectOrder"
