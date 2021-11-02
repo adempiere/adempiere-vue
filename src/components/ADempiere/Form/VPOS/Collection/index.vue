@@ -65,7 +65,7 @@
                   <el-col
                     v-for="field in primaryFieldsList"
                     :key="field.sequence"
-                    :span="8"
+                    :span="size"
                   >
                     <field-definition
                       :metadata-field="field.columnName === 'PayAmt' ? {
@@ -74,10 +74,11 @@
                       } : field"
                     />
                   </el-col>
-                  <el-col :span="8">
-                    <el-form-item :label="$t('form.pos.collect.paymentMethods')">
+                  <el-col :span="size">
+                    <el-form-item :label="$t('form.pos.collect.paymentMethods')" class="from-field">
                       <el-select
                         v-model="currentFieldPaymentMethods"
+                        style="display: block;"
                         @change="changePaymentMethods"
                       >
                         <el-option
@@ -89,11 +90,12 @@
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="8">
-                    <el-form-item :label="$t('form.pos.collect.Currency')">
+                  <el-col :span="size">
+                    <el-form-item :label="$t('form.pos.collect.Currency')" class="from-field">
                       <el-select
                         v-model="currentFieldCurrency"
                         :disabled="!isEmptyValue(currentAvailablePaymentMethods.reference_currency)"
+                        style="display: block;"
                         @change="changeCurrency"
                       >
                         <el-option
@@ -108,7 +110,7 @@
                   <el-col
                     v-for="field in hiddenFieldsList"
                     :key="field.sequence"
-                    :span="8"
+                    :span="size"
                   >
                     <field-definition
                       :metadata-field="field"
@@ -508,7 +510,7 @@ export default {
       if (!this.isEmptyValue(this.currentFieldCurrency)) {
         const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
         const convert = this.convertionsList.find(convert => {
-          if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+          if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id && (!this.isEmptyValue(this.dateConvertions) && this.dateConvertions === this.formatDateToSend(convert.validTo))) {
             return convert
           }
         })
@@ -599,9 +601,35 @@ export default {
         return allRefund[0].amount
       }
       return this.change
+    },
+    dateConvertions() {
+      return this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'DateTrx'
+      })
+    },
+    selectCurrentFieldCurrency() {
+      return this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+    },
+    size() {
+      const size = this.$store.getters.getWidthRight
+      if (this.primaryFieldsList.length <= 1 && this.hiddenFieldsList.length <= 1) {
+        return 8
+      }
+      return 24 / size
     }
   },
   watch: {
+    dateConvertions(value) {
+      if (!this.isEmptyValue(value) && this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered) !== value) {
+        this.$store.dispatch('searchConversion', {
+          conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
+          currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
+          currencyToUuid: this.selectCurrentFieldCurrency.uuid,
+          conversionDate: value
+        })
+      }
+    },
     pending(value) {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,

@@ -66,7 +66,7 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogicPayment: 'K',
+      displayLogicPayment: 'K,D',
       isActiveLogics: true,
       isMandatory: true
     }
