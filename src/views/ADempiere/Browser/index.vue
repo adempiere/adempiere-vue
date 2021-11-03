@@ -275,7 +275,9 @@ export default defineComponent({
           ...zoomWindow,
           uuid: root.isEmptyValue(storedBrowser.value)
             ? null
-            : storedBrowser.value.window.uuid
+            : storedBrowser.value.window
+              ? storedBrowser.value.window.uuid
+              : null
         },
 
         sharedLink

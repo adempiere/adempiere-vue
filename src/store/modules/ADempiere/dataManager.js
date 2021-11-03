@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import router from '@/router'
+
+// api request methods
 import {
   getEntities
 } from '@/api/ADempiere/user-interface/persistence'
@@ -21,7 +24,9 @@ import {
   createEntity,
   deleteEntity
 } from '@/api/ADempiere/common/persistence'
-import router from '@/router'
+
+// utils and helper methods
+import { getContext } from '@/utils/ADempiere/contextUtils'
 import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils'
 
 const dataManager = {
@@ -141,9 +146,17 @@ const dataManager = {
       })
     },
 
+    /**
+     * Get list entities
+     * @param {string} parentUuid
+     * @param {string} containerUuid
+     * @param {number} pageNumber
+     * @returns {promise} array entities list
+     */
     getEntities({
       commit,
-      getters
+      getters,
+      rootGetters
     }, {
       parentUuid,
       containerUuid,
@@ -155,11 +168,27 @@ const dataManager = {
         const token = getters.getPageToken({ containerUuid })
         pageToken = generatePageToken({ pageNumber, token })
       }
+      const { contextColumnNames } = rootGetters.getStoredTab(parentUuid, containerUuid)
+
+      const contextAttriburesList = []
+      if (!isEmptyValue(contextColumnNames)) {
+        contextColumnNames.forEach(columnName => {
+          const value = getContext({
+            containerUuid,
+            columnName
+          })
+          contextAttriburesList.push({
+            value,
+            columnName
+          })
+        })
+      }
 
       return new Promise(resolve => {
         getEntities({
           windowUuid: parentUuid,
           tabUuid: containerUuid,
+          contextAttriburesList,
           pageToken
         })
           .then(dataResponse => {

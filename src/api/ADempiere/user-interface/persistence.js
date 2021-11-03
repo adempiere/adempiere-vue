@@ -76,7 +76,8 @@ export function getEntities({
       // DSL Query
       filters,
       columns,
-      attributes: attributesValues,
+      // replace sql values
+      context_attributes: attributesValues,
       sorting: sortingDefinition,
       // Page Data
       page_token: pageToken,

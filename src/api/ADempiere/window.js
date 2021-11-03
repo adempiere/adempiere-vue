@@ -210,7 +210,7 @@ export function runCallOutRequest({
       old_value: oldValue,
       value,
       window_no: windowNo,
-      attributes: attributesList
+      context_attributes: attributesList
     }
   })
     .then(response => {

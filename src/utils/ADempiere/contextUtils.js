@@ -30,6 +30,7 @@ export default evaluator
 export const getContext = ({
   parentUuid,
   containerUuid,
+  isBooleanToString = false,
   columnName
 }) => {
   let value
@@ -50,6 +51,11 @@ export const getContext = ({
       columnName
     })
   }
+
+  if (isBooleanToString) {
+    return convertBooleanToString(value)
+  }
+
   return value
 }
 

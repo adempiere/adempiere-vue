@@ -16,9 +16,12 @@
 
 import language from '@/lang'
 
+// api request methods
 import { requestBrowserSearch } from '@/api/ADempiere/browser'
+
+// utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
-import { parseContext } from '@/utils/ADempiere/contextUtils'
+import { getContext } from '@/utils/ADempiere/contextUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
 
 const browserControl = {
@@ -63,7 +66,7 @@ const browserControl = {
         type: 'info'
       })
 
-      const { fieldsList, query, whereClause, orderByClause } = rootGetters.getStoredBrowser(containerUuid)
+      const { fieldsList, contextColumnNames } = rootGetters.getStoredBrowser(containerUuid)
 
       // parameters isQueryCriteria
       const parametersList = rootGetters.getBrowserQueryCriteria({
@@ -71,30 +74,23 @@ const browserControl = {
         fieldsList
       })
 
-      let parsedQuery = query
-      if (!isEmptyValue(parsedQuery) && parsedQuery.includes('@')) {
-        parsedQuery = parseContext({
-          containerUuid,
-          value: parsedQuery,
-          isBooleanToString: true
-        }).value
+      const contextAttriburesList = []
+      if (!isEmptyValue(contextColumnNames)) {
+        contextColumnNames.forEach(columnName => {
+          const value = getContext({
+            containerUuid,
+            columnName
+          })
+          contextAttriburesList.push({
+            value,
+            columnName
+          })
+        })
       }
 
-      let parsedWhereClause = whereClause
-      if (!isEmptyValue(parsedWhereClause) && parsedWhereClause.includes('@')) {
-        parsedWhereClause = parseContext({
-          containerUuid,
-          value: parsedWhereClause,
-          isBooleanToString: true
-        }).value
-      }
-
-      // TODO: Add validation compare browserSearchQueryParameters
       return requestBrowserSearch({
         uuid: containerUuid,
-        query: parsedQuery,
-        whereClause: parsedWhereClause,
-        orderByClause,
+        contextAttriburesList,
         parametersList
       })
         .then(browserSearchResponse => {
