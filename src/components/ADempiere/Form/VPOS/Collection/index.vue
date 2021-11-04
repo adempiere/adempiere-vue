@@ -255,6 +255,13 @@ export default {
     convertionList() {
       return this.$store.state['pointOfSales/point/index'].conversionsList
     },
+    bank() {
+      const bank = this.fieldsList.find(field => field.columnName === 'C_Bank_ID')
+      if (!this.isEmptyValue(bank)) {
+        return bank
+      }
+      return {}
+    },
     validateCompleteCollection() {
       let collection
       if (this.pay === this.currentOrder.grandTotal) {
@@ -713,6 +720,11 @@ export default {
     this.unsubscribe = this.subscribeChanges()
     this.defaultValueCurrency()
     setTimeout(() => {
+      if (!this.isEmptyValue(this.bank)) {
+        this.cleanListBank()
+      }
+    }, 1000)
+    setTimeout(() => {
       if (!this.isEmptyValue(this.dayRate.divideRate)) {
         this.showDayRate(this.dayRate, this.dayRate.divideRate)
         this.$store.commit('updateValueOfField', {
@@ -726,6 +738,7 @@ export default {
   },
   methods: {
     formatDateToSend,
+    formatPrice,
     showDayRate(rate) {
       const amount = rate.divideRate > rate.multiplyRate ? rate.divideRate : rate.multiplyRate
       const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
@@ -766,7 +779,6 @@ export default {
       }
       return new Intl.NumberFormat().format(number.toFixed(fixed))
     },
-    formatPrice,
     sumCash(cash) {
       let sum = 0
       if (!this.isEmptyValue(cash)) {
@@ -796,6 +808,94 @@ export default {
     notSubmitForm(event) {
       event.preventDefault()
       return false
+    },
+    getPriceApplyingDiscount(price, discount) {
+      if (this.isEmptyValue(price)) {
+        price = 0
+      }
+      if (this.isEmptyValue(discount)) {
+        discount = 0
+      }
+      return price - discount * price / 100
+    },
+    getDiscountByPriceEntered(unitPrice, priceEntereded) {
+      if (this.isEmptyValue(unitPrice)) {
+        unitPrice = 0
+      }
+      if (this.isEmptyValue(priceEntereded)) {
+        priceEntereded = 0
+      }
+      const discount = 100 - priceEntereded * 100 / unitPrice
+      if (this.isEmptyValue(discount) || discount === -Infinity) {
+        return 0
+      }
+      return discount
+    },
+    cleanListBank() {
+      this.$store.dispatch('deleteLookupList', {
+        containerUuid: this.bank.containerUuid,
+        tableName: this.bank.reference.tableName,
+        query: this.bank.reference.query,
+        directQuery: this.bank.reference.directQuery,
+        value: ''
+      })
+      this.listBank()
+    },
+    defaultValueCurrency() {
+      this.$store.commit('updateValueOfField', {
+        containerUuid: this.containerUuid,
+        columnName: 'DisplayColumn_C_Currency_ID',
+        value: this.pointOfSalesCurrency.iSOCode
+      })
+      this.$store.commit('updateValueOfField', {
+        containerUuid: this.containerUuid,
+        columnName: 'C_Currency_ID',
+        value: this.pointOfSalesCurrency.id
+      })
+      this.$store.commit('updateValueOfField', {
+        containerUuid: this.containerUuid,
+        columnName: 'C_Currency_ID_UUID',
+        value: this.pointOfSalesCurrency.uuid
+      })
+    },
+    defaulTenderType() {
+      this.$store.commit('updateValueOfField', {
+        parentUuid: '',
+        containerUuid: 'Collection',
+        columnName: 'DisplayColumn_TenderType',
+        value: this.$t('form.pos.collect.TenderType.cash')
+      })
+    },
+    currencyDisplay(currency) {
+      const display = this.displayCurrency.find(item => {
+        if (item.currencyUuid === currency || (item.currencyId === currency)) {
+          return item
+        }
+      })
+      if (display) {
+        return display
+      }
+      if (currency === this.pointOfSalesCurrency.id) {
+        return this.pointOfSalesCurrency.uuid
+      }
+      return currency
+    },
+    undoPatment() {
+      const list = this.listPayments[this.listPayments.length - 1]
+      const orderUuid = list.orderUuid
+      const paymentUuid = list.uuid
+      this.$store.dispatch('deletetPayments', {
+        posUuid: this.currentPointOfSales.uuid,
+        orderUuid,
+        paymentUuid
+      })
+    },
+    listBank() {
+      this.$store.dispatch('getLookupListFromServer', {
+        tableName: this.bank.reference.tableName,
+        query: this.bank.reference.query,
+        whereClause: this.bank.validationCode
+      })
     },
     addCollectToList() {
       const containerUuid = this.containerUuid
@@ -924,77 +1024,6 @@ export default {
     exit() {
       this.cancel()
       this.$store.commit('setShowPOSCollection', false)
-    },
-    getPriceApplyingDiscount(price, discount) {
-      if (this.isEmptyValue(price)) {
-        price = 0
-      }
-      if (this.isEmptyValue(discount)) {
-        discount = 0
-      }
-      return price - discount * price / 100
-    },
-    getDiscountByPriceEntered(unitPrice, priceEntereded) {
-      if (this.isEmptyValue(unitPrice)) {
-        unitPrice = 0
-      }
-      if (this.isEmptyValue(priceEntereded)) {
-        priceEntereded = 0
-      }
-      const discount = 100 - priceEntereded * 100 / unitPrice
-      if (this.isEmptyValue(discount) || discount === -Infinity) {
-        return 0
-      }
-      return discount
-    },
-    defaultValueCurrency() {
-      this.$store.commit('updateValueOfField', {
-        containerUuid: this.containerUuid,
-        columnName: 'DisplayColumn_C_Currency_ID',
-        value: this.pointOfSalesCurrency.iSOCode
-      })
-      this.$store.commit('updateValueOfField', {
-        containerUuid: this.containerUuid,
-        columnName: 'C_Currency_ID',
-        value: this.pointOfSalesCurrency.id
-      })
-      this.$store.commit('updateValueOfField', {
-        containerUuid: this.containerUuid,
-        columnName: 'C_Currency_ID_UUID',
-        value: this.pointOfSalesCurrency.uuid
-      })
-    },
-    defaulTenderType() {
-      this.$store.commit('updateValueOfField', {
-        parentUuid: '',
-        containerUuid: 'Collection',
-        columnName: 'DisplayColumn_TenderType',
-        value: this.$t('form.pos.collect.TenderType.cash')
-      })
-    },
-    currencyDisplay(currency) {
-      const display = this.displayCurrency.find(item => {
-        if (item.currencyUuid === currency || (item.currencyId === currency)) {
-          return item
-        }
-      })
-      if (display) {
-        return display
-      }
-      if (currency === this.pointOfSalesCurrency.id) {
-        return this.pointOfSalesCurrency.uuid
-      }
-      return currency
-    },
-    undoPatment() {
-      const list = this.listPayments[this.listPayments.length - 1]
-      const orderUuid = list.orderUuid
-      const paymentUuid = list.uuid
-      this.$store.dispatch('deletetPayments', {
-        posUuid: this.currentPointOfSales.uuid,
-        orderUuid,
-        paymentUuid
-      })
     },
     validateOrder(payment) {
       this.porcessInvoce = true

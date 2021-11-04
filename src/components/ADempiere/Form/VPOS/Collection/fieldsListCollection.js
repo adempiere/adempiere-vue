@@ -47,6 +47,7 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       handleContentSelection: true,
+      validationCode: "IsActive = 'Y'  AND BankType = 'B' AND AD_Client_ID = 1000000",
       displayLogicPayment: 'D,K,T,A,P,C',
       size: 24,
       isActiveLogics: true,
