@@ -528,13 +528,8 @@ export default {
     },
     shortKeysInputTable() {
       return {
-        if (this.isEditQtyOrdered) {
-          return {
-            close: ['esc'],
-            enter: ['enter']
-          }
-        }
-        return {}
+        close: ['esc'],
+        enter: ['enter']
       }
     },
     isShowedPOSKeyLayout: {
