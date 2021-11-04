@@ -603,10 +603,18 @@ export default {
       return this.change
     },
     dateConvertions() {
-      return this.$store.getters.getValueOfField({
+      const date = this.$store.getters.getValueOfField({
         containerUuid: this.containerUuid,
         columnName: 'DateTrx'
       })
+      if (this.isEmptyValue(date) && !this.isEmptyValue(this.currentPointOfSales.currentOrder.dateOrdered)) {
+        return this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
+      }
+      if (this.isEmptyValue(date) && this.isEmptyValue(this.currentPointOfSales.currentOrder.dateOrdered)) {
+        const emptyDate = new Date()
+        return emptyDate.getFullYear() + '-' + String(emptyDate.getMonth() + 1).padStart(2, '0') + '-' + String(emptyDate.getDate()).padStart(2, '0')
+      }
+      return date
     },
     selectCurrentFieldCurrency() {
       return this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
@@ -1002,9 +1010,9 @@ export default {
         this.completePreparedOrder(payment)
         return
       }
-      if (this.pay > this.currentOrder.grandTotal) {
+      if (this.formatPrice(this.pay) > this.formatPrice(this.currentOrder.grandTotal)) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
-      } else if (this.pay < this.currentOrder.grandTotal) {
+      } else if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
         if (this.isPosRequiredPin) {
           const attributePin = {
             payment: payment,
