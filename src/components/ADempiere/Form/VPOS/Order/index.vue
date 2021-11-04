@@ -64,9 +64,6 @@
                 </span>
               </el-tag>
               <fast-ordes-list style="margin-right: 2%;margin-left: 2%;font-size: 12px;" />
-              <el-button type="primary" style="font-size: 12px;" plain @click="newOrder">
-                {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
-              </el-button>
             </el-col>
           </el-row>
         </el-form>

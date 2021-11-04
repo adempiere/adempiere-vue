@@ -40,7 +40,8 @@ const initStateUtils = {
   },
   isNewOrder: false,
   showProductList: false,
-  confirmDelivery: false
+  confirmDelivery: false,
+  showConfirmDelivery: false
 }
 
 export default {
@@ -139,6 +140,9 @@ export default {
     },
     setConfirmDelivery(state, payload) {
       state.confirmDelivery = payload
+    },
+    setShowConfirmDelivery(state, payload) {
+      state.showConfirmDelivery = payload
     }
   },
   actions: {
@@ -326,6 +330,9 @@ export default {
     },
     getConfirmDelivery: (state) => {
       return state.confirmDelivery
+    },
+    getShowConfirmDelivery: (state) => {
+      return state.showConfirmDelivery
     }
   }
 }
