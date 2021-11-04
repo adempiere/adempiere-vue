@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div
     v-if="isLoaded"
@@ -101,7 +102,7 @@
                       <el-input-number
                         ref="editField"
                         v-model="currentEditLine"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc'], enter: ['enter']} : {}"
+                        v-shortkey="shortKeysInputTable"
                         :autofocus="true"
                         controls-position="right"
                         @change="changeEdit(currentValuePriceLine(scope.row), 'PriceEntered')"
@@ -112,7 +113,7 @@
                       <el-input-number
                         ref="editField"
                         v-model="scope.row.quantityOrdered"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc'], enter: ['enter']} : {}"
+                        v-shortkey="shortKeysInputTable"
                         :autofocus="true"
                         controls-position="right"
                         @change="changeEdit(scope.row.quantityOrdered, valueOrder.columnName)"
@@ -123,7 +124,7 @@
                       <el-input-number
                         ref="editField"
                         v-model="scope.row.discount"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc'], enter: ['enter']} : {}"
+                        v-shortkey="shortKeysInputTable"
                         :autofocus="true"
                         controls-position="right"
                         @change="changeEdit(scope.row.discount, valueOrder.columnName)"
@@ -523,6 +524,17 @@ export default {
     shortsKey() {
       return {
         popoverConvet: ['ctrl', 'x']
+      }
+    },
+    shortKeysInputTable() {
+      return {
+        if (this.isEditQtyOrdered) {
+          return {
+            close: ['esc'],
+            enter: ['enter']
+          }
+        }
+        return {}
       }
     },
     isShowedPOSKeyLayout: {
