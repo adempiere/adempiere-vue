@@ -451,6 +451,7 @@ export default {
         })
         .finally(() => {
           this.listShipments({ shipmentUuid: this.currentShipment.uuid })
+          this.$refs.searchValue.focus()
         })
     },
     /**
