@@ -104,7 +104,7 @@
                         v-shortkey="isEditQtyOrdered ? {close: ['esc'], enter: ['enter']} : {}"
                         :autofocus="true"
                         controls-position="right"
-                        @change="changeEdit(currentValuePriceLine(scope.row), 'PriceEntered')"
+                        @change="changeEdit(currentEditLine, 'PriceEntered')"
                         @shortkey.native="theActionEdit"
                       />
                     </template>
@@ -474,6 +474,7 @@ export default {
       isEditQtyOrdered: false,
       isEditLine: {},
       fileColumnNameEdit: '',
+      editPrice: 0,
       showInfo: false
     }
   },
@@ -651,9 +652,13 @@ export default {
         if (this.isEmptyValue(this.currentLineOrder)) {
           return {}
         }
+        if (this.editPrice > 0 && this.editPrice !== this.currentValuePriceLine(this.currentLineOrder)) {
+          return this.editPrice
+        }
         return this.currentValuePriceLine(this.currentLineOrder)
       },
       set(val) {
+        this.editPrice = val
         return val
       }
     },
