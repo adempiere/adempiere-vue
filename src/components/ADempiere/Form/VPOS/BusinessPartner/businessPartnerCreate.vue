@@ -26,57 +26,59 @@
       size="small"
       class="create-bp"
     >
-      <el-row :gutter="24">
-        <el-col :span="24">
-          <el-card class="box-card" shadow="never" style="height: 150px;">
-            <div slot="header" class="clearfix">
-              <span>
-                {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
-              </span>
-            </div>
-            <div class="text item">
-              <field-definition
-                v-for="(field) in datos"
-                :ref="field.columnName"
-                :key="field.columnName"
-                :metadata-field="field"
+      <el-scrollbar wrap-class="scroll-customer-create">
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-card class="box-card" shadow="never" style="height: 150px;">
+              <div slot="header" class="clearfix">
+                <span>
+                  {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
+                </span>
+              </div>
+              <div class="text item">
+                <field-definition
+                  v-for="(field) in datos"
+                  :ref="field.columnName"
+                  :key="field.columnName"
+                  :metadata-field="field"
+                />
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+        <el-row v-show="isVisibleAddress" :gutter="24">
+          <billing-address />
+          <shipping-address v-if="!copyShippingAddress" />
+        </el-row>
+        <el-row :gutter="24">
+          <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
+            <samp style="float: right; padding-right: 10px;">
+              <el-checkbox v-model="isVisibleAddress">
+                {{ $t('form.pos.order.BusinessPartnerCreate.addBillingAddress') }}
+              </el-checkbox>
+              <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
+                {{ $t('form.byInvoice.copyShippingAddress') }}
+              </el-checkbox>
+            </samp>
+          </el-col>
+          <el-col :span="24">
+            <samp style="float: right; padding-right: 10px;">
+              <el-button
+                type="primary"
+                class="custom-button-create-bp"
+                icon="el-icon-check"
+                @click="createBusinessParter"
               />
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-      <el-row v-show="isVisibleAddress" :gutter="24">
-        <billing-address />
-        <shipping-address v-if="!copyShippingAddress" />
-      </el-row>
-      <el-row :gutter="24">
-        <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
-          <samp style="float: right; padding-right: 10px;">
-            <el-checkbox v-model="isVisibleAddress">
-              {{ $t('form.pos.order.BusinessPartnerCreate.addBillingAddress') }}
-            </el-checkbox>
-            <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
-              {{ $t('form.byInvoice.copyShippingAddress') }}
-            </el-checkbox>
-          </samp>
-        </el-col>
-        <el-col :span="24">
-          <samp style="float: right; padding-right: 10px;">
-            <el-button
-              type="primary"
-              class="custom-button-create-bp"
-              icon="el-icon-check"
-              @click="createBusinessParter"
-            />
-            <el-button
-              type="danger"
-              class="custom-button-create-bp"
-              icon="el-icon-close"
-              @click="clearValues"
-            />
-          </samp>
-        </el-col>
-      </el-row>
+              <el-button
+                type="danger"
+                class="custom-button-create-bp"
+                icon="el-icon-close"
+                @click="clearValues"
+              />
+            </samp>
+          </el-col>
+        </el-row>
+      </el-scrollbar>
     </el-form>
   </el-main>
 </template>
@@ -373,7 +375,10 @@ export default {
         margin-bottom: 0px !important;
     }
   }
-
+  .scroll-customer-create {
+    max-height: 250px;
+    max-width: 1000px;
+  }
   .custom-button-create-bp {
     float: right;
     margin-right: 10px;
