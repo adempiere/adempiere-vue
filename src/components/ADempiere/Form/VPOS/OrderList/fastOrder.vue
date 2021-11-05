@@ -18,7 +18,7 @@
 <template>
   <span>
     <el-button type="primary" plain @click="newOrder()">
-      <i class="el-icon-document-add" />
+      {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
     </el-button>
     <el-dropdown size="mini">
       <el-button type="primary">
