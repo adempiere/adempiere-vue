@@ -455,6 +455,7 @@ export default {
           businessPartner: 'Socio de Negocios',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
           customerData: 'Datos del Cliente',
+          addBillingAddress: 'Agregar Dirección de Facturación',
           billingAddress: 'Dirección de Facturación',
           shippingAddress: 'Dirección de Envió',
           taxId: 'Identificación Fiscal'

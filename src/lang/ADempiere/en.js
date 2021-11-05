@@ -479,6 +479,7 @@ export default {
           businessPartner: 'Business Partner',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
           customerData: 'Customer Data',
+          addBillingAddress: 'Add Billing Address',
           billingAddress: 'Billing Address',
           shippingAddress: 'Shipping Address',
           taxId: 'Tax Identification'

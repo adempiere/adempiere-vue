@@ -18,6 +18,7 @@
 <template>
   <el-main
     v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+    style="height: -webkit-fill-available;overflow: hidden;"
     @shortkey.native="actionCreate"
   >
     <el-form
@@ -44,13 +45,16 @@
           </el-card>
         </el-col>
       </el-row>
-      <el-row :gutter="24">
+      <el-row v-show="isVisibleAddress" :gutter="24">
         <billing-address />
         <shipping-address v-if="!copyShippingAddress" />
       </el-row>
       <el-row :gutter="24">
         <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
           <samp style="float: right; padding-right: 10px;">
+            <el-checkbox v-model="isVisibleAddress">
+              {{ $t('form.pos.order.BusinessPartnerCreate.addBillingAddress') }}
+            </el-checkbox>
             <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
               {{ $t('form.byInvoice.copyShippingAddress') }}
             </el-checkbox>
@@ -118,6 +122,7 @@ export default {
       fieldsList,
       checked: true,
       isCustomForm: true,
+      isVisibleAddress: false,
       unsubscribe: () => {}
     }
   },
