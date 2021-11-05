@@ -26,7 +26,7 @@
       size="small"
       class="create-bp"
     >
-      <el-scrollbar wrap-class="scroll-child">
+      <el-scrollbar wrap-class="scroll-customer-create">
         <el-row :gutter="24">
           <el-col :span="24">
             <el-card class="box-card" shadow="never" style="height: 150px;">
@@ -375,7 +375,10 @@ export default {
         margin-bottom: 0px !important;
     }
   }
-
+  .scroll-customer-create {
+    max-height: 250px;
+    max-width: 1000px;
+  }
   .custom-button-create-bp {
     float: right;
     margin-right: 10px;
