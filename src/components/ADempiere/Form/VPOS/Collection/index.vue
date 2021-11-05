@@ -608,11 +608,13 @@ export default {
         columnName: 'DateTrx'
       })
       if (this.isEmptyValue(date) && !this.isEmptyValue(this.currentPointOfSales.currentOrder.dateOrdered)) {
-        return this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
-      }
-      if (this.isEmptyValue(date) && this.isEmptyValue(this.currentPointOfSales.currentOrder.dateOrdered)) {
         const emptyDate = new Date()
-        return emptyDate.getFullYear() + '-' + String(emptyDate.getMonth() + 1).padStart(2, '0') + '-' + String(emptyDate.getDate()).padStart(2, '0')
+        this.$store.commit('updateValueOfField', {
+          containerUuid: this.containerUuid,
+          columnName: 'DateTrx',
+          value: emptyDate.getFullYear() + '-' + String(emptyDate.getMonth() + 1).padStart(2, '0') + '-' + String(emptyDate.getDate()).padStart(2, '0')
+        })
+        return this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
       }
       return date
     },
