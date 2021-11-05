@@ -22,17 +22,15 @@
         <span>{{ $t('form.pos.order.BusinessPartnerCreate.billingAddress') }}</span>
       </div>
       <div class="text item">
-        <el-scrollbar wrap-class="scroll-child">
-          <field-definition
-            v-for="(field) in fieldsListLocationBillingAddress"
-            :ref="field.columnName"
-            :key="field.columnName"
-            :metadata-field="{
-              ...field,
-              isReadOnly: disabled
-            }"
-          />
-        </el-scrollbar>
+        <field-definition
+          v-for="(field) in fieldsListLocationBillingAddress"
+          :ref="field.columnName"
+          :key="field.columnName"
+          :metadata-field="{
+            ...field,
+            isReadOnly: disabled
+          }"
+        />
       </div>
     </el-card>
   </el-col>
