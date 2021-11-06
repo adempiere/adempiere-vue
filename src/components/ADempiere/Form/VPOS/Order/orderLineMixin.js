@@ -302,7 +302,7 @@ export default {
       const { columnName } = orderLine
       // const iSOCode = this.isEmptyValue(this.currentPointOfSales.displayCurrency) ? '' : this.currentPointOfSales.displayCurrency.iSOCode
       if (columnName === 'LineDescription') {
-        return row.lineDescription
+        return row.product.value + ' - ' + row.product.name
       }
       const currency = this.pointOfSalesCurrency.iSOCode
       if (columnName === 'CurrentPrice') {
