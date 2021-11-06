@@ -350,6 +350,7 @@ export default {
       this.$store.dispatch('listProductPriceFromServer', {})
     },
     close() {
+      this.$store.commit('setShowFastConfirmDelivery', false)
       this.$store.commit('setConfirmDelivery', false)
     },
     listShipments({ shipmentUuid }) {
