@@ -20,12 +20,12 @@
     <el-button type="primary" plain @click="newOrder()">
       {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
     </el-button>
-    <el-dropdown size="mini">
+    <el-dropdown size="mini" @command="handleCommand">
       <el-button type="primary">
         <i class="el-icon-arrow-down el-icon--right" />
       </el-button>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item>
+        <el-dropdown-item :command="$t('form.byInvoice.label')">
           <el-popover
             v-model="openPopover"
             placement="right"
@@ -151,7 +151,7 @@
             </el-button>
           </el-popover>
         </el-dropdown-item>
-        <el-dropdown-item v-show="isProcessed">
+        <el-dropdown-item v-show="isProcessed" :command="$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')">
           <el-popover
             v-model="showConfirmDelivery"
             placement="right"
@@ -231,7 +231,6 @@ export default {
       ordersComplete: [],
       dateOrdered: '',
       openPopover: false,
-      showConfirmDelivery: false,
       isStatus: ''
     }
   },
@@ -276,6 +275,16 @@ export default {
     },
     allowsCreateOrder() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
+    },
+    showConfirmDelivery: {
+      get() {
+        return this.$store.getters.showConfirmDelivery
+      },
+      set(value) {
+        if (!this.isEmptyValue(this.currentOrder.uuid)) {
+          this.$store.commit('setShowFastConfirmDelivery', value)
+        }
+      }
     }
   },
   watch: {
@@ -306,6 +315,11 @@ export default {
     formatPrice,
     extractPagingToken,
     createFieldFromDictionary,
+    handleCommand(command) {
+      if (command === this.$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')) {
+        this.openDelivery()
+      }
+    },
     validaTypeDocument(type) {
       this.isStatus = type
     },

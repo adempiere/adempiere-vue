@@ -42,7 +42,7 @@ export default {
     },
     billingAddress() {
       const billingAddress = this.addressForm(this.$store.getters.getValuesView({
-        containerUuid: 'Billing-Address',
+        containerUuid: 'Location-Address-Create',
         format: 'object'
       }))
       billingAddress.is_default_billing = true

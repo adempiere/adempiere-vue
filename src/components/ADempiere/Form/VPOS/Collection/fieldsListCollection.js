@@ -60,6 +60,7 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 4,
+      name: 'Fecha',
       handleFocusGained: true,
       handleFocusLost: true,
       handleKeyPressed: true,
@@ -67,7 +68,7 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogicPayment: 'K,D',
+      displayLogicPayment: 'K,Z,P,D,K,T,A',
       isActiveLogics: true,
       isMandatory: true
     }

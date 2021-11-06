@@ -25,6 +25,8 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 0,
+      handleFocusGained: true,
+      handleFocusLost: true,
       sequence: 0,
       size: 6,
       isMandatory: true

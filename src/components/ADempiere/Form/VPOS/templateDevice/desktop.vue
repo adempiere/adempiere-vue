@@ -47,6 +47,17 @@
                 :metadata="metadata"
               />
             </SplitArea>
+            <el-drawer
+              title="Cobranza"
+              :visible.sync="showCollection"
+              :with-header="false"
+              :before-close="handleClose"
+              size="40%"
+            >
+              <collection
+                key="collection-component"
+              />
+            </el-drawer>
             <SplitArea
               v-show="isShowedPOSKeyLaout"
               :size="isShowedPOSKeyLaout ? 31: 1"
@@ -138,6 +149,9 @@ export default {
     this.unsubscribePOSList()
   },
   methods: {
+    handleClose() {
+      this.$store.commit('setShowPOSCollection', false)
+    },
     posListWithOrganization() {
       return this.$store.subscribe((mutation, state) => {
         if (mutation.type === 'user/SET_ORGANIZATION') {

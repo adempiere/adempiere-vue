@@ -145,9 +145,9 @@
                     placement="right-start"
                     trigger="click"
                     width="300"
-                    :title="$t('form.productInfo.productInformation')"
                     :hide="closeInfo"
                   >
+                    {{ $t('form.productInfo.productInformation') }} <el-button icon="el-icon-close" style="float: right;" />
                     <el-form
                       label-position="top"
                       style="float: right;display: contents;line-height: 30px;"
@@ -175,7 +175,7 @@
                             <b>{{ scope.row.taxRate.name }}</b>
                             <br>
                             {{ $t('form.productInfo.grandTotal') }}:
-                            <b>{{ formatPrice((scope.row.priceList * scope.row.taxRate.rate / 100) + scope.row.priceList * scope.row.quantityOrdered, pointOfSalesCurrency.iSOCode) }}</b>
+                            <b>{{ formatPrice(scope.row.totalAmountWithTax, pointOfSalesCurrency.iSOCode) }}</b>
                             <br>
                             {{ $t('form.pos.tableProduct.quantity') }}:
                             <b>{{ formatQuantity(scope.row.quantityOrdered) }}</b>

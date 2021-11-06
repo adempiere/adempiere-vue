@@ -21,12 +21,12 @@
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
           <el-col v-if="!value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
-            <el-card :body-style="{ padding: '0px' }">
+            <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value.tenderTypeCode)" fit="contain" />
                 </el-col>
-                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
+                <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
                     v-if="!isDisabled"
                     type="text"
@@ -90,12 +90,12 @@
       <el-row :gutter="24">
         <template v-for="(value, key) in listRefund">
           <el-col v-if="value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
-            <el-card :body-style="{ padding: '0px' }">
+            <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value.tenderTypeCode)" fit="contain" />
                 </el-col>
-                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
+                <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
                     v-if="!isDisabled"
                     type="text"

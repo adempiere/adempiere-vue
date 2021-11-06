@@ -23,11 +23,12 @@
       </div>
       <div class="text item">
         <field-definition
-          v-for="(field) in fieldsListLocationBillingAddress"
+          v-for="(field) in fieldsList"
           :ref="field.columnName"
           :key="field.columnName"
           :metadata-field="{
             ...field,
+            size: { 'xs': 24, 'sm': 24, 'md': 24, 'lg': 24, 'xl': 24 },
             isReadOnly: disabled
           }"
         />
@@ -58,6 +59,10 @@ export default {
         }
       }
     },
+    epale: {
+      type: Object,
+      default: () => {}
+    },
     showField: {
       type: Boolean,
       default: false
@@ -79,6 +84,9 @@ export default {
   },
   computed: {
     fieldsListLocationBillingAddress() {
+      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
+        return this.$store.getters.getFieldLocation
+      }
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
       }
