@@ -1040,6 +1040,7 @@ export default {
             showClose: true
           })
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
+          this.newOrderAfterPrintTicket()
         })
         .catch(error => {
           this.$message({
@@ -1067,6 +1068,25 @@ export default {
         day = '0' + day
       }
       return [year, month, day].join('-')
+    },
+    newOrderAfterPrintTicket() {
+      if (!this.allowsCreateOrder) {
+        const attributePin = {
+          withLine: false,
+          newOrder: true,
+          customer: this.currentPointOfSales.templateCustomer.uuid,
+          action: 'newOrder',
+          type: 'actionPos',
+          label: this.$t('form.pos.pinMessage.newOrder')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+        return
+      }
+      this.clearOrder()
+      this.$store.commit('setShowPOSCollection', false)
+      this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
+      this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
