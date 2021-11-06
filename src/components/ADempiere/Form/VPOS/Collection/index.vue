@@ -647,7 +647,6 @@ export default {
       }
     },
     dayRate(value) {
-      console.log(value)
       if (!this.isEmptyValue(value.divideRate)) {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
