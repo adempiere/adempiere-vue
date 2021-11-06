@@ -22,7 +22,7 @@
       <el-popover
         v-model="popoverCreateBusinessParnet"
         placement="bottom-start"
-        width="1200"
+        width="900"
         trigger="click"
       >
         <business-partner-create

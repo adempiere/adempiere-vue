@@ -26,11 +26,11 @@
     >
       <el-row :gutter="24">
         <template v-if="isLoaded">
-          <field
-            v-for="(field) in fieldsListLocation"
-            :key="field.columnName"
-            :metadata-field="field"
-          />
+          <el-col v-for="(field) in fieldsListLocation" :key="field.columnName" :span="12">
+            <field
+              :metadata-field="field"
+            />
+          </el-col>
         </template>
         <div
           v-else
@@ -42,7 +42,7 @@
           style="min-height: calc(50vh - 84px)"
           class="loading-panel"
         />
-        <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-top: 3%;padding-bottom: 3%;">
+        <el-col v-show="!parentMetadata.pos" :span="24" style="padding-left: 12px;padding-right: 12px;padding-top: 3%;padding-bottom: 3%;">
           <samp style="float: right; padding-right: 10px;">
             <el-button
               :disabled="!isLoaded"
@@ -150,7 +150,7 @@ export default {
         const withOutColumnNames = ['C_Country_ID', 'DisplayColumn_C_Country_ID', 'C_Location_ID']
 
         if (mutation.type === 'updateValueOfField' &&
-          mutation.payload.containerUuid === this.metadata.containerUuid) {
+          mutation.payload.containerUuid === this.metadata.containerUuid || mutation.payload.containerUuid === this.parentMetadata.containerUuid) {
           if (mutation.payload.columnName === 'C_Country_ID') {
             const values = []
             // Get country definition to sequence fields and displayed value

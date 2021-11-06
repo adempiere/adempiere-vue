@@ -24,6 +24,8 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       isCustomField: true,
+      handleFocusGained: true,
+      handleFocusLost: true,
       tabindex: 0,
       sequence: 0,
       size: 6,

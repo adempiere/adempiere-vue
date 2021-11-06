@@ -17,6 +17,7 @@
 -->
 <template>
   <el-popover
+    v-if="!metadata.pos"
     ref="locationAddress"
     v-model="isShowedLocationForm"
     placement="left-end"
@@ -36,6 +37,11 @@
       </el-input>
     </el-button>
   </el-popover>
+  <location-address-form
+    v-else
+    :values="localValues"
+    :parent-metadata="metadata"
+  />
 </template>
 
 <script>
