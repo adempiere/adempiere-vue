@@ -30,27 +30,6 @@
         <!-- Collection container top panel -->
         <el-header style="height: auto; padding-bottom: 10px; padding-right: 0px; padding-left: 0px">
           <el-card class="box-card" style="padding-left: 0px; padding-right: 0px">
-            <div slot="header" class="clearfix">
-              <p class="total">
-                <b>{{ $t('form.pos.collect.orderTotal') }}:</b>
-                <b style="float: right;">
-                  {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                </b>
-              </p>
-              <p class="total">
-                <b> {{ $t('form.pos.collect.pending') }}: </b>
-                <b style="float: right;">
-                  {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
-                </b>
-              </p>
-              <p v-if="!isEmptyValue(dayRate)" class="total">
-                <b>{{ $t('form.pos.collect.dayRate') }}:</b>
-                <!-- Conversion rate to date -->
-                <b style="float: right;">
-                  {{ showDayRate(dayRate) }}
-                </b>
-              </p>
-            </div>
             <div
               v-if="isLoaded"
               class="text item"
@@ -151,18 +130,23 @@
         <!-- Collection container bottom panel -->
         <el-footer id="infoInvoce" height="auto" style="padding-left: 0px; padding-right: 0px;">
           <el-row :gutter="24">
-            <el-col :span="24">
+            <el-col :span="24" style="padding-left:  15px !important;padding-right: 15px !important;">
               <span>
                 <p class="total">
-                  <b>
-                    {{ $t('form.pos.collect.orderTotal') }}:
-                  </b>
+                  {{ $t('form.pos.collect.orderTotal') }}:
                   <b style="float: right;">
                     {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
 
-                <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+                <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> {{ $t('form.pos.collect.convertedAmount') }}: <b style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+                <p v-if="!isEmptyValue(dayRate)" class="total">
+                  {{ $t('form.pos.collect.dayRate') }}:
+                  <!-- Conversion rate to date -->
+                  <b style="float: right;">
+                    {{ showDayRate(dayRate) }}
+                  </b>
+                </p>
 
                 <p class="total">
                   {{ $t('form.pos.collect.pending') }}:
@@ -603,10 +587,20 @@ export default {
       return this.change
     },
     dateConvertions() {
-      return this.$store.getters.getValueOfField({
+      const date = this.$store.getters.getValueOfField({
         containerUuid: this.containerUuid,
         columnName: 'DateTrx'
       })
+      if (this.isEmptyValue(date) && !this.isEmptyValue(this.currentPointOfSales.currentOrder.dateOrdered)) {
+        const emptyDate = new Date()
+        this.$store.commit('updateValueOfField', {
+          containerUuid: this.containerUuid,
+          columnName: 'DateTrx',
+          value: emptyDate.getFullYear() + '-' + String(emptyDate.getMonth() + 1).padStart(2, '0') + '-' + String(emptyDate.getDate()).padStart(2, '0')
+        })
+        return this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
+      }
+      return date
     },
     selectCurrentFieldCurrency() {
       return this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
@@ -614,7 +608,7 @@ export default {
     size() {
       const size = this.$store.getters.getWidthRight
       if (this.primaryFieldsList.length <= 1 && this.hiddenFieldsList.length <= 1) {
-        return 8
+        return 12
       }
       return 24 / size
     }
@@ -653,6 +647,7 @@ export default {
       }
     },
     dayRate(value) {
+      console.log(value)
       if (!this.isEmptyValue(value.divideRate)) {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
@@ -1186,5 +1181,9 @@ export default {
   }
   .el-col {
     border-radius: 4px;
+  }
+  .total {
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 </style>
