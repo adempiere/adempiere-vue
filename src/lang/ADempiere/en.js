@@ -556,7 +556,7 @@ export default {
     },
     byInvoice: {
       title: 'Aisle Vendor Orders to be Invoiced',
-      completeOrders: 'Complete Orders',
+      searchCompleteOrders: 'Search complete orders',
       label: 'To be invoiced',
       salesRepresentative: 'Sales Agent',
       businessPartner: 'Business Partner',

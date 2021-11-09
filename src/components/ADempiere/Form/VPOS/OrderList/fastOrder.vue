@@ -153,15 +153,15 @@
         </el-dropdown-item>
         <el-dropdown-item :command="$t('form.byInvoice.label')">
           <el-popover
-            v-model="showFastCompleteOrders"
+            v-model="searchCompleteOrders"
             placement="right"
             width="1010"
             trigger="click"
             @hide="clear()"
           >
-            <fast-complete :show-field="showFastCompleteOrders" />
+            <search-complete-orders :show-field="searchCompleteOrders" />
             <el-button slot="reference" type="text" style="color: #333">
-              {{ $t('form.byInvoice.completeOrders') }}
+              {{ $t('form.byInvoice.searchCompleteOrders') }}
             </el-button>
           </el-popover>
         </el-dropdown-item>
@@ -202,7 +202,7 @@ import {
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
 import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
-import FastComplete from './fastComplete'
+import SearchCompleteOrders from './searchCompleteOrders'
 import Field from '@/components/ADempiere/Field'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
@@ -211,7 +211,7 @@ export default {
   components: {
     CustomPagination,
     ConfirmDelivery,
-    FastComplete,
+    SearchCompleteOrders,
     Field
   },
   props: {
@@ -305,9 +305,9 @@ export default {
         }
       }
     },
-    showFastCompleteOrders: {
+    searchCompleteOrders: {
       get() {
-        return this.$store.getters.getShowFastCompleteOrders
+        return this.$store.getters.getSearchCompleteOrders
       },
       set(value) {
         this.$store.commit('setShowFastCompleteOrders', value)

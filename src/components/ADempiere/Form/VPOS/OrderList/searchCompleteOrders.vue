@@ -18,7 +18,7 @@
 <template>
   <el-container>
     <el-header style="height: 2%;">
-      <p style="text-align: center;"> <b> {{ $t('form.byInvoice.completeOrders') }} </b></p>
+      <p style="text-align: center;"> <b> {{ $t('form.byInvoice.searchCompleteOrders') }} </b></p>
       <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
         <el-form-item label="No. del Documento">
           <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
@@ -148,7 +148,7 @@ import Field from '@/components/ADempiere/Field'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
-  name: 'FastComplete',
+  name: 'SearchCompleteOrders',
   components: {
     CustomPagination,
     Field
