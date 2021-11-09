@@ -13,20 +13,30 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-// List of fields to send for create new
 import language from '@/lang'
-const tableName = 'C_BPartner'
+
 const fieldBase = {
   tableName: 'C_Location',
   isFromDictionary: true,
   overwriteDefinition: {
     size: 24,
+    name: '',
     index: 0
   }
 }
 
 export default [
+  {
+    ...fieldBase,
+    elementColumnName: 'C_Location_ID',
+    columnName: 'C_Location_ID',
+    overwriteDefinition: {
+      isCustomField: true,
+      size: 24,
+      isDisplayed: false,
+      index: 1
+    }
+  },
   {
     ...fieldBase,
     elementColumnName: 'C_Country_ID',
@@ -35,10 +45,10 @@ export default [
       isCustomField: true,
       isActiveLogics: true, // enable logics
       defaultValue: '@#C_Country_ID@',
-      tabindex: 5,
       size: 24,
       sequenceFields: 'CO',
-      isMandatory: false
+      index: 2,
+      isMandatory: true
     }
   },
   {
@@ -47,10 +57,10 @@ export default [
     columnName: 'C_Region_ID',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 6,
       size: 24,
       sequenceFields: 'R',
-      isMandatory: false
+      index: 3,
+      isMandatory: true
     }
   },
   {
@@ -59,10 +69,10 @@ export default [
     columnName: 'C_City_ID',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 7,
       size: 24,
       sequenceFields: 'C',
-      isMandatory: false
+      index: 4,
+      isMandatory: true
     }
   },
   {
@@ -71,9 +81,9 @@ export default [
     columnName: 'Address1',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 6,
       size: 24,
-      sequenceFields: 'A1'
+      sequenceFields: 'A1',
+      index: 5
     }
   },
   {
@@ -82,10 +92,9 @@ export default [
     columnName: 'Address2',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 9,
       size: 24,
-      isDisplayed: false,
-      sequenceFields: 'A2'
+      sequenceFields: 'A2',
+      index: 6
     }
   },
   {
@@ -94,10 +103,9 @@ export default [
     columnName: 'Address3',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 10,
       size: 24,
-      isDisplayed: false,
-      sequenceFields: 'A3'
+      sequenceFields: 'A3',
+      index: 7
     }
   },
   {
@@ -105,11 +113,10 @@ export default [
     elementColumnName: 'Address4',
     columnName: 'Address4',
     overwriteDefinition: {
-      tabindex: 11,
       isCustomField: true,
       size: 24,
-      isDisplayed: false,
-      sequenceFields: 'A4'
+      sequenceFields: 'A4',
+      index: 8
     }
   },
   {
@@ -117,24 +124,21 @@ export default [
     elementColumnName: 'Postal',
     columnName: 'Postal',
     overwriteDefinition: {
-      tabindex: 12,
       isCustomField: true,
       size: 24,
-      sequenceFields: 'P'
+      sequenceFields: 'P',
+      index: 9
     }
   },
   {
     elementColumnName: 'Name',
-    columnName: 'Name',
-    tableName,
     isFromDictionary: true,
     overwriteDefinition: {
       tabindex: 1,
       isCustomField: true,
       size: 24,
       name: language.t('components.contextMenuReferences'),
-      sequence: 24,
-      sequenceFields: 'A4',
+      sequenceFields: 'P',
       isMandatory: true
     }
   }

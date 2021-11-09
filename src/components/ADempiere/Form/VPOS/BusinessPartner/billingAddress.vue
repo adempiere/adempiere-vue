@@ -22,17 +22,22 @@
         <span>{{ $t('form.pos.order.BusinessPartnerCreate.billingAddress') }}</span>
       </div>
       <div class="text item">
-        <field-definition
+        <template
           v-for="(field) in fieldsList"
-          :ref="field.columnName"
-          :key="field.columnName"
-          :metadata-field="{
-            ...field,
-            size: { 'xs': 24, 'sm': 24, 'md': 24, 'lg': 24, 'xl': 24 },
-            isReadOnly: disabled
-          }"
-        />
+        >
+          <field-definition
+            :key="field.columnName"
+            :ref="field.columnName"
+            :metadata-field="{
+              ...field,
+              size: { 'xs': fieldSize, 'sm': fieldSize, 'md': fieldSize, 'lg': fieldSize, 'xl': fieldSize },
+              isReadOnly: disabled
+            }"
+          />
+        </template>
       </div>
+      <br>
+      <br>
     </el-card>
   </el-col>
 </template>
@@ -41,7 +46,6 @@
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListBillingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
-
 export default {
   name: 'BillingAddress',
   mixins: [
@@ -74,6 +78,7 @@ export default {
   },
   data() {
     return {
+      input: '',
       businessPartnerRecord: {},
       isLoadingRecord: false,
       fieldsList,
@@ -83,6 +88,9 @@ export default {
     }
   },
   computed: {
+    fieldSize() {
+      return !this.$store.getters.getCopyShippingAddress ? 24 : 12
+    },
     fieldsListLocationBillingAddress() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
@@ -124,6 +132,12 @@ export default {
   },
   beforeDestroy() {
     this.unsubscribe()
+  },
+  methods: {
+    notSubmitForm(event) {
+      event.preventDefault()
+      return false
+    }
   }
 }
 </script>

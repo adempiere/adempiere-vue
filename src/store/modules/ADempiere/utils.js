@@ -43,7 +43,8 @@ const initStateUtils = {
   showProductList: false,
   confirmDelivery: false,
   showConfirmDelivery: false,
-  showFastConfirmDelivery: false
+  showFastConfirmDelivery: false,
+  showAddNewAddress: false
 }
 
 export default {
@@ -151,6 +152,9 @@ export default {
     },
     setShowFastConfirmDelivery(state, payload) {
       state.showFastConfirmDelivery = payload
+    },
+    setShowAddNewAddress(state, payload) {
+      state.showAddNewAddress = payload
     }
   },
   actions: {
@@ -347,6 +351,9 @@ export default {
     },
     getSearchCompleteOrderss: (state) => {
       return state.searchCompleteOrders
+    },
+    getShowAddNewAddress: (state) => {
+      return state.showAddNewAddress
     }
   }
 }

@@ -17,7 +17,7 @@
 -->
 <template>
   <div>
-    <el-form-item>
+    <el-form-item @submit.native.prevent="notSubmitForm">
       <template slot="label">
         {{ $t('form.productInfo.codeProduct') }}
         <el-popover
@@ -50,7 +50,7 @@
         popper-class="custom-field-prodcut-info"
         :trigger-on-focus="false"
         :fetch-suggestions="localSearch"
-        :select-when-unmatched="true"
+        :select-when-unmatched="false"
         :highlight-first-item="false"
         @shortkey.native="shortcutKeyMethod"
         @select="handleSelect"
@@ -177,6 +177,10 @@ export default {
   methods: {
     formatPrice,
     formatQuantity,
+    notSubmitForm(event) {
+      event.preventDefault()
+      return false
+    },
     shortcutKeyMethod(event) {
       switch (event.srcKey) {
         case 'refreshList':

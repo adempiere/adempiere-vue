@@ -171,6 +171,7 @@ export function updateCustomer({
   Naics,
   Name,
   Name2,
+  lastName,
   description,
   addresses,
   posUuid
@@ -185,6 +186,7 @@ export function updateCustomer({
       duns: Duns,
       naics: Naics,
       name: Name,
+      last_name: lastName,
       description,
       addresses,
       pos_uuid: posUuid

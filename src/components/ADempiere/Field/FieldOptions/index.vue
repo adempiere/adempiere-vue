@@ -88,7 +88,7 @@
 
     <span v-else key="options-form">
       <!-- label or name of field in form -->
-      {{ metadata.name }}
+      <span :style="metadata.required && isEmptyValue(valueField) ? 'color: #f34b4b' : ''"> {{ metadata.name }}</span>
     </span>
   </div>
 </template>

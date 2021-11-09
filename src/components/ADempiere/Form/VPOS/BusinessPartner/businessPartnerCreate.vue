@@ -69,7 +69,6 @@
                 type="primary"
                 class="custom-button-create-bp"
                 icon="el-icon-check"
-                :disabled="isExistingCustomer"
                 @click="createBusinessParter"
               />
               <el-button
@@ -176,7 +175,7 @@ export default {
     },
     getCodigo() {
       return this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
+        containerUuid: 'Business-Partner-Create',
         columnName: 'Value'
       })
     }
@@ -188,6 +187,15 @@ export default {
           this.focusValue()
           this.defaultTemplateAddress(this.currentCustomerTemplatePointOfSales)
         }, 1500)
+      }
+    },
+    getCodigo(value) {
+      if (!this.isEmptyValue(value)) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Business-Partner-Create',
+          columnName: 'TaxID',
+          value
+        })
       }
     },
     copyShippingAddress(value) {
@@ -282,17 +290,17 @@ export default {
     // TODO: Get locations values.
     createBusinessParter() {
       const values = this.datesForm(this.$store.getters.getValuesView({
-        containerUuid: 'Location-Address-Create',
+        containerUuid: 'Business-Partner-Create',
         format: 'object'
       }))
       const billingAddress = this.billingAddress
       if (this.isEmptyValue(billingAddress.first_name)) {
         const region = this.$store.getters.getValueOfField({
-          containerUuid: 'Location-Address-Create',
+          containerUuid: 'Billing-Address',
           columnName: 'DisplayColumn_C_Region_ID'
         })
         const city = this.$store.getters.getValueOfField({
-          containerUuid: 'Location-Address-Create',
+          containerUuid: 'Billing-Address',
           columnName: 'DisplayColumn_C_City_ID'
         })
         billingAddress.first_name = region + '/' + city
@@ -421,8 +429,8 @@ export default {
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
-        if (mutation.type === 'addFocusLost' && mutation.payload.columnName === 'Value' && mutation.payload.containerUuid === 'Business-Partner-Create') {
-          this.getCustomer(mutation.payload.value)
+        if (mutation.type === 'addFocusLost' && mutation.payload.columnName === 'Value' && !this.isEmptyValue(this.getCodigo) && mutation.payload.containerUuid === 'Business-Partner-Create') {
+          this.getCustomer(this.getCodigo)
         }
       })
     }
