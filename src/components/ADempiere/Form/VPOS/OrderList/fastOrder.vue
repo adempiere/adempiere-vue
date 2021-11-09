@@ -307,7 +307,7 @@ export default {
     },
     searchCompleteOrders: {
       get() {
-        return this.$store.getters.getSearchCompleteOrders
+        return this.$store.getters.getSearchCompleteOrderss
       },
       set(value) {
         this.$store.commit('setShowFastCompleteOrders', value)

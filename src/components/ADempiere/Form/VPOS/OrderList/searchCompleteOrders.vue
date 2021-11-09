@@ -217,11 +217,11 @@ export default {
   },
   watch: {
     showField(value) {
-      const date = new Date()
+      const date = new Date().toISOString().slice(0, 10)
       this.$store.commit('updateValueOfField', {
         containerUuid: 'Aisle-Vendor-List',
         columnName: 'DateOrderedFrom',
-        value: date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
+        value: date
       })
       if (value && this.isEmptyValue(this.ordersInvoiced)) {
         this.setFieldsList()

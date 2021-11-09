@@ -592,11 +592,11 @@ export default {
         columnName: 'DateTrx'
       })
       if (this.isEmptyValue(date) && !this.isEmptyValue(this.currentPointOfSales.currentOrder.dateOrdered)) {
-        const emptyDate = new Date()
+        const emptyDate = new Date().toISOString().slice(0, 10)
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'DateTrx',
-          value: emptyDate.getFullYear() + '-' + String(emptyDate.getMonth() + 1).padStart(2, '0') + '-' + String(emptyDate.getDate()).padStart(2, '0')
+          value: emptyDate
         })
         return this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
       }
