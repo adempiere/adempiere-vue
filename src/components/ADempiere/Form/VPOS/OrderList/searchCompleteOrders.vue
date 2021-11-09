@@ -348,6 +348,7 @@ export default {
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
         isProcessed: true,
+        isWaitingForShipment: true,
         pageToken: this.tokenPage,
         dateOrderedFrom: this.dateOrdered,
         businessPartnerUuid: this.businessPartner
