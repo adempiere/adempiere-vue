@@ -74,7 +74,8 @@ export default {
     orderUuid,
     posUuid,
     customerUuid,
-    documentTypeUuid
+    documentTypeUuid,
+    campaignUuid
   }) {
     const isCompleted = rootGetters.posAttributes.currentPointOfSales.currentOrder.isProcessed
     if (isCompleted) {
@@ -87,7 +88,8 @@ export default {
       documentTypeUuid,
       customerUuid,
       priceListUuid: currentPriceList.uuid,
-      warehouseUuid: currentWarehouse.uuid
+      warehouseUuid: currentWarehouse.uuid,
+      campaignUuid
     })
       .then(response => {
         dispatch('reloadOrder', { orderUuid: response.uuid })
@@ -183,6 +185,7 @@ export default {
     setToStore = true
   }) {
     const orderToPush = {
+      ...attribute,
       uuid: attribute.uuid,
       id: attribute.id,
       businessPartner: attribute.businessPartner, // description, duns, id, lastName, naics, name, taxId, uuid, value

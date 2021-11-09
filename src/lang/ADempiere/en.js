@@ -475,6 +475,8 @@ export default {
         pointSale: 'Point of Sale',
         collect: 'Collect',
         collections: 'Cobros',
+        campaign: 'Campaign',
+        noCampaignSelected: 'No Campaign selected',
         BusinessPartnerCreate: {
           businessPartner: 'Business Partner',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',

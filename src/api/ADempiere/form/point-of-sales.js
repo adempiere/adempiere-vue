@@ -108,7 +108,8 @@ export function updateOrder({
   documentTypeUuid,
   description,
   priceListUuid,
-  warehouseUuid
+  warehouseUuid,
+  campaignUuid
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/update-order`,
@@ -120,7 +121,8 @@ export function updateOrder({
       document_type_uuid: documentTypeUuid,
       description,
       price_list_uuid: priceListUuid,
-      warehouse_uuid: warehouseUuid
+      warehouse_uuid: warehouseUuid,
+      campaign_uuid: campaignUuid
     }
   })
     .then(updateOrderResponse => {

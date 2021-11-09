@@ -332,6 +332,30 @@
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
+                <br>
+                <el-dropdown
+                  v-if="!isEmptyValue(currentOrder) && !isEmptyValue(listCampaign)"
+                  trigger="click"
+                  class="info-pos"
+                  @command="changeCampaign"
+                >
+                  <span>
+                    <i class="el-icon-guide" style="font-size: 20px;" />
+                    {{ $t('form.pos.order.campaign') }}:
+                    <b style="cursor: pointer">
+                      {{ currentCampaign }}
+                    </b>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      v-for="item in listCampaign"
+                      :key="item.uuid"
+                      :command="item"
+                    >
+                      {{ item.values.DisplayColumn }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </p>
             </div>
             <span v-if="isMobile" style="float: right;padding-right: 3%;">
@@ -444,6 +468,7 @@ import {
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
+import { requestLookupList } from '@/api/ADempiere/window.js'
 // import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
@@ -473,10 +498,14 @@ export default {
       isEditLine: {},
       fileColumnNameEdit: '',
       editPrice: 0,
-      showInfo: false
+      showInfo: false,
+      listCampaign: []
     }
   },
   computed: {
+    fieldCampaign() {
+      return this.fieldsList.find(field => field.columnName === 'C_Campaign_ID')
+    },
     isMobile() {
       return this.$store.state.app.device === 'mobile'
     },
@@ -723,6 +752,13 @@ export default {
         return this.$store.getters.getOverdrawnInvoice.attributePin
       }
       return ''
+    },
+    currentCampaign() {
+      if (!this.isEmptyValue(this.currentOrder.campaignUuid)) {
+        const campaig = this.listCampaign.find(campaign => campaign.uuid === this.currentOrder.campaignUuid)
+        return campaig.values.DisplayColumn
+      }
+      return this.$t('form.pos.order.noCampaignSelected')
     }
   },
   watch: {
@@ -773,6 +809,11 @@ export default {
     }
   },
   mounted() {
+    setTimeout(() => {
+      if (!this.isEmptyValue(this.fieldCampaign.reference) && this.isEmptyValue(this.listCampaign)) {
+        this.getListCampaign(this.fieldCampaign.reference)
+      }
+    }, 500)
     if (!this.isEmptyValue(this.$route.query.action)) {
       this.$store.dispatch('reloadOrder', { orderUuid: this.$route.query.action })
     }
@@ -796,6 +837,15 @@ export default {
     formatDateToSend,
     formatPrice,
     formatQuantity,
+    getListCampaign(campaing) {
+      requestLookupList({
+        tableName: campaing.tableName,
+        query: campaing.query
+      })
+        .then(responseLookupItem => {
+          this.listCampaign = responseLookupItem.recordsList
+        })
+    },
     focusProducto(value) {
       this.$refs.ProductValue[0].$refs.product.focus()
     },
@@ -905,6 +955,16 @@ export default {
       this.$store.dispatch('setCurrentPOS', pointOfSales)
       this.clearOrder()
     },
+    changeCampaign(item) {
+      this.$store.dispatch('updateOrder', {
+        orderUuid: this.currentOrder.uuid,
+        posUuid: this.currentPointOfSales.uuid,
+        documentTypeUuid: this.currentOrder.documentStatus.uuid,
+        priceListUuid: this.currentPointOfSales.priceList.uuid,
+        warehouseUuid: this.currentPointOfSales.warehouse.uuid,
+        campaignUuid: item.uuid
+      })
+    },
     changeWarehouse(warehouse) {
       if (warehouse.id !== this.currentWarehouse.id) {
         if (warehouse.is_pos_required_pin) {
@@ -928,7 +988,7 @@ export default {
           this.$store.dispatch('updateOrder', {
             orderUuid: this.currentOrder.uuid,
             posUuid: this.currentPointOfSales.uuid,
-            documentTypeUuid: documentType.uuid,
+            documentTypeUuid: this.currentDocumentType.uuid,
             priceListUuid: this.currentPointOfSales.priceList.uuid,
             warehouseUuid: this.currentPointOfSales.warehouse.uuid
           })
