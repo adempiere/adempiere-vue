@@ -108,7 +108,7 @@
                 width="450"
                 :disabled="!isProcessed"
               >
-                <el-row :gutter="24" class="container-reverse">
+                <el-row v-if="!isLoadingReverse" :gutter="24" class="container-reverse">
                   <el-col :span="24" class="container-reverse">
                     <p class="container-popover">
                       <b class="container-popover">
@@ -142,6 +142,15 @@
                     </samp>
                   </el-col>
                 </el-row>
+                <div
+                  v-else
+                  key="form-loading"
+                  v-loading="isLoadingReverse"
+                  :element-loading-text="$t('notifications.loading')"
+                  :element-loading-spinner="'el-icon-loading'"
+                  element-loading-background="rgba(255, 255, 255, 0.8)"
+                  class="view-loading"
+                />
                 <el-button slot="reference" type="text" style="min-height: 50px;width: -webkit-fill-available;white-space: normal;">
                   <i class="el-icon-error" />
                   <br>
@@ -450,6 +459,7 @@ export default {
       validatePin: true,
       visible: false,
       visibleReverse: false,
+      isLoadingReverse: false,
       showFieldListOrder: false,
       messageReverseSales: '',
       showConfirmDelivery: false,
@@ -778,6 +788,7 @@ export default {
         })
     },
     reverseSalesTransaction() {
+      this.isLoadingReverse = true
       reverseSales({
         posUuid: this.currentPointOfSales.uuid,
         orderUuid: this.currentOrder.uuid,
@@ -796,6 +807,7 @@ export default {
           })
         })
         .finally(() => {
+          this.isLoadingReverse = false
           this.visibleReverse = false
           this.messageReverseSales = ''
         })

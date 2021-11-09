@@ -615,7 +615,7 @@ export default {
   },
   watch: {
     dateConvertions(value) {
-      if (!this.isEmptyValue(value) && this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered) !== value) {
+      if (!this.isEmptyValue(this.currentPointOfSales.conversionTypeUuid) && !this.isEmptyValue(this.currentPointOfSales.priceList.currency.uuid) && !this.isEmptyValue(this.selectCurrentFieldCurrency.uuid) && !this.isEmptyValue(value) && this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered) !== value) {
         this.$store.dispatch('searchConversion', {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
