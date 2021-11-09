@@ -20,7 +20,7 @@
     <el-button type="primary" plain @click="newOrder()">
       {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
     </el-button>
-    <el-dropdown size="mini" @command="handleCommand">
+    <el-dropdown size="mini" trigger="click" @command="handleCommand">
       <el-button type="primary">
         <i class="el-icon-arrow-down el-icon--right" />
       </el-button>
@@ -151,6 +151,20 @@
             </el-button>
           </el-popover>
         </el-dropdown-item>
+        <el-dropdown-item :command="$t('form.byInvoice.label')">
+          <el-popover
+            v-model="showFastCompleteOrders"
+            placement="right"
+            width="1010"
+            trigger="click"
+            @hide="clear()"
+          >
+            <fast-complete :show-field="showFastCompleteOrders" />
+            <el-button slot="reference" type="text" style="color: #333">
+              {{ $t('form.byInvoice.completeOrders') }}
+            </el-button>
+          </el-popover>
+        </el-dropdown-item>
         <el-dropdown-item v-show="isProcessed" :command="$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')">
           <el-popover
             v-model="showConfirmDelivery"
@@ -188,6 +202,7 @@ import {
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
 import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
+import FastComplete from './fastComplete'
 import Field from '@/components/ADempiere/Field'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
@@ -196,6 +211,7 @@ export default {
   components: {
     CustomPagination,
     ConfirmDelivery,
+    FastComplete,
     Field
   },
   props: {
@@ -235,8 +251,11 @@ export default {
     }
   },
   computed: {
+    allowsConfirmShipment() {
+      return this.currentPointOfSales.isAllowsConfirmShipment && !this.currentOrder.isDelivered
+    },
     isProcessed() {
-      if (!this.isEmptyValue(this.currentOrder.documentStatus.value) && this.currentOrder.documentStatus.value === 'CO') {
+      if (!this.isEmptyValue(this.currentOrder.documentStatus.value) && this.currentOrder.documentStatus.value === 'CO' && this.allowsConfirmShipment) {
         return true
       }
       return false
@@ -284,6 +303,14 @@ export default {
         if (!this.isEmptyValue(this.currentOrder.uuid)) {
           this.$store.commit('setShowFastConfirmDelivery', value)
         }
+      }
+    },
+    showFastCompleteOrders: {
+      get() {
+        return this.$store.getters.getShowFastCompleteOrders
+      },
+      set(value) {
+        this.$store.commit('setShowFastCompleteOrders', value)
       }
     }
   },
