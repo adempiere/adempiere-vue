@@ -494,7 +494,7 @@ export default {
       if (!this.isEmptyValue(this.currentFieldCurrency)) {
         const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
         const convert = this.convertionsList.find(convert => {
-          if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id && (!this.isEmptyValue(this.dateConvertions) && this.dateConvertions === this.formatDateToSend(convert.validTo))) {
+          if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
             return convert
           }
         })

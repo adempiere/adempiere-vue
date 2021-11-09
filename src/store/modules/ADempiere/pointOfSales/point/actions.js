@@ -144,6 +144,7 @@ export default {
       posUuid
     })
       .then(response => {
+        console.log(response.records)
         commit('setCurrenciesList', response.records)
       })
       .catch(error => {
@@ -184,7 +185,7 @@ export default {
         pos: posToSet.id
       }
     }, () => {})
-    state.currenciesList = []
+    // state.currenciesList = []
     dispatch('listWarehousesFromServer', posToSet.uuid)
     dispatch('listDocumentTypesFromServer', posToSet.uuid)
     dispatch('listCurrenciesFromServer', posToSet.uuid)
