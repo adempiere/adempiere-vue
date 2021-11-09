@@ -340,7 +340,7 @@
                   @command="changeCampaign"
                 >
                   <span>
-                    <i class="el-icon-guide" style="font-size: 20px;" />
+                    <i class="el-icon-guide" />
                     {{ $t('form.pos.order.campaign') }}:
                     <b style="cursor: pointer">
                       {{ currentCampaign }}
