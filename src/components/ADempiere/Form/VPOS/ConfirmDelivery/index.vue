@@ -118,52 +118,64 @@
       width="30%"
       :modal="false"
     >
-      <span>
-        <p class="total">
-          {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}:
-          <b class="order-info">
-            {{ currentOrder.businessPartner.name }}
-          </b>
-        </p>
-        <p class="total">
-          {{ $t('form.pos.order.order') }}:
-          <b class="order-info">
-            {{ currentOrder.documentNo }}
-          </b>
-        </p>
-        <p class="total">
-          {{ $t('form.pos.order.itemQuantity') }}:
-          <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
-            {{ getItemQuantity }}
-          </b>
-        </p>
-        <p class="total">
-          {{ $t('form.pos.order.numberLines') }}:
-          <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
-            {{ numberOfLines }}
-          </b>
-        </p>
-      </span>
-      <span slot="footer" class="dialog-footer">
-        <el-row :gutter="24">
-          <el-col :span="24">
-            <samp style="float: right; padding-right: 10px;">
-              <el-button
-                type="danger"
-                class="custom-button-create-bp"
-                icon="el-icon-close"
-                @click="closeDialog"
-              />
-              <el-button
-                type="primary"
-                class="custom-button-create-bp"
-                icon="el-icon-check"
-                @click="makeDelivery"
-              />
-            </samp>
-          </el-col>
-        </el-row>
-      </span>
+      <template v-if="!isLoadedProcessShipment">
+        <span>
+          <p class="total">
+            {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}:
+            <b class="order-info">
+              {{ currentOrder.businessPartner.name }}
+            </b>
+          </p>
+          <p class="total">
+            {{ $t('form.pos.order.order') }}:
+            <b class="order-info">
+              {{ currentOrder.documentNo }}
+            </b>
+          </p>
+          <p class="total">
+            {{ $t('form.pos.order.itemQuantity') }}:
+            <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
+              {{ getItemQuantity }}
+            </b>
+          </p>
+          <p class="total">
+            {{ $t('form.pos.order.numberLines') }}:
+            <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
+              {{ numberOfLines }}
+            </b>
+          </p>
+        </span>
+        <span slot="footer" class="dialog-footer">
+          <el-row :gutter="24">
+            <el-col :span="24">
+              <samp style="float: right; padding-right: 10px;">
+                <el-button
+                  type="danger"
+                  class="custom-button-create-bp"
+                  icon="el-icon-close"
+                  @click="closeDialog"
+                />
+                <el-button
+                  type="primary"
+                  class="custom-button-create-bp"
+                  icon="el-icon-check"
+                  @click="makeDelivery"
+                />
+              </samp>
+            </el-col>
+          </el-row>
+        </span>
+      </template>
+      <div
+        v-else
+        key="form-loading"
+        v-loading="!isLoadedProcessShipment"
+        :element-loading-text="$t('notifications.loading')"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(255, 255, 255, 0.8)"
+        style="min-height: calc(50vh - 84px)"
+        class="loading-panel"
+      />
     </el-dialog>
     <el-row :gutter="24">
       <el-col :span="24">
@@ -240,6 +252,7 @@ export default {
       deliveryList: [],
       showInfo: false,
       value: false,
+      isLoadedProcessShipment: false,
       timeOut: null
     }
   },
@@ -495,6 +508,7 @@ export default {
       if (this.isEmptyValue(this.currentShipment)) {
         return
       }
+      this.isLoadedProcessShipment = false
       processShipment({
         shipmentUuid: this.currentShipment.uuid
       })
@@ -517,6 +531,7 @@ export default {
         })
         .finally(() => {
           this.dialogVisible = false
+          this.isLoadedProcessShipment = true
           this.$store.commit('setShowPOSOptions', false)
           this.$store.commit('setConfirmDelivery', false)
         })
