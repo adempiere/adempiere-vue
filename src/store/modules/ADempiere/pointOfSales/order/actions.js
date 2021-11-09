@@ -229,17 +229,21 @@ export default {
       containerUuid: 'Orders-List'
     })
     values = convertValuesToSendListOrders(values)
-    const { documentNo, businessPartnerUuid, grandTotal, openAmount, isPaid, isProcessed, isAisleSeller, isInvoiced, dateOrderedFrom, dateOrderedTo, salesRepresentativeUuid } = values
+    const isWaitingForPay = values.isPaid
+    const isOnlyProcessed = values.isProcessed
+    const isOnlyAisleSeller = values.isAisleSeller
+    const isWaitingForInvoice = values.isInvoiced
+    const { documentNo, businessPartnerUuid, grandTotal, openAmount, dateOrderedFrom, dateOrderedTo, salesRepresentativeUuid } = values
     listOrders({
       posUuid,
       documentNo,
       businessPartnerUuid,
       grandTotal,
       openAmount,
-      isPaid,
-      isProcessed,
-      isAisleSeller,
-      isInvoiced,
+      isWaitingForPay,
+      isOnlyProcessed,
+      isOnlyAisleSeller,
+      isWaitingForInvoice,
       dateOrderedFrom,
       dateOrderedTo,
       salesRepresentativeUuid,

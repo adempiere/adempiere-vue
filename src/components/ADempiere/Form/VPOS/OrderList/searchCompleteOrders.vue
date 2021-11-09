@@ -347,7 +347,7 @@ export default {
       listOrders({
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
-        isProcessed: true,
+        isOnlyProcessed: true,
         isWaitingForShipment: true,
         pageToken: this.tokenPage,
         dateOrderedFrom: this.dateOrdered,
