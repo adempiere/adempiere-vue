@@ -158,6 +158,7 @@
       style="width: 100%;"
       popper-class="custom-field-bpartner-info"
       :disabled="isDisabled"
+      :trigger-on-focus="false"
       :select-when-unmatched="false"
       @clear="setBusinessPartner(blankBPartner, false)"
       @keyup.enter.native="getBPartnerWithEnter"
@@ -262,7 +263,6 @@ export default {
       const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
       const orderCustomer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
       if (!this.isEmptyValue(templateCustomer) && templateCustomer.uuid !== orderCustomer.uud) {
-        console.log(orderCustomer.addresses)
         return orderCustomer.addresses
       }
       return []

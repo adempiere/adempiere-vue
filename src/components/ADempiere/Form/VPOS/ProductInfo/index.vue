@@ -50,7 +50,7 @@
         popper-class="custom-field-prodcut-info"
         :trigger-on-focus="false"
         :fetch-suggestions="localSearch"
-        :select-when-unmatched="false"
+        :select-when-unmatched="true"
         :highlight-first-item="false"
         @shortkey.native="shortcutKeyMethod"
         @select="handleSelect"

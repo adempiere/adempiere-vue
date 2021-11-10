@@ -24,7 +24,7 @@
             <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <el-image style="width: 100px; height: 100px" :src="imageCard(value.tenderTypeCode)" fit="contain" />
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value, iSOCode(value))" fit="contain" />
                 </el-col>
                 <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
@@ -93,7 +93,7 @@
             <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <el-image style="width: 100px; height: 100px" :src="imageCard(value.tenderTypeCode)" fit="contain" />
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value)" fit="contain" />
                 </el-col>
                 <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
@@ -373,9 +373,9 @@ export default {
       }
       return require('@/image/' + image + '.jpg')
     },
-    imageCard(typePayment) {
+    imageCard(typePayment, currency) {
       let image
-      switch (typePayment) {
+      switch (typePayment.tenderTypeCode) {
         case 'D':
           image = 'MobilePayment.jpg'
           break
@@ -383,7 +383,13 @@ export default {
           image = 'Mobile.jpg'
           break
         case 'X':
-          image = 'Cash.jpg'
+          if (currency === 'EUR') {
+            image = 'euroCash.jpg'
+          } else if (currency === 'VES') {
+            image = 'vesCash.jpg'
+          } else {
+            image = 'Cash.jpg'
+          }
           break
         case 'A':
           image = 'ACH.jpg'
@@ -392,13 +398,20 @@ export default {
           image = 'GiftCard.jpg'
           break
         case 'Z':
-          image = 'Zelle.jpg'
+          if (this.findTypePay(typePayment).name === 'Paypal') {
+            image = 'Paypal.jpg'
+          } else {
+            image = 'Zelle.jpg'
+          }
           break
         default:
           image = 'Default.jpg'
           break
       }
       return require('@/image/ADempiere/pos/typePayment/' + image)
+    },
+    findTypePay(value) {
+      return this.availablePaymentMethods.find(pay => pay.uuid === value.paymentMethodUuid)
     },
     deleteCollect(key) {
       const orderUuid = key.orderUuid
