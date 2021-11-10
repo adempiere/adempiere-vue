@@ -44,7 +44,8 @@ const initStateUtils = {
   confirmDelivery: false,
   showConfirmDelivery: false,
   showFastConfirmDelivery: false,
-  showAddNewAddress: false
+  showAddNewAddress: false,
+  showAddressUpdate: false
 }
 
 export default {
@@ -155,6 +156,9 @@ export default {
     },
     setShowAddNewAddress(state, payload) {
       state.showAddNewAddress = payload
+    },
+    setShowAddressUpdate(state, payload) {
+      state.showAddressUpdate = payload
     }
   },
   actions: {
@@ -354,6 +358,9 @@ export default {
     },
     getShowAddNewAddress: (state) => {
       return state.showAddNewAddress
+    },
+    getShowAddressUpdate: (state) => {
+      return state.showAddressUpdate
     }
   }
 }

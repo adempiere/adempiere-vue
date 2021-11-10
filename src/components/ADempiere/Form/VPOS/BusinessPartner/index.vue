@@ -78,11 +78,12 @@
               v-if="!isEmptyValue(currentOrder)"
               v-model="showUpdate"
               placement="right"
-              width="1200"
+              width="1250"
               trigger="click"
             >
               <business-partner-update
                 :shows-popovers="showUpdate"
+                :current-address-select="selectAddress.first_name"
               />
               <el-button
                 slot="reference"
@@ -93,7 +94,7 @@
                   class="el-icon-edit"
                   style="font-size: 22px"
                 />
-                Actualizar Socio de Negocio
+                Actualizar Socio de Negocio {{ selectAddress.first_name }}
               </el-button>
             </el-popover>
           </el-dropdown-item>
@@ -341,6 +342,9 @@ export default {
         return this.$store.getters.getShowAddNewAddress
       },
       set(value) {
+        if (!value) {
+          this.$store.commit('setShowAddressUpdate', value)
+        }
         this.$store.commit('setShowAddNewAddress', value)
         return value
       }

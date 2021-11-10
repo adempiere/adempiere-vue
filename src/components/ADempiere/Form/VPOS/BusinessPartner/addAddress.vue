@@ -19,7 +19,7 @@
   <el-col :span="24">
     <el-card class="box-card" shadow="never" style="height: 350px;">
       <div slot="header" class="clearfix">
-        <span>Agregar nueva direccion 1</span>
+        <span>Agregar nueva direccion</span>
       </div>
       <div class="text item">
         <el-row>
@@ -95,6 +95,14 @@ export default {
     showField: {
       type: Boolean,
       default: false
+    },
+    isUpdatedAddress: {
+      type: Boolean,
+      default: false
+    },
+    addressToUpdate: {
+      type: Object,
+      default: () => {}
     },
     disabled: {
       type: Boolean,
@@ -182,6 +190,15 @@ export default {
   watch: {
     showCustomer(value) {
       this.getCustomer()
+    },
+    isUpdatedAddress(value) {
+      if (value && !this.isEmptyValue(this.addressToUpdate)) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Add-Location-Address',
+          columnName: 'C_Country_ID',
+          value: this.addressToUpdate.country_id
+        })
+      }
     }
   },
   beforeDestroy() {
@@ -262,19 +279,33 @@ export default {
         containerUuid: 'Add-Location-Address',
         format: 'object'
       }))
+      let addresses
       const customer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
-      const addresses = [
-        {
-          ...values,
-          is_default_billing: false,
-          is_default_shipping: this.isShippingAddress
-        },
-        {
-          ...values,
-          is_default_billing: this.isBillingAddress,
-          is_default_shipping: false
-        }
-      ]
+      if (this.isBillingAddress && this.isShippingAddress) {
+        addresses = [
+          {
+            ...values,
+            uuid: this.addressToUpdate.uuid,
+            is_default_billing: false,
+            is_default_shipping: this.isShippingAddress
+          },
+          {
+            ...values,
+            uuid: this.addressToUpdate.uuid,
+            is_default_billing: this.isBillingAddress,
+            is_default_shipping: false
+          }
+        ]
+      } else {
+        addresses = [
+          {
+            ...values,
+            uuid: this.addressToUpdate.uuid,
+            is_default_billing: this.isBillingAddress,
+            is_default_shipping: this.isShippingAddress
+          }
+        ]
+      }
       const newAddress = { uuid: customer.uuid, Value: customer.value, Name: customer.name, addresses, posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid }
       updateCustomer(newAddress)
         .then(response => {
@@ -284,6 +315,8 @@ export default {
         })
     },
     close() {
+      this.$store.commit('setShowAddressUpdate', false)
+      this.$store.dispatch('changeShowUpdateCustomer', false)
       this.$store.commit('setShowAddNewAddress', false)
     }
   }

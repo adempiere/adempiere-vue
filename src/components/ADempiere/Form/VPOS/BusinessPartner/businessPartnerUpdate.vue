@@ -48,13 +48,40 @@
           </el-card>
         </el-col>
       </el-row>
-      <el-row :gutter="24">
-        <billing-address
-          :disabled="validateCustomerTemplate"
-        />
-        <shipping-address
-          :disabled="validateCustomerTemplate"
-        />
+      <el-row :gutter="12">
+        <el-scrollbar wrap-class="scroll-child">
+          <el-col v-for="(address) in currentCustomer.addresses" :key="address.uuid" :span="8">
+            <el-card
+              :body-style="{ padding: '10px' }"
+              shadow="never"
+              :style="(currentAddressSelect === address.first_name) ? 'border: 2px solid #36a3f7;min-height: 300px;max-height: 300px;padding: 20px;' : 'min-height: 300px;max-height: 300px;padding: 10px;'"
+            >
+              <div slot="header" class="clearfix">
+                <span style="font-size: 16px;font-weight: bold;">{{ address.first_name }}</span>
+                <el-button
+                  style="float: right; padding: 3px 0"
+                  type="text"
+                  @click="openEditAddress(address)"
+                >
+                  Editar
+                </el-button>
+              </div>
+              <el-scrollbar wrap-class="scroll-customer-description">
+                <el-descriptions class="margin-top" title="Descripción de la Dirección" :column="1">
+                  <el-descriptions-item label="Tipo de Dirección">
+                    <el-tag size="small">
+                      {{ labelDirecction(address) }}
+                    </el-tag>
+                  </el-descriptions-item>
+                  <el-descriptions-item label="Región"> {{ labelAddress(address.city) }} </el-descriptions-item>
+                  <el-descriptions-item label="Ciudad"> {{ labelAddress(address.region) }} </el-descriptions-item>
+                  <el-descriptions-item label="Dirección"> {{ address.address_1 }} </el-descriptions-item>
+                  <el-descriptions-item label="Codigo Postas"> {{ address.postal_code }} </el-descriptions-item>
+                </el-descriptions>
+              </el-scrollbar>
+            </el-card>
+          </el-col>
+        </el-scrollbar>
       </el-row>
       <el-row :gutter="24">
         <el-col :span="24">
@@ -75,6 +102,18 @@
         </el-col>
       </el-row>
     </el-form>
+    <el-dialog
+      title="Editar Dirección"
+      :visible.sync="showAddressUpdate"
+      :modal="false"
+      :show-close="false"
+    >
+      <add-address
+        :is-updated-address="showAddressUpdate"
+        :address-to-update="addressUpdate"
+        :shows-popovers="showAddNewAddress"
+      />
+    </el-dialog>
   </el-main>
 </template>
 
@@ -83,16 +122,16 @@ import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
-import BillingAddress from './billingAddress.vue'
-import ShippingAddress from './shippingAddress.vue'
+// import BillingAddress from './billingAddress.vue'
+// import ShippingAddress from './shippingAddress.vue'
 // import { getSequenceAsList } from '@/utils/ADempiere/location'
+import AddAddress from './addAddress'
 import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
 
 export default {
   name: 'BusinessPartnerUpdate',
   components: {
-    ShippingAddress,
-    BillingAddress
+    AddAddress
   },
   mixins: [
     formMixin,
@@ -112,6 +151,10 @@ export default {
     showsPopovers: {
       type: Boolean,
       default: false
+    },
+    currentAddressSelect: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -122,6 +165,8 @@ export default {
       isCustomForm: true,
       loading: true,
       index: 0,
+      isShowEditAddress: false,
+      addressUpdate: {},
       currentCustomer: {},
       shipping: {
         uuid: ''
@@ -138,6 +183,18 @@ export default {
     }
   },
   computed: {
+    showAddNewAddress: {
+      get() {
+        return this.$store.getters.getShowAddNewAddress
+      },
+      set(value) {
+        this.$store.commit('setShowAddNewAddress', value)
+        return value
+      }
+    },
+    showAddressUpdate() {
+      return this.$store.getters.getShowAddressUpdate
+    },
     fieldsListLocation() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
@@ -421,6 +478,30 @@ export default {
         }]
       })
       this.$store.dispatch('changeShowUpdateCustomer', false)
+    },
+    labelDirecction(value) {
+      if (value.is_default_billing) {
+        return this.$t('form.pos.order.BusinessPartnerCreate.billingAddress')
+      } else if (value.is_default_shipping) {
+        return this.$t('form.pos.order.BusinessPartnerCreate.shippingAddress')
+      }
+      return ''
+    },
+    labelAddress(address) {
+      if (!this.isEmptyValue(address) && !this.isEmptyValue(address.name)) {
+        return address.name
+      }
+      return ''
+    },
+    openEditAddress(address) {
+      this.$store.commit('setShowAddressUpdate', true)
+      this.addressUpdate = address
+      this.loadAddresses(address, 'Add-Location-Address')
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'Add-Location-Address',
+        columnName: 'C_Country_ID',
+        value: address.country_id
+      })
     }
   }
 }
@@ -435,5 +516,8 @@ export default {
   .custom-button-create-bp {
     float: right;
     margin-right: 10px;
+  }
+  .scroll-customer-description {
+    max-height: 150px;
   }
 </style>

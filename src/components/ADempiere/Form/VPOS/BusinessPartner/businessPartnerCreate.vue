@@ -230,11 +230,6 @@ export default {
       }
       this.loadAddresses(customer.addresses[0], 'Shipping-Address')
       this.loadAddresses(customer.addresses[0], 'Billing-Address')
-      this.$store.commit('updateValueOfField', {
-        containerUuid: 'Location-Address-Create',
-        columnName: 'C_Country_ID',
-        value: customer.addresses[0].country_id
-      })
     },
     loadAddresses(address, containerUuid) {
       if (this.isEmptyValue(address)) {
