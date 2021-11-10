@@ -383,13 +383,7 @@ export default {
           image = 'Mobile.jpg'
           break
         case 'X':
-          if (currency === 'EUR') {
-            image = 'euroCash.jpg'
-          } else if (currency === 'VES') {
-            image = 'vesCash.jpg'
-          } else {
-            image = 'Cash.jpg'
-          }
+          image = 'Cash.jpg'
           break
         case 'A':
           image = 'ACH.jpg'
@@ -398,11 +392,7 @@ export default {
           image = 'GiftCard.jpg'
           break
         case 'Z':
-          if (this.findTypePay(typePayment).name === 'Paypal') {
-            image = 'Paypal.jpg'
-          } else {
-            image = 'Zelle.jpg'
-          }
+          image = 'Zelle.jpg'
           break
         default:
           image = 'Default.jpg'
