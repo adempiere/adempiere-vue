@@ -121,7 +121,7 @@
                   class="el-icon-add-location"
                   style="font-size: 22px"
                 />
-                Agregar Nueva direccion
+                {{ $t('form.pos.order.BusinessPartnerCreate.address.addNewAddress') }}
               </el-button>
             </el-popover>
           </el-dropdown-item>
@@ -132,7 +132,7 @@
                   class="el-icon-location-information"
                   style="font-size: 22px"
                 />
-                Seleccionar Direccion
+                {{ $t('form.pos.order.BusinessPartnerCreate.address.selectAddress') }}
                 <i class="el-icon-arrow-down el-icon--right" />
               </span>
               <el-dropdown-menu slot="dropdown">

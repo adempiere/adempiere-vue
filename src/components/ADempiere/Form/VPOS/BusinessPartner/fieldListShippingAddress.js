@@ -73,6 +73,7 @@ export default [
       isCustomField: true,
       tabindex: 6,
       size: 24,
+      isMandatory: true,
       sequenceFields: 'A1'
     }
   },

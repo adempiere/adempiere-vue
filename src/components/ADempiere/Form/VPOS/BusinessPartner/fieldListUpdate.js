@@ -66,5 +66,18 @@ export default [
       sequence: 2,
       size: 6
     }
+  },
+  {
+    elementColumnName: 'EMail',
+    columnName: 'EMail',
+    tableName: 'AD_user',
+    tabindex: '3',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      tabindex: 3,
+      isCustomField: true,
+      sequence: 3,
+      size: 6
+    }
   }
 ]

@@ -35,14 +35,14 @@
       <el-col :span="12" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
         <samp style="padding-right: 10px;">
           <el-checkbox v-model="isBillingAddress">
-            Direccion de Facturacion
+            {{ $t('form.pos.order.BusinessPartnerCreate.address.billingAddress') }}
           </el-checkbox>
         </samp>
       </el-col>
       <el-col :span="12" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
         <samp style="padding-right: 10px;">
           <el-checkbox v-model="isShippingAddress">
-            Direccion de Envio
+            {{ $t('form.pos.order.BusinessPartnerCreate.address.shippingAddress') }}
           </el-checkbox>
         </samp>
       </el-col>
@@ -291,7 +291,7 @@ export default {
           },
           {
             ...values,
-            uuid: this.addressToUpdate.uuid,
+            uuid: !this.isEmptyValue(this.addressToUpdate) ? this.addressToUpdate.uuid : '',
             is_default_billing: this.isBillingAddress,
             is_default_shipping: false
           }
@@ -300,7 +300,7 @@ export default {
         addresses = [
           {
             ...values,
-            uuid: this.addressToUpdate.uuid,
+            uuid: !this.isEmptyValue(this.addressToUpdate) ? this.addressToUpdate.uuid : '',
             is_default_billing: this.isBillingAddress,
             is_default_shipping: this.isShippingAddress
           }

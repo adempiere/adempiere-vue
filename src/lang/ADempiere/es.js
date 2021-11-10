@@ -460,7 +460,21 @@ export default {
           addBillingAddress: 'Agregar Dirección de Facturación',
           billingAddress: 'Dirección de Facturación',
           shippingAddress: 'Dirección de Envió',
-          taxId: 'Identificación Fiscal'
+          taxId: 'Identificación Fiscal',
+          address: {
+            edit: 'Editar',
+            selectAddress: 'Seleccionar Dirección',
+            addNewAddress: 'Agregar Nueva Dirección',
+            editAddress: 'Editar Dirección',
+            billingAddress: 'Dirección de Facturación',
+            shippingAddress: 'Dirección de Envió',
+            managementDescription: 'Descripción de la Dirección',
+            addressType: 'Tipo de Dirección',
+            region: 'Región',
+            city: 'Ciudad',
+            address: 'Dirección',
+            postCode: 'Código Postas'
+          }
         }
       },
       collect: {

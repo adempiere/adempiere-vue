@@ -67,16 +67,16 @@
                 </el-button>
               </div>
               <el-scrollbar wrap-class="scroll-customer-description">
-                <el-descriptions class="margin-top" title="Descripción de la Dirección" :column="1">
-                  <el-descriptions-item label="Tipo de Dirección">
-                    <el-tag size="small">
+                <el-descriptions class="margin-top" :title="$t('form.pos.order.BusinessPartnerCreate.address.managementDescription')" :column="1">
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.addressType')">
+                    <el-tag size="small" :type="address.is_default_billing ? 'success' : ''">
                       {{ labelDirecction(address) }}
                     </el-tag>
                   </el-descriptions-item>
-                  <el-descriptions-item label="Región"> {{ labelAddress(address.city) }} </el-descriptions-item>
-                  <el-descriptions-item label="Ciudad"> {{ labelAddress(address.region) }} </el-descriptions-item>
-                  <el-descriptions-item label="Dirección"> {{ address.address_1 }} </el-descriptions-item>
-                  <el-descriptions-item label="Codigo Postas"> {{ address.postal_code }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.region')"> {{ labelAddress(address.region) }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.city')"> {{ labelAddress(address.city) }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.address')"> {{ address.address_1 }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.postCode')"> {{ address.postal_code }} </el-descriptions-item>
                 </el-descriptions>
               </el-scrollbar>
             </el-card>
@@ -103,7 +103,7 @@
       </el-row>
     </el-form>
     <el-dialog
-      title="Editar Dirección"
+      :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
       :visible.sync="showAddressUpdate"
       :modal="false"
       :show-close="false"
@@ -122,9 +122,6 @@ import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
-// import BillingAddress from './billingAddress.vue'
-// import ShippingAddress from './shippingAddress.vue'
-// import { getSequenceAsList } from '@/utils/ADempiere/location'
 import AddAddress from './addAddress'
 import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
 

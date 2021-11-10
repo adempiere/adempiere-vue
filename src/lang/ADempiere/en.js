@@ -484,7 +484,21 @@ export default {
           addBillingAddress: 'Add Billing Address',
           billingAddress: 'Billing Address',
           shippingAddress: 'Shipping Address',
-          taxId: 'Tax Identification'
+          taxId: 'Tax Identification',
+          address: {
+            edit: 'Edit',
+            selectAddress: 'Select Address',
+            addNewAddress: 'Add New Address',
+            editAddress: 'Edit Address',
+            billingAddress: 'Billing Address',
+            shippingAddress: 'Shipping Address',
+            managementDescription: 'Address Description',
+            addressType: 'Address Type',
+            region: 'Region',
+            city: 'City',
+            address: 'Address',
+            postCode: 'Post Code'
+          }
         }
       },
       collect: {
