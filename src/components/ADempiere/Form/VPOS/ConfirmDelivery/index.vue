@@ -38,7 +38,33 @@
           :placeholder="$t('quickAccess.searchWithEnter')"
           class="search-delivery"
           @select="searchProduct"
-        />
+        >
+          <template slot="prefix">
+            <svg-icon
+              icon-class="shopping"
+              class="el-input__icon"
+            />
+          </template>
+
+          <template slot-scope="props">
+            <div class="header" style="margin: 0px">
+              <b> {{ props.item.product.value }} - {{ props.item.product.name }} </b>
+            </div>
+            <div style="margin: 0px">
+              <div style="float: left;width: 70%;margin: 0px">
+                <p style="overflow: hidden;text-overflow: ellipsis;text-align: inherit;margin: 0px">
+                  {{ props.item.product.upc }} <br>
+                  {{ props.item.product.description }}
+                </p>
+              </div>
+              <div style="width: 30%;float: right;margin: 0px">
+                <p style="overflow: hidden;text-overflow: ellipsis;text-align: end;margin: 0px">
+                  {{ formatQuantity(props.item.quantityOrdered) }}
+                </p>
+              </div>
+            </div>
+          </template>
+        </el-autocomplete>
       </el-form-item>
     </el-form>
     <el-table
@@ -201,7 +227,7 @@
 
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
+import { formatPrice, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
 import {
   createShipmentLine,
   createShipment,
@@ -341,6 +367,7 @@ export default {
   },
   methods: {
     formatPrice,
+    formatQuantity,
     keyAction(event) {
       switch (event.srcKey) {
         case 'refreshList':
@@ -381,7 +408,7 @@ export default {
         })
     },
     searchProduct(value) {
-      const searchValue = this.isEmptyValue(value.link) ? value : value.link
+      const searchValue = this.isEmptyValue(value.product) ? value : value.product.value
       clearTimeout(this.timeOut)
       this.timeOut = setTimeout(() => {
         this.isSearchProduct = true
@@ -418,14 +445,7 @@ export default {
       }
     },
     querySearchAsyncDelivery(queryString, callBack) {
-      let results = queryString ? this.currentOrderLine.filter(this.createFilter(queryString)) : this.currentOrderLine
-      const searchStructure = results.map(product => {
-        return {
-          value: product.product.name,
-          link: product.product.value
-        }
-      })
-      results = searchStructure
+      const results = queryString ? this.currentOrderLine.filter(this.createFilter(queryString)) : this.currentOrderLine
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
         if (this.isEmptyValue(results)) {
