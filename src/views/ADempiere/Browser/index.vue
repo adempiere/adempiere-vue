@@ -61,7 +61,8 @@
         :container-manager="containerManagerTable"
         :panel-metadata="browserMetadata"
         :header="tableHeader"
-        :data-table="[]"
+        :data-table="recordsList"
+        :record-count="recordCount"
       />
     </el-main>
   </el-container>
@@ -263,7 +264,31 @@ export default defineComponent({
 
       isMandatoryColumn,
 
-      isReadOnlyColumn
+      isReadOnlyColumn,
+
+      seekRecord: ({
+        containerUuid,
+        row
+      }) => {
+        console.log(containerUuid, row)
+      },
+
+      setSelection: ({
+        containerUuid,
+        recordsSelected
+      }) => {
+        root.$store.commit('setBrowserSelectionsList', {
+          containerUuid,
+          selectionsList: recordsSelected
+        })
+      },
+
+      setPage: ({ containerUuid, pageNumber }) => {
+        root.$store.commit('getBrowserSearch', {
+          containerUuid,
+          pageNumber
+        })
+      }
     }
 
     const actionsManager = ref({
@@ -288,6 +313,19 @@ export default defineComponent({
       menuParentUuid: root.$route.meta.parentUuid
     })
 
+    // get records list
+    const recordsList = computed(() => {
+      return root.$store.getters.getBrowserRecordsList(browserUuid)
+    })
+
+    const recordCount = computed(() => {
+      const data = root.$store.getters.getBrowserData(browserUuid)
+      if (data && data.recordCount) {
+        return data.recordCount
+      }
+      return 0
+    })
+
     getBrowserDefinition()
 
     return {
@@ -301,7 +339,9 @@ export default defineComponent({
       // computed
       openedCriteria,
       isShowContextMenu,
-      tableHeader
+      tableHeader,
+      recordCount,
+      recordsList
     }
   }
 })

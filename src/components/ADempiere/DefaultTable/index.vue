@@ -97,9 +97,12 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
+// components
 import CellInfo from './CellInfo'
-import columnsDisplayOption from './columnsDisplayOption'
+import ColumnsDisplayOption from './ColumnsDisplayOption'
 import CustomPagination from '@/components/ADempiere/Pagination'
+
+// utils and helper methods
 import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
 import { isLookup } from '@/utils/ADempiere/references'
 
@@ -108,7 +111,7 @@ export default defineComponent({
 
   components: {
     CellInfo,
-    columnsDisplayOption,
+    ColumnsDisplayOption,
     CustomPagination
   },
 
@@ -243,7 +246,7 @@ export default defineComponent({
     const handleSelection = (rowsSelection, rowsSelected) => {
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
-        recordsSelected: rowsSelected
+        recordsSelected: rowsSelection
       })
     }
 

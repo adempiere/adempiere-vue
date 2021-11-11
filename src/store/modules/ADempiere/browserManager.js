@@ -14,17 +14,61 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Vue from 'vue'
 import language from '@/lang'
 
 // api request methods
 import { requestBrowserSearch } from '@/api/ADempiere/browser'
 
+// constants
+import { ROW_ATTRIBUTES, ROW_KEY_ATTRIBUTES } from '@/utils/ADempiere/constants/table'
+
 // utils and helper methods
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
-import { getContext } from '@/utils/ADempiere/contextUtils'
+import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils'
+import { getContextAttributes } from '@/utils/ADempiere/contextUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
 
+const initState = {
+  browserData: {}
+}
+
 const browserControl = {
+  state: initState,
+
+  mutations: {
+    setBrowserData(state, {
+      containerUuid,
+      recordsList = [],
+      nextPageToken,
+      recordCount = 0,
+      isLoaded = true,
+      isLoadedContext = false,
+      selectionsList = [],
+      pageNumber = 1
+    }) {
+      const dataBrowser = {
+        containerUuid,
+        recordsList,
+        pageNumber,
+        nextPageToken,
+        isLoaded,
+        isLoadedContext,
+        recordCount,
+        selectionsList
+      }
+      Vue.set(state.browserData, containerUuid, dataBrowser)
+    },
+
+    setBrowserSelectionsList(state, {
+      containerUuid,
+      selectionsList
+    }) {
+      Vue.set(state.browserData[containerUuid], 'selectionsList', selectionsList)
+
+      console.log(state.browserData)
+    }
+  },
+
   actions: {
     browserActionPerformed({ dispatch, getters }, {
       containerUuid,
@@ -56,8 +100,9 @@ const browserControl = {
     },
 
     // Search with query criteria
-    getBrowserSearch({ commit, dispatch, rootGetters }, {
+    getBrowserSearch({ commit, getters, rootGetters }, {
       containerUuid,
+      pageNumber,
       isClearSelection = false
     }) {
       showMessage({
@@ -65,6 +110,13 @@ const browserControl = {
         message: language.t('notifications.searching'),
         type: 'info'
       })
+
+      let pageToken
+      if (!isEmptyValue(pageNumber)) {
+        pageNumber-- // TODO: Remove with fix in backend
+        const token = getters.getBrowserPageToken(containerUuid)
+        pageToken = generatePageToken({ pageNumber, token })
+      }
 
       const { fieldsList, contextColumnNames } = rootGetters.getStoredBrowser(containerUuid)
 
@@ -74,47 +126,39 @@ const browserControl = {
         fieldsList
       })
 
-      const contextAttriburesList = []
-      if (!isEmptyValue(contextColumnNames)) {
-        contextColumnNames.forEach(columnName => {
-          const value = getContext({
-            containerUuid,
-            columnName
-          })
-          contextAttriburesList.push({
-            value,
-            columnName
-          })
-        })
-      }
+      // get context values
+      const contextAttriburesList = getContextAttributes({
+        containerUuid,
+        contextColumnNames
+      })
 
       return requestBrowserSearch({
         uuid: containerUuid,
         contextAttriburesList,
-        parametersList
+        parametersList,
+        nextPageToken: pageToken
       })
         .then(browserSearchResponse => {
-          const recordsList = browserSearchResponse.recordsList.map(itemRecord => {
-            const values = itemRecord.attributes
-
+          const recordsList = browserSearchResponse.recordsList.map((itemRecord, indexRow) => {
             return {
-              ...values,
-              // datatables attributes
-              isNew: false,
-              isEdit: false,
-              isReadOnlyFromRow: false
+              ...itemRecord.attributes,
+              // datatables app attributes
+              ...ROW_ATTRIBUTES,
+              indexRow
             }
           })
-
-          // let selection = allData.selection
-          // if (isClearSelection) {
-          //   selection = []
-          // }
 
           let token = browserSearchResponse.nextPageToken
           if (token !== undefined) {
             token = token.slice(0, -2)
           }
+
+          commit('setBrowserData', {
+            containerUuid,
+            recordsList,
+            recordCount: browserSearchResponse.recordCount,
+            nextPageToken: token
+          })
 
           showMessage({
             title: language.t('notifications.succesful'),
@@ -126,10 +170,9 @@ const browserControl = {
         .catch(error => {
           // Set default registry values so that the table does not say loading,
           // there was already a response from the server
-          // dispatch('setRecordSelection', {
-          //   containerUuid,
-          //   panelType: 'browser'
-          // })
+          commit('setBrowserData', {
+            containerUuid
+          })
 
           showMessage({
             title: language.t('notifications.error'),
@@ -139,6 +182,105 @@ const browserControl = {
           })
           console.warn(`Error getting browser search: ${error.message}. Code: ${error.code}.`)
         })
+    }
+  },
+
+  getters: {
+    /**
+     * Used by result in browser
+     * @param {string} containerUuid
+     */
+    getBrowserData: (state, getters) => (containerUuid) => {
+      return state.browserData[containerUuid] || {
+        containerUuid,
+        recordsList: [],
+        nextPageToken: undefined,
+        recordCount: 0,
+        isLoadedContext: false,
+        selectionsList: [],
+        pageNumber: 1,
+        isLoaded: false
+      }
+    },
+    getBrowserRecordsList: (state, getters) => (containerUuid) => {
+      return getters.getBrowserData(containerUuid).recordsList
+    },
+    getBrowserSelectionsList: (state, getters) => (containerUuid) => {
+      return getters.getBrowserData(containerUuid).selectionsList
+    },
+    getBrowserPageNumber: (state, getters) => (containerUuid) => {
+      return getters.getBrowserData(containerUuid).pageNumber
+    },
+    getBrowserPageToken: (state, getters) => (containerUuid) => {
+      return getters.getBrowserData(containerUuid).nextPageToken
+    },
+    getBrowserRowData: (state, getters) => ({ containerUuid, recordUuid, indexRow }) => {
+      const recordsList = getters.getBrowserRecordsList(containerUuid)
+      if (!isEmptyValue(indexRow)) {
+        return recordsList[indexRow]
+      }
+      return recordsList.find(itemData => {
+        if (itemData.UUID === recordUuid) {
+          return true
+        }
+      })
+    },
+    /**
+     * Getter converter selection data record in format
+     * @param {string} containerUuid
+     * @param {array}  selection
+     * [{
+     *    selectionId: keyColumn Value,
+     *    selectionValues: [{ columnName, value }]
+     * }]
+     */
+    getBrowserSelectionToServer: (state, getters, rootState, rootGetters) => ({
+      containerUuid,
+      selectionsList = []
+    }) => {
+      const selectionToServer = []
+
+      if (isEmptyValue(selectionsList)) {
+        selectionsList = getters.getBrowserSelectionsList(containerUuid)
+      }
+
+      if (isEmptyValue(selectionsList)) {
+        return selectionToServer
+      }
+
+      const { fieldsList, keyColumn } = rootGetters.getStoredBrowser(containerUuid)
+
+      // reduce list
+      const fieldsListSelection = fieldsList
+        .filter(itemField => {
+          return itemField.isIdentifier || itemField.isUpdateable
+        })
+        .map(itemField => {
+          return itemField.columnName
+        })
+
+      selectionsList.forEach(itemRow => {
+        const attributesList = []
+
+        Object.keys(itemRow).forEach(columnName => {
+          if (!columnName.includes('DisplayColumn') && !ROW_KEY_ATTRIBUTES.includes(columnName)) {
+            // evaluate metadata attributes before to convert
+            if (fieldsListSelection.includes(columnName)) {
+              attributesList.push({
+                columnName,
+                value: itemRow[columnName]
+              })
+            }
+          }
+        })
+
+        selectionToServer.push({
+          selectionId: itemRow[keyColumn],
+          selectionValues: attributesList
+        })
+      })
+
+      return selectionToServer
     }
   }
 }
