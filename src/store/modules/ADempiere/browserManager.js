@@ -27,6 +27,7 @@ import { ROW_ATTRIBUTES, ROW_KEY_ATTRIBUTES } from '@/utils/ADempiere/constants/
 import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils'
 import { getContextAttributes } from '@/utils/ADempiere/contextUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
+import { isDisplayedField } from '@/utils/ADempiere/dictionary/browser'
 
 const initState = {
   browserData: {}
@@ -76,12 +77,14 @@ const browserControl = {
       value,
       valueTo
     }) {
-      const fieldsList = getters.getFieldsListFromPanel(containerUuid)
+      const fieldsList = getters.getStoredFieldsFromBrowser(containerUuid)
 
       const fieldsEmpty = getters.getFieldsListEmptyMandatory({
         containerUuid,
-        fieldsList
+        fieldsList,
+        showedMethod: isDisplayedField
       })
+
       if (!isEmptyValue(fieldsEmpty)) {
         showMessage({
           message: language.t('notifications.mandatoryFieldMissing') + fieldsEmpty,

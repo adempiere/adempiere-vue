@@ -145,9 +145,11 @@ export default defineComponent({
       if (browserMetadata.value.awaitForValuesToQuery) {
         return false
       }
-      return root.isEmptyValue(root.$store.getters.getBrowserFieldsEmptyMandatory({
-        containerUuid: browserUuid
-      }))
+      return root.isEmptyValue(
+        root.$store.getters.getBrowserFieldsEmptyMandatory({
+          containerUuid: browserUuid
+        })
+      )
     })
 
     const openedCriteria = computed({
@@ -251,6 +253,10 @@ export default defineComponent({
           containerUuid,
           fieldsShowed
         })
+      },
+
+      getFieldsLit({ containerUuid }) {
+        return root.$store.getters.getStoredFieldsFromBrowser(containerUuid)
       }
     }
 

@@ -80,7 +80,7 @@
               v-if="visibleForDesktop
                 && showPanelFieldOption
                 && option.name === currentFieldOption.name"
-              :field-attributes="fieldAttributes"
+              :field-attributes="metadata"
               :field-value="valueField"
               :container-manager="containerManager"
             />
@@ -111,7 +111,8 @@ import LabelPopoverOption from './LabelPopoverOption.vue'
 import {
   optionsListStandad, optionsListAdvancedQuery,
   documentStatusOptionItem, translateOptionItem,
-  zoomInOptionItem, calculatorOptionItem
+  zoomInOptionItem, calculatorOptionItem,
+  hideThisField
 } from '@/components/ADempiere/Field/FieldOptions/fieldOptionsList.js'
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 import { isLookup, LIST } from '@/utils/ADempiere/references.js'
@@ -193,6 +194,27 @@ export default defineComponent({
       return '110'
     })
 
+    const fieldsListShowed = computed(() => {
+      const { parentUuid, containerUuid } = props.metadata
+      const fieldsList = props.containerManager.getFieldsLit({
+        parentUuid,
+        containerUuid
+      })
+
+      return root.$store.getters.getFieldsListNotMandatory({
+        containerUuid: props.containerUuid,
+        fieldsList,
+        showedMethod: props.containerManager.isDisplayedField,
+        isTable: props.inTable
+      })
+        .filter(itemField => {
+          return itemField.isShowedFromUser &&
+            itemField.columnName !== props.metadata.columnName
+        }).map(itemField => {
+          return itemField.columnName
+        })
+    })
+
     function redirect() {
       let window = props.metadata.reference.zoomWindows
       if (typeValue(window) === 'ARRAY') {
@@ -220,26 +242,6 @@ export default defineComponent({
       })
     }
 
-    const handleCommand = (command) => {
-      root.$store.commit('setRecordAccess', false)
-      if (command.name === root.$t('table.ProcessActivity.zoomIn')) {
-        redirect()
-        return
-      }
-
-      if (isMobile.value) {
-        root.$store.commit('changeShowRigthPanel', true)
-      } else {
-        visibleForDesktop.value = true
-      }
-
-      root.$store.commit('changeShowPopoverField', true)
-      root.$store.dispatch('setOptionField', {
-        ...command,
-        fieldAttributes: props.metadata
-      })
-    }
-
     const isDocuemntStatus = computed(() => {
       if (props.metadata.isPanelWindow && !props.metadata.isAdvancedQuery) {
         const { parentUuid, containerUuid, columnName } = props.metadata
@@ -263,6 +265,9 @@ export default defineComponent({
       const menuOptions = []
       if (field.isNumericField) {
         menuOptions.push(calculatorOptionItem)
+      }
+      if (!field.required) {
+        menuOptions.push(hideThisField)
       }
       // infoOption, operatorOption
       if (field.isAdvancedQuery) {
@@ -336,9 +341,32 @@ export default defineComponent({
     const handleClose = (key, keyPath) => {
       triggerMenu.value = 'click'
     }
+
+    /**
+     * Used by mobile menu
+     */
+    const handleCommand = (command) => {
+      root.$store.commit('setRecordAccess', false)
+
+      handleOptionSelected(command.name)
+    }
+
+    /**
+     * Used by desktop menu
+     */
     const handleSelect = (key, keyPath) => {
-      if (key === root.$t('table.ProcessActivity.zoomIn')) {
+      handleOptionSelected(key)
+
+      triggerMenu.value = 'hover'
+    }
+
+    const handleOptionSelected = (optionName) => {
+      if (optionName === root.$t('table.ProcessActivity.zoomIn')) {
         redirect()
+        return
+      }
+      if (optionName === root.$t('fieldOptions.hideThisField')) {
+        hideOnlyThisfield()
         return
       }
 
@@ -356,16 +384,29 @@ export default defineComponent({
         //   }
         // }, () => {})
       }
-      root.$store.commit('changeShowPopoverField', true)
+
       const option = optionsList.value.find(option => {
-        return option.name === key
+        return option.name === optionName
       })
+
+      root.$store.commit('changeShowPopoverField', true)
       root.$store.dispatch('setOptionField', {
         ...option,
         valueField: valueField.value,
         fieldAttributes: props.metadata
       })
-      triggerMenu.value = 'hover'
+    }
+
+    /**
+     * Hide only this field
+     */
+    const hideOnlyThisfield = () => {
+      const { parentUuid, containerUuid } = props.metadata
+      props.containerManager.changeFieldShowedFromUser({
+        parentUuid,
+        containerUuid,
+        fieldsShowed: fieldsListShowed.value
+      })
     }
 
     watch(panelContextMenu, (newValue, oldValue) => {
@@ -378,13 +419,11 @@ export default defineComponent({
       }
     })
 
-    const fieldAttributes = ref(props.metadata)
     return {
       // computed
       currentFieldOption,
       isMobile,
       labelStyle,
-      fieldAttributes,
       isDocuemntStatus,
       optionsList,
       openOptionField,

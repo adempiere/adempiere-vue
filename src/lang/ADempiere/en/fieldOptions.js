@@ -34,7 +34,8 @@ const fieldOptions = {
     allUsers: ', all Users',
     thisWindow: ' and this Window',
     allWindows: ' and all Windows'
-  }
+  },
+  hideThisField: 'Hide This Field'
 }
 
 export default fieldOptions

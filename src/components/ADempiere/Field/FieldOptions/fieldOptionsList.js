@@ -35,7 +35,7 @@ export const zoomInOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-files',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/ContextInfo')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/EmptyOption')
 }
 
 /**
@@ -96,6 +96,17 @@ export const documentStatusOptionItem = {
   svg: false,
   icon: 'el-icon-set-up',
   componentRender: () => import('@/components/ADempiere/Field/FieldOptions/DocumentStatus')
+}
+
+/**
+ * Hide only this field
+ */
+export const hideThisField = {
+  name: language.t('fieldOptions.hideThisField'),
+  enabled: true,
+  svg: true,
+  icon: 'eye',
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/EmptyOption')
 }
 
 export const optionsListStandad = [

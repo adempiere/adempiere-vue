@@ -160,6 +160,10 @@ export default defineComponent({
           containerUuid,
           fieldsShowed
         })
+      },
+
+      getFieldsLit({ parentUuid, containerUuid }) {
+        return root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
       }
     }
 

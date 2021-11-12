@@ -93,15 +93,21 @@ const getters = {
    * Obtain empty obligatory fields
    * @param {string} containerUuid
    * @param {array} fieldsList
+   * @param {function} showedMethod
    * @param {string} formatReturn
    */
   getFieldsListEmptyMandatory: (state, getters) => ({
     containerUuid,
     fieldsList,
+    showedMethod,
     formatReturn = 'name'
   }) => {
     if (isEmptyValue(fieldsList)) {
       fieldsList = getters.getFieldsListFromPanel(containerUuid)
+    }
+    // TODO: Remove conditional with complete support
+    if (!showedMethod) {
+      showedMethod = fieldIsDisplayed
     }
 
     // all mandatory and empty fields value
@@ -114,7 +120,7 @@ const getters = {
 
       if (isEmptyValue(value)) {
         const isMandatory = fieldItem.isMandatory || fieldItem.isMandatoryFromLogic
-        if (fieldIsDisplayed(fieldItem) && isMandatory) {
+        if (showedMethod(fieldItem) && isMandatory) {
           return true
         }
       }
