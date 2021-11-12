@@ -27,9 +27,6 @@ const getters = {
   getDataRecordSelection: (state, getters) => (containerUuid) => {
     return getters.getDataRecordAndSelection(containerUuid).selection
   },
-  getPageNumber: (state, getters) => (containerUuid) => {
-    return getters.getDataRecordAndSelection(containerUuid).pageNumber
-  },
   getRowData: (state, getters) => ({ containerUuid, recordUuid, index }) => {
     const recordsList = getters.getDataRecordsList(containerUuid)
     if (!isEmptyValue(index)) {

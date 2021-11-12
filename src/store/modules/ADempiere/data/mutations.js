@@ -52,9 +52,6 @@ const mutations = {
   notifyRowTableChange: (state, payload) => {
     Object.assign(payload.row, payload.newRow)
   },
-  setPageNumber(state, payload) {
-    payload.data.pageNumber = payload.pageNumber
-  },
   setIsloadContext(state, payload) {
     payload.data.isLoadedContext = payload.isLoadedContext
   },

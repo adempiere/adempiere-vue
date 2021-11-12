@@ -44,46 +44,7 @@ import {
 import { showMessage } from '@/utils/ADempiere/notification'
 
 const actions = {
-  /**
-   * Set page number of pagination list
-   * @param {string}  parameters.parentUuid
-   * @param {string}  parameters.containerUuid
-   * @param {integer} parameters.panelType
-   * @param {string}  parameters.pageNumber
-   */
-  setPageNumber({ commit, state, dispatch, rootGetters }, parameters) {
-    const {
-      parentUuid, containerUuid, panelType = 'window', pageNumber,
-      isAddRecord = false, isShowNotification = true
-    } = parameters
-    const data = state.recordSelection.find(recordItem => {
-      return recordItem.containerUuid === containerUuid
-    })
-    commit('setPageNumber', {
-      data: data,
-      pageNumber: pageNumber
-    })
 
-    // refresh list table with data from server
-    if (panelType === 'window') {
-      dispatch('getDataListTab', {
-        parentUuid,
-        containerUuid,
-        isAddRecord,
-        isShowNotification
-      })
-        .catch(error => {
-          console.warn(`Error getting data list tab. Message: ${error.message}, code ${error.code}.`)
-        })
-    } else if (panelType === 'browser') {
-      if (!rootGetters.isNotReadyForSubmit(containerUuid)) {
-        dispatch('getBrowserSearch', {
-          containerUuid,
-          isClearSelection: true
-        })
-      }
-    }
-  },
   /**
    * Insert new row bottom list table, used only from window
    * @param {string}  parentUuid

@@ -100,7 +100,7 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 // components
 import CellInfo from './CellInfo'
 import ColumnsDisplayOption from './ColumnsDisplayOption'
-import CustomPagination from '@/components/ADempiere/Pagination'
+import CustomPagination from './CustomPagination.vue'
 
 // utils and helper methods
 import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
@@ -290,9 +290,15 @@ export default defineComponent({
     margin-left: 10px;
     margin-bottom: 10px;
   }
-}
-.el-table--scrollable-y .el-table__body-wrapper {
-  overflow-y: auto;
-  height: 90% !important;
+
+  .el-table__cell {
+    // height table row
+    padding: 0px !important;
+  }
+
+  .el-table--scrollable-y .el-table__body-wrapper {
+    overflow-y: auto;
+    height: 90% !important;
+  }
 }
 </style>

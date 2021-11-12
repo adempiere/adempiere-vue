@@ -1,7 +1,7 @@
 <!--
  ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
  Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
- Contributor(s): Yamel Senih ysenih@erpya.com www.erpya.com
+ Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-footer style="height: 30px;">
     <div style="float: right;">
@@ -37,25 +38,14 @@
 </template>
 
 <script>
-/**
- * @deprecated
- * TODO: Use DefaultTable/CustomPagination
- */
-export default {
+import { defineComponent, computed } from '@vue/composition-api'
+
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+
+export default defineComponent({
   name: 'CustomPagination',
+
   props: {
-    parentUuid: {
-      type: String,
-      default: undefined
-    },
-    containerUuid: {
-      type: String,
-      default: undefined
-    },
-    panelType: {
-      type: String,
-      default: 'window'
-    },
     currentPage: {
       type: Number,
       default: undefined
@@ -75,22 +65,23 @@ export default {
     handleChangePage: {
       type: Function,
       default: (pageNumber) => {
-        this.$store.dispatch('setPageNumber', {
-          parentUuid: this.parentUuid,
-          containerUuid: this.containerUuid,
-          pageNumber,
-          panelType: this.panelType
-        })
+        console.info('implement change page number method', pageNumber)
       }
     }
   },
-  computed: {
-    isSelection() {
-      if (this.isEmptyValue(this.selection)) {
+
+  setup(props) {
+    const isSelection = computed(() => {
+      if (isEmptyValue(props.selection)) {
         return false
       }
       return true
+    })
+
+    return {
+      isSelection
     }
   }
-}
+
+})
 </script>
