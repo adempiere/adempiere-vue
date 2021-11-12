@@ -998,9 +998,9 @@ export default {
     },
     validateOrder(payment) {
       this.porcessInvoce = true
-      if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
+      if (this.formatPrice(this.pay) > this.formatPrice(this.currentOrder.grandTotal)) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
-      } else if (this.formatPrice(this.pay) > this.formatPrice(this.currentOrder.grandTotal)) {
+      } else if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
         if (this.isPosRequiredPin) {
           const attributePin = {
             payment: payment,

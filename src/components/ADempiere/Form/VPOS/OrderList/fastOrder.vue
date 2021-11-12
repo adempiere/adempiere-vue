@@ -21,7 +21,7 @@
       {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
     </el-button>
     <el-dropdown size="mini" trigger="click" @command="handleCommand">
-      <el-button type="primary">
+      <el-button type="primary" size="small" style="padding: 10px;padding-left: 5px;">
         <i class="el-icon-arrow-down el-icon--right" />
       </el-button>
       <el-dropdown-menu slot="dropdown">

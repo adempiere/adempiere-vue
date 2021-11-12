@@ -31,6 +31,12 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      elem: document.documentElement,
+      isFullscreen: false
+    }
+  },
   computed: {
     // load the component that is indicated in the attributes of received property
     componentRender() {
@@ -65,6 +71,7 @@ export default {
             key: 'showContextMenu',
             value: false
           })
+          this.click()
           form = import('@/components/ADempiere/Form/VPOS')
           break
         case 'VGetWeight':
@@ -94,6 +101,36 @@ export default {
   created() {
     if (this.metadata.fileName === 'VPOS') {
       this.$store.dispatch('loadDataFromServer')
+    }
+  },
+  methods: {
+    click() {
+      if (this.isFullscreen) {
+        this.closeFullscreen()
+        this.isFullscreen = true
+        return this.isFullscreen
+      }
+      this.openFullscreen()
+      this.isFullscreen = false
+      return this.isFullscreen
+    },
+    openFullscreen() {
+      if (this.elem.requestFullscreen) {
+        this.elem.requestFullscreen()
+      } else if (this.elem.webkitRequestFullscreen) { /* Safari */
+        this.elem.webkitRequestFullscreen()
+      } else if (this.elem.msRequestFullscreen) { /* IE11 */
+        this.elem.msRequestFullscreen()
+      }
+    },
+    closeFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+      } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen()
+      } else if (document.msExitFullscreen) { /* IE11 */
+        document.msExitFullscreen()
+      }
     }
   }
 }
