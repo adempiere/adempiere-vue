@@ -103,7 +103,7 @@
             <el-button type="danger" icon="el-icon-close" @click="exit" />
             <el-button type="info" icon="el-icon-minus" :disabled="isDisabled" @click="undoPatment" />
             <el-button type="primary" icon="el-icon-plus" :disabled="validPay || addPay || isDisabled" @click="addCollectToList(paymentBox)" />
-            <el-button type="success" :disabled="isDisabled" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
+            <el-button type="success" :disabled="validatePaymentBeforeProcessing" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
           </samp>
         </el-header>
         <!-- Panel where they show the payments registered from the collection container -->
@@ -296,6 +296,12 @@ export default {
         return []
       }
       return payment
+    },
+    validatePaymentBeforeProcessing() {
+      if (this.isEmptyValue(this.listPayments)) {
+        return true
+      }
+      return this.isDisabled
     },
     cashPayment() {
       const cash = this.listPayments.filter(pay => {
@@ -992,13 +998,9 @@ export default {
     },
     validateOrder(payment) {
       this.porcessInvoce = true
-      if (this.validateReturn !== this.change) {
-        this.completePreparedOrder(payment)
-        return
-      }
-      if (this.formatPrice(this.pay) > this.formatPrice(this.currentOrder.grandTotal)) {
+      if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
-      } else if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
+      } else if (this.formatPrice(this.pay) > this.formatPrice(this.currentOrder.grandTotal)) {
         if (this.isPosRequiredPin) {
           const attributePin = {
             payment: payment,

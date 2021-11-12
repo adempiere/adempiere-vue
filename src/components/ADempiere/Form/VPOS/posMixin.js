@@ -382,6 +382,7 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
+        isOpenRefund: true,
         createPayments: !this.isEmptyValue(payments),
         payments: payments
       })

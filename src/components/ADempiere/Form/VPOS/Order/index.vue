@@ -423,13 +423,14 @@
     </el-container>
     <div v-if="isMobile && isShowedPOSKeyLayout" :style="classButtomRight">
       <el-button
+        v-show="!isEmptyValue(currentPointOfSales.keyLayoutUuid)"
         :circle="true"
         type="primary"
         :icon="isShowedPOSKeyLayout ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"
         @click="isShowedPOSKeyLayout = !isShowedPOSKeyLayout"
       />
     </div>
-    <div v-if="!isMobile" :style="classButtomRight">
+    <div v-if="!isMobile && !isEmptyValue(currentPointOfSales.keyLayoutUuid)" :style="classButtomRight">
       <el-button
         id="buttonPanelRightPos"
         :circle="true"
@@ -564,7 +565,9 @@ export default {
         return this.$store.getters.getShowPOSKeyLayout
       },
       set(val) {
-        this.$store.commit('setShowPOSKeyLayout', val)
+        if (!this.isEmptyValue(this.currentPointOfSales.keyLayoutUuid)) {
+          this.$store.commit('setShowPOSKeyLayout', val)
+        }
       }
     },
     styleTab() {

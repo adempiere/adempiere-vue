@@ -671,6 +671,7 @@ export default {
               posUuid: this.currentPointOfSales.uuid,
               tenderTypeCode: this.selectionTypeRefund.tender_type
             }
+            this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
             if (this.selectionTypeRefund.is_pos_required_pin || this.maximumRefundAllowed <= (this.change / this.dayRate.divideRate)) {
               const attributePin = {
                 posUuid,
@@ -685,24 +686,32 @@ export default {
               this.visible = true
               this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
             } else {
-              this.completePreparedOrder(posUuid, orderUuid, payments)
-              overdrawnInvoice({
-                posUuid,
-                orderUuid,
-                createPayments: !this.isEmptyValue(this.currentOrder.listPayments.payments),
-                payments: this.currentOrder.listPayments.payments,
-                customerDetails,
-                option: this.option
-              })
+              this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
                 .then(response => {
-                  this.$store.dispatch('reloadOrder', response.uuid)
-                  this.$message({
-                    type: 'success',
-                    message: this.$t('notifications.completed'),
-                    showClose: true
-                  })
+                  if (response.type === 'success') {
+                    // this.completePreparedOrder(posUuid, orderUuid, payments)
+                    overdrawnInvoice({
+                      posUuid,
+                      orderUuid,
+                      createPayments: !this.isEmptyValue(this.currentOrder.listPayments.payments),
+                      payments: this.currentOrder.listPayments.payments,
+                      customerDetails,
+                      option: this.option
+                    })
+                      .then(response => {
+                        if (response.type === 'success') {
+                          this.completePreparedOrder(posUuid, orderUuid, payments)
+                        }
+                        this.$store.dispatch('reloadOrder', response.uuid)
+                        this.$message({
+                          type: 'success',
+                          message: this.$t('notifications.completed'),
+                          showClose: true
+                        })
+                      })
+                    this.$store.commit('dialogoInvoce', { show: false, success: true })
+                  }
                 })
-              this.$store.commit('dialogoInvoce', { show: false, success: true })
             }
           } else {
             this.$message({
@@ -729,6 +738,7 @@ export default {
               label: this.$t('form.pos.pinMessage.invoiceOpen')
             }
             this.visible = true
+            this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
             this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
           } else {
             this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)

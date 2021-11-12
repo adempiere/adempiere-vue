@@ -65,12 +65,7 @@
               style="overflow: auto"
             >
               <key-layout
-                v-if="!showCollection"
                 key="layout-component"
-              />
-              <collection
-                v-else
-                key="collection-component"
               />
             </SplitArea>
           </Split>
