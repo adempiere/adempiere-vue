@@ -459,7 +459,7 @@ export default {
           customerData: 'Datos del Cliente',
           addBillingAddress: 'Agregar Dirección de Facturación',
           billingAddress: 'Dirección de Facturación',
-          shippingAddress: 'Dirección de Envió',
+          shippingAddress: 'Dirección de Envío',
           taxId: 'Identificación Fiscal',
           address: {
             edit: 'Editar',
