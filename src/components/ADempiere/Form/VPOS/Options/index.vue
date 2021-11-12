@@ -259,7 +259,12 @@
               >
                 <i class="el-icon-sell" />
                 <br>
-                {{ $t('form.pos.optionsPoinSales.cashManagement.cashOpening') }}
+                <el-button
+                  type="text"
+                  @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.cashOpening')) : showCashOpen = true"
+                >
+                  {{ $t('form.pos.optionsPoinSales.cashManagement.cashOpening') }}
+                </el-button>
               </p>
             </el-card>
           </el-col>
@@ -270,7 +275,12 @@
               >
                 <i class="el-icon-money" />
                 <br>
-                {{ $t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal') }}
+                <el-button
+                  type="text"
+                  @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal')) : showCashWithdrawl = true"
+                >
+                  {{ $t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal') }}
+                </el-button>
               </p>
             </el-card>
           </el-col>
@@ -410,6 +420,22 @@
         />
       </span>
     </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.cashOpening')"
+      :visible.sync="showCashOpen"
+      width="60%"
+      center
+    >
+      <cash-opening />
+    </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal')"
+      :visible.sync="showCashWithdrawl"
+      width="60%"
+      center
+    >
+      <cash-withdrawal />
+    </el-dialog>
   </div>
 </template>
 
@@ -432,6 +458,8 @@ import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 import ModalDialog from '@/components/ADempiere/Dialog'
 import posProcess from '@/utils/ADempiere/constants/posProcess'
 import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
+import CashOpening from './CashOpening'
+import CashWithdrawal from './Cashwithdrawal'
 
 export default {
   name: 'Options',
@@ -439,6 +467,8 @@ export default {
     ListProductPrice,
     OrdersList,
     ModalDialog,
+    CashOpening,
+    CashWithdrawal,
     ConfirmDelivery
   },
   mixins: [
@@ -503,6 +533,22 @@ export default {
         if (!this.isEmptyValue(this.$route.query.pos)) {
           this.$store.commit('showListOrders', value)
         }
+      }
+    },
+    showCashWithdrawl: {
+      get() {
+        return this.$store.getters.getShowCashWithdrawl
+      },
+      set(value) {
+        this.$store.commit('setShowCashWithdrawl', value)
+      }
+    },
+    showCashOpen: {
+      get() {
+        return this.$store.getters.getShowCashOpen
+      },
+      set(value) {
+        this.$store.commit('setshowCashOpen', value)
       }
     },
     adviserPin() {
@@ -720,6 +766,14 @@ export default {
           break
         case this.$t('form.pos.pinMessage.newOrder'):
           this.newOrder()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.cashOpening'):
+          console.log(1)
+          this.$store.commit('setshowCashOpen', true)
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal'):
+          console.log(2)
+          this.$store.commit('setShowCashWithdrawl', true)
           break
       }
     },

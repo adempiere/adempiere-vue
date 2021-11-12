@@ -357,6 +357,7 @@ export default {
       if (isShowList) {
         // TODO: Evaluate if length = 1 and this element id = blankOption
         const list = this.getterLookupList
+        this.optionsList =  this.getterLookupList
         if (this.isEmptyValue(list) || (list.length === 1 && this.blankValues.includes(list[0]))) {
           this.remoteMethod()
         }

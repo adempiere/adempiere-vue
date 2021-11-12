@@ -550,6 +550,7 @@ export function createPayment({
   paymentDate,
   tenderTypeCode,
   paymentMethodUuid,
+  chargeUuid,
   isRefund,
   currencyUuid
 }) {
@@ -564,6 +565,7 @@ export function createPayment({
       reference_no: referenceNo,
       description: description,
       amount: amount,
+      charge_uuid: chargeUuid,
       payment_date: paymentDate,
       tender_type_code: tenderTypeCode,
       payment_method_uuid: paymentMethodUuid,
@@ -626,14 +628,18 @@ export function deletePayment({
 
 export function getPaymentsList({
   posUuid,
-  orderUuid
+  orderUuid,
+  isOnlyRefund,
+  isOnlyReceipt
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/payments`,
     method: 'get',
     params: {
       pos_uuid: posUuid,
-      order_uuid: orderUuid
+      order_uuid: orderUuid,
+      is_only_refund: isOnlyRefund,
+      is_only_receipt: isOnlyReceipt
     }
   })
     .then(listPaymentsResponse => {
@@ -1116,6 +1122,70 @@ export function reverseSales({
       pos_uuid: posUuid,
       order_uuid: orderUuid,
       description
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+/**
+ * POST Reverse Sales
+ *
+ * req.query.token - user token
+ * Body:
+ * req.body.order_uuid - Order UUID
+ * req.body.pos_uuid - POS UUID
+ * req.body.description - POS UUID description
+ * Details:
+ */
+
+export function cashOpening({
+  posUuid,
+  collectingAgentUuid,
+  description,
+  payments
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/cash-opening`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      collecting_agent_uuid: collectingAgentUuid,
+      description,
+      payments
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+/**
+ * POST Reverse Sales
+ *
+ * req.query.token - user token
+ * Body:
+ * req.body.order_uuid - Order UUID
+ * req.body.pos_uuid - POS UUID
+ * req.body.description - POS UUID description
+ * Details:
+ */
+
+export function cashWithdrawal({
+  posUuid,
+  collectingAgentUuid,
+  description,
+  payments
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/cash-withdrawal`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      collecting_agent_uuid: collectingAgentUuid,
+      description,
+      payments
     }
   })
     .then(response => {

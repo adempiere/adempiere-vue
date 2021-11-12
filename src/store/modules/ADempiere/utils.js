@@ -45,7 +45,9 @@ const initStateUtils = {
   showConfirmDelivery: false,
   showFastConfirmDelivery: false,
   showAddNewAddress: false,
-  showAddressUpdate: false
+  showAddressUpdate: false,
+  showCashOpen: false,
+  showCashWithdrawl: false
 }
 
 export default {
@@ -159,6 +161,12 @@ export default {
     },
     setShowAddressUpdate(state, payload) {
       state.showAddressUpdate = payload
+    },
+    setshowCashOpen(state, payload) {
+      state.showCashOpen = payload
+    },
+    setShowCashWithdrawl(state, payload) {
+      state.showCashWithdrawl = payload
     }
   },
   actions: {
@@ -361,6 +369,12 @@ export default {
     },
     getShowAddressUpdate: (state) => {
       return state.showAddressUpdate
+    },
+    getShowCashOpen: (state) => {
+      return state.showCashOpen
+    },
+    getShowCashWithdrawl: (state) => {
+      return state.showCashWithdrawl
     }
   }
 }
