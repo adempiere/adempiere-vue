@@ -241,9 +241,6 @@ export default {
     listCurrency() {
       return this.$store.getters.getCurrenciesList
     },
-    convertionList() {
-      return this.$store.state['pointOfSales/point/index'].conversionsList
-    },
     isPaymentBox() {
       return this.$store.getters.getPaymentBox
     },
@@ -367,9 +364,6 @@ export default {
       const pending = this.currentOrder.grandTotal <= this.pay ? 0 : this.currentOrder.grandTotal
       return pending
     },
-    convertion() {
-      return this.$store.getters.getDivideRateCollection
-    },
     isMandatory() {
       const containerUuid = this.containerUuid
       const fieldsEmpty = this.$store.getters.getFieldsListEmptyMandatory({
@@ -435,27 +429,13 @@ export default {
     updateOrderPaymentPos() {
       return this.$store.getters.getUpdatePaymentPos
     },
-    convertionsList() {
+    conversionsList() {
       return this.$store.state['pointOfSales/point/index'].conversionsList
-    },
-    currentConvertion() {
-      if (this.isEmptyValue(this.currentPointOfSales.displayCurrency)) {
-        return {}
-      }
-      const convert = this.convertionsList.find(convert => {
-        if (!this.isEmptyValue(convert.currencyTo) && !this.isEmptyValue(this.currentPointOfSales.displayCurrency) && convert.currencyTo.id === this.currentPointOfSales.displayCurrency.id) {
-          return convert
-        }
-      })
-      if (convert) {
-        return convert
-      }
-      return {}
     },
     dayRate() {
       if (!this.isEmptyValue(this.currentFieldCurrency)) {
         const currency = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
-        const convert = this.convertionsList.find(convert => {
+        const convert = this.conversionsList.find(convert => {
           if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
             return convert
           }
@@ -552,10 +532,10 @@ export default {
       }
     },
     listPayments(payment) {
-      if (!this.isEmptyValue(this.convertionsList)) {
+      if (!this.isEmptyValue(this.conversionsList)) {
         let rate
         payment.forEach((pay) => {
-          rate = this.convertionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === pay.currencyUuid)
+          rate = this.conversionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === pay.currencyUuid)
           if (!rate) {
             if (this.currentPointOfSales.priceList.currency.uuid !== pay.currencyUuid) {
               this.searchConversion(pay.currencyUuid)
@@ -615,7 +595,7 @@ export default {
       return sum
     },
     convertAmount(currencyUuid) {
-      const currencyPay = this.convertionsList.find(currency => {
+      const currencyPay = this.conversionsList.find(currency => {
         if (!this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === currencyUuid) {
           return currency
         }
@@ -776,7 +756,7 @@ export default {
     changeCurrency(value) {
       this.currentFieldCurrency = value
       const currency = this.listCurrency.find(currency => currency.iso_code === value)
-      const convert = this.convertionsList.find(convert => {
+      const convert = this.conversionsList.find(convert => {
         if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
           return convert
         }
