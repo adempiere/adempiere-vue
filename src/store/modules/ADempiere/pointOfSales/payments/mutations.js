@@ -82,5 +82,14 @@ export default {
   },
   setShipment(state, shipment) {
     state.shipment = shipment
+  },
+  setListCashSummary(state, list) {
+    state.listCashSummary = list
+  },
+  setListCastOpen(state, shipment) {
+    state.listCastOpen = shipment
+  },
+  setListWithdrawal(state, list) {
+    state.listWithdrawal = list
   }
 }

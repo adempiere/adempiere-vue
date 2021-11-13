@@ -530,13 +530,6 @@ export function createNewReturnOrder({
   console.info(`New Customer Return Order ${orderUuid}`)
 }
 
-export function cashClosing({
-  posId,
-  posUuid
-}) {
-  console.info(`Cash closing with POS id ${posId}, and uuid ${posUuid}`)
-}
-
 // Create Payment
 
 export function createPayment({
@@ -1186,6 +1179,40 @@ export function cashWithdrawal({
       collecting_agent_uuid: collectingAgentUuid,
       description,
       payments
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+export function cashSummaryMovements({
+  posUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/cash-summary-movements`,
+    method: 'get',
+    params: {
+      pos_uuid: posUuid
+    }
+  })
+    .then(response => {
+      return camelizeObjectKeys(response)
+    })
+}
+
+export function cashClosing({
+  posUuid,
+  id,
+  uuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/cash-closing`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      id,
+      uuid
     }
   })
     .then(response => {

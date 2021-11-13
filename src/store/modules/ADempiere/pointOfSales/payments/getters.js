@@ -63,5 +63,14 @@ export default {
   },
   getShipment: (state) => {
     return state.shipment
+  },
+  getListCashOpen: (state) => {
+    return state.listCastOpen
+  },
+  getListCashWithdrawal: (state) => {
+    return state.listWithdrawal
+  },
+  getListCashSummary: (state) => {
+    return state.listCashSummary
   }
 }

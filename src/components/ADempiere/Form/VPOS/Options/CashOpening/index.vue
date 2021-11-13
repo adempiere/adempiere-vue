@@ -25,7 +25,6 @@
           <el-form
             label-position="top"
             label-width="10px"
-            :disabled="isDisabled"
           >
             <el-row id="fieldListCollection">
               <el-col
@@ -70,6 +69,21 @@
               </el-col>
             </el-row>
           </el-form>
+          <br>
+          <el-button
+            style="float: right;margin-left: 10px;"
+            type="success"
+            icon="el-icon-plus"
+            :disabled="validPay"
+            @click="addPayment()"
+          />
+          <el-button
+            type="info"
+            icon="el-icon-minus"
+            style="float: right;margin-left: 0px;"
+            :disabled="isEmptyValue(listCastOpen)"
+            @click="undoPatment()"
+          />
         </div>
       </el-card>
       <el-card class="box-card" style="padding-left: 0px; padding-right: 0px">
@@ -135,7 +149,6 @@
                 <el-form
                   label-position="top"
                   label-width="10px"
-                  :disabled="isDisabled"
                 >
                   <el-row id="fieldListCollection">
                     <el-col
@@ -160,24 +173,19 @@
         </div>
       </el-card>
     </el-main>
-    <el-footer>
+    <el-footer style="height: auto; padding: 0px; padding-top: 10px">
       <el-button
-        style="float: right;"
-        type="success"
-        icon="el-icon-check"
-        @click="cashOpening()"
-      />
-      <el-button
-        style="float: right;margin-left: 0px;"
+        style="float: right;margin-left: 10px;"
         type="primary"
-        icon="el-icon-plus"
-        :disabled="isDisabled"
-        @click="addPayment"
+        icon="el-icon-check"
+        :disabled="isEmptyValue(listCastOpen)"
+        @click="cashOpening()"
       />
       <el-button
         style="float: right;"
         type="danger"
         icon="el-icon-close"
+        :disabled="isEmptyValue(listCastOpen)"
         @click="close()"
       />
     </el-footer>
@@ -191,7 +199,6 @@ import fieldsListCashOpen from './fieldsList.js'
 import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import {
   createPayment,
-  getPaymentsList,
   cashOpening,
   deletePayment
 } from '@/api/ADempiere/form/point-of-sales.js'
@@ -235,7 +242,6 @@ export default {
       value: '',
       amontSend: 0,
       currentFieldCurrency: '',
-      listCastOpen: [],
       currentFieldPaymentMethods: ''
     }
   },
@@ -245,6 +251,9 @@ export default {
     },
     isPaymentBox() {
       return this.$store.getters.getPaymentBox
+    },
+    listCastOpen() {
+      return this.$store.getters.getListCashOpen
     },
     addPay() {
       const amount = this.$store.getters.getValueOfField({
@@ -400,6 +409,22 @@ export default {
     },
     validateConvertion() {
       if (this.fieldAmount <= this.pending) {
+        return false
+      }
+      return true
+    },
+    validPay() {
+      // filter by visible fields
+      const fieldsEmpty = this.$store.getters.getFieldsListEmptyMandatory({
+        containerUuid: 'Cash-Opening',
+        fieldsList: this.fieldsList,
+        isValidate: true
+      })
+      const paymentMethods = this.availablePaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+      if (paymentMethods.tender_type === 'X') {
+        return false
+      }
+      if (this.isEmptyValue(fieldsEmpty)) {
         return false
       }
       return true
@@ -682,16 +707,6 @@ export default {
       }
       return currency
     },
-    undoPatment() {
-      const list = this.listPayments[this.listPayments.length - 1]
-      const orderUuid = list.orderUuid
-      const paymentUuid = list.uuid
-      this.$store.dispatch('deletetPayments', {
-        posUuid: this.currentPointOfSales.uuid,
-        orderUuid,
-        paymentUuid
-      })
-    },
     validateOrder(payment) {
       this.porcessInvoce = true
       if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
@@ -815,21 +830,8 @@ export default {
         })
     },
     listPaymentOpen() {
-      getPaymentsList({
-        posUuid: this.currentPointOfSales.uuid,
-        isOnlyReceipt: true
-      })
-        .then(response => {
-          this.listCastOpen = response.listPayments
-        })
-        .catch(error => {
-          this.$message({
-            message: error.message,
-            isShowClose: true,
-            type: 'error'
-          })
-          console.warn(`Error: ${error.message}. Code: ${error.code}.`)
-        })
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('listPaymentOpen', posUuid)
     },
     deleteCollect(value) {
       deletePayment({
@@ -922,7 +924,6 @@ export default {
       }
       return require('@/image/ADempiere/pos/typePayment/' + image)
     },
-
     clearField() {
       this.$store.commit('updateValuesOfContainer', {
         containerUuid: 'Cash-Opening',
@@ -937,6 +938,30 @@ export default {
           value: undefined
         }]
       })
+    },
+    undoPatment() {
+      const list = this.listCastOpen[this.listCastOpen.length - 1]
+      deletePayment({
+        paymentUuid: list.uuid
+      })
+        .then(response => {
+          this.$message({
+            type: 'success',
+            showClose: true,
+            message: response
+          })
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+        })
+        .finally(() => {
+          this.listPaymentOpen()
+        })
     },
     close() {
       this.clearField()

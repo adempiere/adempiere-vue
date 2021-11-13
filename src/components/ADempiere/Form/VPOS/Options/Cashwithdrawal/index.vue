@@ -70,6 +70,21 @@
               </el-col>
             </el-row>
           </el-form>
+          <br>
+          <el-button
+            style="float: right;margin-left: 10px;"
+            type="success"
+            icon="el-icon-plus"
+            :disabled="validPay"
+            @click="addPayment()"
+          />
+          <el-button
+            type="info"
+            icon="el-icon-minus"
+            style="float: right;margin-left: 0px;"
+            :disabled="isEmptyValue(listCashWithdrawaln)"
+            @click="undoPatment()"
+          />
         </div>
       </el-card>
       <el-card class="box-card" style="padding-left: 0px; padding-right: 0px">
@@ -79,7 +94,7 @@
           <el-container>
             <el-main style="min-height: 200px;">
               <el-row :gutter="24">
-                <el-col v-for="(payment) in listCastOpen" :key="payment.uuid" :span="12" style="padding-left: 5px; padding-right: 5px;">
+                <el-col v-for="(payment) in listCashWithdrawaln" :key="payment.uuid" :span="12" style="padding-left: 5px; padding-right: 5px;">
                   <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
                     <el-row>
                       <el-col :span="6" style="padding: 10px">
@@ -158,24 +173,19 @@
         </div>
       </el-card>
     </el-main>
-    <el-footer>
+    <el-footer style="height: auto; padding: 0px; padding-top: 10px">
       <el-button
-        style="float: right;"
-        type="success"
-        icon="el-icon-check"
-        @click="cashWithdrawal()"
-      />
-      <el-button
-        style="float: right;margin-left: 0px;"
+        style="float: right;margin-left: 10px;"
         type="primary"
-        icon="el-icon-plus"
-        :disabled="isDisabled"
-        @click="addPayment()"
+        icon="el-icon-check"
+        :disabled="isEmptyValue(listCashWithdrawaln)"
+        @click="cashWithdrawal()"
       />
       <el-button
         style="float: right;"
         type="danger"
         icon="el-icon-close"
+        :disabled="isEmptyValue(listCashWithdrawaln)"
         @click="close()"
       />
     </el-footer>
@@ -189,7 +199,6 @@ import fieldsListCashOpen from './fieldsList.js'
 import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import {
   createPayment,
-  getPaymentsList,
   cashWithdrawal,
   deletePayment
 } from '@/api/ADempiere/form/point-of-sales.js'
@@ -233,7 +242,6 @@ export default {
       value: '',
       amontSend: 0,
       currentFieldCurrency: '',
-      listCastOpen: [],
       currentFieldPaymentMethods: ''
     }
   },
@@ -243,6 +251,9 @@ export default {
     },
     isPaymentBox() {
       return this.$store.getters.getPaymentBox
+    },
+    listCashWithdrawaln() {
+      return this.$store.getters.getListCashWithdrawal
     },
     addPay() {
       const amount = this.$store.getters.getValueOfField({
@@ -416,6 +427,22 @@ export default {
     },
     validateConvertion() {
       if (this.fieldAmount <= this.pending) {
+        return false
+      }
+      return true
+    },
+    validPay() {
+      // filter by visible fields
+      const fieldsEmpty = this.$store.getters.getFieldsListEmptyMandatory({
+        containerUuid: 'Cash-Withdrawal',
+        fieldsList: this.fieldsList,
+        isValidate: true
+      })
+      const paymentMethods = this.availablePaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+      if (paymentMethods.tender_type === 'X') {
+        return false
+      }
+      if (this.isEmptyValue(fieldsEmpty)) {
         return false
       }
       return true
@@ -680,16 +707,6 @@ export default {
       }
       return currency
     },
-    undoPatment() {
-      const list = this.listPayments[this.listPayments.length - 1]
-      const orderUuid = list.orderUuid
-      const paymentUuid = list.uuid
-      this.$store.dispatch('deletetPayments', {
-        posUuid: this.currentPointOfSales.uuid,
-        orderUuid,
-        paymentUuid
-      })
-    },
     validateOrder(payment) {
       this.porcessInvoce = true
       if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
@@ -813,21 +830,8 @@ export default {
         })
     },
     listPaymentOpen() {
-      getPaymentsList({
-        posUuid: this.currentPointOfSales.uuid,
-        isOnlyRefund: true
-      })
-        .then(response => {
-          this.listCastOpen = response.listPayments
-        })
-        .catch(error => {
-          this.$message({
-            message: error.message,
-            isShowClose: true,
-            type: 'error'
-          })
-          console.warn(`Error: ${error.message}. Code: ${error.code}.`)
-        })
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('listPaymentWithdrawal', posUuid)
     },
     deleteCollect(value) {
       deletePayment({
@@ -872,7 +876,7 @@ export default {
         posUuid: this.currentPointOfSales.uuid,
         collectingAgentUuid: attribute.CollectingAgent_ID_UUID,
         description: attribute.Description,
-        payments: this.listCastOpen
+        payments: this.listCashWithdrawaln
       })
         .then(response => {
           this.$message({
@@ -934,6 +938,30 @@ export default {
           value: undefined
         }]
       })
+    },
+    undoPatment() {
+      const list = this.listCashWithdrawaln[this.listCashWithdrawaln.length - 1]
+      deletePayment({
+        paymentUuid: list.uuid
+      })
+        .then(response => {
+          this.$message({
+            type: 'success',
+            showClose: true,
+            message: response
+          })
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+        })
+        .finally(() => {
+          this.listPaymentOpen()
+        })
     },
     close() {
       this.clearField()

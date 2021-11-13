@@ -21,7 +21,9 @@ import {
   updatePayment,
   getPaymentsList,
   // Customer Bank Account
-  createCustomerBankAccount
+  createCustomerBankAccount,
+  // Cash Summary Movements
+  cashSummaryMovements
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
@@ -513,6 +515,47 @@ export default {
       })
       commit('setDeliveryList', deliveryList)
     }
+  },
+  listCashSummary({ commit, state }, posUuid) {
+    cashSummaryMovements({
+      posUuid
+    })
+      .then(response => {
+        commit('setListCashSummary', response)
+      })
+  },
+  listPaymentOpen({ commit, state }, posUuid) {
+    getPaymentsList({
+      posUuid,
+      isOnlyReceipt: true
+    })
+      .then(response => {
+        commit('setListCastOpen', response.listPayments)
+      })
+      .catch(error => {
+        this.$message({
+          message: error.message,
+          isShowClose: true,
+          type: 'error'
+        })
+        console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+      })
+  },
+  listPaymentWithdrawal({ commit, state }, posUuid) {
+    getPaymentsList({
+      posUuid,
+      isOnlyRefund: true
+    })
+      .then(response => {
+        commit('setListWithdrawal', response.listPayments)
+      })
+      .catch(error => {
+        this.$message({
+          message: error.message,
+          isShowClose: true,
+          type: 'error'
+        })
+        console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+      })
   }
-
 }

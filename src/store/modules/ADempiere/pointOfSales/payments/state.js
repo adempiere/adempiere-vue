@@ -36,6 +36,9 @@ export default {
   listRefund: [],
   addRefund: {},
   currentFieldCurrencyRedund: {},
+  listCashSummary: [],
+  listCastOpen: [],
+  listWithdrawal: [],
   dialogoInvoce: {
     show: false,
     type: 0,

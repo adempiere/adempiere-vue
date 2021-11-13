@@ -15,12 +15,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // List of fields to send for create new
-const tableName = 'C_BPartner'
-
 export default [
   {
     elementColumnName: 'Value',
     columnName: 'Value',
+    fieldUuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
     isFromDictionary: true,
     overwriteDefinition: {
       isCustomField: true,
@@ -35,6 +35,8 @@ export default [
   {
     elementColumnName: 'TaxID',
     columnName: 'TaxID',
+    fieldUuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
     isFromDictionary: true,
     overwriteDefinition: {
       isCustomField: true,
@@ -47,7 +49,8 @@ export default [
   {
     elementColumnName: 'Name',
     columnName: 'Name',
-    tableName,
+    fieldUuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
     isFromDictionary: true,
     overwriteDefinition: {
       tabindex: 1,
@@ -60,7 +63,8 @@ export default [
   {
     elementColumnName: 'Name2',
     columnName: 'Name2',
-    tableName,
+    fieldUuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
     isFromDictionary: true,
     overwriteDefinition: {
       tabindex: 2,

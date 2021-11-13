@@ -261,7 +261,7 @@
                 <br>
                 <el-button
                   type="text"
-                  @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.cashOpening')) : showCashOpen = true"
+                  @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.cashOpening')) : openCashOpening()"
                 >
                   {{ $t('form.pos.optionsPoinSales.cashManagement.cashOpening') }}
                 </el-button>
@@ -277,7 +277,7 @@
                 <br>
                 <el-button
                   type="text"
-                  @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal')) : showCashWithdrawl = true"
+                  @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal')) : openCashWithdrawal()"
                 >
                   {{ $t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal') }}
                 </el-button>
@@ -288,7 +288,7 @@
             <el-card shadow="hover" style="height: 100px">
               <p
                 :style="blockOption"
-                @click="cashClosing"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.closeBox')) : openCashClosing()"
               >
                 <i class="el-icon-sold-out" />
                 <br>
@@ -436,6 +436,14 @@
     >
       <cash-withdrawal />
     </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.closeBox')"
+      :visible.sync="showCashSummaryMovements"
+      width="60%"
+      center
+    >
+      <cash-summary-movements />
+    </el-dialog>
   </div>
 </template>
 
@@ -447,7 +455,6 @@ import {
   generateImmediateInvoice,
   withdrawal,
   createNewReturnOrder,
-  cashClosing,
   deleteOrder,
   createOrder,
   reverseSales,
@@ -459,6 +466,7 @@ import ModalDialog from '@/components/ADempiere/Dialog'
 import posProcess from '@/utils/ADempiere/constants/posProcess'
 import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
 import CashOpening from './CashOpening'
+import CashSummaryMovements from './CashSummaryMovements'
 import CashWithdrawal from './Cashwithdrawal'
 
 export default {
@@ -468,6 +476,7 @@ export default {
     OrdersList,
     ModalDialog,
     CashOpening,
+    CashSummaryMovements,
     CashWithdrawal,
     ConfirmDelivery
   },
@@ -549,6 +558,14 @@ export default {
       },
       set(value) {
         this.$store.commit('setshowCashOpen', value)
+      }
+    },
+    showCashSummaryMovements: {
+      get() {
+        return this.$store.getters.getShowCashSummaryMovements
+      },
+      set(value) {
+        this.$store.commit('setShowCashSummaryMovements', value)
       }
     },
     adviserPin() {
@@ -686,6 +703,21 @@ export default {
         }
       }
     },
+    openCashOpening() {
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('listPaymentOpen', posUuid)
+      this.$store.commit('setshowCashOpen', true)
+    },
+    openCashWithdrawal() {
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('listPaymentWithdrawal', posUuid)
+      this.$store.commit('setShowCashWithdrawl', true)
+    },
+    openCashClosing() {
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('listCashSummary', posUuid)
+      this.$store.commit('setShowCashSummaryMovements', true)
+    },
     openListOrdes() {
       this.showFieldListOrder = true
     },
@@ -768,12 +800,13 @@ export default {
           this.newOrder()
           break
         case this.$t('form.pos.optionsPoinSales.cashManagement.cashOpening'):
-          console.log(1)
-          this.$store.commit('setshowCashOpen', true)
+          this.openCashOpening()
           break
         case this.$t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal'):
-          console.log(2)
-          this.$store.commit('setShowCashWithdrawl', true)
+          this.openCashWithdrawal()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.closeBox'):
+          this.openCashClosing()
           break
       }
     },
@@ -944,13 +977,6 @@ export default {
     copyLineOrder() {
       const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
       this.showModal(process)
-    },
-    cashClosing() {
-      const { uuid: posUuid, id: posId } = this.currentPointOfSales
-      cashClosing({
-        posId,
-        posUuid
-      })
     },
     deleteOrder() {
       if (this.isEmptyValue(this.currentOrder.uuid)) {
