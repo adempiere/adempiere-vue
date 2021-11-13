@@ -92,7 +92,7 @@
           class="text item"
         >
           <el-container>
-            <el-main style="min-height: 200px;">
+            <el-main style="min-height: 150px;">
               <el-row :gutter="24">
                 <el-col v-for="(payment) in listCashWithdrawaln" :key="payment.uuid" :span="12" style="padding-left: 5px; padding-right: 5px;">
                   <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">

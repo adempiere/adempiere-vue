@@ -91,7 +91,7 @@
           class="text item"
         >
           <el-container>
-            <el-main style="min-height: 200px;">
+            <el-main style="min-height: 150px;">
               <el-row :gutter="24">
                 <template v-for="(payment) in listCastOpen">
                   <el-col :key="payment.uuid" :span="12" style="padding-left: 5px; padding-right: 5px;">
@@ -796,16 +796,16 @@ export default {
         containerUuid: 'Cash-Opening',
         format: 'object'
       })
-      const paymentMethods = this.availablePaymentMethods.find(payemnt => payemnt.uuid === this.currentFieldPaymentMethods)
+      const selectCurrency = this.listCurrency.find(payemnt => payemnt.iso_code === this.currentFieldCurrency)
+      const paymentMethodsPos = this.availablePaymentMethods.find(payemnt => payemnt.uuid === this.currentFieldPaymentMethods)
       payment.currency = this.currentFieldCurrency
       payment.amount = payment.PayAmt
-      payment.tenderTypeCode = paymentMethods.tender_type
-      payment.paymentMethodUuid = paymentMethods.uuid
-      payment.paymentMethods = paymentMethods
+      payment.tenderTypeCode = paymentMethodsPos.tender_type
+      payment.paymentMethodUuid = this.currentFieldPaymentMethods
+      payment.paymentMethods = paymentMethodsPos
       payment.chargeUuid = this.currentPointOfSales.defaultOpeningChargeUuid
       payment.posUuid = this.currentPointOfSales.uuid
-      payment.currencyUuid = paymentMethods.refund_reference_currency.uuid
-      this.listCastOpen.push(payment)
+      payment.currencyUuid = selectCurrency.uuid
       this.sendPayment(payment)
     },
     sendPayment(payment) {
