@@ -19,8 +19,8 @@ export default [
   {
     elementColumnName: 'Value',
     columnName: 'Value',
-    fieldUuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
-    uuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
+    fieldUuid: '8d382fa8-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8d382fa8-fb40-11e8-a479-7a0060f0aa01',
     isFromDictionary: true,
     overwriteDefinition: {
       isCustomField: true,
@@ -35,8 +35,8 @@ export default [
   {
     elementColumnName: 'TaxID',
     columnName: 'TaxID',
-    fieldUuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
-    uuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
+    fieldUuid: '8cef473e-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8cef473e-fb40-11e8-a479-7a0060f0aa01',
     isFromDictionary: true,
     overwriteDefinition: {
       isCustomField: true,
@@ -49,8 +49,8 @@ export default [
   {
     elementColumnName: 'Name',
     columnName: 'Name',
-    fieldUuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
-    uuid: '8cec3710-fb40-11e8-a479-7a0060f0aa01',
+    fieldUuid: '8cf0a87c-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8cf0a87c-fb40-11e8-a479-7a0060f0aa01',
     isFromDictionary: true,
     overwriteDefinition: {
       tabindex: 1,
@@ -74,6 +74,8 @@ export default [
     }
   },
   {
+    uuid: '8d9f2910-fb40-11e8-a479-7a0060f0aa01',
+    fieldUuid: '8d9f2910-fb40-11e8-a479-7a0060f0aa01',
     elementColumnName: 'EMail',
     columnName: 'EMail',
     tableName: 'AD_user',
