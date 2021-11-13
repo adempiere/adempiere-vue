@@ -25,7 +25,6 @@
           <el-form
             label-position="top"
             label-width="10px"
-            :disabled="isDisabled"
           >
             <el-row id="fieldListCollection">
               <el-col
@@ -148,7 +147,6 @@
                 <el-form
                   label-position="top"
                   label-width="10px"
-                  :disabled="isDisabled"
                 >
                   <el-row id="fieldListCollection">
                     <el-col

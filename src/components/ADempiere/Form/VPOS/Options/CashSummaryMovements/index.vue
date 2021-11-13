@@ -22,6 +22,7 @@
         <el-table
           :data="listCashSummary.records"
           border
+          height="250"
           style="width: 100%"
         >
           <el-table-column
