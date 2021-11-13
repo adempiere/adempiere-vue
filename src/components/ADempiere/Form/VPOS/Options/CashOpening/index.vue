@@ -185,7 +185,6 @@
         style="float: right;"
         type="danger"
         icon="el-icon-close"
-        :disabled="isEmptyValue(listCastOpen)"
         @click="close()"
       />
     </el-footer>

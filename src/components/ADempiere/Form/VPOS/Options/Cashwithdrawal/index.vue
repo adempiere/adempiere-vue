@@ -183,7 +183,6 @@
         style="float: right;"
         type="danger"
         icon="el-icon-close"
-        :disabled="isEmptyValue(listCashWithdrawaln)"
         @click="close()"
       />
     </el-footer>
@@ -794,16 +793,17 @@ export default {
         containerUuid: 'Cash-Withdrawal',
         format: 'object'
       })
-      const paymentMethods = this.availablePaymentMethods.find(payemnt => payemnt.uuid === this.currentFieldPaymentMethods)
+      const selectCurrency = this.listCurrency.find(payemnt => payemnt.iso_code === this.currentFieldCurrency)
+      const paymentMethodsPos = this.availablePaymentMethods.find(payemnt => payemnt.uuid === this.currentFieldPaymentMethods)
       payment.currency = this.currentFieldCurrency
       payment.amount = payment.PayAmt
-      payment.tenderTypeCode = paymentMethods.tender_type
-      payment.paymentMethodUuid = paymentMethods.uuid
-      payment.paymentMethods = paymentMethods
+      payment.tenderTypeCode = paymentMethodsPos.tender_type
+      payment.paymentMethodUuid = this.currentFieldPaymentMethods
+      payment.paymentMethods = paymentMethodsPos
       payment.isRefund = true
       payment.chargeUuid = this.currentPointOfSales.defaultWithdrawalChargeUuid
       payment.posUuid = this.currentPointOfSales.uuid
-      payment.currencyUuid = paymentMethods.refund_reference_currency.uuid
+      payment.currencyUuid = selectCurrency.uuid
       this.sendPayment(payment)
     },
     sendPayment(payment) {
