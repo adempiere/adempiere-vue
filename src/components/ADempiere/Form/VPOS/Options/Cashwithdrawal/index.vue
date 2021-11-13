@@ -824,6 +824,7 @@ export default {
           console.warn(`Error: ${error.message}. Code: ${error.code}.`)
         })
         .finally(() => {
+          this.clearField()
           this.listPaymentOpen()
         })
     },
@@ -927,7 +928,7 @@ export default {
         containerUuid: 'Cash-Withdrawal',
         attributes: [{
           columnName: 'PayAmt',
-          value: undefined
+          value: 0
         }, {
           columnName: 'CollectingAgent_ID',
           value: undefined
@@ -958,6 +959,7 @@ export default {
           console.warn(`Error: ${error.message}. Code: ${error.code}.`)
         })
         .finally(() => {
+          this.clearField()
           this.listPaymentOpen()
         })
     },
