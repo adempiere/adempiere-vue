@@ -955,8 +955,10 @@ export default {
       this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
     },
     changePos(pointOfSales) {
-      this.$store.dispatch('setCurrentPOS', pointOfSales)
-      this.clearOrder()
+      if (!this.isEmptyValue(this.currentPointOfSales.id) && this.currentPointOfSales.id !== pointOfSales.id) {
+        this.$store.dispatch('setCurrentPOS', pointOfSales)
+        this.clearOrder()
+      }
     },
     changeCampaign(item) {
       this.$store.dispatch('updateOrder', {
