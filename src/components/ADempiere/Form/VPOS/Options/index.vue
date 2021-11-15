@@ -296,6 +296,18 @@
               </p>
             </el-card>
           </el-col>
+          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <p
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.assignSeller')) : assignSeller()"
+              >
+                <i class="el-icon-sold-out" />
+                <br>
+                {{ $t('form.pos.optionsPoinSales.cashManagement.assignSeller') }}
+              </p>
+            </el-card>
+          </el-col>
         </el-row>
       </el-collapse-item>
 
@@ -444,6 +456,14 @@
     >
       <cash-summary-movements />
     </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.assignSeller')"
+      :visible.sync="showAssignSeller"
+      width="60%"
+      center
+    >
+      <assign-seller />
+    </el-dialog>
   </div>
 </template>
 
@@ -468,6 +488,7 @@ import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixi
 import CashOpening from './CashOpening'
 import CashSummaryMovements from './CashSummaryMovements'
 import CashWithdrawal from './Cashwithdrawal'
+import AssignSeller from './AssignSeller'
 
 export default {
   name: 'Options',
@@ -478,6 +499,7 @@ export default {
     CashOpening,
     CashSummaryMovements,
     CashWithdrawal,
+    AssignSeller,
     ConfirmDelivery
   },
   mixins: [
@@ -566,6 +588,14 @@ export default {
       },
       set(value) {
         this.$store.commit('setShowCashSummaryMovements', value)
+      }
+    },
+    showAssignSeller: {
+      get() {
+        return this.$store.getters.getShowAssignSeller
+      },
+      set(value) {
+        this.$store.commit('setShowAssignSeller', value)
       }
     },
     adviserPin() {
@@ -718,6 +748,9 @@ export default {
       this.$store.dispatch('listCashSummary', posUuid)
       this.$store.commit('setShowCashSummaryMovements', true)
     },
+    assignSeller() {
+      this.$store.commit('setShowAssignSeller', true)
+    },
     openListOrdes() {
       this.showFieldListOrder = true
     },
@@ -807,6 +840,9 @@ export default {
           break
         case this.$t('form.pos.optionsPoinSales.cashManagement.closeBox'):
           this.openCashClosing()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.assignSeller'):
+          this.assignSeller()
           break
       }
     },

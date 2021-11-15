@@ -412,7 +412,8 @@ export default {
           title: 'Gestión de Caja',
           cashOpening: 'Apertura de Caja',
           cashwithdrawal: 'Retiro de Efectivo',
-          closeBox: 'Cierre de Caja'
+          closeBox: 'Cierre de Caja',
+          assignSeller: 'Asignar vendedor'
         },
         generalOptions: {
           title: 'Opciones Generales',

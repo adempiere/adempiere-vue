@@ -1219,3 +1219,19 @@ export function cashClosing({
       return response
     })
 }
+export function allocateSeller({
+  posUuid,
+  salesRepresentativeUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/allocate-seller`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      sales_representative_uuid: salesRepresentativeUuid
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
