@@ -416,6 +416,8 @@ export default {
       priceList: 'Price List',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
+        emptyAvailablePaymentMethods: 'This terminal has no payment methods configured',
+        emptyListCashSummary: 'There is no cash movement',
         salesOrder: {
           title: 'Sale Order',
           newOrder: 'New Order',

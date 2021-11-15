@@ -392,6 +392,8 @@ export default {
       priceList: 'Lista de Precio',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
+        emptyAvailablePaymentMethods: 'Este terminal no tiene configurado los metodos de pagos',
+        emptyListCashSummary: 'No hay moviemineto en caja',
         salesOrder: {
           title: 'Orden de Venta',
           newOrder: 'Nueva Orden',

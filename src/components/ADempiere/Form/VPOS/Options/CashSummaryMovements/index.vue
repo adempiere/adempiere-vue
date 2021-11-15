@@ -16,7 +16,8 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <el-container style="background: white; height: 100% !important;">
+  <el-empty v-if="isEmptyValue(listCashSummary.records)" :description="$t('form.pos.optionsPoinSales.emptyListCashSummary')" />
+  <el-container v-else style="background: white; height: 100% !important;">
     <el-main style="background: white; padding: 0px; height: 100% !important; overflow: hidden">
       <el-card class="box-card" style="padding-left: 0px; padding-right: 0px">
         <el-table
