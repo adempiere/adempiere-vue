@@ -236,7 +236,7 @@ export default {
     const isOnlyProcessed = values.isProcessed
     const isOnlyAisleSeller = values.isAisleSeller
     const isWaitingForInvoice = values.isInvoiced
-    const { documentNo, businessPartnerUuid, grandTotal, openAmount, dateOrderedFrom, dateOrderedTo, salesRepresentativeUuid } = values
+    const { documentNo, businessPartnerUuid, grandTotal, openAmount, dateOrderedFrom, dateOrderedTo } = values
     listOrders({
       posUuid,
       documentNo,
@@ -249,7 +249,7 @@ export default {
       isWaitingForInvoice,
       dateOrderedFrom,
       dateOrderedTo,
-      salesRepresentativeUuid,
+      salesRepresentativeUuid: getters['user/getUserUuid'],
       pageToken
     })
       .then(responseOrdersList => {

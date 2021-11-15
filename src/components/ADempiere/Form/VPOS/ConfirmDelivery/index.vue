@@ -144,7 +144,7 @@
       width="30%"
       :modal="false"
     >
-      <template v-if="!isLoadedProcessShipment">
+      <template>
         <span>
           <p class="total">
             {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}:
@@ -185,6 +185,8 @@
                   type="primary"
                   class="custom-button-create-bp"
                   icon="el-icon-check"
+                  :loading="isLoadedConfirm"
+                  :disabled="isLoadedConfirm"
                   @click="makeDelivery"
                 />
               </samp>
@@ -192,16 +194,6 @@
           </el-row>
         </span>
       </template>
-      <div
-        v-else
-        key="form-loading"
-        v-loading="!isLoadedProcessShipment"
-        :element-loading-text="$t('notifications.loading')"
-        element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(255, 255, 255, 0.8)"
-        style="min-height: calc(50vh - 84px)"
-        class="loading-panel"
-      />
     </el-dialog>
     <el-row :gutter="24">
       <el-col :span="24">
@@ -278,6 +270,7 @@ export default {
       deliveryList: [],
       showInfo: false,
       value: false,
+      isLoadedConfirm: false,
       isLoadedProcessShipment: false,
       timeOut: null
     }
@@ -528,6 +521,7 @@ export default {
       if (this.isEmptyValue(this.currentShipment)) {
         return
       }
+      this.isLoadedConfirm = true
       this.isLoadedProcessShipment = false
       processShipment({
         shipmentUuid: this.currentShipment.uuid
@@ -552,6 +546,7 @@ export default {
         .finally(() => {
           this.dialogVisible = false
           this.isLoadedProcessShipment = true
+          this.isLoadedConfirm = false
           this.$store.commit('setShowPOSOptions', false)
           this.$store.commit('setConfirmDelivery', false)
         })

@@ -351,7 +351,8 @@ export default {
         isWaitingForShipment: true,
         pageToken: this.tokenPage,
         dateOrderedFrom: this.dateOrdered,
-        businessPartnerUuid: this.businessPartner
+        businessPartnerUuid: this.businessPartner,
+        salesRepresentativeUuid: this.$store.getters['user/getUserUuid']
       })
         .then(response => {
           this.isloading = false
