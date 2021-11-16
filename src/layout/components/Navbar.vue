@@ -176,6 +176,7 @@ export default {
         path: '/login'
       }, () => {})
       this.$store.commit('setPointOfSalesList', [])
+      this.$store.commit('setListOrderLine', [])
       this.$store.commit('setOrder', {
         documentType: {},
         documentStatus: {
