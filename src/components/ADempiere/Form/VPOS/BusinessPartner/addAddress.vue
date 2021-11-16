@@ -306,7 +306,7 @@ export default {
           }
         ]
       }
-      const newAddress = { uuid: customer.uuid, Value: customer.value, Name: customer.name, addresses, posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid }
+      const newAddress = { uuid: customer.uuid, Value: customer.value, TaxId: customer.taxId, Name: customer.name, addresses, posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid }
       updateCustomer(newAddress)
         .then(response => {
           const orderUuid = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid
