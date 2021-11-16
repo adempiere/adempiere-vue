@@ -327,7 +327,7 @@ export default {
         clearTimeout(this.timeOut)
         this.timeOut = setTimeout(() => {
           this.listOrdersInvoiced()
-        }, 1500)
+        }, 500)
       }
     }
   },
@@ -480,6 +480,7 @@ export default {
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
         isOnlyAisleSeller: true,
+        isWaitingForInvoice: false,
         pageToken: this.tokenPage,
         dateOrderedFrom: this.dateOrdered,
         businessPartnerUuid: this.businessPartner,

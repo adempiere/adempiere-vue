@@ -79,7 +79,8 @@ export function createOrder({
   documentTypeUuid,
   salesRepresentativeUuid,
   priceListUuid,
-  warehouseUuid
+  warehouseUuid,
+  campaignUuid
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/create-order`,
@@ -90,7 +91,8 @@ export function createOrder({
       document_type_uuid: documentTypeUuid,
       sales_representative_uuid: salesRepresentativeUuid,
       price_list_uuid: priceListUuid,
-      warehouse_uuid: warehouseUuid
+      warehouse_uuid: warehouseUuid,
+      campaign_uuid: campaignUuid
     }
   })
     .then(createOrderResponse => {

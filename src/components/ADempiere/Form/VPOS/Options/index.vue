@@ -977,7 +977,8 @@ export default {
         posUuid,
         customerUuid: this.currentOrder.businessPartner.uuid,
         priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
-        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
+        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid,
+        campaignUuid: this.currentPointOfSales.defaultCampaignUuid
       })
         .then(order => {
           this.$store.dispatch('currentOrder', order)

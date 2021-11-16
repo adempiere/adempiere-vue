@@ -40,13 +40,14 @@ export default {
     customerUuid,
     documentTypeUuid
   }) {
-    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
+    const { currentPriceList, currentWarehouse, defaultCampaignUuid } = rootGetters.posAttributes.currentPointOfSales
     return createOrder({
       posUuid,
       customerUuid,
       documentTypeUuid,
       priceListUuid: currentPriceList.uuid,
-      warehouseUuid: currentWarehouse.uuid
+      warehouseUuid: currentWarehouse.uuid,
+      campaignUuid: defaultCampaignUuid
     })
       .then(order => {
         commit('setOrder', order)

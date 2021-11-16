@@ -228,7 +228,7 @@ export default {
         clearTimeout(this.timeOut)
         this.timeOut = setTimeout(() => {
           this.listOrdersInvoiced()
-        }, 1000)
+        }, 500)
       }
     }
   },
@@ -344,26 +344,28 @@ export default {
     },
     listOrdersInvoiced() {
       this.isloading = true
-      listOrders({
-        posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
-        documentNo: this.input,
-        isOnlyProcessed: true,
-        isWaitingForShipment: true,
-        pageToken: this.tokenPage,
-        dateOrderedFrom: this.dateOrdered,
-        businessPartnerUuid: this.businessPartner,
-        salesRepresentativeUuid: this.$store.getters['user/getUserUuid']
-      })
-        .then(response => {
-          this.isloading = false
-          this.tokenPage = this.extractPagingToken(response.nextPageToken)
-          this.total = response.recordCount
-          this.ordersInvoiced = response.ordersList
+      if (this.$store.getters.getSearchCompleteOrderss) {
+        listOrders({
+          posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
+          documentNo: this.input,
+          isOnlyProcessed: true,
+          isWaitingForShipment: true,
+          pageToken: this.tokenPage,
+          dateOrderedFrom: this.dateOrdered,
+          businessPartnerUuid: this.businessPartner,
+          salesRepresentativeUuid: this.$store.getters['user/getUserUuid']
         })
-        .catch(error => {
-          this.isloading = false
-          console.warn(`listOrdersFromServer: ${error.message}. Code: ${error.code}.`)
-        })
+          .then(response => {
+            this.isloading = false
+            this.tokenPage = this.extractPagingToken(response.nextPageToken)
+            this.total = response.recordCount
+            this.ordersInvoiced = response.ordersList
+          })
+          .catch(error => {
+            this.isloading = false
+            console.warn(`listOrdersFromServer: ${error.message}. Code: ${error.code}.`)
+          })
+      }
     },
     clear() {
       this.$store.commit('setShowFastCompleteOrders', false)

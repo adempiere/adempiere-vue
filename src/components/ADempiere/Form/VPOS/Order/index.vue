@@ -760,6 +760,9 @@ export default {
       if (!this.isEmptyValue(this.currentOrder.campaignUuid)) {
         const campaig = this.listCampaign.find(campaign => campaign.uuid === this.currentOrder.campaignUuid)
         return campaig.values.DisplayColumn
+      } else if (!this.isEmptyValue(this.currentPointOfSales.defaultCampaignUuid)) {
+        const campaig = this.listCampaign.find(campaign => campaign.uuid === this.currentPointOfSales.defaultCampaignUuid)
+        return campaig.values.DisplayColumn
       }
       return this.$t('form.pos.order.noCampaignSelected')
     }
