@@ -998,9 +998,9 @@ export default {
     },
     validateOrder(payment) {
       this.porcessInvoce = true
-      if (this.formatPrice(this.pay) > this.formatPrice(this.currentOrder.grandTotal)) {
+      if (this.currentOrder.paymentAmount > this.currentOrder.grandTotal) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
-      } else if (this.formatPrice(this.pay) < this.formatPrice(this.currentOrder.grandTotal)) {
+      } else if (this.currentOrder.paymentAmount < this.currentOrder.grandTotal) {
         if (this.isPosRequiredPin) {
           const attributePin = {
             payment: payment,
@@ -1072,19 +1072,6 @@ export default {
       return [year, month, day].join('-')
     },
     newOrderAfterPrintTicket() {
-      if (!this.allowsCreateOrder) {
-        const attributePin = {
-          withLine: false,
-          newOrder: true,
-          customer: this.currentPointOfSales.templateCustomer.uuid,
-          action: 'newOrder',
-          type: 'actionPos',
-          label: this.$t('form.pos.pinMessage.newOrder')
-        }
-        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-        this.visible = true
-        return
-      }
       this.clearOrder()
       this.$store.commit('setShowPOSCollection', false)
       this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })

@@ -476,7 +476,7 @@ export default {
             region: 'Región',
             city: 'Ciudad',
             address: 'Dirección',
-            postCode: 'Código Postas'
+            postCode: 'Código Postal'
           }
         }
       },

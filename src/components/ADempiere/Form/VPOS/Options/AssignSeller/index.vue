@@ -38,6 +38,7 @@
         style="float: right;margin-left: 10px;"
         type="primary"
         icon="el-icon-check"
+        :disabled="validateSeller"
         @click="assignSeller()"
       />
       <el-button
@@ -95,6 +96,15 @@ export default {
       visible: false,
       infoClose: {},
       value: ''
+    }
+  },
+  computed: {
+    validateSeller() {
+      const salesRep = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'SalesRep_ID'
+      })
+      return this.isEmptyValue(salesRep)
     }
   },
   methods: {

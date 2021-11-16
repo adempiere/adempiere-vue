@@ -153,7 +153,6 @@
       v-model="displayedValue"
       :placeholder="$t('quickAccess.searchWithEnter')"
       :fetch-suggestions="localSearch"
-      clearable
       value-key="name"
       style="width: 100%;"
       popper-class="custom-field-bpartner-info"

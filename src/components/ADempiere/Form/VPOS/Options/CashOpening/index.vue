@@ -95,7 +95,7 @@
             <el-main style="min-height: 150px;">
               <el-row :gutter="24">
                 <template v-for="(payment) in listCastOpen">
-                  <el-col :key="payment.uuid" :span="12" style="padding-left: 5px; padding-right: 5px;">
+                  <el-col :key="payment.uuid" :span="8" style="padding-left: 5px; padding-right: 5px;">
                     <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
                       <el-row>
                         <el-col :span="6" style="padding: 10px">
@@ -109,7 +109,7 @@
                             style="float: right; margin-right: 10px; color: red; padding-top: 10px;"
                             @click="deleteCollect(payment)"
                           />
-                          <div style="padding-right: 10px; padding-top: 10%;">
+                          <div style="padding-right: 10px; padding-top: 5%;">
                             <div class="top clearfix">
                               <span>
                                 {{
@@ -123,7 +123,15 @@
                                 class="button"
                                 style="color: rgb(50, 54, 58); font-size: 13px; text-align: left; float: unset; padding-top: 5px;"
                               >
-                                {{ payment.description }}
+                                {{ payment.documentNo }}
+                              </el-button>
+                              <el-button
+                                v-if="!isEmptyValue(payment.paymentDate)"
+                                type="text"
+                                class="button"
+                                style="color: rgb(50, 54, 58); font-size: 13px; text-align: left; float: unset; padding-top: 5px;"
+                              >
+                                {{ formatDate(payment.paymentDate) }}
                               </el-button>
                               <div
                                 slot="header"
@@ -132,7 +140,7 @@
                               >
                                 <p class="total">
                                   <b style="float: right;">
-                                    {{ formatPrice(payment.amount, payment.currency) }}
+                                    {{ formatPrice(payment.amount, currencyPayment(payment)) }}
                                   </b>
                                 </p>
                               </div>
@@ -179,7 +187,7 @@
         style="float: right;margin-left: 10px;"
         type="primary"
         icon="el-icon-check"
-        :disabled="isEmptyValue(listCastOpen)"
+        :disabled="validateCash"
         @click="cashOpening()"
       />
       <el-button
@@ -196,7 +204,7 @@
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListCashOpen from './fieldsList.js'
-import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
+import { formatPrice, formatDate, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import {
   createPayment,
   cashOpening,
@@ -521,6 +529,16 @@ export default {
     },
     selectCurrentFieldCurrency() {
       return this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+    },
+    validateCash() {
+      const collectingAgent = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'CollectingAgent_ID'
+      })
+      if (this.isEmptyValue(collectingAgent) || this.isEmptyValue(this.listCastOpen)) {
+        return true
+      }
+      return false
     }
   },
   watch: {
@@ -598,6 +616,7 @@ export default {
   },
   methods: {
     formatDateToSend,
+    formatDate,
     amountConvert(currency) {
       this.$store.dispatch('searchConversion', {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
@@ -727,18 +746,6 @@ export default {
         this.$store.commit('dialogoInvoce', { show: true, type: 2 })
       }
     },
-    formatDate(date) {
-      let month = '' + (date.getMonth() + 1)
-      let day = '' + date.getDate()
-      const year = date.getFullYear()
-      if (month.length < 2) {
-        month = '0' + month
-      }
-      if (day.length < 2) {
-        day = '0' + day
-      }
-      return [year, month, day].join('-')
-    },
     newOrderAfterPrintTicket() {
       if (!this.allowsCreateOrder) {
         const attributePin = {
@@ -810,13 +817,7 @@ export default {
     },
     sendPayment(payment) {
       createPayment(payment)
-        .then(response => {
-          this.$message({
-            type: 'success',
-            showClose: true,
-            message: 'ok'
-          })
-        })
+        .then(response => {})
         .catch(error => {
           this.$message({
             message: error.message,
@@ -838,13 +839,7 @@ export default {
       deletePayment({
         paymentUuid: value.uuid
       })
-        .then(response => {
-          this.$message({
-            type: 'success',
-            showClose: true,
-            message: response
-          })
-        })
+        .then(response => {})
         .catch(error => {
           this.$message({
             message: error.message,
@@ -897,6 +892,13 @@ export default {
         .finally(() => {
           this.close()
         })
+    },
+    currencyPayment(payment) {
+      const currency = this.listCurrency.find(currency => currency.uuid === payment.currencyUuid)
+      if (!this.isEmptyValue(currency)) {
+        return currency.iso_code
+      }
+      return ''
     },
     imageCard(typePayment) {
       let image

@@ -394,6 +394,9 @@ export default {
             showClose: true
           })
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
+          this.clearOrder()
+          this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
+          this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
         })
         .catch(error => {
           this.$message({
