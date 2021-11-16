@@ -388,6 +388,9 @@ export default {
           columnName: 'Name',
           value: customer.name
         }, {
+          columnName: 'Name2',
+          value: customer.lastName
+        }, {
           columnName: 'Value',
           value: customer.value
         }, {

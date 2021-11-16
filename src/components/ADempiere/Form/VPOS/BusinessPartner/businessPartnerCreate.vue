@@ -300,6 +300,18 @@ export default {
         })
         billingAddress.first_name = region + '/' + city
       }
+      const validateValueCustomer = this.$store.getters.getValueOfField({
+        containerUuid: 'Business-Partner-Create',
+        columnName: 'Value'
+      })
+      if (this.isEmptyValue(validateValueCustomer)) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Business-Partner-Create',
+          columnName: 'Value',
+          value: values.taxId
+        })
+        values.value = values.taxId
+      }
       values.addresses = [this.billingAddress, this.shippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: this.containerUuid,
