@@ -309,6 +309,7 @@ export default {
           payments: response.listPayments.reverse(),
           isLoaded: true
         })
+        dispatch('updateOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)

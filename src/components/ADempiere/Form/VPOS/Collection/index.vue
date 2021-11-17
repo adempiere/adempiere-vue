@@ -151,20 +151,20 @@
                 <p class="total">
                   {{ $t('form.pos.collect.pending') }}:
                   <b style="float: right;">
-                    {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
+                    {{ formatPrice(currentOrder.openAmount, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
 
                 <p class="total">
                   {{ $t('form.pos.collect.payment') }}:
                   <b style="float: right;">
-                    {{ formatPrice(pay, pointOfSalesCurrency.iSOCode) }}
+                    {{ formatPrice(currentOrder.paymentAmount, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
                 <p class="total">
                   {{ $t('form.pos.collect.change') }}:
                   <b style="float: right;">
-                    {{ formatPrice(change, pointOfSalesCurrency.iSOCode) }}
+                    {{ formatPrice(currentOrder.refundAmount, pointOfSalesCurrency.iSOCode) }}
                   </b>
                 </p>
               </span>
