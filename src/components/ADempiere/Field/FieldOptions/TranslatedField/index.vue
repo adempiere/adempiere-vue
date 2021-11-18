@@ -33,20 +33,15 @@
         form-translated-field
         @submit.native.prevent="notSubmitForm"
       >
-        <el-form-item
-          :label="$t('field.container.description')"
-          class="justify-text"
-        >
+        <p class="justify-text">
+          <b> {{ $t('field.container.description') }}: </b>
           {{ fieldAttributes.description }}
-        </el-form-item>
+        </p>
 
-        <el-form-item
-          v-if="!isEmptyValue(fieldAttributes.help)"
-          :label="$t('field.container.help')"
-          class="justify-text"
-        >
+        <p v-if="!isEmptyValue(fieldAttributes.help)" class="justify-text">
+          <b> {{ $t('field.container.help') }}: </b>
           {{ fieldAttributes.help }}
-        </el-form-item>
+        </p>
 
         <el-form-item
           :required="true"
