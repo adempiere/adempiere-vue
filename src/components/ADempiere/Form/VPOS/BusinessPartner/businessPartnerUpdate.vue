@@ -36,7 +36,7 @@
             </div>
             <div class="text item">
               <field-definition
-                v-for="(field) in datos"
+                v-for="(field) in fieldsList"
                 :ref="field.columnName"
                 :key="field.columnName"
                 :metadata-field="{
@@ -266,17 +266,20 @@ export default {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
     },
     update() {
-      const values = this.$store.getters.getValuesView({
+      const values = this.datesForm(this.$store.getters.getValuesView({
         containerUuid: 'Business-Partner-Update',
         format: 'object'
-      })
+      }))
       this.shippingAddress.uuid = this.isEmptyValue(this.shipping) ? '' : this.shipping.uuid
       this.billingAddress.uuid = this.isEmptyValue(this.billing) ? '' : this.billing.uuid
+      this.billingAddress.email = values.email
+      this.shippingAddress.email = values.email
       values.addresses = [this.billingAddress, this.shippingAddress]
       values.uuid = this.$store.getters.getValueOfField({
         containerUuid: this.$route.meta.uuid,
         columnName: 'C_BPartner_ID_UUID' // this.parentMetadata.columnName
       })
+      values.taxId = values.value
       values.posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
       updateCustomer(values)
         .then(response => {
@@ -391,6 +394,9 @@ export default {
           columnName: 'Name2',
           value: customer.lastName
         }, {
+          columnName: 'EMail',
+          value: customer.addresses[0].email
+        }, {
           columnName: 'Value',
           value: customer.value
         }, {
@@ -421,6 +427,9 @@ export default {
             break
           case 'Phone':
             valuesToSend['phone'] = value
+            break
+          case 'EMail':
+            valuesToSend['email'] = value
             break
         }
       })

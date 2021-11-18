@@ -413,7 +413,10 @@ export default {
         cashManagement: {
           title: 'Gestión de Caja',
           cashOpening: 'Apertura de Caja',
+          cashOpenBox: 'Caja Aperturada',
           cashwithdrawal: 'Retiro de Efectivo',
+          successfulCashWithdrawal: 'Retiro de caja exitoso',
+          cashCloseBox: 'Caja Cerrada',
           closeBox: 'Cierre de Caja',
           assignSeller: 'Asignar vendedor'
         },
@@ -457,6 +460,7 @@ export default {
         campaign: 'Campaña',
         noCampaignSelected: 'Sin Campaña seleccionada',
         BusinessPartnerCreate: {
+          phone: 'Telefono',
           businessPartner: 'Socio de Negocios',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
           customerData: 'Datos del Cliente',
@@ -467,6 +471,7 @@ export default {
           address: {
             edit: 'Editar',
             selectAddress: 'Seleccionar Dirección',
+            saveAddress: 'Dirección guardada',
             addNewAddress: 'Agregar Nueva Dirección',
             editAddress: 'Editar Dirección',
             billingAddress: 'Dirección de Facturación',

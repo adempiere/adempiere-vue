@@ -169,15 +169,15 @@ export function createCustomer({
 // Update Customer
 export function updateCustomer({
   uuid,
-  Value,
-  TaxId,
-  Duns,
-  Naics,
-  Name,
-  Name2,
+  value,
+  taxId,
+  duns,
+  naics,
+  name,
   lastName,
   description,
   addresses,
+  phone,
   posUuid
 }) {
   return request({
@@ -185,13 +185,12 @@ export function updateCustomer({
     method: 'post',
     data: {
       uuid,
-      value: Value,
-      tax_id: TaxId,
-      duns: Duns,
-      naics: Naics,
-      name: Name,
+      value,
+      tax_id: taxId,
+      name,
       last_name: lastName,
       description,
+      phone,
       addresses,
       pos_uuid: posUuid
     }

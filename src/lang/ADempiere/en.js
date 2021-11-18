@@ -437,9 +437,12 @@ export default {
         cashManagement: {
           title: 'Cash Management',
           cashOpening: 'Cash Opening',
-          cashwithdrawal: 'Cash withdrawa',
           closeBox: 'Close the box',
-          assignSeller: 'Assign seller'
+          assignSeller: 'Assign seller',
+          cashOpenBox: 'Cashbox Opened',
+          cashwithdrawal: 'Cash Withdrawal',
+          successfulCashWithdrawal: 'Cash withdrawal successful',
+          cashCloseBox: 'Cashbox Closed'
         },
         generalOptions: {
           title: 'General Options',
@@ -481,6 +484,7 @@ export default {
         campaign: 'Campaign',
         noCampaignSelected: 'No Campaign selected',
         BusinessPartnerCreate: {
+          phone: 'Phone',
           businessPartner: 'Business Partner',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
           customerData: 'Customer Data',
@@ -491,6 +495,7 @@ export default {
           address: {
             edit: 'Edit',
             selectAddress: 'Select Address',
+            saveAddress: 'Save Address',
             addNewAddress: 'Add New Address',
             editAddress: 'Edit Address',
             billingAddress: 'Billing Address',

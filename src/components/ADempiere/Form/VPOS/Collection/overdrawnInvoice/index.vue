@@ -701,8 +701,22 @@ export default {
               this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
                 .then(response => {
                   if (response.type === 'success') {
+                    const { BankAccountType, A_Ident_SSN, C_Bank_ID_UUID, EMail, IsACH } = !this.isEmptyValue(this.$store.getters.getAddRefund) ? this.$store.getters.getAddRefund.customer.customerAccount : ''
                     this.completePreparedOrder(posUuid, orderUuid, payments)
                     this.$store.dispatch('reloadOrder', response.uuid)
+                    this.$store.dispatch('customerBankAccount', {
+                      customerUuid: this.currentOrder.businessPartner.uuid,
+                      posUuid: this.currentPointOfSales.uuid,
+                      email: EMail,
+                      socialSecurityNumber: A_Ident_SSN,
+                      name: this.currentOrder.businessPartner.name,
+                      bankAccountType: BankAccountType,
+                      bankUuid: C_Bank_ID_UUID,
+                      isAch: IsACH
+                    })
+                      .then(response => {
+                        this.refundAllowed(posUuid, orderUuid, payments)
+                      })
                     this.$message({
                       type: 'success',
                       message: this.$t('notifications.completed'),

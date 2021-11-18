@@ -304,6 +304,8 @@ export default {
         containerUuid: 'Business-Partner-Create',
         columnName: 'Value'
       })
+      this.billingAddress.email = values.email
+      this.shippingAddress.email = values.email
       if (this.isEmptyValue(validateValueCustomer)) {
         this.$store.commit('updateValueOfField', {
           containerUuid: 'Business-Partner-Create',
@@ -389,6 +391,9 @@ export default {
             break
           case 'Phone':
             valuesToSend['phone'] = value
+            break
+          case 'EMail':
+            valuesToSend['email'] = value
             break
         }
       })

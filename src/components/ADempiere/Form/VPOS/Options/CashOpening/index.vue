@@ -878,7 +878,7 @@ export default {
           this.$message({
             type: 'success',
             showClose: true,
-            message: response
+            message: this.$t('form.pos.optionsPoinSales.cashManagement.cashOpenBox')
           })
         })
         .catch(error => {

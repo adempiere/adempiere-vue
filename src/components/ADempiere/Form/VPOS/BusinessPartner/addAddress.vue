@@ -19,7 +19,9 @@
   <el-col :span="24">
     <el-card class="box-card" shadow="never" style="height: 350px;">
       <div slot="header" class="clearfix">
-        <span>Agregar nueva direccion</span>
+        <span>
+          {{ $t('form.pos.order.BusinessPartnerCreate.address.addNewAddress') }}
+        </span>
       </div>
       <div class="text item">
         <el-row>
@@ -291,7 +293,6 @@ export default {
           },
           {
             ...values,
-            uuid: !this.isEmptyValue(this.addressToUpdate) ? this.addressToUpdate.uuid : '',
             is_default_billing: this.isBillingAddress,
             is_default_shipping: false
           }
@@ -306,11 +307,23 @@ export default {
           }
         ]
       }
-      const newAddress = { uuid: customer.uuid, Value: customer.value, TaxId: customer.taxId, Name: customer.name, addresses, posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid }
+      const newAddress = { uuid: customer.uuid, value: customer.value, taxId: customer.taxId, name: customer.name, addresses, posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid }
       updateCustomer(newAddress)
         .then(response => {
           const orderUuid = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid
           this.$store.dispatch('reloadOrder', { orderUuid })
+          this.$message({
+            type: 'success',
+            showClose: true,
+            message: this.$t('form.pos.order.BusinessPartnerCreate.address.saveAddress')
+          })
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            showClose: true,
+            message: error
+          })
         })
         .finally(() => {
           this.close()
