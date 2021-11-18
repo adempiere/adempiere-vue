@@ -252,7 +252,7 @@
 
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.cashManagement.title')" name="cashManagement">
         <el-row :gutter="12" style="padding-right: 10px;">
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsCashOpening" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
@@ -261,14 +261,14 @@
                 <br>
                 <el-button
                   type="text"
-                  @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.cashOpening')) : openCashOpening()"
+                  @click="openCashOpening()"
                 >
                   {{ $t('form.pos.optionsPoinSales.cashManagement.cashOpening') }}
                 </el-button>
               </p>
             </el-card>
           </el-col>
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsCashWithdrawal" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
@@ -277,18 +277,18 @@
                 <br>
                 <el-button
                   type="text"
-                  @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal')) : openCashWithdrawal()"
+                  @click="openCashWithdrawal()"
                 >
                   {{ $t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal') }}
                 </el-button>
               </p>
             </el-card>
           </el-col>
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsCashClosing" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
-                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.closeBox')) : openCashClosing()"
+                @click="openCashClosing()"
               >
                 <i class="el-icon-sold-out" />
                 <br>
@@ -296,7 +296,7 @@
               </p>
             </el-card>
           </el-col>
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsAllocateSeller" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
@@ -528,8 +528,20 @@ export default {
     }
   },
   computed: {
+    isAllowsCashOpening() {
+      return this.currentPointOfSales.isAllowsCashOpening
+    },
+    isAllowsCashClosing() {
+      return this.currentPointOfSales.isAllowsCashClosing
+    },
+    isAllowsCashWithdrawal() {
+      return this.currentPointOfSales.isAllowsCashWithdrawal
+    },
+    isAllowsAllocateSeller() {
+      return this.currentPointOfSales.isAllowsAllocateSeller
+    },
     allowsConfirmShipment() {
-      return this.currentPointOfSales.isAllowsConfirmShipment && !this.currentOrder.isDelivered
+      return this.currentPointOfSales.isAllowsConfirmShipment
     },
     infowOverdrawnInvoice() {
       if (this.$store.getters.getOverdrawnInvoice.attributePin) {
