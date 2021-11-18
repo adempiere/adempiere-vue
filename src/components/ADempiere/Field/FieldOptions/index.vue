@@ -82,6 +82,7 @@
                 && option.name === currentFieldOption.name"
               :field-attributes="metadata"
               :field-value="valueField"
+              :record-uuid="recordUuid"
               :container-manager="containerManager"
             />
 
@@ -135,6 +136,10 @@ export default defineComponent({
     containerManager: {
       type: Object,
       default: () => ({})
+    },
+    recordUuid: {
+      type: String,
+      default: undefined
     }
   },
 
@@ -274,13 +279,11 @@ export default defineComponent({
         return menuOptions.concat(optionsListAdvancedQuery)
       }
 
-      if (field.isPanelWindow) {
-        if (field.isTranslatedField) {
-          menuOptions.push(translateOptionItem)
-        }
-        if (isDocuemntStatus.value) {
-          menuOptions.push(documentStatusOptionItem)
-        }
+      if (field.isTranslatedField) {
+        menuOptions.push(translateOptionItem)
+      }
+      if (isDocuemntStatus.value) {
+        menuOptions.push(documentStatusOptionItem)
       }
 
       if (field.reference &&

@@ -53,7 +53,7 @@ export const operatorOptionItem = {
  * Only when is translate option
  */
 export const translateOptionItem = {
-  name: language.t('language'),
+  name: language.t('fieldOptions.translation'),
   enabled: true,
   svg: true,
   icon: 'language',

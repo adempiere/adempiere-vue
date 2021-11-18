@@ -85,7 +85,6 @@
         <samp style="float: left; padding-right: 10px;">
           <el-button
             type="danger"
-            class="custom-button-address-location"
             icon="el-icon-delete"
             @click="remove()"
           />
@@ -94,14 +93,12 @@
         <samp style="float: right; padding-right: 10px;">
           <el-button
             type="danger"
-            class="custom-button-address-location"
             icon="el-icon-close"
             @click="close()"
           />
 
           <el-button
             type="primary"
-            class="custom-button-address-location"
             icon="el-icon-check"
             @click="sendValue()"
           />

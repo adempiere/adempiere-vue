@@ -24,31 +24,40 @@
         <b> {{ fieldAttributes.name }} </b>
       </span>
     </div>
-    <div>
-      <el-form ref="form" label-position="top">
-        <el-form-item :label="$t('field.container.description')">
+
+    <el-scrollbar wrap-class="scroll-child">
+      <el-form
+        ref="form"
+        class="form-translated-field"
+        label-position="top"
+        form-translated-field
+        @submit.native.prevent="notSubmitForm"
+      >
+        <el-form-item
+          :label="$t('field.container.description')"
+          class="justify-text"
+        >
           {{ fieldAttributes.description }}
         </el-form-item>
-        <el-form-item :label="$t('field.container.help')">
+
+        <el-form-item
+          v-if="!isEmptyValue(fieldAttributes.help)"
+          :label="$t('field.container.help')"
+          class="justify-text"
+        >
           {{ fieldAttributes.help }}
         </el-form-item>
+
         <el-form-item
           :required="true"
+          :label="$t('language') + ':'"
         >
-          <template slot="label">
-            {{ $t('language') + ':' }}
-          </template>
           <el-select
             v-model="langValue"
-            size="medium"
+            size="small"
             style="width: 100%;"
             filterable
           >
-            <!-- <el-option
-              key="blank-option"
-              :value="undefined"
-              label=" "
-            /> -->
             <el-option
               v-for="(optionLang, key) in languageList"
               :key="key"
@@ -57,31 +66,33 @@
             />
           </el-select>
         </el-form-item>
+
         <el-form-item
-          :label="$t('field.codeTranslation') + fieldAttributes.name"
+          :label="$t('fieldOptions.translationValue')"
           :required="true"
         >
           <el-input
             v-model="translatedValue"
+            size="small"
             :disabled="isEmptyValue(langValue)"
           />
         </el-form-item>
       </el-form>
-    </div>
-    <br>
-    <el-row>
+    </el-scrollbar>
+
+    <el-row class="footer">
       <el-col :span="24">
         <samp style="float: right; padding-right: 10px;">
           <el-button
             type="danger"
-            class="custom-button-address-location"
             icon="el-icon-close"
             @click="close()"
           />
+
           <el-button
             type="primary"
-            class="custom-button-address-location"
             icon="el-icon-check"
+            :disabled="isDisableRequest"
             @click="changeTranslationValue(translatedValue)"
           />
         </samp>
@@ -91,9 +102,11 @@
 </template>
 
 <script>
-import { getLanguage } from '@/lang/index'
+import { defineComponent, computed, watch, ref } from '@vue/composition-api'
 
-export default {
+import { getLanguage } from '@/lang'
+
+export default defineComponent({
   name: 'TranslatedField',
 
   props: {
@@ -107,124 +120,150 @@ export default {
     }
   },
 
-  data() {
-    return {
-      langValue: undefined,
-      translatedValue: '',
-      isLoading: false
-    }
-  },
+  setup(props, { root }) {
+    const { columnName, tabTableName: tableName } = props.fieldAttributes
 
-  computed: {
-    languageList() {
-      return this.$store.getters.getLanguagesList.filter(itemLanguage => {
+    const langValue = ref()
+    const translatedValue = ref('')
+    const isLoading = ref(false)
+
+    const languageList = computed(() => {
+      return root.$store.getters.getLanguagesList.filter(itemLanguage => {
         return !itemLanguage.isBaseLanguage
       })
-    },
-    icon() {
-      if (this.isLoading) {
-        return 'el-icon-loading'
-      }
-      return 'el-icon-refresh'
-    },
-    getterTranslationValues() {
-      const values = this.$store.getters.getTranslationByLanguage({
-        containerUuid: this.fieldAttributes.containerUuid,
-        language: this.langValue,
-        recordUuid: this.fieldAttributes.recordUuid
-      })
-      if (this.isEmptyValue(values)) {
-        return undefined
-      }
-      return values
-    },
-    gettterValue() {
-      const values = this.getterTranslationValues
-      if (this.isEmptyValue(values)) {
-        return undefined
-      }
-      return values[this.fieldAttributes.columnName]
-    }
-  },
-
-  watch: {
-    gettterValue(newValue, oldValue) {
-      this.translatedValue = newValue
-    }
-  },
-
-  created() {
-    this.getTranslation()
-    let langMatch = this.languageList.find(itemLanguage => {
-      return itemLanguage.languageISO === getLanguage()
     })
-    if (langMatch) {
-      langMatch = langMatch.language
-    } else {
-      langMatch = this.languageList[0].language
-    }
-    this.langValue = langMatch
-  },
 
-  methods: {
-    getTranslation() {
-      if (this.isEmptyValue(this.getterTranslationValues)) {
-        this.getTranslationsFromServer()
-      }
-    },
-    getTranslationsFromServer() {
-      this.isLoading = true
-      this.$store.dispatch('getTranslationsFromServer', {
-        containerUuid: this.fieldAttributes.containerUuid,
-        recordUuid: this.fieldAttributes.recordUuid,
-        tableName: this.fieldAttributes.tableName,
-        language: this.langValue
+    const translationValues = computed(() => {
+      return root.$store.getters.getTranslationValues({
+        language: langValue.value,
+        tableName,
+        recordUuid: props.recordUuid
       })
-        .finally(() => {
-          this.isLoading = false
+    })
+
+    const translationOriginalValues = computed(() => {
+      return root.$store.getters.getTranslationValues({
+        language: langValue.value,
+        tableName,
+        recordUuid: props.recordUuid
+      })
+    })
+
+    const isDisableRequest = computed(() => {
+      return translatedValue.value === translationOriginalValues.value[columnName]
+    })
+
+    const gettterValue = computed(() => {
+      const values = translationValues.value
+      if (root.isEmptyValue(values)) {
+        return undefined
+      }
+      return values[columnName]
+    })
+
+    const getTranslation = () => {
+      if (!root.isEmptyValue(translationValues.value)) {
+        // translatedValue.value = gettterValue.value
+        return
+      }
+      getTranslationsFromServer()
+    }
+
+    const getTranslationsFromServer = () => {
+      isLoading.value = true
+      root.$store.dispatch('getTranslationsFromServer', {
+        recordUuid: props.recordUuid,
+        tableName,
+        language: langValue.value
+      })
+        .then(values => {
+          translatedValue.value = values[columnName]
         })
-    },
-    changeTranslationValue(value) {
-      this.$store.dispatch('changeTranslationValue', {
-        containerUuid: this.fieldAttributes.containerUuid,
-        language: this.langValue,
-        columnName: this.fieldAttributes.columnName,
-        recordUuid: this.fieldAttributes.recordUuid,
+        .finally(() => {
+          isLoading.value = false
+        })
+    }
+
+    const changeTranslationValue = (value) => {
+      root.$store.dispatch('changeTranslationValue', {
+        language: langValue.value,
+        tableName,
+        recordUuid: props.recordUuid,
+        columnName,
         value
       })
-      this.close()
-    },
-    close() {
-      this.$children[0].visible = false
-      this.$store.commit('changeShowRigthPanel', false)
-      this.$store.commit('changeShowOptionField', false)
+      close()
+    }
+
+    const close = () => {
+      root.$store.commit('cancelTranslated', {
+        language: langValue.value,
+        tableName,
+        recordUuid: props.recordUuid
+      })
+
+      root.$children[0].visible = false
+      root.$store.commit('changeShowRigthPanel', false)
+      root.$store.commit('changeShowOptionField', false)
+    }
+
+    watch(gettterValue, (newValue) => {
+      let value = ''
+      if (!root.isEmptyValue(newValue)) {
+        value = newValue
+      }
+      translatedValue.value = value
+    })
+
+    let langMatch = languageList.value.find(itemLanguage => {
+      return itemLanguage.languageISO === getLanguage()
+    })
+    if (root.isEmptyValue(langMatch)) {
+      langMatch = languageList.value[0]
+    }
+    langValue.value = langMatch.language
+
+    getTranslation()
+
+    return {
+      langValue,
+      translatedValue,
+      // computed
+      languageList,
+      isDisableRequest,
+      // methods
+      changeTranslationValue,
+      close
     }
   }
 
-}
+})
 </script>
 
 <style lang="scss" src="../common-style.scss">
 </style>
-<style lang="scss" scoped>
-  .custom-tittle-popover {
-    font-size: 14px;
-    font-weight: bold;
-  }
-</style>
 <style lang="scss">
-  /**
-   * Separation between elements (item) of the form
-   */
-  .el-form-item {
-    margin-bottom: 10px !important;
-    margin-left: 10px;
-    margin-right: 10px;
+.translated-field {
+  &.el-card {
+    max-width: 300px;
+
+    .form-translated-field {
+      .el-form-item {
+        // spacing between form items
+        padding-bottom: 10px;
+
+        .el-form-item__content {
+          // text content interline
+          line-height: 20px;
+        }
+      }
+    }
   }
-  /**
-   * Reduce the spacing between the form element and its label
-   */
-  .el-form--label-top .el-form-item__label {
-    padding-bottom: 0px !important;
+
+  .footer {
+    // line footer
+    border-top: 1px solid #e6ebf5 !important;
+    padding-top: 10px;
   }
+}
 </style>

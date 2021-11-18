@@ -18,6 +18,8 @@ const fieldOptions = {
   // calculator
   field: 'Campo',
   value: 'Valor',
+  translation: 'Traducción',
+  translationValue: 'Valor de Traducción',
   // preference value
   currentValue: 'Valor Actual',
   preference: {

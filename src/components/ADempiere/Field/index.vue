@@ -33,6 +33,7 @@
           <field-options
             :metadata="fieldAttributes"
             :container-manager="containerManager"
+            :record-uuid="recordUuid"
           />
         </template>
 
