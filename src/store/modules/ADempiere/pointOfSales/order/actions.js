@@ -45,6 +45,7 @@ export default {
       posUuid,
       customerUuid,
       documentTypeUuid,
+      salesRepresentativeUuid: rootGetters['user/getUserUuid'],
       priceListUuid: currentPriceList.uuid,
       warehouseUuid: currentWarehouse.uuid,
       campaignUuid: defaultCampaignUuid
