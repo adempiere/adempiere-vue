@@ -60,9 +60,6 @@ const mutations = {
   },
   setContextInfoField(state, payload) {
     state.contextInfoField.push(payload)
-  },
-  setPrivateAccess(state, payload) {
-    state.recordPrivateAccess = payload
   }
 }
 

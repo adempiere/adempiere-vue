@@ -27,11 +27,6 @@ import {
   requestDefaultValue,
   requestGetContextInfoValue
 } from '@/api/ADempiere/window'
-import {
-  getPrivateAccess,
-  lockPrivateAccess,
-  unlockPrivateAccess
-} from '@/api/ADempiere/actions/private-access'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -588,93 +583,7 @@ const actions = {
         console.warn(`Error ${error.code} getting context info value for field ${error.message}.`)
       })
   },
-  getPrivateAccessFromServer({ rootGetters }, {
-    tableName,
-    recordId,
-    recordUuid
-  }) {
-    return getPrivateAccess({
-      tableName,
-      recordId,
-      recordUuid
-    })
-      .then(privateAccessResponse => {
-        return {
-          ...privateAccessResponse
-        }
-      })
-      .catch(error => {
-        console.warn(`Error get private access: ${error.message}. Code: ${error.code}.`)
-      })
-  },
-  lockRecord({ rootGetters }, {
-    tableName,
-    recordId,
-    recordUuid
-  }) {
-    return lockPrivateAccess({
-      tableName,
-      recordId,
-      recordUuid
-    })
-      .then(privateAccessResponse => {
-        if (!isEmptyValue(privateAccessResponse.recordId)) {
-          const recordLocked = {
-            isPrivateAccess: true,
-            isLocked: true,
-            ...privateAccessResponse
-          }
-          showMessage({
-            title: language.t('notifications.succesful'),
-            message: language.t('notifications.recordLocked'),
-            type: 'success'
-          })
-          return recordLocked
-        }
-      })
-      .catch(error => {
-        showMessage({
-          title: language.t('notifications.error'),
-          message: language.t('login.unexpectedError') + error.message,
-          type: 'error'
-        })
-        console.warn(`Error lock private access: ${error.message}. Code: ${error.code}.`)
-      })
-  },
-  unlockRecord({ rootGetters }, {
-    tableName,
-    recordId,
-    recordUuid
-  }) {
-    return unlockPrivateAccess({
-      tableName,
-      recordId,
-      recordUuid
-    })
-      .then(privateAccessResponse => {
-        if (!isEmptyValue(privateAccessResponse.recordId)) {
-          const recordUnlocked = {
-            isPrivateAccess: true,
-            isLocked: false,
-            ...privateAccessResponse
-          }
-          showMessage({
-            title: language.t('notifications.succesful'),
-            message: language.t('notifications.recordUnlocked'),
-            type: 'success'
-          })
-          return recordUnlocked
-        }
-      })
-      .catch(error => {
-        showMessage({
-          title: language.t('notifications.error'),
-          message: language.t('login.unexpectedError') + error.message,
-          type: 'error'
-        })
-        console.warn(`Error unlock private access: ${error.message}. Code: ${error.code}.`)
-      })
-  },
+
   resetStateBusinessData({ commit }) {
     commit('resetStateContainerInfo')
     commit('setInitialContext', {})

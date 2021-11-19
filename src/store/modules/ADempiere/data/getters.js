@@ -101,15 +101,8 @@ const getters = {
         return info
       }
     })
-  },
-  getRecordPrivateAccess: (state) => (tableName, recordId) => {
-    if (!isEmptyValue(tableName) && !isEmptyValue(recordId)) {
-      if (state.recordPrivateAccess.tableName === tableName && state.recordPrivateAccess.recordId === recordId) {
-        return state.recordPrivateAccess
-      }
-      return undefined
-    }
   }
+
 }
 
 export default getters

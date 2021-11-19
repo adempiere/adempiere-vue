@@ -23,9 +23,15 @@
       :content="tooltipText"
       placement="top"
     >
-      <el-button type="text" @click="lockRecord()">
+      <el-button v-if="isLocked" type="text" @click="unLockRecord()">
         <i
-          :class="{ 'el-icon-lock': isLocked, 'el-icon-unlock': !isLocked }"
+          class="el-icon-lock"
+          style="font-size: 15px; color: black;"
+        />
+      </el-button>
+      <el-button v-else type="text" @click="lockRecord()">
+        <i
+          class="el-icon-unlock"
           style="font-size: 15px; color: black;"
         />
       </el-button>
@@ -99,31 +105,38 @@ export default defineComponent({
       return root.$t('data.lockRecord')
     })
 
-    const lockRecord = () => {
-      const action = isLocked.value ? 'unlockRecord' : 'lockRecord'
-      const { recordId, recordUuid } = getRecordId()
+    const storedPrivateAccess = computed(() => {
+      const { recordUuid } = getRecordKeys()
 
-      root.$store.dispatch(action, {
+      return root.$store.getters.getStoredPrivateAccess({
+        tableName,
+        recordUuid
+      })
+    })
+
+    const lockRecord = () => {
+      const { recordId, recordUuid } = getRecordKeys()
+
+      root.$store.dispatch('lockRecordFromServer', {
         tableName,
         recordId,
         recordUuid
       })
-        .then(() => {
-          root.$message({
-            type: 'success',
-            message: root.$t('data.notification.' + action),
-            showClose: true
-          })
+        .then(isLockedResponse => {
+          isLocked.value = isLockedResponse
         })
-        .catch(() => {
-          root.$message({
-            type: 'error',
-            message: root.$t('data.isError') + root.$t('data.' + action),
-            showClose: true
-          })
-        })
-        .finally(() => {
-          getPrivateAccess()
+    }
+
+    const unLockRecord = () => {
+      const { recordId, recordUuid } = getRecordKeys()
+
+      root.$store.dispatch('unlockRecordFromServer', {
+        tableName,
+        recordId,
+        recordUuid
+      })
+        .then(isUnLockedResponse => {
+          isLocked.value = isUnLockedResponse
         })
     }
 
@@ -141,7 +154,7 @@ export default defineComponent({
       return undefined
     })
 
-    const getRecordId = () => {
+    const getRecordKeys = () => {
       let recordId
       let recordUuid
       const recordRow = record.value
@@ -163,25 +176,28 @@ export default defineComponent({
     const isGettingRecordAccess = ref(false)
 
     const getPrivateAccess = () => {
-      const { recordId, recordUuid } = getRecordId()
+      const { recordId, recordUuid } = getRecordKeys()
 
       if (root.isEmptyValue(recordId) && root.isEmptyValue(recordUuid)) {
         return
       }
 
+      // get from vuex stored
+      if (!root.isEmptyValue(storedPrivateAccess.value)) {
+        isLocked.value = storedPrivateAccess.value.isLocked
+        return
+      }
+
       isGettingRecordAccess.value = true
 
+      // get from server
       root.$store.dispatch('getPrivateAccessFromServer', {
         tableName,
         recordId,
         recordUuid
       })
         .then(privateAccessResponse => {
-          if (!root.isEmptyValue(privateAccessResponse)) {
-            isLocked.value = privateAccessResponse.isLocked
-          } else {
-            isLocked.value = false
-          }
+          isLocked.value = privateAccessResponse
         })
         .finally(() => {
           isGettingRecordAccess.value = false
@@ -208,7 +224,8 @@ export default defineComponent({
       isFirstTab,
       tooltipText,
       // methods
-      lockRecord
+      lockRecord,
+      unLockRecord
     }
   }
 })
