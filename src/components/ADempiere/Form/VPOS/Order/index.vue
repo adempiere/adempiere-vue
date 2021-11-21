@@ -383,7 +383,7 @@
               </b></p>
               <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
               <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
-              <div style="background: rgb(54 163 247 / 22%);">
+              <div style="border: 1px solid #36a3f7;">
                 <p class="total">
                   <b>
                     {{ $t('form.pos.order.total') }}:
