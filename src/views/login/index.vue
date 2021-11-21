@@ -182,7 +182,7 @@ export default {
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
               this.$router.push({
-                path: this.redirect || '/documentation',
+                path: this.redirect || '/',
                 query: this.otherQuery
               }, () => {})
             })
