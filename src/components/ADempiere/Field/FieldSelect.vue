@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-select
     :ref="metadata.columnName"
@@ -22,7 +23,7 @@
     :filterable="!isMobile"
     :placeholder="metadata.placeholder"
     :loading="isLoading"
-    value-key="id"
+    value-key="value"
     :class="cssClassStyle"
     clearable
     :multiple="isSelectMultiple"
@@ -36,7 +37,7 @@
     <el-option
       v-for="(option, key) in optionsList"
       :key="key"
-      :value="option.id"
+      :value="option.value"
       :label="option.label"
     />
   </el-select>
@@ -56,6 +57,9 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  * - Table List
  * - Table Direct
  *
+ * TODO: String values add single quotation marks 'value'
+ * TODO: Add support to valuesList filter on proxy-api
+ * TODO: No blanck option enabled if is mandatory field
  * TODO: ALL: Although in the future these will have different components, and
  * are currently not supported is also displayed as a substitute for fields:
  * - Search Field
@@ -72,14 +76,14 @@ export default {
     const label = ' '
     const blankOption = {
       label,
-      id: undefined,
+      value: undefined,
       uuid: undefined
     }
 
     return {
       isLoading: false,
       optionsList: [blankOption],
-      blankValues: [null, undefined, -1],
+      blankValues: [null, undefined, -1, '-1'],
       blankOption
     }
   },
@@ -101,32 +105,34 @@ export default {
       }
       return styleClass
     },
-    getterLookupList() {
+    getLookupList() {
       if (this.isEmptyValue(this.metadata.reference.query) ||
         !this.metadata.displayed) {
         return [this.blankOption]
       }
-      return this.$store.getters.getLookupList({
+      return this.$store.getters.getStoredLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        tableName: this.metadata.reference.tableName,
         query: this.metadata.reference.query,
-        tableName: this.metadata.reference.tableName
+        validationCode: this.metadata.reference.validationCode
       })
     },
-    getterLookupAll() {
-      const allOptions = this.$store.getters.getLookupAll({
+    getLookupAll() {
+      const allOptions = this.$store.getters.getStoredLookupAll({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
-        query: this.metadata.reference.query,
-        directQuery: this.metadata.reference.directQuery,
         tableName: this.metadata.reference.tableName,
+        query: this.metadata.reference.query,
+        validationCode: this.metadata.reference.validationCode,
+        directQuery: this.metadata.reference.directQuery,
         value: this.value
       })
 
       // sets the value to blank when the lookupList or lookupItem have no
       // values, or if only lookupItem does have a value
       if (this.isEmptyValue(allOptions) || (allOptions.length &&
-        (!this.blankValues.includes(allOptions[0].id)))) {
+        (!this.blankValues.includes(allOptions[0].value)))) {
         allOptions.unshift(this.blankOption)
       }
       return allOptions
@@ -231,7 +237,7 @@ export default {
             // set first value
             value = value[0]
           } else {
-            value = this.blankOption.id
+            value = this.blankOption.value
           }
         }
       }
@@ -240,7 +246,7 @@ export default {
     'metadata.displayed'(value) {
       if (value) {
         // if is field showed, search into store all options to list
-        this.optionsList = this.getterLookupAll
+        this.optionsList = this.getLookupAll
       }
     },
     value(newValue) {
@@ -255,8 +261,8 @@ export default {
         const label = this.displayedValue
         if (!isEmptyValue(label)) {
           this.optionsList.push({
-            // TODO: Add uuid
-            id: newValue,
+            value: newValue,
+            uuid: option.uuid,
             label
           })
         } else {
@@ -273,7 +279,7 @@ export default {
 
   beforeMount() {
     if (this.metadata.displayed) {
-      this.optionsList = this.getterLookupAll
+      this.optionsList = this.getLookupAll
       const value = this.value
       if (!this.isEmptyValue(value) && !this.metadata.isAdvancedQuery) {
         const option = this.findOption(value)
@@ -284,8 +290,8 @@ export default {
           if (!this.isEmptyValue(this.displayedValue)) {
             // verify if exists to add
             this.optionsList.push({
-              id: value,
-              // TODO: Add uuid
+              value,
+              uuid: option.uuid,
               label: this.displayedValue
             })
           } else {
@@ -311,7 +317,7 @@ export default {
     },
     changeBlankOption() {
       if (Number(this.metadata.defaultValue) === -1) {
-        this.blankOption.id = this.metadata.defaultValue
+        this.blankOption.value = this.metadata.defaultValue
       }
     },
     preHandleChange(value) {
@@ -323,7 +329,7 @@ export default {
       })
     },
     findOption(value) {
-      const option = this.optionsList.find(item => item.id === value)
+      const option = this.optionsList.find(item => item.value === value)
       if (option && option.label) {
         return option
       }
@@ -352,7 +358,7 @@ export default {
             this.displayedValue = responseLookupItem.label
             this.uuidValue = responseLookupItem.uuid
             this.$nextTick(() => {
-              this.optionsList = this.getterLookupAll
+              this.optionsList = this.getLookupAll
             })
           }
         })
@@ -365,9 +371,9 @@ export default {
      */
     getDataLookupList(isShowList) {
       if (isShowList) {
-        // TODO: Evaluate if length = 1 and this element id = blankOption
-        const list = this.getterLookupList
-        if (this.isEmptyValue(list) || (list.length === 1 && this.blankValues.includes(list[0]))) {
+        const list = this.getLookupList
+        if (this.isEmptyValue(list) || (list.length === 1 &&
+          this.blankValues.includes(list[0].value))) {
           this.remoteMethod()
         }
       }
@@ -380,16 +386,16 @@ export default {
         columnName: this.metadata.columnName,
         tableName: this.metadata.reference.tableName,
         query: this.metadata.reference.query,
-        whereClause: this.metadata.validationCode,
+        validationCode: this.metadata.reference.validationCode,
         // valuesList: this.value
         isAddBlankValue: true,
-        blankValue: this.blankOption.id
+        blankValue: this.blankOption.value
       })
         .then(responseLookupList => {
           if (!this.isEmptyValue(responseLookupList)) {
             this.optionsList = responseLookupList
           } else {
-            this.optionsList = this.getterLookupAll
+            this.optionsList = this.getLookupAll
           }
         })
         .finally(() => {
@@ -397,24 +403,27 @@ export default {
         })
     },
     clearLookup() {
-      // set empty list and empty option
-      this.optionsList = [
-        this.blankOption
-      ]
-
       this.$store.dispatch('deleteLookupList', {
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
         tableName: this.metadata.reference.tableName,
         query: this.metadata.reference.query,
         directQuery: this.metadata.reference.directQuery,
+        validationCode: this.metadata.reference.validationCode,
         value: this.value
       })
+        .then(() => {
+          // set empty list and empty option
+          this.optionsList = [
+            this.blankOption
+          ]
 
-      // set empty value
-      this.value = this.blankOption.id
+          // set empty value
+          this.value = this.blankOption.value
+        })
     }
   }
+
 }
 </script>
 
