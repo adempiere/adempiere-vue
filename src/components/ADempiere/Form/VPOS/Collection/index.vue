@@ -132,7 +132,7 @@
           <el-row :gutter="24">
             <el-col :span="24" style="padding-left:  15px !important;padding-right: 15px !important;">
               <span>
-                <div style="background: rgb(54 163 247 / 22%);">
+                <div style="border: 1px solid #36a3f7;">
                   <p class="total">
                     {{ $t('form.pos.collect.orderTotal') }}:
                     <b style="float: right;">
