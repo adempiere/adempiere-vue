@@ -556,7 +556,7 @@ export default {
     },
     byInvoice: {
       title: 'Pedidos Vendedor de Pasillo por Facturar',
-      searchCompleteOrders: 'Buscar Ordenes Completas',
+      searchCompleteOrders: 'Solo Completas',
       label: 'Por Facturar',
       salesRepresentative: 'Agente Comercial',
       businessPartner: 'Socio de Negocio',

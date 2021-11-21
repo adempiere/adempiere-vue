@@ -18,7 +18,7 @@
 <template>
   <el-container>
     <el-header style="height: 2%;">
-      <p style="text-align: center;"> <b> {{ $t('form.byInvoice.searchCompleteOrders') }} </b></p>
+      <p style="text-align: center;"> <b> Por Entregar </b></p>
       <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
         <el-form-item label="No. del Documento">
           <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
@@ -148,7 +148,7 @@ import Field from '@/components/ADempiere/Field'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
-  name: 'SearchCompleteOrders',
+  name: 'ToDeliver',
   components: {
     CustomPagination,
     Field
@@ -159,8 +159,8 @@ export default {
       default: () => {
         return {
           panelType: 'from',
-          uuid: 'Aisle-Vendor-List',
-          containerUuid: 'Aisle-Vendor-List'
+          uuid: 'to-Deliver',
+          containerUuid: 'to-Deliver'
         }
       }
     },
@@ -349,6 +349,7 @@ export default {
           posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
           documentNo: this.input,
           isOnlyProcessed: true,
+          isWaitingForShipment: true,
           pageToken: this.tokenPage,
           dateOrderedFrom: this.dateOrdered,
           businessPartnerUuid: this.businessPartner,
@@ -367,7 +368,7 @@ export default {
       }
     },
     clear() {
-      this.$store.commit('setShowFastCompleteOrders', false)
+      this.$store.commit('setShowsearchToDeliveOrders', false)
       this.input = ''
       this.$store.commit('updateValueOfField', {
         containerUuid: 'Aisle-Vendor-List',

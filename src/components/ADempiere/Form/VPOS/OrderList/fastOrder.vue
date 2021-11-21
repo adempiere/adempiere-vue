@@ -151,6 +151,19 @@
             </el-button>
           </el-popover>
         </el-dropdown-item>
+        <el-dropdown-item v-show="allowsConfirmShipment">
+          <el-popover
+            v-model="showToDeliveOrders"
+            placement="right"
+            trigger="click"
+            width="800"
+          >
+            <to-deliver />
+            <el-button slot="reference" type="text" style="color: #333">
+              Por Entregar
+            </el-button>
+          </el-popover>
+        </el-dropdown-item>
         <el-dropdown-item :command="$t('form.byInvoice.label')">
           <el-popover
             v-model="searchCompleteOrders"
@@ -162,23 +175,6 @@
             <search-complete-orders :show-field="searchCompleteOrders" />
             <el-button slot="reference" type="text" style="color: #333">
               {{ $t('form.byInvoice.searchCompleteOrders') }}
-            </el-button>
-          </el-popover>
-        </el-dropdown-item>
-        <el-dropdown-item v-show="isProcessed" :command="$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')">
-          <el-popover
-            v-model="showConfirmDelivery"
-            placement="right"
-            trigger="click"
-            width="800"
-          >
-            <confirm-delivery
-              :is-selectable="false"
-              :is-visible="showConfirmDelivery"
-              popover-name="isShowPopoverMenu"
-            />
-            <el-button slot="reference" type="text" style="color: #333">
-              {{ $t('form.pos.optionsPoinSales.salesOrder.confirmDelivery') }}
             </el-button>
           </el-popover>
         </el-dropdown-item>
@@ -201,8 +197,8 @@ import {
   listOrders
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
-import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
 import SearchCompleteOrders from './searchCompleteOrders'
+import ToDeliver from './toDeliver'
 import Field from '@/components/ADempiere/Field'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
@@ -210,7 +206,7 @@ export default {
   name: 'AisleVendorList',
   components: {
     CustomPagination,
-    ConfirmDelivery,
+    ToDeliver,
     SearchCompleteOrders,
     Field
   },
@@ -252,7 +248,7 @@ export default {
   },
   computed: {
     allowsConfirmShipment() {
-      return this.currentPointOfSales.isAllowsConfirmShipment && !this.currentOrder.isDelivered
+      return this.currentPointOfSales.isAllowsConfirmShipment
     },
     isProcessed() {
       if (!this.isEmptyValue(this.currentOrder.documentStatus.value) && this.currentOrder.documentStatus.value === 'CO' && this.allowsConfirmShipment) {
@@ -302,6 +298,16 @@ export default {
       set(value) {
         if (!this.isEmptyValue(this.currentOrder.uuid)) {
           this.$store.commit('setShowFastConfirmDelivery', value)
+        }
+      }
+    },
+    showToDeliveOrders: {
+      get() {
+        return this.$store.getters.getSearchToDeliveOrders
+      },
+      set(value) {
+        if (!this.isEmptyValue(this.currentOrder.uuid)) {
+          this.$store.commit('setShowsearchToDeliveOrders', value)
         }
       }
     },

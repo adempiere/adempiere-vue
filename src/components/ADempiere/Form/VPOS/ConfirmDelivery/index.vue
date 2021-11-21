@@ -142,58 +142,54 @@
       :title="$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')"
       :visible.sync="dialogVisible"
       width="30%"
-      :modal="false"
+      :append-to-body="true"
     >
-      <template>
-        <span>
-          <p class="total">
-            {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}:
-            <b class="order-info">
-              {{ currentOrder.businessPartner.name }}
-            </b>
-          </p>
-          <p class="total">
-            {{ $t('form.pos.order.order') }}:
-            <b class="order-info">
-              {{ currentOrder.documentNo }}
-            </b>
-          </p>
-          <p class="total">
-            {{ $t('form.pos.order.itemQuantity') }}:
-            <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
-              {{ getItemQuantity }}
-            </b>
-          </p>
-          <p class="total">
-            {{ $t('form.pos.order.numberLines') }}:
-            <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
-              {{ numberOfLines }}
-            </b>
-          </p>
-        </span>
-        <span slot="footer" class="dialog-footer">
-          <el-row :gutter="24">
-            <el-col :span="24">
-              <samp style="float: right; padding-right: 10px;">
-                <el-button
-                  type="danger"
-                  class="custom-button-create-bp"
-                  icon="el-icon-close"
-                  @click="closeDialog"
-                />
-                <el-button
-                  type="primary"
-                  class="custom-button-create-bp"
-                  icon="el-icon-check"
-                  :loading="isLoadedConfirm"
-                  :disabled="isLoadedConfirm"
-                  @click="makeDelivery"
-                />
-              </samp>
-            </el-col>
-          </el-row>
-        </span>
-      </template>
+      <p class="total">
+        {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}:
+        <b class="order-info">
+          {{ currentOrder.businessPartner.name }}
+        </b>
+      </p>
+      <p class="total">
+        {{ $t('form.pos.order.order') }}:
+        <b class="order-info">
+          {{ currentOrder.documentNo }}
+        </b>
+      </p>
+      <p class="total">
+        {{ $t('form.pos.order.itemQuantity') }}:
+        <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
+          {{ getItemQuantity }}
+        </b>
+      </p>
+      <p class="total">
+        {{ $t('form.pos.order.numberLines') }}:
+        <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
+          {{ numberOfLines }}
+        </b>
+      </p>
+      <span slot="footer" class="dialog-footer">
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <samp style="float: right; padding-right: 10px;">
+              <el-button
+                type="danger"
+                class="custom-button-create-bp"
+                icon="el-icon-close"
+                @click="closeDialog"
+              />
+              <el-button
+                type="primary"
+                class="custom-button-create-bp"
+                icon="el-icon-check"
+                :loading="isLoadedConfirm"
+                :disabled="isLoadedConfirm"
+                @click="makeDelivery"
+              />
+            </samp>
+          </el-col>
+        </el-row>
+      </span>
     </el-dialog>
     <el-row :gutter="24">
       <el-col :span="24">

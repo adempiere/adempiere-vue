@@ -39,6 +39,7 @@ const initStateUtils = {
     visible: false
   },
   searchCompleteOrders: false,
+  searchToDeliveOrders: false,
   isNewOrder: false,
   showProductList: false,
   confirmDelivery: false,
@@ -139,6 +140,9 @@ export default {
     },
     setShowFastCompleteOrders(state, show) {
       state.searchCompleteOrders = show
+    },
+    setShowsearchToDeliveOrders(state, show) {
+      state.searchToDeliveOrders = show
     },
     focusNewOrder(state, payload) {
       state.isNewOrder = payload
@@ -371,6 +375,9 @@ export default {
     },
     getSearchCompleteOrderss: (state) => {
       return state.searchCompleteOrders
+    },
+    getSearchToDeliveOrders: (state) => {
+      return state.searchToDeliveOrders
     },
     getShowAddNewAddress: (state) => {
       return state.showAddNewAddress
