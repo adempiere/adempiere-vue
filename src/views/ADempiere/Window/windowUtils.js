@@ -87,7 +87,10 @@ export function generateTabs({
       containerUuid: tabItem.uuid,
       panelMetadata: tab,
       isAddFieldUuid: true,
-      isAddLinkColumn: true
+      isAddLinkColumn: true,
+      fieldOverwrite: {
+        isReadOnlyFromForm: true
+      }
     })
   })
 

@@ -16,7 +16,7 @@
 
 import Vue from 'vue'
 import { isEmptyValue, typeValue } from '@/utils/ADempiere/valueUtils.js'
-import { convertStringToBoolean } from '@/utils/ADempiere/valueFormat.js'
+import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 import {
   ACTIVE, PROCESSING, PROCESSED
 } from '@/utils/ADempiere/constants/systemColumns'

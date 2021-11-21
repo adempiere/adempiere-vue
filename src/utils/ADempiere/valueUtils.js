@@ -20,8 +20,7 @@ import language from '@/lang'
 import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
 
 // utils and helper methods
-import { convertStringToBoolean } from '@/utils/ADempiere/valueFormat.js'
-import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+import { convertBooleanToString, convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 import { OPERATION_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
 
 /**
@@ -355,9 +354,6 @@ export function parsedValueComponent({
   const isEmpty = isEmptyValue(value)
   if (isEmpty && !isMandatory) {
     if (componentPath === 'FieldYesNo') {
-      if (columnName === 'IsActive') {
-        return true
-      }
       // Processing, Processed, and any other columnName, return false by default
       return Boolean(value)
     }

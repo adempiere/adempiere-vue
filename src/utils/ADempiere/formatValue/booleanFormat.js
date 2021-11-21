@@ -41,3 +41,31 @@ export const convertBooleanToString = (booleanValue) => {
 
   return 'N'
 }
+
+/**
+ * Convert string values ('Y' or 'N') to component compatible Boolean values
+ * @param {mixed} valueToParsed
+ */
+export const convertStringToBoolean = (valueToParsed) => {
+  let valReturn = valueToParsed
+
+  switch (String(valueToParsed).trim()) {
+    case 'N':
+    case 'false':
+    case language.t('components.switchInactiveText'):
+      valReturn = false
+      break
+
+    case 'Y':
+    case 'true':
+    case language.t('components.switchActiveText'):
+      valReturn = true
+      break
+
+    default:
+      valReturn = valueToParsed
+      break
+  }
+
+  return valReturn
+}

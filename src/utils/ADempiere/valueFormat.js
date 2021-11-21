@@ -23,33 +23,6 @@ import store from '@/store'
 import { DATE, DATE_PLUS_TIME, TIME, AMOUNT, COSTS_PLUS_PRICES, NUMBER, QUANTITY } from '@/utils/ADempiere/references.js'
 
 /**
- * Convert string values ('Y' or 'N') to component compatible Boolean values
- * @param {mixed} valueToParsed
- */
-export const convertStringToBoolean = (valueToParsed) => {
-  let valReturn = valueToParsed
-
-  // TODO: Add lang values
-  switch (String(valueToParsed).trim()) {
-    case 'N':
-    case 'false':
-      valReturn = false
-      break
-
-    case 'Y':
-    case 'true':
-      valReturn = true
-      break
-
-    default:
-      valReturn = valueToParsed
-      break
-  }
-
-  return valReturn
-}
-
-/**
  * Convert a object to array pairs
  * @param {object} object, object to convert
  * @param {string} nameKey, name from key in pairs

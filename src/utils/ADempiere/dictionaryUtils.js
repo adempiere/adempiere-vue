@@ -17,8 +17,9 @@
 import evaluator from '@/utils/ADempiere/evaluator'
 import { isEmptyValue, parsedValueComponent } from '@/utils/ADempiere/valueUtils'
 import { getContext, getParentFields, getPreference, parseContext } from '@/utils/ADempiere/contextUtils'
-import REFERENCES, { BUTTON, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
+import REFERENCES, { BUTTON, YES_NO, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
 import { FIELD_OPERATORS_LIST } from '@/utils/ADempiere/dataUtils'
+import { READ_ONLY_FORM_COLUMNS, readOnlyColumn } from '@/utils/ADempiere/constants/systemColumns'
 
 /**
  * Generate field to app
@@ -32,12 +33,17 @@ export function generateField({
   typeRange = false,
   isSOTrxMenu
 }) {
+  const { columnName } = fieldToGenerate
   let isShowedFromUser = false
   let isSQLValue = false
   // verify if it no overwrite value with ...moreAttributes
   if (moreAttributes.isShowedFromUser) {
     isShowedFromUser = moreAttributes.isShowedFromUser
   }
+
+  let isColumnReadOnlyForm = false
+  let isChangedAllForm = false
+  let valueIsReadOnlyForm
 
   const componentReference = evalutateTypeField(fieldToGenerate.displayType)
   let evaluatedLogics = {
@@ -86,8 +92,19 @@ export function generateField({
       operator = 'LIKE'
     }
   } else {
+    // Yes No value, and form manage
+    if (moreAttributes.isReadOnlyFromForm && YES_NO.id === fieldToGenerate.displayType) {
+      const columnReadOnly = readOnlyColumn(columnName)
+      if (!isEmptyValue(columnReadOnly)) {
+        isColumnReadOnlyForm = true
+        isChangedAllForm = columnReadOnly.isChangedAllForm
+        valueIsReadOnlyForm = columnReadOnly.valueIsReadOnlyForm
+      }
+    }
+
     parsedDefaultValue = getDefaultValue({
       ...fieldToGenerate,
+      isColumnReadOnlyForm,
       parentUuid: moreAttributes.parentUuid,
       containerUuid: moreAttributes.containerUuid,
       componentPath: componentReference.componentPath,
@@ -103,11 +120,12 @@ export function generateField({
     if (fieldToGenerate.isRange) {
       parsedDefaultValueTo = getDefaultValue({
         ...fieldToGenerate,
+        isColumnReadOnlyForm,
         parentUuid: moreAttributes.parentUuid,
         containerUuid: moreAttributes.containerUuid,
         componentPath: componentReference.componentPath,
         defaultValue: fieldToGenerate.defaultValueTo,
-        columnName: `${fieldToGenerate.columnName}_To`,
+        columnName: `${columnName}_To`,
         elementName: `${fieldToGenerate.elementName}_To`,
         isSOTrxMenu
       })
@@ -133,7 +151,7 @@ export function generateField({
     componentPath: componentReference.componentPath,
     isSupported: componentReference.isSupported,
     size: componentReference.size || DEFAULT_SIZE,
-    displayColumnName: `DisplayColumn_${fieldToGenerate.columnName}`, // key to display column
+    displayColumnName: `DisplayColumn_${columnName}`, // key to display column
     // value attributes
     value: String(parsedDefaultValue).trim() === '' ? undefined : parsedDefaultValue,
     oldValue: parsedDefaultValue,
@@ -141,6 +159,10 @@ export function generateField({
     parsedDefaultValue,
     parsedDefaultValueTo,
     // logics to app (isDisplayedFromLogic, isMandatoryFromLogic, isReadOnlyFromLogic)
+    isReadOnlyFromForm: false,
+    isColumnReadOnlyForm,
+    isChangedAllForm,
+    valueIsReadOnlyForm,
     ...evaluatedLogics,
     //
     parentFieldsList,
@@ -167,7 +189,7 @@ export function generateField({
   // Overwrite some values
   if (field.isRange) {
     field.operator = 'GREATER_EQUAL'
-    field.columnNameTo = `${field.columnName}_To`
+    field.columnNameTo = `${columnName}_To`
     field.elementNameTo = `${field.elementNameTo}_To`
     if (typeRange) {
       field.uuid = `${field.uuid}_To`
@@ -266,6 +288,7 @@ export function getDefaultValue({
   displayType,
   defaultValue,
   isMandatory,
+  isColumnReadOnlyForm,
   isKey
 }) {
   let parsedDefaultValue = defaultValue
@@ -298,6 +321,13 @@ export function getDefaultValue({
         columnName: elementName
       })
     }
+  }
+
+  if (isColumnReadOnlyForm && isEmptyValue(parsedDefaultValue)) {
+    const { defaultValue: defaultValueColumn } = READ_ONLY_FORM_COLUMNS.find(columnItem => {
+      return columnItem.columnName === columnName
+    })
+    parsedDefaultValue = defaultValueColumn
   }
 
   parsedDefaultValue = parsedValueComponent({

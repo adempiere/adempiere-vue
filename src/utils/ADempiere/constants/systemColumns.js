@@ -76,3 +76,45 @@ export const DOCUMENT_STATUS_COLUMNS_LIST = [
   'DocStatus',
   'O_DocStatus'
 ]
+
+export const COLUMN_IS_ACTIVE = {
+  columnName: ACTIVE, // column name of field
+  defaultValue: true, // default value when loading
+  valueIsReadOnlyForm: false, // value that activates read-only form
+  isChangedAllForm: false // change the entire form to read only including this field
+}
+
+export const COLUMN_PROCESSING = {
+  columnName: PROCESSING,
+  defaultValue: true,
+  valueIsReadOnlyForm: false,
+  isChangedAllForm: true
+}
+
+export const COLUMN_PROCESSED = {
+  columnName: PROCESSED,
+  defaultValue: false,
+  valueIsReadOnlyForm: true,
+  isChangedAllForm: true
+}
+
+export const READ_ONLY_COLUMNS_LIST = [
+  ACTIVE,
+  PROCESSING,
+  PROCESSED
+]
+
+/**
+ * Fields with this column name, changed all fields is read only
+ */
+export const READ_ONLY_FORM_COLUMNS = [
+  COLUMN_IS_ACTIVE,
+  COLUMN_PROCESSED,
+  COLUMN_PROCESSING
+]
+
+export function readOnlyColumn(columnName) {
+  return READ_ONLY_FORM_COLUMNS.find(item => {
+    return item.columnName === columnName
+  })
+}
