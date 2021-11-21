@@ -24,7 +24,6 @@ import {
   getEntity
 } from '@/api/ADempiere/common/persistence.js'
 import {
-  requestDefaultValue,
   requestGetContextInfoValue
 } from '@/api/ADempiere/window'
 
@@ -33,7 +32,6 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertArrayKeyValueToObject } from '@/utils/ADempiere/valueFormat.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 import {
-  parseContext,
   getPreference
 } from '@/utils/ADempiere/contextUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
@@ -377,36 +375,6 @@ const actions = {
     })
   },
 
-  /**
-   * @param {string} parentUuid
-   * @param {string} containerUuid
-   * @param {string} query
-   */
-  getValueBySQL({ commit }, {
-    parentUuid,
-    containerUuid,
-    query
-  }) {
-    // TODO: Change to promise all
-    return new Promise(resolve => {
-      if (query.includes('@')) {
-        query = parseContext({
-          parentUuid,
-          containerUuid,
-          isSQL: true,
-          value: query
-        }).query
-      }
-
-      requestDefaultValue(query)
-        .then(defaultValueResponse => {
-          resolve(defaultValueResponse)
-        })
-        .catch(error => {
-          console.warn(`Error getting default value from server. Error code ${error.code}: ${error.message}.`)
-        })
-    })
-  },
   /**
    * TODO: Add support to tab children
    * @param {string} parentUuid

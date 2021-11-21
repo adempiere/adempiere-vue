@@ -88,11 +88,21 @@ export default {
   },
   async created() {
     if (this.metadata.isSQLValue && (this.isEmptyValue(this.metadata.value) || this.metadata.value.isSQL)) {
-      const value = await this.$store.dispatch('getValueBySQL', {
+      let value = this.$store.getters.getStoredDefaultValue({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
         query: this.metadata.defaultValue
       })
+
+      if (this.isEmptyValue(value)) {
+        value = await this.$store.dispatch('getValueBySQL', {
+          parentUuid: this.metadata.parentUuid,
+          containerUuid: this.metadata.containerUuid,
+          columnName: this.metadata.columnName,
+          query: this.metadata.defaultValue
+        })
+      }
+
       // set value and change into store
       this.preHandleChange(value)
     }

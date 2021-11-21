@@ -89,3 +89,20 @@ export function getEntities({
       return convertEntityList(response)
     })
 }
+
+/**
+ * Get default value for a field, parameter or query criteria
+ * @param {string} query, sql to get value
+ */
+export function requestDefaultValue(query) {
+  return request({
+    url: '/user-interface/window/default-value',
+    method: 'get',
+    params: {
+      query
+    }
+  })
+    .then(valueResponse => {
+      return valueResponse
+    })
+}
