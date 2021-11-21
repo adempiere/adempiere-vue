@@ -42,6 +42,7 @@ export default {
       default: null
     }
   },
+
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'
@@ -86,6 +87,7 @@ export default {
       }
     }
   },
+
   async created() {
     if (this.metadata.isSQLValue && (this.isEmptyValue(this.metadata.value) || this.metadata.value.isSQL)) {
       const value = await this.$store.dispatch('getValueBySQL', {
@@ -93,15 +95,21 @@ export default {
         containerUuid: this.metadata.containerUuid,
         query: this.metadata.defaultValue
       })
+
+      // set value into component and fieldValue store
+      this.value = this.parseValue(value)
+
       // set value and change into store
       this.preHandleChange(value)
     }
   },
+
   mounted() {
     if (this.metadata.handleRequestFocus) {
       this.requestFocus()
     }
   },
+
   methods: {
     /**
      * Parse the value to a new value if required for element-ui component
