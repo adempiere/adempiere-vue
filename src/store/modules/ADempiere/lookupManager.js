@@ -312,7 +312,7 @@ const lookupManager = {
   },
 
   getters: {
-    getLookupItem: (state, getters, rootState, rootGetters) => ({
+    getStoredLookupItem: (state, getters, rootState, rootGetters) => ({
       parentUuid,
       containerUuid,
       tableName,
@@ -339,7 +339,7 @@ const lookupManager = {
       return undefined
     },
 
-    getLookupList: (state, getters, rootState, rootGetters) => ({
+    getStoredLookupList: (state, getters, rootState, rootGetters) => ({
       parentUuid,
       containerUuid,
       tableName,
@@ -379,7 +379,7 @@ const lookupManager = {
     /**
      * Get all lookups, item and list joined
      */
-    getLookupAll: (state, getters) => ({
+    getStoredLookupAll: (state, getters) => ({
       parentUuid,
       containerUuid,
       tableName,
@@ -388,7 +388,7 @@ const lookupManager = {
       validationCode,
       value
     }) => {
-      const optionsList = getters.getLookupList({
+      const optionsList = getters.getStoredLookupList({
         parentUuid,
         containerUuid,
         tableName,
@@ -398,7 +398,7 @@ const lookupManager = {
 
       // set item values getter from server into list
       if (isEmptyValue(optionsList)) {
-        const option = getters.getLookupItem({
+        const option = getters.getStoredLookupItem({
           parentUuid,
           containerUuid,
           tableName,

@@ -339,7 +339,7 @@ const getters = {
           let displayedValue
           if (!isEmptyValue(parsedDefaultValue)) {
             const { tableName, directQuery, query } = fieldItem.reference
-            const optionsList = rootGetters.getLookupAll({
+            const optionsList = rootGetters.getStoredLookupAll({
               parentUuid,
               containerUuid,
               directQuery,

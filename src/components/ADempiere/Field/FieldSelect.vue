@@ -105,12 +105,12 @@ export default {
       }
       return styleClass
     },
-    getterLookupList() {
+    getLookupList() {
       if (this.isEmptyValue(this.metadata.reference.query) ||
         !this.metadata.displayed) {
         return [this.blankOption]
       }
-      return this.$store.getters.getLookupList({
+      return this.$store.getters.getStoredLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
         tableName: this.metadata.reference.tableName,
@@ -118,8 +118,8 @@ export default {
         validationCode: this.metadata.reference.validationCode
       })
     },
-    getterLookupAll() {
-      const allOptions = this.$store.getters.getLookupAll({
+    getLookupAll() {
+      const allOptions = this.$store.getters.getStoredLookupAll({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
         tableName: this.metadata.reference.tableName,
@@ -246,7 +246,7 @@ export default {
     'metadata.displayed'(value) {
       if (value) {
         // if is field showed, search into store all options to list
-        this.optionsList = this.getterLookupAll
+        this.optionsList = this.getLookupAll
       }
     },
     value(newValue) {
@@ -279,7 +279,7 @@ export default {
 
   beforeMount() {
     if (this.metadata.displayed) {
-      this.optionsList = this.getterLookupAll
+      this.optionsList = this.getLookupAll
       const value = this.value
       if (!this.isEmptyValue(value) && !this.metadata.isAdvancedQuery) {
         const option = this.findOption(value)
@@ -358,7 +358,7 @@ export default {
             this.displayedValue = responseLookupItem.label
             this.uuidValue = responseLookupItem.uuid
             this.$nextTick(() => {
-              this.optionsList = this.getterLookupAll
+              this.optionsList = this.getLookupAll
             })
           }
         })
@@ -371,7 +371,7 @@ export default {
      */
     getDataLookupList(isShowList) {
       if (isShowList) {
-        const list = this.getterLookupList
+        const list = this.getLookupList
         if (this.isEmptyValue(list) || (list.length === 1 &&
           this.blankValues.includes(list[0].value))) {
           this.remoteMethod()
@@ -395,7 +395,7 @@ export default {
           if (!this.isEmptyValue(responseLookupList)) {
             this.optionsList = responseLookupList
           } else {
-            this.optionsList = this.getterLookupAll
+            this.optionsList = this.getLookupAll
           }
         })
         .finally(() => {
