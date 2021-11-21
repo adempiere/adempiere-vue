@@ -505,11 +505,6 @@ export default {
       const createBP = () => {
         this.$store.commit('updateValueOfField', {
           containerUuid: 'Business-Partner-Create',
-          columnName: 'Name',
-          value
-        })
-        this.$store.commit('updateValueOfField', {
-          containerUuid: 'Business-Partner-Create',
           columnName: 'Value',
           value
         })
