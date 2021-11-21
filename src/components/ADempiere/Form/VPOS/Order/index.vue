@@ -236,10 +236,8 @@
                 <el-button type="primary" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
                 <el-button v-show="isValidForDeleteLine(listOrderLine)" type="danger" icon="el-icon-delete" :disabled="isDisabled" @click="deleteOrderLine(currentOrderLine)" />
                 <el-button
-                  v-show="allowsCollectOrder"
                   type="success"
                   icon="el-icon-bank-card"
-                  :disabled="!allowsCollectOrder"
                   @click="openCollectionPanel"
                 >
                   {{ labelButtonCollections }}
@@ -385,15 +383,17 @@
               </b></p>
               <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
               <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
-              <p class="total">
-                <b>
-                  {{ $t('form.pos.order.total') }}:
-                </b>
-                <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">
-                  {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                </b>
-              </p>
-              <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+              <div style="background: rgb(54 163 247 / 22%);">
+                <p class="total">
+                  <b>
+                    {{ $t('form.pos.order.total') }}:
+                  </b>
+                  <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">
+                    {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
+                  </b>
+                </p>
+                <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+              </div>
             </span>
             <span v-if="!isMobile" style="float: right;padding-right: 3%;">
               <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
