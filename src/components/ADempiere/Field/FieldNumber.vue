@@ -63,7 +63,8 @@
 </template>
 
 <script>
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 // constants
 import { FIELDS_CURRENCY, isDecimalField } from '@/utils/ADempiere/references'
@@ -75,7 +76,7 @@ export default {
   name: 'FieldNumber',
 
   mixins: [
-    fieldMixin
+    FieldMixin
   ],
 
   data() {
@@ -94,6 +95,11 @@ export default {
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass += this.metadata.cssClassName
       }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       return styleClass
     },
     maxValue() {

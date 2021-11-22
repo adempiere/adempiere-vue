@@ -41,7 +41,10 @@
 </template>
 
 <script>
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+
+// constants
 import { DATE_PLUS_TIME } from '@/utils/ADempiere/references'
 import { OPERATORS_MULTIPLE_VALUES } from '@/utils/ADempiere/dataUtils'
 
@@ -52,7 +55,7 @@ export default {
   name: 'FieldDate',
 
   mixins: [
-    fieldMixin
+    FieldMixin
   ],
 
   data() {
@@ -143,6 +146,11 @@ export default {
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass += this.metadata.cssClassName
       }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       return styleClass
     },
     isMultipleValues() {
@@ -344,7 +352,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
   .custom-field-date {
     width: 100% !important;
   }

@@ -1,7 +1,7 @@
 <!--
  ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
  Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
- Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+ Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -15,10 +15,12 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-cascader
     :ref="metadata.columnName"
     :v-model="[value]"
+    :class="cssClassStyle"
     :placeholder="metadata.placeholder"
     :options="options"
     :readonly="Boolean(metadata.readonly)"
@@ -34,14 +36,19 @@
 </template>
 
 <script>
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+// components and mixis
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+
+// api request methods
 import { getLocatorList } from '@/api/ADempiere/field/locator.js'
 
 export default {
   name: 'FieldLocation',
+
   mixins: [
-    fieldMixin
+    FieldMixin
   ],
+
   data() {
     return {
       options: [],
@@ -54,7 +61,20 @@ export default {
       }
     }
   },
+
   computed: {
+    cssClassStyle() {
+      let styleClass = ' custom-field-locator '
+      if (!this.isEmptyValue(this.metadata.cssClassName)) {
+        styleClass += this.metadata.cssClassName
+      }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
+      return styleClass
+    },
     warehouse() {
       return this.$store.getters['user/getWarehouse']
     },
@@ -69,9 +89,11 @@ export default {
         })
     }
   },
+
   created() {
     this.options = this.warehousesList
   },
+
   methods: {
     preHandleChange(value) {
       let selected = value

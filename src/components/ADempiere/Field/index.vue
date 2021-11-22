@@ -69,13 +69,17 @@
 </template>
 
 <script>
+// components and mixins
 import FieldOptions from '@/components/ADempiere/Field/FieldOptions/index.vue'
 
-import { evalutateTypeField } from '@/utils/ADempiere/dictionaryUtils'
+// constants
 import { TEXT } from '@/utils/ADempiere/references'
 import {
   ACTIVE, CLIENT, PROCESSING, PROCESSED
 } from '@/utils/ADempiere/constants/systemColumns'
+
+// utils and helper methods
+import { evalutateTypeField } from '@/utils/ADempiere/dictionaryUtils'
 
 /**
  * This is the base component for linking the components according to the
@@ -427,5 +431,16 @@ export default {
     white-space: pre;
   }
   */
+
+  /**
+   * Red border in empty mandatory field
+   */
+  .field-empty-required {
+    .el-input__inner,
+    .tui-editor-defaultUI,
+    .el-textarea__inner {
+      border-color: #f55 !important;
+    }
+  }
 }
 </style>

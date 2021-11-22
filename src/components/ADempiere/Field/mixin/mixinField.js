@@ -15,6 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export default {
+  name: 'MixinField',
+
   props: {
     parentUuid: {
       type: String,
@@ -52,10 +54,18 @@ export default {
     },
     cssClassStyle() {
       let styleClass = ''
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass = this.metadata.cssClassName
       }
+
       return styleClass
+    },
+    isEmptyRequired() {
+      return this.isEmptyValue(this.value) && this.metadata.required
     },
     value: {
       get() {

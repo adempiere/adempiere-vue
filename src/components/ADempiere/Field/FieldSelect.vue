@@ -44,8 +44,8 @@
 </template>
 
 <script>
-// mixins
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 // utils and helper methods
 import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
@@ -68,7 +68,7 @@ export default {
   name: 'FieldSelect',
 
   mixins: [
-    fieldMixin
+    FieldMixin
   ],
 
   data() {
@@ -100,9 +100,15 @@ export default {
       if (this.isSelectMultiple) {
         styleClass += ' custom-field-select-multiple '
       }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass += this.metadata.cssClassName
       }
+
       return styleClass
     },
     getLookupList() {

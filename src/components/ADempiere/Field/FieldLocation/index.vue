@@ -30,6 +30,7 @@
     <el-button slot="reference" type="text" style="width: -webkit-fill-available;" @click="setShowedLocationForm(true)">
       <el-input
         v-model="displayedValue"
+        :class="cssClassStyle"
         readonly
       >
         <i slot="prefix" class="el-icon-location-information el-input__icon" />
@@ -65,6 +66,18 @@ export default {
   },
 
   computed: {
+    cssClassStyle() {
+      let styleClass = ' custom-field-location '
+      if (!this.isEmptyValue(this.metadata.cssClassName)) {
+        styleClass += this.metadata.cssClassName
+      }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
+      return styleClass
+    },
     displayedValue: {
       get() {
         /**
