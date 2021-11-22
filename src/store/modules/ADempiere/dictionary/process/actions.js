@@ -32,6 +32,10 @@ export default {
     })
   },
 
+  /**
+   * Get process dictionary definition
+   * @param {string} uuid of dictionary
+   */
   getProcessDefinitionFromServer({ dispatch }, {
     uuid
   }) {
@@ -51,6 +55,13 @@ export default {
 
           dispatch('addProcessToList', processDefinition)
           resolve(processDefinition)
+
+          if (processDefinition.isReport) {
+            dispatch('getListPrintFormats', {
+              processUuid: uuid,
+              processId: processDefinition.id
+            })
+          }
         })
         .catch(error => {
           reject(error)

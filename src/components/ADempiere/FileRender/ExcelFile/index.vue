@@ -52,10 +52,17 @@
 
 <script>
 import { defineComponent, ref } from '@vue/composition-api'
+
+// components and mixins
 import XLSX from 'xlsx'
+
+// utils and helper methods
 import { exportFileFromJson } from '@/utils/ADempiere/exportUtil.js'
+import { buildLinkHref, buildBlobAndValues } from '@/utils/ADempiere/resource'
+
 export default defineComponent({
   name: 'ExcelFile',
+
   props: {
     mimeType: {
       type: String,
@@ -74,23 +81,19 @@ export default defineComponent({
       required: true
     }
   },
+
   setup(props) {
     const excelData = ref({})
+
     function downloadWithLink() {
-      let link = {
-        href: undefined,
-        download: undefined
-      }
-      const reportObject = Object.values(props.stream)
-      const blob = new Blob([Uint8Array.from(reportObject)], {
-        type: props.mimeType
+      buildLinkHref({
+        fileName: `${props.name}.${props.format}`,
+        mimeType: props.mimeType,
+        outputStream: props.stream,
+        isDownload: true
       })
-      link = document.createElement('a')
-      link.href = window.URL.createObjectURL(blob)
-      link.download = `${props.name}.${props.format}`
-      // download report file
-      link.click()
     }
+
     function handleDownload() {
       const header = excelData.value.header
       const data = excelData.value.results
@@ -105,6 +108,7 @@ export default defineComponent({
         resolve(file)
       })
     }
+
     function getHeaderRow(sheet) {
       const headers = []
       const range = XLSX.utils.decode_range(sheet['!ref'])
@@ -122,32 +126,38 @@ export default defineComponent({
       }
       return headers
     }
+
     function generateReaderData() {
-      const data = Object.values(props.stream)
-      const blob = new Blob([
-        Uint8Array.from(data)
-      ], {
-        type: props.mimeType
+      const { blobFile, dataValues } = buildBlobAndValues({
+        mimeType: props.mimeType,
+        outputStream: props.stream
       })
+
       return new Promise((resolve) => {
         const reader = new FileReader()
         reader.onload = (e) => {
-          const workbook = XLSX.read(data, { type: 'array' })
+          const workbook = XLSX.read(dataValues, {
+            type: 'array'
+          })
           const firstSheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[firstSheetName]
           const header = getHeaderRow(worksheet)
           const results = XLSX.utils.sheet_to_json(worksheet)
+
           // value to render
           excelData.value = {
             header,
             results
           }
+
           resolve()
         }
-        reader.readAsArrayBuffer(blob)
+        reader.readAsArrayBuffer(blobFile)
       })
     }
+
     generateReaderData()
+
     return {
       excelData,
       // methods
@@ -155,5 +165,6 @@ export default defineComponent({
       handleDownload
     }
   }
+
 })
 </script>

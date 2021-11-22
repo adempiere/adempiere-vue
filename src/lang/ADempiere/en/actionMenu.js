@@ -22,6 +22,8 @@ const actionMenu = {
   shareLink: 'Share Link',
   withoutActions: 'Without Actions',
   zoomWindow: 'Zoom Window',
+  // process
+  runProcessOrReport: 'Run',
   // relations
   relations: 'Relations',
   withoutRelations: 'Without Relations',

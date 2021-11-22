@@ -172,7 +172,7 @@ export default defineComponent({
         }
         return root.$t('data.undo')
       }
-      return root.$t('components.RunProcess')
+      return root.$t('actionMenu.runProcessOrReport')
     })
 
     const defaultActionToRun = computed(() => {

@@ -25,14 +25,17 @@
 
 <script>
 import { defineComponent } from '@vue/composition-api'
+
 export default defineComponent({
   name: 'PDF-File',
+
   props: {
     src: {
       type: String,
       required: true
     }
   }
+
 })
 </script>
 

@@ -87,6 +87,34 @@ export function getImagePath({
 }
 
 /**
+ * Generate blob file and data values
+ * @param {string} mimeType
+ * @param {array} outputStream
+ * @returns {object}
+ */
+export function buildBlobAndValues({
+  mimeType,
+  outputStream
+}) {
+  const dataValues = Object.values(outputStream)
+  const blobFile = new Blob([
+    Uint8Array.from(dataValues)
+  ], {
+    type: mimeType
+  })
+
+  // const blobFile = new Blob(
+  //   [outputStream],
+  //   { type: mimeType }
+  // )
+
+  return {
+    dataValues,
+    blobFile
+  }
+}
+
+/**
  * Build link from ouput report
  * @param {string} fileName
  * @param {string} mimeType
@@ -100,24 +128,14 @@ export function buildLinkHref({
   outputStream,
   isDownload = false
 }) {
+  const { blobFile } = buildBlobAndValues({
+    mimeType,
+    outputStream
+  })
+
   const link = document.createElement('a')
+  link.href = window.URL.createObjectURL(blobFile)
   link.download = fileName
-  link.href = window.URL.createObjectURL(blob)
-
-  // const blob = new Blob(
-  //   [outputStream],
-  //   { type: mimeType }
-  // )
-
-  const reportObject = Object.values(outputStream)
-  const blob = new Blob(
-    [
-      Uint8Array.from(reportObject)
-    ],
-    {
-      type: mimeType
-    }
-  )
 
   // download report file
   if (isDownload) {

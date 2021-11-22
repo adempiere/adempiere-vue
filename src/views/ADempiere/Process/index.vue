@@ -59,6 +59,7 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
+// components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
@@ -66,8 +67,19 @@ import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
 import { convertProcess } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
-import { sharedLink } from '@/utils/ADempiere/constants/actionsMenuList'
-import { isHiddenField } from '@/utils/ADempiere/references'
+
+// utils and helper methods
+import {
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField
+} from '@/utils/ADempiere/dictionary/process.js'
+
+// constants
+import {
+  runProcessOrReport,
+  sharedLink
+} from '@/utils/ADempiere/constants/actionsMenuList'
 
 export default defineComponent({
   name: 'ProcessView',
@@ -90,7 +102,6 @@ export default defineComponent({
   setup(props, { root }) {
     const isLoadedMetadata = ref(false)
     const processMetadata = ref({})
-    const panelType = 'process'
 
     let processUuid = root.$route.meta.uuid
     // set uuid from test
@@ -104,6 +115,13 @@ export default defineComponent({
 
     const storedProcess = computed(() => {
       return root.$store.getters.getStoredProcess(processUuid)
+    })
+
+    const storedPrintFormatList = computed(() => {
+      if (root.$route.meta.type === 'report') {
+        return root.$store.getters.getPrintFormatList(processUuid)
+      }
+      return []
     })
 
     root.$store.dispatch('settings/changeSetting', {
@@ -161,31 +179,15 @@ export default defineComponent({
         // })
       },
 
-      isDisplayedField: ({ displayType, isDisplayed, isDisplayedFromLogic, isActive }) => {
-        // button field not showed
-        if (isHiddenField(displayType)) {
-          return false
-        }
-
-        // verify if field is active
-        if (!isActive) {
-          return false
-        }
-
-        return isDisplayed && isDisplayedFromLogic
-      },
+      isDisplayedField,
 
       isReadOnlyField({
         field
       }) {
-        return (
-          field.isReadOnly || field.isReadOnlyFromLogic
-        )
+        return isReadOnlyField(field)
       },
 
-      isMandatoryField({ isMandatory, isMandatoryFromLogic }) {
-        return isMandatory || isMandatoryFromLogic
-      },
+      isMandatoryField,
 
       changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
         root.$store.dispatch('changeProcessFieldShowedFromUser', {
@@ -198,7 +200,10 @@ export default defineComponent({
     getProcess()
 
     const actionsManager = ref({
-      actionsList: [
+      containerUuid: processUuid,
+
+      getActionList: () => [
+        runProcessOrReport,
         sharedLink
       ]
     })
@@ -209,7 +214,6 @@ export default defineComponent({
 
     return {
       processUuid,
-      panelType,
       isLoadedMetadata,
       processMetadata,
       containerManager,
@@ -217,6 +221,7 @@ export default defineComponent({
       relationsManager,
       // computeds
       showContextMenu,
+      storedPrintFormatList,
       // methods
       getProcess
     }

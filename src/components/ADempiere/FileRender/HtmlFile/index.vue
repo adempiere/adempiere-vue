@@ -29,14 +29,17 @@
 
 <script>
 import { defineComponent } from '@vue/composition-api'
+
 export default defineComponent({
   name: 'HTML-TXT-File',
+
   props: {
     content: {
       type: [Object, String],
       required: true
     }
   }
+
 })
 </script>
 
@@ -46,6 +49,7 @@ export default defineComponent({
   height: inherit;
   padding-left: 10px;
   padding-right: 10px;
+
   .sub-content-html {
     min-height: inherit;
     height: inherit;
@@ -55,5 +59,6 @@ export default defineComponent({
     width: 100%;
     padding-bottom: 4%;
   }
+
 }
 </style>

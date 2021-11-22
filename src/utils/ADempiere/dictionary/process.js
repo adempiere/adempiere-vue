@@ -16,6 +16,50 @@
 
 import { generateField } from '@/utils/ADempiere/dictionaryUtils'
 import { sortFields } from '@/utils/ADempiere/dictionary/panel'
+import { isHiddenField } from '@/utils/ADempiere/references'
+
+/**
+ * Is displayed field parameter in process/report panel
+ * @param {number} displayType
+ * @param {boolean} isActive
+ * @param {boolean} isDisplayed
+ * @param {boolean} isMandatory
+ * @param {boolean} isMandatoryFromLogic
+ * @returns {boolean}
+ */
+export function isDisplayedField({ displayType, isActive, isDisplayed, isDisplayedFromLogic }) {
+  // button field not showed
+  if (isHiddenField(displayType)) {
+    return false
+  }
+
+  // verify if field is active
+  if (!isActive) {
+    return false
+  }
+
+  return isDisplayed && isDisplayedFromLogic
+}
+
+/**
+ * Process manager mandatory logic
+ * @param {boolean} isMandatory
+ * @param {boolean} isMandatoryFromLogic
+ * @returns {boolean}
+ */
+export function isMandatoryField({ isMandatory, isMandatoryFromLogic }) {
+  return isMandatory || isMandatoryFromLogic
+}
+
+/**
+ * Process is read only field
+ * @param {boolean} isReadOnly
+ * @param {boolean} isReadOnlyFromLogic
+ * @returns {boolean}
+ */
+export function isReadOnlyField({ isReadOnly, isReadOnlyFromLogic }) {
+  return isReadOnly && isReadOnlyFromLogic
+}
 
 /**
  * Generate the actions and the associated process to store in the vuex store,

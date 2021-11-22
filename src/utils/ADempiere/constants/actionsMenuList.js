@@ -210,6 +210,19 @@ export const recordAccess = {
   }
 }
 
+export const runProcessOrReport = {
+  name: language.t('actionMenu.runProcessOrReport'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-setting',
+  actionName: 'runProcessOrReport',
+  runProcessOrReport: ({ root, containerUuid }) => {
+    root.$store.dispatch('startProcess', {
+      containerUuid
+    })
+  }
+}
+
 export const windowActions = [
   createNewRecord,
   refreshRecords,

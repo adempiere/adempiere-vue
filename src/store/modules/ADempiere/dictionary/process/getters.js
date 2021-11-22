@@ -15,6 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { isDisplayedField, isMandatoryField } from '@/utils/ADempiere/dictionary/process'
+import { isNumberField } from '@/utils/ADempiere/references'
 
 /**
  * Dictionary Process Getters
@@ -34,5 +36,63 @@ export default {
       return process.fieldsList
     }
     return undefined
+  },
+
+  /**
+   * Getter converter params with value format
+   * @param {String} containerUuid
+   * @param {Array<Object>} fieldsList
+   * @returns {Array<Object>} [{ columnName: name key, value: value to send }]
+   */
+  getProcessParameters: (state, getters, rootState, rootGetters) => ({
+    containerUuid,
+    fieldsList = []
+  }) => {
+    if (isEmptyValue(fieldsList)) {
+      fieldsList = getters.getStoredFieldsFromProcess(containerUuid)
+    }
+
+    const processParameters = []
+
+    fieldsList.forEach(fieldItem => {
+      const { columnName } = fieldItem
+      const isMandatory = isMandatoryField(fieldItem)
+      // evaluate displayed fields
+      const isDisplayed = isDisplayedField(fieldItem) &&
+        (fieldItem.isShowedFromUser || isMandatory)
+
+      if (!isDisplayed) {
+        return
+      }
+
+      const value = rootGetters.getValueOfField({
+        containerUuid,
+        columnName
+      })
+
+      if (fieldItem.isRange && isNumberField(fieldItem.displayType)) {
+        const valueTo = rootGetters.getValueOfField({
+          containerUuid,
+          columnName: fieldItem.columnNameTo
+        })
+        if (!isEmptyValue(valueTo)) {
+          processParameters.push({
+            columnName: fieldItem.columnNameTo,
+            value: valueTo
+          })
+        }
+      }
+
+      if (isEmptyValue(value)) {
+        return
+      }
+      processParameters.push({
+        columnName,
+        value
+      })
+    })
+
+    return processParameters
   }
+
 }
