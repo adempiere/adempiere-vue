@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 import { isDisplayedField, isMandatoryField } from '@/utils/ADempiere/dictionary/browser.js'
 import { isNumberField } from '@/utils/ADempiere/references'
@@ -70,7 +71,7 @@ export default {
         columnName
       })
 
-      if (fieldItem.isRange && isNumberField(fieldItem.displayType)) {
+      if (fieldItem.isRange && !isNumberField(fieldItem.displayType)) {
         const valueTo = rootGetters.getValueOfField({
           containerUuid,
           columnName: fieldItem.columnNameTo
@@ -83,13 +84,12 @@ export default {
         }
       }
 
-      if (isEmptyValue(value)) {
-        return
+      if (!isEmptyValue(value)) {
+        queryParams.push({
+          columnName,
+          value
+        })
       }
-      queryParams.push({
-        columnName,
-        value
-      })
     })
 
     return queryParams
