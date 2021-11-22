@@ -26,13 +26,10 @@
       v-if="showContextMenu"
       style="height: 39px; background: white;"
     >
+      <!-- TODO: Add action menu -->
+
       <modal-dialog
         :parent-uuid="$route.meta.parentUuid"
-        :container-uuid="formUuid"
-        :panel-type="panelType"
-      />
-      <context-menu
-        :menu-parent-uuid="$route.meta.parentUuid"
         :container-uuid="formUuid"
         :panel-type="panelType"
       />
@@ -78,31 +75,30 @@
       </el-row>
     </el-main>
   </el-container>
-  <div
+
+  <loading-view
     v-else
     key="form-loading"
-    v-loading="!isLoaded"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="view-loading"
   />
 </template>
 
 <script>
-import ContextMenu from '@/components/ADempiere/ContextMenu'
+// components and mixins
 import FormPanel from '@/components/ADempiere/Form'
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import ModalDialog from '@/components/ADempiere/Dialog'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 
 export default {
   name: 'FormView',
+
   components: {
-    ContextMenu,
     FormPanel,
+    LoadingView,
     ModalDialog,
     TitleAndHelp
   },
+
   data() {
     return {
       formUuid: this.$route.meta.uuid,
@@ -111,6 +107,7 @@ export default {
       panelType: 'form'
     }
   },
+
   computed: {
     formName() {
       if (this.$route.meta.title === 'PriceChecking') {
@@ -144,9 +141,11 @@ export default {
       return this.$store.getters.getIsShowTitleForm
     }
   },
+
   created() {
     this.getForm()
   },
+
   methods: {
     changeDisplatedTitle() {
       this.$store.commit('changeShowTitleForm', !this.isShowTitleForm)

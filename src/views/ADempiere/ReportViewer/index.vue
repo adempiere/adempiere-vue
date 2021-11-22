@@ -18,14 +18,7 @@
 -->
 <template>
   <div v-if="isLoading" key="report-viewer-loaded" style="min-height: inherit;">
-    <context-menu
-      v-if="showContextMenu"
-      :container-uuid="reportResult.processUuid"
-      :panel-type="panelType"
-      :is-report="true"
-      :last-parameter="reportResult.processUuid"
-      :report-format="reportFormat"
-    />
+    <!-- TODO: Add action menu -->
 
     <el-row type="flex" style="min-height: inherit;">
       <el-col :span="24">
@@ -54,32 +47,32 @@
     />
   </div>
 
-  <div
+  <loading-view
     v-else
     key="report-viewer-loading"
-    v-loading="!isLoading"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="view-loading"
   />
 </template>
 
 <script>
-import ContextMenu from '@/components/ADempiere/ContextMenu'
-import ModalDialog from '@/components/ADempiere/Dialog'
+// components and mixins
 import FileRender from '@/components/ADempiere/FileRender'
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import ModalDialog from '@/components/ADempiere/Dialog/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+
+// utils and helper methods
 import { showNotification } from '@/utils/ADempiere/notification'
 
 export default {
   name: 'ReportViewer',
+
   components: {
-    ContextMenu,
-    ModalDialog,
     FileRender,
+    LoadingView,
+    ModalDialog,
     TitleAndHelp
   },
+
   data() {
     return {
       panelType: 'process',
@@ -90,6 +83,7 @@ export default {
       reportResult: {}
     }
   },
+
   computed: {
     // TODO: Add get metadata from server to open report view from link
     showContextMenu() {
@@ -105,13 +99,16 @@ export default {
       return this.$store.getters.getCachedReport(this.$route.params.instanceUuid)
     }
   },
+
   created() {
     this.processMetadata = this.getterProcess
   },
+
   mounted() {
     this.getCachedReport()
     this.$route.meta.reportFormat = this.reportFormat
   },
+
   methods: {
     showNotification,
     displayReport(reportResult) {
