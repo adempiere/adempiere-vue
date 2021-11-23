@@ -241,7 +241,7 @@
                   @click="breakFree()"
                 >
                   <i class="el-icon-document-checked" />
-                  {{ $t('form.pos.breakFree') }}
+                  {{ $t('form.pos.releaseOrder') }}
                 </el-button>
                 <el-button
                   v-show="allowsCollectOrder"
