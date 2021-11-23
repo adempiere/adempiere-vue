@@ -236,6 +236,8 @@
                 <el-button type="primary" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
                 <el-button v-show="isValidForDeleteLine(listOrderLine)" type="danger" icon="el-icon-delete" :disabled="isDisabled" @click="deleteOrderLine(currentOrderLine)" />
                 <el-button
+                  v-show="allowsCollectOrder"
+                  :disabled="!allowsCollectOrder"
                   type="success"
                   icon="el-icon-bank-card"
                   @click="openCollectionPanel"
@@ -356,7 +358,7 @@
                 </el-dropdown>
               </p>
             </div>
-            <span v-if="isMobile" style="float: right;padding-right: 3%;">
+            <span v-if="isMobile" style="float: right;padding-right: 1%;">
               <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.date') }}:
@@ -378,12 +380,14 @@
                 </b></p>
             </span>
             <span style="float: right;">
-              <p class="total">{{ $t('form.pos.order.seller') }}:<b style="float: right;">
-                {{ currentOrder.salesRepresentative.name }}
-              </b></p>
-              <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
-              <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
-              <div style="border: 1px solid #36a3f7;">
+              <div style="padding-left: 10px;padding-right: 10px;">
+                <p class="total">{{ $t('form.pos.order.seller') }}:<b style="float: right;">
+                  {{ currentOrder.salesRepresentative.name }}
+                </b></p>
+                <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
+                <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
+              </div>
+              <div style="border: 1px solid rgb(54, 163, 247);padding-left: 10px;padding-right: 10px;">
                 <p class="total">
                   <b>
                     {{ $t('form.pos.order.total') }}:

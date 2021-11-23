@@ -132,7 +132,7 @@
           <el-row :gutter="24">
             <el-col :span="24" style="padding-left:  15px !important;padding-right: 15px !important;">
               <span>
-                <div style="border: 1px solid #36a3f7;">
+                <div style="border: 1px solid rgb(54, 163, 247);padding-left: 10px;padding-right: 10px;">
                   <p class="total">
                     {{ $t('form.pos.collect.orderTotal') }}:
                     <b style="float: right;">
@@ -142,35 +142,36 @@
 
                   <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> {{ $t('form.pos.collect.convertedAmount') }}: <b style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
                 </div>
+                <div style="padding-left: 10px;padding-right: 10px;">
+                  <p class="total">
+                    {{ $t('form.pos.collect.payment') }}:
+                    <b style="float: right;">
+                      {{ formatPrice(currentOrder.paymentAmount, pointOfSalesCurrency.iSOCode) }}
+                    </b>
+                  </p>
 
-                <p class="total">
-                  {{ $t('form.pos.collect.payment') }}:
-                  <b style="float: right;">
-                    {{ formatPrice(currentOrder.paymentAmount, pointOfSalesCurrency.iSOCode) }}
-                  </b>
-                </p>
+                  <p class="total">
+                    {{ $t('form.pos.collect.pending') }}:
+                    <b style="float: right;">
+                      {{ formatPrice(currentOrder.openAmount, pointOfSalesCurrency.iSOCode) }}
+                    </b>
+                  </p>
 
-                <p class="total">
-                  {{ $t('form.pos.collect.pending') }}:
-                  <b style="float: right;">
-                    {{ formatPrice(currentOrder.openAmount, pointOfSalesCurrency.iSOCode) }}
-                  </b>
-                </p>
+                  <p class="total">
+                    {{ $t('form.pos.collect.change') }}:
+                    <b style="float: right;">
+                      {{ formatPrice(currentOrder.refundAmount, pointOfSalesCurrency.iSOCode) }}
+                    </b>
+                  </p>
 
-                <p class="total">
-                  {{ $t('form.pos.collect.change') }}:
-                  <b style="float: right;">
-                    {{ formatPrice(currentOrder.refundAmount, pointOfSalesCurrency.iSOCode) }}
-                  </b>
-                </p>
-
-                <p v-if="!isEmptyValue(dayRate)" class="total">
-                  {{ $t('form.pos.collect.dayRate') }}:
-                  <!-- Conversion rate to date -->
-                  <b style="float: right;">
-                    {{ showDayRate(dayRate) }}
-                  </b>
-                </p>
+                  <p v-if="!isEmptyValue(dayRate)" class="total">
+                    {{ $t('form.pos.collect.dayRate') }}:
+                    <!-- Conversion rate to date -->
+                    <b style="float: right;">
+                      {{ showDayRate(dayRate) }}
+                    </b>
+                  </p>
+                </div>
               </span>
             </el-col>
           </el-row>
