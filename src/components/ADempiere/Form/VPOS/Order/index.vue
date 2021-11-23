@@ -236,7 +236,7 @@
                 <el-button type="info" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
                 <el-button v-show="isValidForDeleteLine(listOrderLine)" type="danger" icon="el-icon-delete" :disabled="isDisabled" @click="deleteOrderLine(currentOrderLine)" />
                 <el-button
-                  v-show="validateBreakFree"
+                  v-show="isValidToRelease"
                   type="primary"
                   @click="breakFree()"
                 >
@@ -516,7 +516,7 @@ export default {
     }
   },
   computed: {
-    validateBreakFree() {
+    isValidToRelease() {
       if (!this.isEmptyValue(this.currentOrder) && this.currentOrder.documentStatus.value === 'DR') {
         return true
       }
