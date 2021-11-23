@@ -62,9 +62,8 @@
         min-width="50"
       />
 
-      <template v-for="(fieldAttributes, key) in header">
+      <template v-for="(fieldAttributes, key) in headerList">
         <el-table-column
-          v-if="isDisplayed(fieldAttributes) && tableColumnDataType(fieldAttributes, currentOption)"
           :key="key"
           :label="headerLabel(fieldAttributes)"
           :column-key="fieldAttributes.columnName"
@@ -105,6 +104,7 @@ import CustomPagination from './CustomPagination.vue'
 // utils and helper methods
 import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
 import { isLookup } from '@/utils/ADempiere/references'
+import { tableColumnDataType } from '@/utils/ADempiere/valueUtils'
 
 export default defineComponent({
   name: 'DefaultTable',
@@ -152,11 +152,23 @@ export default defineComponent({
   setup(props, { root }) {
     const valueToSearch = ref('')
 
+    const currentOption = computed(() => {
+      return root.$store.getters.getTableOption
+    })
+
     const keyColumn = computed(() => {
       if (props.panelMetadata) {
         return props.panelMetadata.keyColumn
       }
       return undefined
+    })
+
+    const headerList = computed(() => {
+      return props.header.filter(fieldItem => {
+        return isDisplayed(fieldItem) &&
+          // fieldItem.isShowedTableFromUser &&
+          tableColumnDataType(fieldItem, currentOption.value)
+      })
     })
 
     /**
@@ -176,7 +188,7 @@ export default defineComponent({
       return columnsName.concat(displayColumnsName)
     })
 
-    const handleRowClick = (row, column, event) => {
+    function handleRowClick(row, column, event) {
       props.containerManager.seekRecord({
         parentUuid: props.parentUuid,
         containerUuid: props.containerUuid,
@@ -185,7 +197,7 @@ export default defineComponent({
       })
     }
 
-    const headerLabel = (field) => {
+    function headerLabel(field) {
       if (field.isMandatory || field.isMandatoryFromLogic) {
         return '* ' + field.name
       }
@@ -196,7 +208,7 @@ export default defineComponent({
     /**
      * Verify is displayed column/field in table
      */
-    const isDisplayed = (field) => {
+    function isDisplayed(field) {
       // validate with container manager
       if (!root.isEmptyValue(props.containerManager) &&
         props.containerManager.isDisplayedColumn) {
@@ -209,7 +221,7 @@ export default defineComponent({
     /**
      * custom method to handle change page
      */
-    const handleChangePage = (pageNumber) => {
+    function handleChangePage(pageNumber) {
       props.containerManager.setPage({
         parentUuid: props.parentUuid,
         containerUuid: props.containerUuid,
@@ -228,9 +240,10 @@ export default defineComponent({
               return value
                 .trim()
                 .toLowerCase()
-                .includes(search
-                  .trim()
-                  .toLowerCase()
+                .includes(
+                  search
+                    .trim()
+                    .toLowerCase()
                 )
             }
           })
@@ -239,18 +252,14 @@ export default defineComponent({
       return props.dataTable
     })
 
-    const currentOption = computed(() => {
-      return root.$store.getters.getTableOption
-    })
-
-    const handleSelection = (rowsSelection, rowsSelected) => {
+    function handleSelection(rowsSelection, rowsSelected) {
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
         recordsSelected: rowsSelection
       })
     }
 
-    const handleSelectionAll = (rowsSelection) => {
+    function handleSelectionAll(rowsSelection) {
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
         recordsSelected: rowsSelection
@@ -261,6 +270,7 @@ export default defineComponent({
       // data
       valueToSearch,
       // computeds
+      headerList,
       recordsWithFilter,
       currentOption,
       keyColumn,

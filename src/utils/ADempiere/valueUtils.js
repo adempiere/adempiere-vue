@@ -441,46 +441,32 @@ export function parsedValueComponent({
 }
 
 /**
- * add a tab depending on the status of the document
+ * Get tag type of the document status
  * @author Elsio Sanchez <elsiosanches@gmail.com>
- * @param {string} tag, document status key
+ * @param {string} status, document status key
  */
-export function tagStatus(tag) {
+export function tagStatus(status) {
   let type
-  switch (tag) {
-    case 'VO':
-      type = 'danger'
-      break
+  switch (status) {
     case 'AP':
+    case 'CO':
       type = 'success'
       break
+    case '??':
     case 'DR':
       type = 'info'
       break
     case 'CL':
       type = 'primary'
       break
-    case 'CO':
-      type = 'success'
-      break
-    case '??':
-      type = 'info'
-      break
     case 'IP':
-      type = 'warning'
-      break
     case 'WC':
-      type = 'warning'
-      break
     case 'WP':
       type = 'warning'
       break
+    case 'VO':
     case 'NA':
-      type = 'danger'
-      break
     case 'IN':
-      type = 'danger'
-      break
     case 'RE':
       type = 'danger'
       break
@@ -489,16 +475,14 @@ export function tagStatus(tag) {
 }
 
 /**
- * add a tab depending on the status of the document
+ * Payment method icon element-ui supported
  * @author Elsio Sanchez <elsiosanches@gmail.com>
- * @param {string} iconElment, icon the Elment
+ * @param {string} paymentMethod, value the payment
  */
-export function iconStatus(iconElment) {
+export function paymentIcon(paymentMethod) {
   let icon
-  switch (iconElment) {
+  switch (paymentMethod) {
     case 'A':
-      icon = 'el-icon-wallet'
-      break
     case 'M':
       icon = 'el-icon-wallet'
       break
@@ -511,15 +495,11 @@ export function iconStatus(iconElment) {
     case 'Z':
       icon = 'el-icon-coin'
       break
-    case 'T':
-      icon = 'el-icon-bank-card'
-      break
     case 'P':
       icon = 'el-icon-mobile'
       break
+    case 'T':
     case 'C':
-      icon = 'el-icon-bank-card'
-      break
     case 'D':
       icon = 'el-icon-bank-card'
       break

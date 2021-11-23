@@ -119,9 +119,6 @@ import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 import { isLookup, LIST } from '@/utils/ADempiere/references.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 
-// constants
-import { DOCUMENT_STATUS_COLUMNS_LIST } from '@/utils/ADempiere/constants/systemColumns.js'
-
 export default defineComponent({
   name: 'FieldOptions',
   components: {
@@ -249,20 +246,24 @@ export default defineComponent({
     }
 
     const isDocuemntStatus = computed(() => {
-      if (props.metadata.isPanelWindow && !props.metadata.isAdvancedQuery) {
-        const { parentUuid, containerUuid, columnName } = props.metadata
-        if (DOCUMENT_STATUS_COLUMNS_LIST.includes(columnName)) {
-          const statusValue = root.$store.getters.getValueOfField({
-            parentUuid,
-            containerUuid,
-            columnName
-          })
-          // if (!root.isEmptyValue(root.$store.getters.getOrders)) {
-          if (!root.isEmptyValue(statusValue)) {
-            return true
-          }
-        }
+      if (!props.metadata.isColumnDocumentStatus) {
+        return false
       }
+
+      // if (!root.isEmptyValue(root.$store.getters.getOrders)) {
+      //   reutrn false
+      // }
+
+      const { parentUuid, containerUuid, columnName } = props.metadata
+      const statusValue = root.$store.getters.getValueOfField({
+        parentUuid,
+        containerUuid,
+        columnName
+      })
+      if (!root.isEmptyValue(statusValue)) {
+        return true
+      }
+
       return false
     })
 

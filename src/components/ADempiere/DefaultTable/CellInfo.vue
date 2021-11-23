@@ -17,17 +17,19 @@
 -->
 
 <template>
-  <el-tag
-    v-if="isDocumentStatus"
+  <document-status-tag
+    v-if="fieldAttributes.isColumnDocumentStatus"
     key="document-status"
-    :type="documentStatus"
-    disable-transitions
-  >
-    {{ displayedValue }}
-  </el-tag>
+    size="small"
+    :value="fieldValue"
+    :displayed-value="displayedValue"
+  />
 
   <span v-else key="info-value">
-    <p v-if="!isEmptyValue(displayedValue) && displayedValue.length >= 23" style="max-height: 40px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+    <p
+      v-if="!isEmptyValue(displayedValue) && displayedValue.length >= 23"
+      style="max-height: 40px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;"
+    >
       <el-popover
         placement="top-start"
         width="300"
@@ -56,8 +58,10 @@
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
 
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+
 // utils and helpers methods
-import { FIELDS_CURRENCY } from '@/utils/ADempiere/references.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 import {
   formatField, formatPrice, formatQuantity
@@ -65,10 +69,14 @@ import {
 import { convertBooleanToTranslationLang } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
 // constants
-import { DOCUMENT_STATUS_COLUMNS_LIST } from '@/utils/ADempiere/constants/systemColumns.js'
+import { FIELDS_CURRENCY } from '@/utils/ADempiere/references.js'
 
 export default defineComponent({
   name: 'CellInfo',
+
+  components: {
+    DocumentStatusTag
+  },
 
   props: {
     fieldAttributes: {
@@ -82,20 +90,14 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const { columnName, elementColumnName } = props.fieldAttributes
-    const fieldValue = props.dataRow[columnName]
+    const { columnName } = props.fieldAttributes
 
-    const isDocumentStatus = computed(() => {
-      return DOCUMENT_STATUS_COLUMNS_LIST.includes(columnName) ||
-        DOCUMENT_STATUS_COLUMNS_LIST.includes(elementColumnName)
+    const fieldValue = computed(() => {
+      return props.dataRow[columnName]
     })
 
     const displayedValue = computed(() => {
       return formatValue(props.dataRow, props.fieldAttributes)
-    })
-
-    const documentStatus = computed(() => {
-      return root.tagStatus(fieldValue)
     })
 
     const formatNumber = ({ displayType, value }) => {
@@ -120,7 +122,7 @@ export default defineComponent({
       switch (componentPath) {
         case 'FieldDate':
         case 'FieldTime': {
-          let cell = fieldValue
+          let cell = fieldValue.value
           if (typeValue(cell) === 'DATE') {
             cell = cell.getTime()
           }
@@ -130,19 +132,19 @@ export default defineComponent({
         }
 
         case 'FieldNumber':
-          if (root.isEmptyValue(fieldValue)) {
+          if (root.isEmptyValue(fieldValue.value)) {
             valueToShow = undefined
             break
           }
           valueToShow = formatNumber({
             displayType,
-            value: fieldValue
+            value: fieldValue.value
           })
           break
 
         case 'FieldSelect':
           valueToShow = row[displayColumnName]
-          if (root.isEmptyValue(valueToShow) && fieldValue === 0) {
+          if (root.isEmptyValue(valueToShow) && fieldValue.value === 0) {
             valueToShow = field.defaultValue
             break
           }
@@ -150,11 +152,11 @@ export default defineComponent({
 
         case 'FieldYesNo':
           // replace boolean true-false value for 'Yes' or 'Not' ('Si' or 'No' for spanish)
-          valueToShow = convertBooleanToTranslationLang(fieldValue)
+          valueToShow = convertBooleanToTranslationLang(fieldValue.value)
           break
 
         default:
-          valueToShow = fieldValue
+          valueToShow = fieldValue.value
           break
       }
 
@@ -163,8 +165,7 @@ export default defineComponent({
 
     return {
       // computeds
-      isDocumentStatus,
-      documentStatus,
+      fieldValue,
       displayedValue
     }
   }

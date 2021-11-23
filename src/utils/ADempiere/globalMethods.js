@@ -16,7 +16,6 @@
 
 export {
   tagStatus,
-  iconStatus,
   isEmptyValue,
   currencyFind,
   tenderTypeFind,

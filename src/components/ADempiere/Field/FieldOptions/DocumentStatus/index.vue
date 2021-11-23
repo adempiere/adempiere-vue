@@ -17,50 +17,102 @@
 -->
 
 <template>
-  <el-popover
-    v-if="(fieldAttributes.columnName === 'DocStatus') && (!isEmptyValue(processOrderUuid))"
-    placement="right"
-    width="400"
-    trigger="click"
-    :disabled="withoutRecord"
-  >
-    <el-select
-      v-model="valueActionDocument"
-      @change="documentActionChange"
-      @visible-change="listActionDocument"
-    >
-      <el-option
-        v-for="(item, key) in listDocumentActions"
-        :key="key"
-        :label="item.name"
-        :value="item.value"
-      />
-    </el-select>
-    <el-tag
-      v-if="isEmptyValue(valueActionDocument)"
-      :type="tagStatus(fieldAttributes.value)"
-    >
-      {{ fieldAttributes.displayColumnName }}
-    </el-tag>
-    <el-tag
-      v-else
-      :type="tagStatus(valueActionDocument)"
-    >
-      {{ labelDocumentActions }}
-    </el-tag>
-    <p v-if="isEmptyValue(valueActionDocument)"> {{ fieldAttributes.description }} </p>
-    <p v-else> {{ descriptionDocumentActions }} </p>
-    <el-button
-      slot="reference"
-      type="text"
-      icon="el-icon-set-up"
-    />
-  </el-popover>
+  <el-card v-if="fieldAttributes.isColumnDocumentStatus" class="field-option-card document-status-option">
+    <div slot="header">
+      <span>
+        {{ $t('field.field') }}:
+        <b> {{ fieldAttributes.name }} </b>
+      </span>
+    </div>
+
+    <p>
+      {{ fieldAttributes.description }}
+    </p>
+
+    <el-row :gutter="10">
+      <el-col :span="16">
+        <el-select
+          v-model="valueActionDocument"
+          size="mini"
+          class="custom-select-document-status"
+          :popper-append-to-body="true"
+          @change="documentActionChange"
+          @visible-change="listActionDocument"
+        >
+          <!-- Current selected docuemnt status -->
+          <el-option
+            :label="displayedValue"
+            :value="value"
+            disabled
+            class="custom-option-document-status"
+          >
+            <span class="displayed-value">
+              {{ displayedValue }}
+            </span>
+            <document-status-tag
+              size="mini"
+              class="tag-status"
+              :value="value"
+              :displayed-value="value"
+            />
+          </el-option>
+
+          <!-- Available document status -->
+          <el-option
+            v-for="(item, key) in listDocumentActions"
+            :key="key"
+            :label="item.name"
+            :value="item.value"
+            class="custom-option-document-status"
+          >
+            <div style="width: 100%;">
+              <span class="displayed-value">
+                {{ item.name }}
+              </span>
+              <document-status-tag
+                size="mini"
+                class="tag-status"
+                :value="item.value"
+                :displayed-value="item.value"
+              />
+            </div>
+
+            <!-- TODO: Add description legend info -->
+            <!--
+            <div class="info">
+              {{ item.description }}
+            </div>
+            -->
+          </el-option>
+        </el-select>
+      </el-col>
+
+      <el-col :span="8">
+        <document-status-tag
+          :style="{
+            width: '100%',
+            'text-align': 'center'
+          }"
+          :value="value"
+          :displayed-value="displayedValue"
+        />
+      </el-col>
+    </el-row>
+  </el-card>
 </template>
 
 <script>
-export default {
-  name: 'DocumentStatusField',
+import { defineComponent, computed, ref } from '@vue/composition-api'
+
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+
+export default defineComponent({
+  name: 'DocumentStatus',
+
+  components: {
+    DocumentStatusTag
+  },
 
   props: {
     fieldAttributes: {
@@ -69,67 +121,78 @@ export default {
     }
   },
 
-  data() {
-    return {
-      valueActionDocument: ''
-    }
-  },
+  setup(props, { root }) {
+    const displayedValue = computed(() => {
+      const { parentUuid, containerUuid, displayColumnName } = props.fieldAttributes
+      return root.$store.getters.getValueOfField({
+        parentUuid,
+        containerUuid,
+        columnName: displayColumnName
+      })
+    })
 
-  computed: {
-    withoutRecord() {
+    const value = computed(() => {
+      const { parentUuid, containerUuid, columnName } = props.fieldAttributes
+      return root.$store.getters.getValueOfField({
+        parentUuid,
+        containerUuid,
+        columnName
+      })
+    })
+    const valueActionDocument = ref(value.value)
+
+    const withoutRecord = computed(() => {
       // TODO: Validate with record attribute
-      if (this.isEmptyValue(this.$route.query.action) ||
-      ['create-new', 'reference', 'advancedQuery', 'criteria'].includes(this.$route.query.action)) {
+      if (root.isEmptyValue(root.$route.query.action) ||
+        ['create-new', 'reference', 'advancedQuery', 'criteria'].includes(root.$route.query.action)) {
         return true
       }
       return false
-    },
-    documentActions() {
-      return this.$store.getters.getListDocumentActions
-    },
-    listDocumentActions() {
-      return this.documentActions.documentActionsList
-    },
-    labelDocumentActions() {
-      const found = this.listDocumentActions.find(element => {
-        if (element.value === this.valueActionDocument) {
-          return element
-        }
-      })
-      if (this.isEmptyValue(found)) {
-        return this.valueActionDocument
-      }
-      return found.name
-    },
-    descriptionDocumentActions() {
-      const found = this.listDocumentActions.find(element => {
-        if (element.value === this.valueActionDocument) {
-          return element
-        }
-      })
-      if (this.isEmptyValue(found)) {
-        return this.valueActionDocument
-      }
-      return found.description
-    },
-    processOrderUuid() {
-      return this.$store.getters.getOrders
-    }
-  },
+    })
 
-  methods: {
-    listActionDocument(isShowList) {
-      if (isShowList) {
-        if (!this.withoutRecord && this.$route.query.action !== this.documentActions.recordUuid) {
-          this.$store.dispatch('listDocumentActionStatus', {
-            recordUuid: this.$route.query.action,
-            tableName: this.$route.params.tableName,
-            recordId: this.$route.params.recordId
-          })
+    const documentActions = computed(() => {
+      return root.$store.getters.getListDocumentActions
+    })
+
+    const listDocumentActions = computed(() => {
+      return documentActions.value.documentActionsList
+    })
+
+    const currentActionNode = computed(() => {
+      return listDocumentActions.value.find(element => {
+        if (element.value === valueActionDocument.value) {
+          return element
         }
+      })
+    })
+
+    const labelDocumentActions = computed(() => {
+      if (root.isEmptyValue(currentActionNode.value)) {
+        return displayedValue.value
       }
-    },
-    documentActionChange(value) {
+      return currentActionNode.value.name
+    })
+
+    const processOrder = computed(() => {
+      return root.$store.getters.getOrders
+    })
+
+    function listActionDocument(isShowList) {
+      if (!isShowList) {
+        return
+      }
+      if (!withoutRecord.value && root.$route.query.action !== documentActions.value.recordUuid) {
+        const tableName = props.fieldAttributes.tabTableName
+
+        root.$store.dispatch('listDocumentActionStatus', {
+          recordUuid: root.$route.query.action,
+          tableName,
+          recordId: root.$route.params.recordId
+        })
+      }
+    }
+
+    function documentActionChange(value) {
       // this.$store.dispatch('notifyFieldChange', {
       //   parentUuid: this.fieldAttributes.parentUuid,
       //   containerUuid: this.fieldAttributes.containerUuid,
@@ -138,28 +201,69 @@ export default {
       //   newValue: value
       // })
 
-      const actionProcess = this.$store.getters.getOrders
-      this.$store.dispatch('startProcess', {
+      const tableName = props.fieldAttributes.tabTableName
+
+      root.$store.dispatch('startProcess', {
         action: {
-          uuid: actionProcess.uuid,
-          id: actionProcess.id,
-          name: actionProcess.name
+          uuid: processOrder.value.uuid,
+          id: processOrder.value.id,
+          name: processOrder.value.name
         }, // process metadata
-        tableName: this.$route.params.tableName,
-        recordId: this.$route.params.recordId,
-        recordUuid: this.$route.query.action,
-        parametersList: [{
-          columnName: this.fieldAttributes.columnName,
-          value: this.valueActionDocument
-        }],
+        tableName,
+        recordId: root.$route.params.recordId,
+        recordUuid: root.$route.query.action,
+        parametersList: [
+          {
+            columnName: props.fieldAttributes.columnName,
+            value: props.valueActionDocument
+          }
+        ],
         isActionDocument: true,
-        parentUuid: this.fieldAttributes.parentUuid,
-        panelType: this.fieldAttributes.panelType,
-        containerUuid: this.fieldAttributes.containerUuid // determinate if get table name and record id (window) or selection (browser)
+        parentUuid: props.fieldAttributes.parentUuid,
+        panelType: props.fieldAttributes.panelType,
+        containerUuid: props.fieldAttributes.containerUuid // determinate if get table name and record id (window) or selection (browser)
       })
-      this.valueActionDocument = ''
+
+      valueActionDocument.value = ''
+    }
+
+    return {
+      valueActionDocument,
+      // computeds
+      value,
+      displayedValue,
+      labelDocumentActions,
+      listDocumentActions,
+      withoutRecord,
+      // methods
+      listActionDocument,
+      documentActionChange
     }
   }
 
-}
+})
 </script>
+
+<style lang="scss" src="../common-style.scss">
+</style>
+<style lang="scss">
+.document-status-option {
+  &.el-card {
+    max-width: 300px;
+  }
+}
+
+.custom-option-document-status {
+  width: 295px !important;
+
+  .displayed-value {
+    float: left;
+    font-size: 13px !important;
+  }
+
+  .tag-status {
+    float: right;
+    font-size: 13px !important;
+  }
+}
+</style>

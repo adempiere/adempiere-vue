@@ -19,7 +19,11 @@ import { isEmptyValue, parsedValueComponent } from '@/utils/ADempiere/valueUtils
 import { getContext, getParentFields, getPreference, parseContext } from '@/utils/ADempiere/contextUtils'
 import REFERENCES, { BUTTON, YES_NO, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
 import { FIELD_OPERATORS_LIST } from '@/utils/ADempiere/dataUtils'
-import { READ_ONLY_FORM_COLUMNS, readOnlyColumn } from '@/utils/ADempiere/constants/systemColumns'
+import {
+  DOCUMENT_STATUS_COLUMNS_LIST,
+  READ_ONLY_FORM_COLUMNS,
+  readOnlyColumn
+} from '@/utils/ADempiere/constants/systemColumns'
 
 /**
  * Generate field to app
@@ -44,6 +48,8 @@ export function generateField({
   let isColumnReadOnlyForm = false
   let isChangedAllForm = false
   let valueIsReadOnlyForm
+
+  let isColumnDocumentStatus = false
 
   const componentReference = evalutateTypeField(fieldToGenerate.displayType)
   let evaluatedLogics = {
@@ -139,6 +145,10 @@ export function generateField({
       containerUuid: moreAttributes.containerUuid,
       ...fieldToGenerate
     })
+
+    // manage document status and tag document status
+    isColumnDocumentStatus = DOCUMENT_STATUS_COLUMNS_LIST.includes(columnName) ||
+      DOCUMENT_STATUS_COLUMNS_LIST.includes(fieldToGenerate.elementColumnName)
   }
 
   const field = {
@@ -181,6 +191,7 @@ export function generateField({
     defaultOperator: operator,
     operatorsList,
     // popover's
+    isColumnDocumentStatus,
     isComparisonField,
     isNumericField,
     isTranslatedField
