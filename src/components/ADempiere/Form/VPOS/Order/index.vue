@@ -232,9 +232,17 @@
           <el-footer :class="classOrderFooter">
             <div class="keypad">
               <el-row :gutter="24">
-                <el-button type="primary" icon="el-icon-top" :disabled="isDisabled" @click="arrowTop" />
-                <el-button type="primary" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
+                <el-button type="info" icon="el-icon-top" :disabled="isDisabled" @click="arrowTop" />
+                <el-button type="info" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
                 <el-button v-show="isValidForDeleteLine(listOrderLine)" type="danger" icon="el-icon-delete" :disabled="isDisabled" @click="deleteOrderLine(currentOrderLine)" />
+                <el-button
+                  v-show="validateBreakFree"
+                  type="primary"
+                  @click="breakFree()"
+                >
+                  <i class="el-icon-document-checked" />
+                  {{ $t('form.pos.breakFree') }}
+                </el-button>
                 <el-button
                   v-show="allowsCollectOrder"
                   :disabled="!allowsCollectOrder"
@@ -474,7 +482,7 @@ import {
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 import { requestLookupList } from '@/api/ADempiere/window.js'
-// import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
+import { releaseOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'Order',
@@ -508,6 +516,12 @@ export default {
     }
   },
   computed: {
+    validateBreakFree() {
+      if (!this.isEmptyValue(this.currentOrder) && this.currentOrder.documentStatus.value === 'DR') {
+        return true
+      }
+      return false
+    },
     fieldCampaign() {
       return this.fieldsList.find(field => field.columnName === 'C_Campaign_ID')
     },
@@ -847,6 +861,24 @@ export default {
     formatDateToSend,
     formatPrice,
     formatQuantity,
+    breakFree() {
+      releaseOrder({
+        posUuid: this.currentPointOfSales.uuid,
+        salesRepresentativeUuid: this.$store.getters['user/getUserUuid'],
+        orderUuid: this.currentOrder.uuid
+      })
+        .then(response => {
+          console.log({ response })
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error Hold Order ${error.message}. Code: ${error.code}.`)
+        })
+    },
     getListCampaign(campaing) {
       requestLookupList({
         tableName: campaing.tableName,
