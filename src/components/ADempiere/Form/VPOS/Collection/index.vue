@@ -134,13 +134,15 @@
               <span>
                 <div style="border: 1px solid rgb(54, 163, 247);padding-left: 10px;padding-right: 10px;">
                   <p class="total">
-                    {{ $t('form.pos.collect.orderTotal') }}:
+                    <b>
+                      {{ $t('form.pos.collect.orderTotal') }}:
+                    </b>
                     <b style="float: right;">
                       {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
                     </b>
                   </p>
 
-                  <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> {{ $t('form.pos.collect.convertedAmount') }}: <b style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+                  <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"><b> {{ $t('form.pos.collect.convertedAmount') }}: </b><b style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
                 </div>
                 <div style="padding-left: 10px;padding-right: 10px;">
                   <p class="total">
