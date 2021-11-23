@@ -238,7 +238,7 @@
                 <el-button
                   v-show="isValidToRelease"
                   type="primary"
-                  @click="breakFree()"
+                  @click="releaseSalesOrder()"
                 >
                   <i class="el-icon-document-checked" />
                   {{ $t('form.pos.releaseOrder') }}
@@ -861,7 +861,7 @@ export default {
     formatDateToSend,
     formatPrice,
     formatQuantity,
-    breakFree() {
+    releaseSalesOrder() {
       releaseOrder({
         posUuid: this.currentPointOfSales.uuid,
         salesRepresentativeUuid: this.$store.getters['user/getUserUuid'],
