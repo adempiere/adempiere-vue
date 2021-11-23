@@ -85,7 +85,6 @@ export default defineComponent({
 
       return {
         type,
-        a: 1,
         effect
       }
     })
