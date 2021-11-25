@@ -195,9 +195,6 @@ export default {
       })
     }
   },
-  created() {
-    this.unsubscribe = this.subscribeChanges()
-  },
   methods: {
     formatDate,
     formatPrice,
