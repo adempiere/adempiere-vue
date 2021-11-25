@@ -99,7 +99,7 @@ export default {
         .then(response => {
           const orderUuid = response.orderUuid
           dispatch('listPayments', { posUuid, orderUuid })
-          dispatch('updateOrder', { posUuid, orderUuid })
+          dispatch('reloadOrder', { posUuid, orderUuid })
         })
         .catch(error => {
           console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -224,7 +224,7 @@ export default {
         .then(response => {
           const orderUuid = response.orderUuid
           dispatch('listPayments', { posUuid, orderUuid })
-          dispatch('updateOrder', { posUuid, orderUuid })
+          dispatch('reloadOrder', { posUuid, orderUuid })
           return {
             ...response,
             type: 'Success'
@@ -256,7 +256,7 @@ export default {
         .then(response => {
           const orderUuid = response.order_uuid
           dispatch('listPayments', { posUuid, orderUuid })
-          dispatch('updateOrder', { posUuid, orderUuid })
+          dispatch('reloadOrder', { posUuid, orderUuid })
           return {
             ...response,
             type: 'Success'
@@ -286,7 +286,7 @@ export default {
     })
       .then(response => {
         dispatch('listPayments', { posUuid, orderUuid })
-        dispatch('updateOrder', { posUuid, orderUuid })
+        dispatch('reloadOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -309,7 +309,7 @@ export default {
           payments: response.listPayments.reverse(),
           isLoaded: true
         })
-        dispatch('updateOrder', { posUuid, orderUuid })
+        dispatch('reloadOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)

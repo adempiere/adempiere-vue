@@ -819,17 +819,6 @@ export default {
           this.$refs.editField[0].select()
         }, 500)
       }
-    },
-    currentPriceList(value) {
-      if (!this.isEmptyValue(value)) {
-        this.$store.dispatch('updateOrder', {
-          orderUuid: this.currentOrder.uuid,
-          posUuid: this.currentPointOfSales.uuid,
-          priceListUuid: value.uuid,
-          warehouseUuid: this.currentWarehouse.uuid,
-          documentTypeUuid: this.currentDocumentType.uuid
-        })
-      }
     }
   },
   mounted() {
