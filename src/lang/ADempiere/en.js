@@ -457,7 +457,8 @@ export default {
         }
       },
       generalNotifications: {
-        orderReleased: 'Order was released: '
+        orderReleased: 'Order was released: ',
+        selectedOrder: 'Selected Order: '
       },
       tableProduct: {
         product: 'Product',

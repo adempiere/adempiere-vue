@@ -433,7 +433,8 @@ export default {
         }
       },
       generalNotifications: {
-        orderReleased: 'Orden Liberada: '
+        orderReleased: 'Orden Liberada: ',
+        selectedOrder: 'Orden Seleccionada: '
       },
       tableProduct: {
         product: 'Producto',
@@ -562,6 +563,7 @@ export default {
       title: 'Pedidos Vendedor de Pasillo por Facturar',
       searchCompleteOrders: 'Solo Completas',
       label: 'Por Facturar',
+      toDeliver: 'Por Entregar',
       salesRepresentative: 'Agente Comercial',
       businessPartner: 'Socio de Negocio',
       copyShippingAddress: 'Copiar dirección para el envío',

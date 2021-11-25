@@ -25,17 +25,21 @@
         <i class="el-icon-arrow-down el-icon--right" />
       </el-button>
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item :command="$t('form.byInvoice.label')">
-          <el-popover
-            v-model="openPopover"
-            placement="right"
-            width="1010"
-            trigger="click"
-            @hide="clear()"
-          >
-            <el-container>
-              <el-header style="height: 2%;">
-                <p style="text-align: center;"> <b> {{ $t('form.byInvoice.title') }} </b></p>
+        <template v-for="(option, key) in quickOptions">
+          <el-dropdown-item v-show="option.isShow" :key="key" :command="option">
+            <el-popover
+              :key="key"
+              v-model="option.isVisible"
+              placement="right"
+              trigger="click"
+            >
+              <find-orders
+                :data="option"
+                :data-list="orderList"
+                :is-loading-table="isloading"
+                :params="option.params"
+                :show-field="showToDeliveOrders"
+              >
                 <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
                   <el-form-item label="No. del Documento">
                     <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
@@ -53,80 +57,7 @@
                     />
                   </el-form-item>
                 </el-form>
-              </el-header>
-              <el-main>
-                <el-table
-                  v-loading="isloading"
-                  :data="ordersInvoiced"
-                  height="400"
-                  border
-                  :empty-text="$t('form.byInvoice.emptyList')"
-                  fit
-                  highlight-current-row
-                  @current-change="handleCurrentChange"
-                >
-                  <el-table-column
-                    prop="documentNo"
-                    :label="$t('form.byInvoice.documentNo')"
-                    width="135"
-                  />
-                  <el-table-column
-                    label="Fecha de Orden"
-                    width="135"
-                  >
-                    <template slot-scope="scope">
-                      {{ formatDate(scope.row.dateOrdered) }}
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column
-                    :label="$t('form.byInvoice.businessPartner')"
-                    min-width="120"
-                  >
-                    <template slot-scope="scope">
-                      {{ scope.row.businessPartner.name }}
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column
-                    prop="salesRepresentative.name"
-                    :label="$t('form.byInvoice.salesRepresentative')"
-                    min-width="100"
-                  />
-
-                  <el-table-column
-                    :label="$t('table.ProcessActivity.Status')"
-                    width="100"
-                  >
-                    <template slot-scope="scope">
-                      <el-tag
-                        :type="tagStatus(scope.row.documentStatus.value)"
-                      >
-                        {{ scope.row.documentStatus.name }}
-                      </el-tag>
-                    </template>
-                  </el-table-column>
-
-                  <el-table-column
-                    :label="$t('form.productInfo.grandTotal')"
-                    align="right"
-                    width="150"
-                  >
-                    <template slot-scope="scope">
-                      {{ formatPrice(scope.row.grandTotal, scope.row.priceList.currency.iso_code) }}
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </el-main>
-              <el-footer>
-                <custom-pagination
-                  :total="total"
-                  :current-page="currentPage"
-                  :handle-change-page="handleChangePage"
-                  layout="total, prev, pager, next"
-                  style="float: right;"
-                />
-              </el-footer>
+              </find-orders>
               <el-row :gutter="24">
                 <el-col :span="24">
                   <samp style="float: right; padding-right: 10px;">
@@ -134,57 +65,29 @@
                       type="danger"
                       class="custom-button-create-bp"
                       icon="el-icon-close"
-                      @click="clear"
+                      @click="closeSearch(option)"
                     />
                     <el-button
                       type="primary"
                       class="custom-button-create-bp"
                       icon="el-icon-check"
-                      @click="selectionChangeOrder"
+                      @click="openOrder(option)"
                     />
                   </samp>
                 </el-col>
               </el-row>
-            </el-container>
-            <el-button slot="reference" type="text" style="color: #333" @click="validaTypeDocument('Draff')">
-              {{ $t('form.byInvoice.label') }}
-            </el-button>
-          </el-popover>
-        </el-dropdown-item>
-        <el-dropdown-item v-show="allowsConfirmShipment">
-          <el-popover
-            v-model="showToDeliveOrders"
-            placement="right"
-            trigger="click"
-            width="800"
-          >
-            <to-deliver />
-            <el-button slot="reference" type="text" style="color: #333">
-              Por Entregar
-            </el-button>
-          </el-popover>
-        </el-dropdown-item>
-        <el-dropdown-item :command="$t('form.byInvoice.label')">
-          <el-popover
-            v-model="searchCompleteOrders"
-            placement="right"
-            width="1010"
-            trigger="click"
-            @hide="clear()"
-          >
-            <search-complete-orders :show-field="searchCompleteOrders" />
-            <el-button slot="reference" type="text" style="color: #333">
-              {{ $t('form.byInvoice.searchCompleteOrders') }}
-            </el-button>
-          </el-popover>
-        </el-dropdown-item>
+              <el-button slot="reference" type="text" style="color: #333" @click="option.isVisible = true">
+                {{ option.title }}
+              </el-button>
+            </el-popover>
+          </el-dropdown-item>
+        </template>
       </el-dropdown-menu>
     </el-dropdown>
   </span>
 </template>
 
 <script>
-import CustomPagination from '@/components/ADempiere/Pagination'
 import fieldsListOrders from './fieldsListOrders.js'
 import {
   createFieldFromDictionary
@@ -196,18 +99,15 @@ import {
 import {
   listOrders
 } from '@/api/ADempiere/form/point-of-sales.js'
-import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
-import SearchCompleteOrders from './searchCompleteOrders'
-import ToDeliver from './toDeliver'
+import { createShipment, shipments, holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
+import FindOrders from './FindOrders'
 import Field from '@/components/ADempiere/Field'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
   name: 'AisleVendorList',
   components: {
-    CustomPagination,
-    ToDeliver,
-    SearchCompleteOrders,
+    FindOrders,
     Field
   },
   props: {
@@ -234,6 +134,7 @@ export default {
       currentPage: 1,
       tokenPage: '',
       input: '',
+      valueVisible: false,
       isCustomForm: true,
       businessPartner: '',
       timeOut: null,
@@ -242,6 +143,37 @@ export default {
       ordersInvoiced: [],
       ordersComplete: [],
       dateOrdered: '',
+      searchCriteria: {},
+      currentOptions: {},
+      quickOptions: [
+        {
+          title: this.$t('form.byInvoice.label'),
+          params: {
+            isOnlyAisleSeller: true,
+            isWaitingForInvoice: false
+          },
+          isVisible: false,
+          isShow: true
+        },
+        {
+          title: this.$t('form.byInvoice.toDeliver'),
+          params: {
+            isOnlyProcessed: true,
+            isWaitingForShipment: true
+          },
+          isVisible: false,
+          isShow: this.allowsConfirmShipment
+        },
+        {
+          title: this.$t('form.byInvoice.searchCompleteOrders'),
+          params: {
+            isOnlyProcessed: true
+          },
+          isVisible: false,
+          isShow: true
+        }
+      ],
+      orderList: [],
       openPopover: false,
       isStatus: ''
     }
@@ -306,35 +238,11 @@ export default {
         return this.$store.getters.getSearchToDeliveOrders
       },
       set(value) {
-        if (!this.isEmptyValue(this.currentOrder.uuid)) {
-          this.$store.commit('setShowsearchToDeliveOrders', value)
-        }
+        this.$store.commit('setShowsearchToDeliveOrders', value)
       }
     },
-    searchCompleteOrders: {
-      get() {
-        return this.$store.getters.getSearchCompleteOrderss
-      },
-      set(value) {
-        this.$store.commit('setShowFastCompleteOrders', value)
-      }
-    }
-  },
-  watch: {
-    openPopover(value) {
-      const date = new Date()
-      this.$store.commit('updateValueOfField', {
-        containerUuid: 'Aisle-Vendor-List',
-        columnName: 'DateOrderedFrom',
-        value: date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0')
-      })
-      if (value && this.isEmptyValue(this.ordersInvoiced)) {
-        this.setFieldsList()
-        clearTimeout(this.timeOut)
-        this.timeOut = setTimeout(() => {
-          this.listOrdersInvoiced()
-        }, 500)
-      }
+    getSearchOrder() {
+      return this.$store.getters.getQuickSearchOrder
     }
   },
   created() {
@@ -349,9 +257,71 @@ export default {
     extractPagingToken,
     createFieldFromDictionary,
     handleCommand(command) {
-      if (command === this.$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')) {
-        this.openDelivery()
+      if (this.isEmptyValue(this.metadataList)) {
+        this.setFieldsList()
       }
+      const index = this.quickOptions.findIndex(option => option.title === command.title)
+      this.quickOptions[index].isVisible = true
+      this.currentOptions = command
+      this.listOrdersInvoiced(this.currentOptions)
+    },
+    closeSearch(command) {
+      const index = this.quickOptions.findIndex(option => option.title === command.title)
+      this.quickOptions[index].isVisible = false
+      this.orderList = []
+      this.input = ''
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'Aisle-Vendor-List',
+        columnName: 'C_BPartner_ID',
+        value: undefined
+      })
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'Aisle-Vendor-List',
+        columnName: 'DisplayColumn_C_BPartner_ID',
+        value: undefined
+      })
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'Aisle-Vendor-List',
+        columnName: 'C_BPartner_ID_UUID',
+        value: undefined
+      })
+    },
+    openOrder(command) {
+      const posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
+      const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      if (!this.isEmptyValue(this.getSearchOrder) && this.getSearchOrder.documentNo !== currentOrder.documentNo) {
+        this.$store.state['pointOfSales/point/index'].conversionsList = []
+        this.$store.dispatch('currentOrder', this.getSearchOrder)
+        this.$store.dispatch('deleteAllCollectBox')
+        this.$router.push({
+          params: {
+            ...this.$route.params
+          },
+          query: {
+            ...this.$route.query,
+            action: this.getSearchOrder.uuid
+          }
+        }, () => {})
+        const orderUuid = this.getSearchOrder.uuid
+        this.$store.dispatch('listPayments', { posUuid, orderUuid })
+      }
+      holdOrder({
+        posUuid: this.currentPointOfSales.uuid,
+        salesRepresentativeUuid: this.$store.getters['user/getUserUuid'],
+        orderUuid: this.getSearchOrder.uuid
+      })
+        .then(response => {
+          this.$message.success(this.$t('form.pos.generalNotifications.selectedOrder') + response.documentNo)
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error Hold Order ${error.message}. Code: ${error.code}.`)
+        })
+      this.closeSearch(command)
     },
     validaTypeDocument(type) {
       this.isStatus = type
@@ -387,7 +357,7 @@ export default {
     },
     handleChangePage(newPage) {
       this.tokenPage = this.tokenPage + '-' + newPage
-      this.listOrdersInvoiced()
+      this.listOrdersInvoiced(this.currentOptions)
     },
     handleCurrentChange(row) {
       // close popover
@@ -429,7 +399,7 @@ export default {
           mutation.payload.containerUuid === this.metadata.containerUuid) {
           clearTimeout(this.timeOut)
           this.timeOut = setTimeout(() => {
-            this.listOrdersInvoiced()
+            this.listOrdersInvoiced(this.currentOptions)
           }, 2000)
         }
       })
@@ -480,23 +450,26 @@ export default {
         return new Date().setTime(new Date(elementB.dateOrdered).getTime()) - new Date().setTime(new Date(elementA.dateOrdered).getTime())
       })
     },
-    listOrdersInvoiced() {
+    listOrdersInvoiced(option) {
       this.isloading = true
-      listOrders({
+      const values = {
+        ...option.params,
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
-        isOnlyAisleSeller: true,
-        isWaitingForInvoice: false,
         pageToken: this.tokenPage,
         dateOrderedFrom: this.dateOrdered,
         businessPartnerUuid: this.businessPartner,
         salesRepresentativeUuid: this.$store.getters['user/getUserUuid']
-      })
+      }
+      listOrders(
+        values
+      )
         .then(response => {
           this.isloading = false
-          this.tokenPage = this.extractPagingToken(response.nextPageToken)
-          this.total = response.recordCount
-          this.ordersInvoiced = response.ordersList
+          this.orderList = response.ordersList
+          // this.tokenPage = this.extractPagingToken(response.nextPageToken)
+          // this.total = response.recordCount
+          // this.ordersInvoiced = response.ordersList
         })
         .catch(error => {
           this.isloading = false

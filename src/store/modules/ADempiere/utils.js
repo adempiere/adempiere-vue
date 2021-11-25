@@ -50,7 +50,8 @@ const initStateUtils = {
   showCashOpen: false,
   showCashWithdrawl: false,
   showCashSummaryMovements: false,
-  showAssignSeller: false
+  showAssignSeller: false,
+  quickSearchOrder: {}
 }
 
 export default {
@@ -179,6 +180,9 @@ export default {
     },
     setShowAssignSeller(state, payload) {
       state.showAssignSeller = payload
+    },
+    setQuickSearchOrder(state, order) {
+      state.quickSearchOrder = order
     }
   },
   actions: {
@@ -396,6 +400,9 @@ export default {
     },
     getShowAssignSeller: (state) => {
       return state.showAssignSeller
+    },
+    getQuickSearchOrder: (state) => {
+      return state.quickSearchOrder
     }
   }
 }
