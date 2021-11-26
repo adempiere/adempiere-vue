@@ -154,10 +154,7 @@ export default defineComponent({
 
     // use getter to reactive properties
     const currentTabMetadata = computed(() => {
-      if (props.isParentTabs) {
-        return root.$store.getters.getCurrentTab(props.parentUuid)
-      }
-      return root.$store.getters.getCurrentTabChild(props.parentUuid)
+      return root.$store.getters.getStoredTab(props.parentUuid, tabUuid.value)
     })
 
     const isShowedTabs = computed(() => {
