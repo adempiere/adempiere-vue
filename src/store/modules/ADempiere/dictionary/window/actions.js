@@ -14,9 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { requestWindowMetadata } from '@/api/ADempiere/dictionary/window'
-import { generateWindow } from '@/views/ADempiere/Window/windowUtils'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+// api request methods
+import { requestWindowMetadata } from '@/api/ADempiere/dictionary/window.js'
+
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { generateWindow } from '@/utils/ADempiere/dictionary/window.js'
 
 export default {
   addWindow({ commit }, windowResponse) {
@@ -89,19 +92,26 @@ export default {
       attributeNameControl
     })
 
-    // set value into current tab
-    const currentTab = getters.getCurrentTab(parentUuid)
-    if (currentTab.uuid === containerUuid) {
-      // commit('changeTabAttribute', {
-      //   tab: currentTab,
-      //   attributeName,
-      //   attributeValue
-      // })
-      commit('changeWindowAttribute', {
-        uuid: parentUuid,
-        attributeName: 'currentTab',
-        attributeValue: tab
-      })
+    if (tab.isParentTab) {
+      // set value into current parent tab
+      const currentTab = getters.getCurrentTab(parentUuid)
+      if (currentTab.uuid === containerUuid) {
+        commit('changeWindowAttribute', {
+          uuid: parentUuid,
+          attributeName: 'currentTab',
+          attributeValue: tab
+        })
+      }
+    } else {
+      // set value into current child tab
+      const currentTabChild = getters.getCurrentTabChild(parentUuid)
+      if (currentTabChild.uuid === containerUuid) {
+        commit('changeWindowAttribute', {
+          uuid: parentUuid,
+          attributeName: 'currentTabChild',
+          attributeValue: tab
+        })
+      }
     }
   }
 }

@@ -38,11 +38,22 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import LoadingView from '@/components/ADempiere/LoadingView'
+// components and mixins
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 
+// utils and helper methods
 import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
-import { generateWindow } from './windowUtils'
-import { isHiddenField } from '@/utils/ADempiere/references'
+import {
+  generateWindow,
+  // panel
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  // table
+  isDisplayedColumn,
+  isMandatoryColumn,
+  isReadOnlyColumn
+} from '@/utils/ADempiere/dictionary/window.js'
 
 export default defineComponent({
   name: 'Window',
@@ -84,34 +95,8 @@ export default defineComponent({
         return new Promise()
       },
 
-      isDisplayedColumn: ({ isDisplayedGrid, isDisplayedFromLogic, isActive, isKey, displayType }) => {
-        // button field not showed
-        if (isHiddenField(displayType)) {
-          return false
-        }
-
-        // verify if field is active
-        if (!isActive) {
-          return false
-        }
-
-        // window (table) result
-        return isDisplayedGrid && isDisplayedFromLogic && !isKey
-      },
-
-      isDisplayedField: ({ isDisplayed, isDisplayedFromLogic, isActive, displayType }) => {
-        // button field not showed
-        if (isHiddenField(displayType)) {
-          return false
-        }
-
-        // verify if field is active
-        if (!isActive) {
-          return false
-        }
-
-        return isDisplayed && isDisplayedFromLogic
-      },
+      isDisplayedField,
+      isDisplayedColumn,
 
       isReadOnlyField({
         field,
@@ -127,7 +112,7 @@ export default defineComponent({
         if (preferenceClientId !== clientId && isWithRecord) {
           return true
         }
-        // record is inactive
+        // record is inactive isReadOnlyFromForm
         if (!isActive && field.columnName !== 'IsActive') {
           return true
         }
@@ -142,17 +127,13 @@ export default defineComponent({
         if (!field.isUpdateable && isWithRecord) {
           return true
         }
-        return (
-          field.isReadOnly || field.isReadOnlyFromLogic || field.isReadOnlyFromForm
-        )
-      },
 
-      isMandatoryField({
-        isMandatory,
-        isMandatoryFromLogic
-      }) {
-        return isMandatory || isMandatoryFromLogic
+        return isReadOnlyField(field) || field.isReadOnlyFromForm
       },
+      isReadOnlyColumn,
+
+      isMandatoryField,
+      isMandatoryColumn,
 
       changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
         root.$store.dispatch('changeTabFieldShowedFromUser', {

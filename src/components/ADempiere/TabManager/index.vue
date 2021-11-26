@@ -19,13 +19,12 @@
 <template>
   <div style="height: 100% !important;">
     <auxiliary-panel
-      v-if="isShowRecords"
+      v-if="isParentTabs && isShowedTableRecords"
       :parent-uuid="parentUuid"
       :container-uuid="tabUuid"
       :label="tabsList[currentTab].name"
     >
       <record-navigation
-        style="height: 100% !important;"
         :parent-uuid="parentUuid"
         :container-uuid="tabUuid"
         :container-manager="containerManagerTab"
@@ -36,7 +35,6 @@
     <el-tabs
       v-model="currentTab"
       type="border-card"
-      style="height: 100% !important;"
       @tab-click="handleClick"
     >
       <el-tab-pane
@@ -50,48 +48,39 @@
         :disabled="isDisabledTab(key)"
         :style="tabStyle"
       >
-        <lock-record
+        <tab-label
           slot="label"
           :is-active-tab="tabAttributes.uuid === tabUuid"
-          :tab-position="isParentTabs ? key : 1"
-          :tab-uuid="tabAttributes.uuid"
-          :table-name="tabAttributes.tableName"
-          :tab-name="tabAttributes.name"
-        >
-          <el-button
-            v-if="currentTab == key"
-            slot="prefix"
-            type="text"
-            @click="openContainer"
-          >
-            <i class="el-icon-s-fold" style="font-size: 15px; color: black;" />
-          </el-button>
-        </lock-record>
-
-        <!-- records in table to multi records -->
-        <default-table
-          v-if="!isParentTabs"
-          v-show="!isParentTabs && isShowMultiRecords"
-          key="default-table"
           :parent-uuid="parentUuid"
           :container-uuid="tabAttributes.uuid"
-          :container-manager="containerManagerTab"
-          :header="tableHeaders"
-          :data-table="recordsList"
-          :panel-metadata="tabAttributes"
         />
-        <!-- Close table when clicking on group of fields -->
-        <div @click="close()">
-          <!-- fields in panel to single record -->
-          <panel-definition
-            v-show="isParentTabs || (!isParentTabs && !isShowMultiRecords)"
-            key="panel-definition"
+
+        <div v-if="isShowedTabs">
+          <!-- records in table to multi records -->
+          <default-table
+            v-if="!isParentTabs"
+            v-show="!isParentTabs && isShowedTableRecords"
+            key="default-table"
             :parent-uuid="parentUuid"
             :container-uuid="tabAttributes.uuid"
-            :container-manager="containerManager"
+            :container-manager="containerManagerTab"
+            :header="tableHeaders"
+            :data-table="recordsList"
             :panel-metadata="tabAttributes"
-            :group-tab="tabAttributes.tabGroup"
           />
+          <!-- Close table when clicking on group of fields -->
+          <div @click="close()">
+            <!-- fields in panel to single record -->
+            <panel-definition
+              v-show="isParentTabs || (!isParentTabs && !isShowedTableRecords)"
+              key="panel-definition"
+              :parent-uuid="parentUuid"
+              :container-uuid="tabAttributes.uuid"
+              :container-manager="containerManager"
+              :panel-metadata="tabAttributes"
+              :group-tab="tabAttributes.tabGroup"
+            />
+          </div>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -101,12 +90,12 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-// components
+// components and mixins
 import AuxiliaryPanel from '@/components/ADempiere/AuxiliaryPanel/index.vue'
 import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
-import LockRecord from '@/components/ADempiere/ContainerOptions/LockRecord/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import RecordNavigation from '@/components/ADempiere/RecordNavigation/index.vue'
+import TabLabel from '@/components/ADempiere/TabManager/TabLabel.vue'
 
 export default defineComponent({
   name: 'TabManager',
@@ -114,9 +103,9 @@ export default defineComponent({
   components: {
     AuxiliaryPanel,
     DefaultTable,
-    LockRecord,
     PanelDefinition,
-    RecordNavigation
+    RecordNavigation,
+    TabLabel
   },
 
   props: {
@@ -151,9 +140,14 @@ export default defineComponent({
     const tabUuid = ref(props.tabsList[tabNo].uuid)
 
     const tabStyle = computed(() => {
-      // height in card
+      let height = '68vh'
+      if (!isShowedTabs.value) {
+        height = '0vh'
+      }
+      // height tab content
       return {
-        height: '75vh',
+        // height: '75vh',
+        height,
         overflow: 'auto'
       }
     })
@@ -166,17 +160,22 @@ export default defineComponent({
       return root.$store.getters.getCurrentTabChild(props.parentUuid)
     })
 
-    const isShowRecords = computed(() => {
-      return currentTabMetadata.value.isShowedTableRecords
+    const isShowedTabs = computed(() => {
+      if (props.isParentTabs) {
+        return root.$store.getters.getStoredWindow(props.parentUuid).isShowedTabsParent
+      }
+      return root.$store.getters.getStoredWindow(props.parentUuid).isShowedTabsChildren
     })
 
-    const isShowMultiRecords = ref(true)
+    const isShowedTableRecords = computed(() => {
+      return currentTabMetadata.value.isShowedTableRecords
+    })
 
     const isCreateNew = computed(() => {
       return Boolean(root.$route.query.action === 'create-new')
     })
 
-    const isDisabledTab = (key) => {
+    function isDisabledTab(key) {
       return key > 0 && isCreateNew.value
     }
 
@@ -318,19 +317,6 @@ export default defineComponent({
       })
     }
 
-    const openContainer = () => {
-      if (props.isParentTabs) {
-        root.$store.dispatch('changeTabAttribute', {
-          parentUuid: props.parentUuid,
-          containerUuid: tabUuid.value,
-          attributeName: 'isShowedTableRecords',
-          attributeValue: true
-        })
-        return
-      }
-      isShowMultiRecords.value = !isShowMultiRecords.value
-    }
-
     getData()
 
     setTabNumber(currentTab.value)
@@ -338,17 +324,16 @@ export default defineComponent({
     return {
       tabUuid,
       currentTab,
-      isShowMultiRecords,
       tableHeaders,
       recordsList,
       // computed
       containerManagerTab,
-      isShowRecords,
+      isShowedTabs,
+      isShowedTableRecords,
       tabStyle,
       // methods
       handleClick,
       close,
-      openContainer,
       isDisabledTab
     }
   }

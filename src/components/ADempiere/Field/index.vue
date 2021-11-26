@@ -150,15 +150,6 @@ export default {
       return 'field-standard'
     },
     sizeField() {
-      if (this.field.isShowedRecordNavigation) {
-        return {
-          xs: this.field.size.xs,
-          sm: this.field.size.sm * 2,
-          md: this.field.size.md * 2,
-          lg: this.field.size.lg * 2,
-          xl: this.field.size.xl * 2
-        }
-      }
       return {
         xs: this.field.size.xs,
         sm: this.field.size.sm,

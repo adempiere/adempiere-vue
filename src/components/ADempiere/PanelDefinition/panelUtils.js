@@ -148,7 +148,6 @@ export function generatePanelAndFields({
     selectionColumns,
     identifierColumns,
     isLoadedFieldsList: true,
-    isShowedTableRecords: false,
     isShowedTotals: false
   }
 

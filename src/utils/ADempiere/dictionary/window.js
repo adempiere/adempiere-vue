@@ -14,9 +14,72 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+// utils and helpers methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils.js'
+import { isHiddenField } from '@/utils/ADempiere/references.js'
 
+/**
+ * Is displayed field in panel tab
+ */
+export function isDisplayedField({ isDisplayed, isDisplayedFromLogic, isActive, displayType }) {
+  // button field not showed
+  if (isHiddenField(displayType)) {
+    return false
+  }
+
+  // verify if field is active
+  if (!isActive) {
+    return false
+  }
+
+  return isDisplayed && isDisplayedFromLogic
+}
+
+/**
+ * Tab manager mandatory logic
+ * @param {boolean} isMandatoryFromLogic
+ * @returns {boolean}
+ */
+export function isMandatoryField({ isMandatory, isMandatoryFromLogic }) {
+  return isMandatory || isMandatoryFromLogic
+}
+
+export function isReadOnlyField({ isQueryCriteria, isReadOnlyFromLogic }) {
+  return isQueryCriteria && isReadOnlyFromLogic
+}
+
+/**
+ * Is displayed column in table multi record
+ */
+export function isDisplayedColumn({ isDisplayedGrid, isDisplayedFromLogic, isActive, isKey, displayType }) {
+  // button field not showed
+  if (isHiddenField(displayType)) {
+    return false
+  }
+
+  // verify if field is active
+  if (!isActive) {
+    return false
+  }
+
+  // window (table) result
+  return isDisplayedGrid && isDisplayedFromLogic && !isKey
+}
+
+export function isMandatoryColumn({ isMandatory, isMandatoryFromLogic }) {
+  return isMandatory || isMandatoryFromLogic
+}
+
+export function isReadOnlyColumn({ isReadOnly }) {
+  return isReadOnly
+}
+
+/**
+ * Generate window
+ * @param {object} responseWindow
+ * @returns {object}
+ */
 export function generateWindow(responseWindow) {
   const {
     tabsList, tabsListParent, tabsListChild,
@@ -38,13 +101,13 @@ export function generateWindow(responseWindow) {
     currentTabChild,
     tabsListChild,
     tabsListParent,
-    // app attributes
     currentTabUuid: tabsListParent[0].uuid,
     firstTab,
     firstTabUuid,
     // App properties
-    isShowedTabsChildren: false,
-    isShowedRecordNavigation: undefined,
+    isShowedTabsParent: true,
+    isShowedTabsChildren: true,
+    isShowedRecordNavigation: undefined, // TODO: @deprecated
     isShowedAdvancedQuery: false
   }
 
@@ -68,6 +131,7 @@ export function generateTabs({
       itemTab.isAdvancedTab || itemTab.isHasTree
     )
   }).map((tabItem, index) => {
+    const isParentTab = Boolean(firstTabTableName === tabItem.tableName)
     // let tab = tabItem
     const tab = {
       ...tabItem,
@@ -76,9 +140,10 @@ export function generateTabs({
       tabGroup: tabItem.fieldGroup,
       firstTabUuid,
       // relations
-      isParentTab: Boolean(firstTabTableName === tabItem.tableName),
+      isParentTab,
       // app properties
-      isShowedRecordNavigation: !(tabItem.isSingleRow),
+      isShowedRecordNavigation: !(tabItem.isSingleRow || isParentTab), // TODO: @deprecated
+      isShowedTableRecords: !(tabItem.isSingleRow || isParentTab),
       index // this index is not related to the index in which the tabs are displayed
     }
 

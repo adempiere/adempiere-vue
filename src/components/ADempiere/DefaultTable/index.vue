@@ -41,7 +41,7 @@
 
     <el-table
       ref="multipleTable"
-      style="width: 100%;height: 93% !important;"
+      style="width: 100%; height: 88% !important;"
       border
       height="90% !important"
       :row-key="keyColumn"

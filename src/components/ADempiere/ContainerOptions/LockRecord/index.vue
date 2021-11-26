@@ -17,41 +17,27 @@
 -->
 
 <template>
-  <span v-if="isFirstTab" key="withTooltip">
-    <el-tooltip
-      v-if="isFirstTab"
-      :content="tooltipText"
-      placement="top"
-    >
-      <el-button v-if="isLocked" type="text" @click="unLockRecord()">
-        <i
-          class="el-icon-lock"
-          style="font-size: 15px; color: black;"
-        />
-      </el-button>
-      <el-button v-else type="text" @click="lockRecord()">
-        <i
-          class="el-icon-unlock"
-          style="font-size: 15px; color: black;"
-        />
-      </el-button>
-    </el-tooltip>
-
-    <slot name="prefix" />
-
+  <span v-if="isActiveTab" key="withTooltip" class="lock-record">
     <span :class="{ 'locked-record': isLocked }">
       {{ tabName }}
     </span>
 
-    <slot name="sufix" />
+    <el-tooltip
+      :content="tooltipText"
+      placement="top"
+    >
+      <el-button v-if="isLocked" type="text" @click="unLockRecord()">
+        <i class="el-icon-unlock icon-font" />
+      </el-button>
+
+      <el-button v-else type="text" @click="lockRecord()">
+        <i class="el-icon-lock icon-font" />
+      </el-button>
+    </el-tooltip>
   </span>
 
-  <span v-else key="onlyName">
-    <slot name="prefix" />
-
+  <span v-else key="onlyName" :class="{ 'locked-record': isLocked }">
     {{ tabName }}
-
-    <slot name="sufix" />
   </span>
 </template>
 
@@ -62,13 +48,13 @@ export default defineComponent({
   name: 'LockRecord',
 
   props: {
-    tabUuid: {
+    parentUuid: {
       type: String,
       required: true
     },
-    tabPosition: {
-      type: Number,
-      default: 0
+    containerUuid: {
+      type: String,
+      required: true
     },
     tabName: {
       type: String,
@@ -85,12 +71,7 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const containerUuid = props.tabUuid
     const tableName = props.tableName
-
-    const isFirstTab = computed(() => {
-      return props.tabPosition === 0
-    })
 
     const isLocked = ref(false)
 
@@ -141,17 +122,11 @@ export default defineComponent({
     }
 
     const record = computed(() => {
-      if (isFirstTab) {
-        const recordUuid = root.$route.query.action
-        if (isValidUuid(recordUuid)) {
-          return root.$store.getters.getRowData({
-            containerUuid,
-            recordUuid
-          })
-        }
-      }
-
-      return undefined
+      return root.$store.getters.getValuesView({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        format: 'object'
+      })
     })
 
     const getRecordKeys = () => {
@@ -221,7 +196,6 @@ export default defineComponent({
     return {
       isLocked,
       // computed
-      isFirstTab,
       tooltipText,
       // methods
       lockRecord,
@@ -232,7 +206,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.locked-record {
-  color: red !important;
+.lock-record {
+  .locked-record {
+    color: red !important;
+  }
+
+  .icon-font {
+    font-size: 15px;
+    color: black;
+  }
 }
 </style>

@@ -22,9 +22,9 @@
     class="container-main"
     @shortkey.native="keyAction"
   >
-    <el-row :gutter="12" style="height: 100% !important;">
-      <transition name="slide-fade" style="height: 100% !important;">
-        <el-col :span="10" class="container-main" :style="fullscreen ? {width: 100 + '%'} : ''">
+    <el-row>
+      <transition name="slide-fade">
+        <el-col :span="10" class="container-main" :style="isFullScreen ? {width: 100 + '%'} : ''">
           <el-card class="table">
             <div slot="header">
               {{ label }}
@@ -32,15 +32,15 @@
               <el-button
                 type="text"
                 icon="el-icon-close"
-                style="float: right;padding: 3px 0px;font-size: 22px;padding-left: 5px;"
+                style="float: right; padding: 3px 0px;font-size: 22px; padding-left: 5px;"
                 @click="closeContainer"
               />
               <el-button
                 type="text"
                 style="float: right; font-size: 18px; padding: 3px 0"
-                @click="fullscreen = !fullscreen"
+                @click="isFullScreen = !isFullScreen"
               >
-                <svg-icon :icon-class="!fullscreen ? 'fullscreen' : 'exit-fullscreen'" />
+                <svg-icon :icon-class="!isFullScreen ? 'fullscreen' : 'exit-fullscreen'" />
               </el-button>
             </div>
 
@@ -72,16 +72,11 @@ export default defineComponent({
     label: {
       type: String,
       required: true
-    },
-    // Container opening position
-    position: {
-      type: String,
-      default: ''
     }
   },
 
   setup(props, { root }) {
-    const fullscreen = ref(false)
+    const isFullScreen = ref(false)
 
     const shorcutKeys = computed(() => {
       return {
@@ -106,21 +101,13 @@ export default defineComponent({
       })
     }
 
-    const percent = (position) => {
-      if (position) {
-        return '0%'
-      }
-      return ''
-    }
-
     return {
-      fullscreen,
+      isFullScreen,
       // computeds
       shorcutKeys,
       // methods
       closeContainer,
-      keyAction,
-      percent
+      keyAction
     }
   }
 
