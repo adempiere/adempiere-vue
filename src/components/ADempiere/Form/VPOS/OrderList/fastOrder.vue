@@ -457,7 +457,7 @@ export default {
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
         pageToken: this.tokenPage,
-        dateOrderedFrom: this.dateOrdered,
+        dateOrderedTo: this.dateOrdered,
         businessPartnerUuid: this.businessPartner,
         salesRepresentativeUuid: this.$store.getters['user/getUserUuid']
       }
