@@ -14,39 +14,55 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Vue from 'vue'
 import router from '@/router'
 
 // api request methods
 import {
   getEntities
-} from '@/api/ADempiere/user-interface/persistence'
+} from '@/api/ADempiere/user-interface/persistence.js'
 import {
   createEntity,
   deleteEntity
-} from '@/api/ADempiere/common/persistence'
+} from '@/api/ADempiere/common/persistence.js'
 
 // utils and helper methods
-import { getContext } from '@/utils/ADempiere/contextUtils'
-import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils'
+import { getContext } from '@/utils/ADempiere/contextUtils.js'
+import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils.js'
 
-const dataManager = {
-  namespaced: true,
+const initState = {
+  tabData: {}
+}
 
-  state: {
-    containerData: []
-  },
+const windowManager = {
+  state: initState,
 
   mutations: {
-    setContainerData(state, payload) {
-      const index = state.containerData.findIndex(element => {
-        return element.containerUuid === payload.containerUuid
-      })
-      if (index > -1) {
-        // update records
-        state.containerData.splice(index, 0, payload)
-      } else {
-        state.containerData.push(payload)
+    setTabData(state, {
+      parentUuid,
+      containerUuid,
+      recordsList = [],
+      nextPageToken,
+      recordCount = 0,
+      isLoaded = true,
+      isLoadedContext = false,
+      pageNumber = 1
+    }) {
+      const dataTab = {
+        parentUuid,
+        containerUuid,
+        recordsList,
+        nextPageToken,
+        recordCount,
+        isLoaded,
+        isLoadedContext,
+        pageNumber
       }
+      Vue.set(state.tabData, containerUuid, dataTab)
+    },
+
+    resetStateWindowManager(state) {
+      state = initState
     }
   },
 
@@ -196,7 +212,7 @@ const dataManager = {
               return record.attributes
             })
 
-            commit('setContainerData', {
+            commit('setTabData', {
               parentUuid,
               containerUuid,
               recordsList: dataToStored,
@@ -265,25 +281,43 @@ const dataManager = {
   },
 
   getters: {
-    getContainerData: (state) => ({
-      containerUuid
-    }) => {
-      return state.containerData.find(dataStored => {
-        return dataStored.containerUuid === containerUuid
-      })
-    },
-
-    getPageToken: (state, getters) => ({
-      containerUuid
-    }) => {
-      const dataAll = getters.getContainerData({ containerUuid })
-      if (!isEmptyValue(dataAll)) {
-        return dataAll.nextPageToken
+    /**
+     * Used by result in tab
+     * @param {string} containerUuid
+     */
+    getTabData: (state, getters) => ({ containerUuid }) => {
+      return state.tabData[containerUuid] || {
+        parentUuid: undefined,
+        containerUuid,
+        recordsList: [],
+        nextPageToken: undefined,
+        recordCount: 0,
+        isLoadedContext: false,
+        pageNumber: 1,
+        isLoaded: false
       }
-
-      return undefined
+    },
+    getTabRecordsList: (state, getters) => ({ containerUuid }) => {
+      return getters.getTabData({ containerUuid }).recordsList
+    },
+    getTabPageNumber: (state, getters) => ({ containerUuid }) => {
+      return getters.getTabData({ containerUuid }).pageNumber
+    },
+    getTabPageToken: (state, getters) => ({ containerUuid }) => {
+      return getters.getTabData({ containerUuid }).nextPageToken
+    },
+    getTabRowData: (state, getters) => ({ containerUuid, recordUuid, indexRow }) => {
+      const recordsList = getters.getTabRecordsList({ containerUuid })
+      if (!isEmptyValue(indexRow)) {
+        return recordsList[indexRow]
+      }
+      return recordsList.find(itemData => {
+        if (itemData.UUID === recordUuid) {
+          return true
+        }
+      })
     }
   }
 }
 
-export default dataManager
+export default windowManager

@@ -14,7 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { generateField } from '@/utils/ADempiere/dictionaryUtils.js'
+import { getFieldTemplate } from '@/utils/ADempiere/lookupFactory.js'
 
 /**
  * Order the fields, then assign the groups to each field, and finally group
@@ -106,4 +109,145 @@ export function assignedGroup({
   })
 
   return fieldsList
+}
+
+/**
+ * Generate panel
+ * @param {string} parentUuid
+ * @param {string} containerUuid
+ * @param {object} panelMetadata
+ * @param {boolean} isAddFieldsRange
+ * @param {boolean} isAddFieldUuid
+ * @param {boolean} isAddLinkColumn
+ * @param {object} fieldOverwrite
+ * @returns
+ */
+export function generatePanelAndFields({
+  parentUuid,
+  containerUuid,
+  panelMetadata = {},
+  isAddFieldsRange = false,
+  isAddFieldUuid = false,
+  isAddLinkColumn = false,
+  fieldOverwrite = {}
+}) {
+  const fieldAdditionalAttributes = {
+    parentUuid,
+    containerUuid,
+    // tab attributes
+    tabTableName: panelMetadata.tableName,
+    // app attributes
+    isShowedFromUser: true,
+    isReadOnlyFromForm: false,
+    ...fieldOverwrite
+  }
+
+  const fieldsRangeList = []
+  const selectionColumns = []
+  let identifierColumns = []
+
+  let keyColumn
+
+  // convert fields and add app attributes
+  let fieldsList = panelMetadata.fields.map((fieldItem, index) => {
+    const fieldDefinition = generateField({
+      fieldToGenerate: fieldItem,
+      moreAttributes: {
+        ...fieldAdditionalAttributes,
+        fieldsListIndex: index
+      }
+    })
+    const { columnName, componentPath } = fieldDefinition
+
+    if (fieldDefinition.isKey) {
+      keyColumn = columnName
+    }
+    if (fieldDefinition.isSelectionColumn) {
+      selectionColumns.push(columnName)
+    }
+    if (fieldDefinition.isIdentifier) {
+      identifierColumns.push({
+        columnName,
+        identifierSequence: fieldDefinition.identifierSequence,
+        componentPath
+      })
+    }
+
+    // Add new field if is range number
+    if (isAddFieldsRange && fieldDefinition.isRange && componentPath === 'FieldNumber') {
+      const fieldRange = generateField({
+        fieldToGenerate: fieldItem,
+        moreAttributes: fieldAdditionalAttributes,
+        typeRange: true
+      })
+
+      fieldsRangeList.push(fieldRange)
+    }
+
+    return fieldDefinition
+  })
+
+  if (!isEmptyValue(fieldsRangeList)) {
+    fieldsList = fieldsList.concat(fieldsRangeList)
+    // order range fields
+    fieldsList = sortFields({
+      fieldsList
+    })
+  }
+
+  identifierColumns = sortFields({
+    fieldsList: identifierColumns,
+    orderBy: 'identifierSequence'
+  })
+
+  let fieldLinkColumnName
+  if (isAddLinkColumn) {
+    // parent link column name
+    fieldLinkColumnName = fieldsList.find(fieldItem => {
+      return fieldItem.isParent
+    })
+    if (fieldLinkColumnName) {
+      fieldLinkColumnName = fieldLinkColumnName.columnName
+    }
+  }
+
+  if (isAddFieldUuid) {
+    // indicates it contains the uuid field
+    const isWithUuidField = fieldsList.some(fieldItem => {
+      return fieldItem.columnName === 'UUID'
+    })
+    // add field uuid column name
+    if (!isWithUuidField) {
+      const fieldUuid = getFieldTemplate({
+        ...fieldAdditionalAttributes,
+        fieldsListIndex: fieldsList.length,
+        isShowedFromUser: false,
+        name: 'UUID',
+        columnName: 'UUID',
+        componentPath: 'FieldText'
+      })
+
+      fieldsList.push(fieldUuid)
+    }
+  }
+
+  // panel for save on store
+  const panel = {
+    ...panelMetadata,
+    parentUuid,
+    containerUuid,
+    fieldLinkColumnName,
+    fieldsList,
+    // app attributes
+    keyColumn,
+    selectionColumns,
+    identifierColumns,
+    isLoadedFieldsList: true,
+    isShowedTotals: false
+  }
+
+  // delete unused and dupicated property with 'fieldsList'
+  delete panel.fields
+
+  return panel
 }

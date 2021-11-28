@@ -27,7 +27,7 @@
       <record-navigation
         :parent-uuid="parentUuid"
         :container-uuid="tabUuid"
-        :container-manager="containerManagerTab"
+        :container-manager="containerManager"
         :current-tab="tabsList[currentTab]"
       />
     </auxiliary-panel>
@@ -63,7 +63,7 @@
             key="default-table"
             :parent-uuid="parentUuid"
             :container-uuid="tabAttributes.uuid"
-            :container-manager="containerManagerTab"
+            :container-manager="containerManager"
             :header="tableHeaders"
             :data-table="recordsList"
             :panel-metadata="tabAttributes"
@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import { defineComponent, computed, ref } from '@vue/composition-api'
+import { defineComponent, computed, watch, ref } from '@vue/composition-api'
 
 // components and mixins
 import AuxiliaryPanel from '@/components/ADempiere/AuxiliaryPanel/index.vue'
@@ -187,14 +187,6 @@ export default defineComponent({
       })
     }
 
-    const containerManagerTab = computed(() => {
-      return {
-        ...props.containerManager,
-
-        vuexStore: () => 'dataManager'
-      }
-    })
-
     // create the table header
     const tableHeaders = computed(() => {
       const panel = props.tabsList[tabNo]
@@ -236,38 +228,39 @@ export default defineComponent({
           ...root.$route.params
         }
       }, () => {})
-      const containerManager = props.containerManager
-      if (containerManager !== undefined) {
-        // console.log(containerManager)
-        // containerManager.seekTab({
-        //   tabNumber,
-        //   currentTab
-        // }).then(() => {})
-      }
+
       return tabNumber
     }
 
+    const tabData = computed(() => {
+      return root.$store.getters.getTabData({
+        containerUuid: currentTabMetadata.value.uuid
+      })
+    })
+
     // get records list
     const recordsList = computed(() => {
-      const data = root.$store.getters['dataManager/getContainerData']({
-        containerUuid: props.containerUuid
-      })
-      if (data && data.recordsList) {
-        return data.recordsList
+      return tabData.value.recordsList
+    })
+
+    const isLoadedParentRecords = computed(() => {
+      return root.$store.getters.getTabData({
+        containerUuid: currentTabMetadata.value.firstTabUuid
+      }).isLoaded
+    })
+
+    const isReadyFromGetData = computed(() => {
+      if (props.isParentTabs) {
+        return !tabData.value.isLoaded
       }
-      return []
+      // TODO: add is loaded context columns
+      return isLoadedParentRecords.value && !tabData.value.isLoaded
     })
 
     const getData = () => {
-      // TODO: Add support to load data in dependent childs
-      if (!props.isParentTabs) {
-        return
-      }
-      // TODO: Add store get data from tab
-      root.$store.dispatch('dataManager/getEntities', {
+      root.$store.dispatch('getEntities', {
         parentUuid: props.parentUuid,
-        containerUuid: tabUuid.value,
-        ...props.tabsList[currentTab.value]
+        containerUuid: tabUuid.value
       }).then(responseData => {
         if (!isCreateNew.value && !root.isEmptyValue(responseData)) {
           let row
@@ -314,7 +307,17 @@ export default defineComponent({
       })
     }
 
-    getData()
+    if (props.isParentTabs) {
+      if (isReadyFromGetData.value) {
+        getData()
+      }
+    } else {
+      watch(isReadyFromGetData, (newValue, oldValue) => {
+        if (newValue) {
+          getData()
+        }
+      })
+    }
 
     setTabNumber(currentTab.value)
 
@@ -324,7 +327,6 @@ export default defineComponent({
       tableHeaders,
       recordsList,
       // computed
-      containerManagerTab,
       isShowedTabs,
       isShowedTableRecords,
       tabStyle,

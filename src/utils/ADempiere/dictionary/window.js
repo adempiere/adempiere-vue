@@ -16,7 +16,7 @@
 
 // utils and helpers methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils.js'
+import { generatePanelAndFields } from '@/utils/ADempiere/dictionary/panel.js'
 import { isHiddenField } from '@/utils/ADempiere/references.js'
 
 /**

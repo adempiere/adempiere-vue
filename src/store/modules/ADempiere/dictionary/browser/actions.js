@@ -16,9 +16,12 @@
 
 import router from '@/router'
 
+// api request methods
 import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser.js'
-import { generatePanelAndFields } from '@/components/ADempiere/PanelDefinition/panelUtils'
+
+// utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { generatePanelAndFields } from '@/utils/ADempiere/dictionary/panel.js'
 import { isDisplayedField, isMandatoryField } from '@/utils/ADempiere/dictionary/browser.js'
 
 export default {

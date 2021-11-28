@@ -22,7 +22,7 @@
     <default-table
       :parent-uuid="parentUuid"
       :container-uuid="containerUuid"
-      :container-manager="recordNavigationManager"
+      :container-manager="containerManager"
       :panel-metadata="panelMetadata"
       :header="tableheaders"
       :data-table="recordsList"
@@ -99,28 +99,19 @@ export default defineComponent({
       return []
     })
 
-    // namespace to vuex store module
-    const vuexStore = props.containerManager.vuexStore()
+    const tabData = computed(() => {
+      return root.$store.getters.getTabData({
+        containerUuid: props.containerUuid
+      })
+    })
 
     // get records list
     const recordsList = computed(() => {
-      const data = root.$store.getters[vuexStore + '/getContainerData']({
-        containerUuid: props.containerUuid
-      })
-      if (data && data.recordsList) {
-        return data.recordsList
-      }
-      return []
+      return tabData.value.recordsList
     })
 
     const recordCount = computed(() => {
-      const data = root.$store.getters[vuexStore + '/getContainerData']({
-        containerUuid: props.containerUuid
-      })
-      if (data && data.recordCount) {
-        return data.recordCount
-      }
-      return 0
+      return tabData.value.recordCount
     })
 
     const actionAdvancedQuery = () => {
@@ -131,15 +122,11 @@ export default defineComponent({
       activeName.value = activeNames
     }
 
-    // set and/or overwrite methods
-    const recordNavigationManager = props.containerManager
-
     return {
       activeName,
       // computeds
       recordsList,
       recordCount,
-      recordNavigationManager,
       isLoadedPanel,
       panelMetadata,
       tableheaders,

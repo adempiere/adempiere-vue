@@ -65,8 +65,10 @@ const browserControl = {
       selectionsList
     }) {
       Vue.set(state.browserData[containerUuid], 'selectionsList', selectionsList)
+    },
 
-      console.log(state.browserData)
+    resetStateBrowserManager(state) {
+      state = initState
     }
   },
 
