@@ -102,7 +102,6 @@ import ColumnsDisplayOption from './ColumnsDisplayOption'
 import CustomPagination from './CustomPagination.vue'
 
 // utils and helper methods
-import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
 import { isLookup } from '@/utils/ADempiere/references'
 import { tableColumnDataType } from '@/utils/ADempiere/valueUtils'
 
@@ -210,12 +209,7 @@ export default defineComponent({
      */
     function isDisplayed(field) {
       // validate with container manager
-      if (!root.isEmptyValue(props.containerManager) &&
-        props.containerManager.isDisplayedColumn) {
-        return props.containerManager.isDisplayedColumn(field)
-      }
-
-      return fieldIsDisplayed(field, true)
+      return props.containerManager.isDisplayedColumn(field)
     }
 
     /**
