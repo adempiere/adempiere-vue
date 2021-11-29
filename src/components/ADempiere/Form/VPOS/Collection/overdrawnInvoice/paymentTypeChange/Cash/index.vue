@@ -9,26 +9,48 @@
 
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See thelistPaymentsRefund() {
+      const listServer = this.currentOrder.listPayments
+      if (!this.isEmptyValue(listServer)) {
+        return listServer.payments.filter(payment => payment.isRefund)
+      }
+      return []
+    },
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <div v-if="fieldsList.length > 2">
+  <div>
     <el-form
       label-position="top"
       label-width="10px"
     >
-      <p class="total" style="padding-left: 2%;">
-        <b class="order-info">
-          {{ $t('form.pos.collect.change') }}  : {{ amountRefund }}
-        </b>
-        <b class="order-info" style="padding-left: 2%;">
-          {{ $t('form.pos.collect.Currency') }}  : {{ currencyReference.iso_code + '(' + currencyReference.currency_symbol + ')' }}
-        </b>
-      </p>
+      <el-row :gutter="12">
+        <el-col
+          v-for="field in fieldsList"
+          :key="field.sequence"
+          :span="6"
+        >
+          <field-definition
+            :key="field.columnName"
+            :metadata-field="field"
+          />
+        </el-col>
+        <el-col :span="12">
+          <el-form-item :label="$t('form.pos.collect.Currency')" class="from-field">
+            <el-select v-model="referenceCurrency" :disabled="!isEmptyValue(referenceCurrency)">
+              <el-option
+                v-for="item in listCurrency"
+                :key="item.id"
+                :label="item.iso_code + '(' + item.currency_symbol + ')'"
+                :value="item.iso_code"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
   </div>
 </template>
@@ -62,6 +84,10 @@ export default {
         return {}
       }
     },
+    referenceCurrency: {
+      type: String,
+      default: ''
+    },
     metadata: {
       type: Object,
       default: () => {
@@ -76,6 +102,7 @@ export default {
     return {
       option: 1,
       typePay: 0,
+      value: '',
       fieldsList: fieldsListCash,
       currentFieldCurrency: '',
       currentPaymentType: ''
@@ -185,7 +212,7 @@ export default {
     this.$store.commit('updateValueOfField', {
       containerUuid: this.metadata.containerUuid,
       columnName: 'PayAmt',
-      value: this.change / this.dayRate.divideRate
+      value: this.currentPointOfSales.currentOrder.refundAmount
     })
   },
   methods: {

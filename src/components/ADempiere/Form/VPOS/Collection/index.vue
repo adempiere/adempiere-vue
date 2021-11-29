@@ -778,8 +778,8 @@ export default {
       let sum = 0
       if (!this.isEmptyValue(cash)) {
         cash.forEach((pay) => {
-          if (!this.isEmptyValue(pay.divideRate)) {
-            const searchConversion = this.$store.state['pointOfSales/point/index'].conversionsList.find(currency => currency.currencyTo.uuid === pay.currencyUuid)
+          const searchConversion = this.$store.state['pointOfSales/point/index'].conversionsList.find(currency => currency.currencyTo.uuid === pay.currencyUuid)
+          if (!this.isEmptyValue(pay.divideRate) && !this.isEmptyValue(searchConversion)) {
             sum += pay.amount * searchConversion.divideRate
           } else {
             sum += pay.amount
@@ -1007,7 +1007,7 @@ export default {
       this.porcessInvoce = true
       if (this.currentOrder.paymentAmount > this.currentOrder.grandTotal) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
-      } else if (this.currentOrder.paymentAmount < this.currentOrder.grandTotal) {
+      } else if (this.currentOrder.paymentAmount < this.currentOrder.grandTotal && Math.abs(this.currentOrder.openAmount) > this.currentPointOfSales.writeOffAmountTolerance) {
         if (this.isPosRequiredPin) {
           const attributePin = {
             payment: payment,

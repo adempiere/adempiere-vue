@@ -20,7 +20,7 @@
     <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; overflow: auto; padding-left: 0px;">
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
-          <el-col v-if="!value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
+          <el-col v-if="!value.isRefund" :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
             <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
@@ -89,7 +89,7 @@
     <el-footer v-if="!isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
       <el-row :gutter="24">
         <template v-for="(value, key) in listRefund">
-          <el-col v-if="value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
+          <el-col v-if="value.isRefund" :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
             <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
@@ -197,6 +197,10 @@ export default {
     isLoaded: {
       type: Boolean,
       default: false
+    },
+    size: {
+      type: Number,
+      default: 12
     }
   },
   data() {
@@ -239,7 +243,7 @@ export default {
   },
   watch: {
     listPaymentType(value) {
-      if (!this.isEmptyValue(value.reference)) {
+      if (!this.isEmptyValue(value) && !this.isEmptyValue(value.reference)) {
         this.tenderTypeDisplaye({
           tableName: value.reference.tableName,
           query: value.reference.query
@@ -251,7 +255,7 @@ export default {
     if (!this.isEmptyValue(this.isAddTypePay)) {
       this.convertingPaymentMethods()
     }
-    if (!this.isEmptyValue(this.listPaymentType.reference)) {
+    if (!this.isEmptyValue(this.listPaymentType) && !this.isEmptyValue(this.listPaymentType.reference)) {
       this.tenderTypeDisplaye({
         tableName: this.listPaymentType.reference.tableName,
         query: this.listPaymentType.reference.query

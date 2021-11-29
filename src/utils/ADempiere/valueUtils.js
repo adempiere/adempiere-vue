@@ -118,6 +118,9 @@ export function extractPagingToken(token) {
  * @param {number} number
  */
 export function round(number, standardPrecision) {
+  if (isEmptyValue(number)) {
+    return
+  }
   const amount = number.toFixed(standardPrecision)
   return Number(amount)
 }

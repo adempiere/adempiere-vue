@@ -14,63 +14,61 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import language from '@/lang'
 const tableName = 'C_Payment'
 
 export default [
-  // Name
+  // Amont
   {
-    elementColumnName: 'Name',
-    columnName: 'Name',
-    tableName: 'C_BPartner',
-    tabindex: '1',
+    tableName,
+    elementColumnName: 'PayAmt',
+    columnName: 'PayAmt',
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 0,
-      isCustomField: true,
-      size: 24,
-      isMandatory: true
-    }
-  },
-  // Code
-  {
-    elementColumnName: 'Value',
-    columnName: 'Value',
-    isFromDictionary: true,
-    tabindex: '0',
-    overwriteDefinition: {
-      sequence: 1,
-      isCustomField: true,
-      size: 24,
-      isMandatory: true
-    }
-  },
-  // Phone
-  {
-    elementColumnName: 'Phone',
-    columnName: 'Phone',
-    tableName: 'AD_user',
-    tabindex: '4',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      sequence: 2,
-      isCustomField: true,
-      size: 24,
-      isMandatory: true
-    }
-  },
-  // TenderType
-  {
-    tableName,
-    elementColumnName: 'TenderType',
-    columnName: 'TenderType',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      defaultValue: 'X',
-      sequence: 3,
-      handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
+      isNumericField: true,
+      isActiveLogics: true,
+      isMandatory: true,
+      displayLogicPayment: 'X'
+    }
+  },
+  // Currency
+  // Bank
+  {
+    tableName,
+    columnName: 'C_Bank_ID',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 2,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.bank'),
+      handleActionKeyPerformed: true,
+      handleActionPerformed: true,
+      handleContentSelection: true,
+      displayLogicPayment: 'D,K,T,A,P,C',
+      size: 24,
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // Date
+  {
+    tableName,
+    elementColumnName: 'DateTrx',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 4,
+      name: 'Fecha',
+      handleFocusGained: true,
+      handleFocusLost: true,
+      handleKeyPressed: true,
+      handleKeyReleased: true,
+      handleActionKeyPerformed: true,
+      handleActionPerformed: true,
+      size: 24,
+      displayLogicPayment: 'K,Z,P,D,K,T,A',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -81,28 +79,82 @@ export default [
     tableName: 'AD_user',
     isFromDictionary: true,
     overwriteDefinition: {
+      sequence: 5,
+      handleActionKeyPerformed: true,
+      handleContentSelection: true,
+      handleActionPerformed: true,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.name'),
+      size: 24,
+      displayLogicPayment: 'Z',
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // ReferenceNo
+  {
+    tableName: 'HR_Attribute',
+    elementColumnName: 'ReferenceNo',
+    columnName: 'ReferenceNo',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 6,
+      handleActionKeyPerformed: true,
+      handleContentSelection: true,
+      handleActionPerformed: true,
+      displayLogicPayment: 'K,Z,P,D,K,T,A',
+      size: 24,
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // type credit card
+  {
+    tableName,
+    elementColumnName: 'CreditCardType',
+    columnName: 'CreditCardType',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 7,
+      defaultValue: 'M',
+      handleActionKeyPerformed: true,
+      handleContentSelection: true,
+      handleActionPerformed: true,
+      size: 24,
+      displayLogicPayment: 'C',
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // number credit card
+  {
+    tableName,
+    elementColumnName: 'CreditCardNumber',
+    columnName: 'CreditCardNumber',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 8,
+      handleActionKeyPerformed: true,
+      handleContentSelection: true,
+      handleActionPerformed: true,
+      size: 24,
+      displayLogicPayment: 'C',
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // accountno
+  {
+    tableName,
+    elementColumnName: 'AccountNo',
+    columnName: 'AccountNo',
+    isFromDictionary: true,
+    overwriteDefinition: {
       sequence: 9,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogic: `@TenderType@=='D' || @TenderType@=='Z'`,
-      isActiveLogics: true,
-      isMandatory: true
-    }
-  },
-  // Bank
-  {
-    tableName,
-    columnName: 'C_Bank_ID',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      sequence: 6,
-      handleActionKeyPerformed: true,
-      handleActionPerformed: true,
-      handleContentSelection: true,
-      displayLogic: `@TenderType@<>'X'|| @TenderType@<>'Z'`,
-      size: 24,
+      displayLogicPayment: 'M,A',
       isActiveLogics: true,
       isMandatory: true
     }
