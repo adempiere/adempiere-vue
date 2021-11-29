@@ -144,12 +144,12 @@ const browserControl = {
         nextPageToken: pageToken
       })
         .then(browserSearchResponse => {
-          const recordsList = browserSearchResponse.recordsList.map((itemRecord, indexRow) => {
+          const recordsList = browserSearchResponse.recordsList.map((record, rowIndex) => {
             return {
-              ...itemRecord.attributes,
+              ...record.attributes,
               // datatables app attributes
               ...ROW_ATTRIBUTES,
-              indexRow
+              rowIndex
             }
           })
 
@@ -219,11 +219,12 @@ const browserControl = {
     getBrowserPageToken: (state, getters) => (containerUuid) => {
       return getters.getBrowserData(containerUuid).nextPageToken
     },
-    getBrowserRowData: (state, getters) => ({ containerUuid, recordUuid, indexRow }) => {
+    getBrowserRowData: (state, getters) => ({ containerUuid, recordUuid, rowIndex }) => {
       const recordsList = getters.getBrowserRecordsList(containerUuid)
-      if (!isEmptyValue(indexRow)) {
-        return recordsList[indexRow]
+      if (!isEmptyValue(rowIndex)) {
+        return recordsList[rowIndex]
       }
+
       return recordsList.find(itemData => {
         if (itemData.UUID === recordUuid) {
           return true

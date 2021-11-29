@@ -41,6 +41,9 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 // components and mixins
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 
+// constants
+import { READ_ONLY_FORM_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'
+
 // utils and helper methods
 import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import {
@@ -101,17 +104,23 @@ export default defineComponent({
       isReadOnlyField({
         field,
         // records values
-        preferenceClientId,
         clientId,
         isActive,
         isProcessing,
         isProcessed,
         isWithRecord
       }) {
-        // evaluate context
+        // evaluate client id context with record
+        const preferenceClientId = root.$store.getters.getPreferenceClientId
         if (preferenceClientId !== clientId && isWithRecord) {
           return true
         }
+
+        // not updateable and record saved
+        if (!field.isUpdateable && isWithRecord) {
+          return true
+        }
+
         // record is inactive isReadOnlyFromForm
         if (!isActive && field.columnName !== 'IsActive') {
           return true
@@ -123,17 +132,59 @@ export default defineComponent({
           return true
         }
 
+        return isReadOnlyField(field) || field.isReadOnlyFromForm
+      },
+
+      isReadOnlyColumn({
+        field,
+        // records values
+        row
+      }) {
+        // read only with metadata
+        if (isReadOnlyColumn(field)) {
+          true
+        }
+
         // not updateable and record saved
+        const isWithRecord = !root.isEmptyValue(row.UUID)
         if (!field.isUpdateable && isWithRecord) {
           return true
         }
 
-        return isReadOnlyField(field) || field.isReadOnlyFromForm
+        // evaluate client id context with record
+        const preferenceClientId = root.$store.getters.getPreferenceClientId
+        if (preferenceClientId !== parseInt(row.AD_Client_ID, 10) && isWithRecord) {
+          return true
+        }
+
+        // columnName: IsActive
+        const fieldReadOnlyForm = READ_ONLY_FORM_COLUMNS.find(item => {
+          return !item.isChangedAllForm &&
+            // columnName: IsActive, Processed, Processing
+            Object.prototype.hasOwnProperty.call(row, item.columnName)
+        })
+
+        if (fieldReadOnlyForm) {
+          const { columnName, valueIsReadOnlyForm } = fieldReadOnlyForm
+          // compare if is same key
+          return field.columnName !== columnName &&
+            // compare if is same value
+            row[columnName] === valueIsReadOnlyForm
+        }
+
+        return false
       },
-      isReadOnlyColumn,
 
       isMandatoryField,
       isMandatoryColumn,
+
+      getRow: ({ containerUuid, rowIndex, rowUuid }) => {
+        return root.$store.getters.getTabRowData({
+          containerUuid,
+          rowIndex,
+          rowUuid
+        })
+      },
 
       changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
         root.$store.dispatch('changeTabFieldShowedFromUser', {

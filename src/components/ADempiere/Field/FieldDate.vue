@@ -196,6 +196,16 @@ export default {
 
         // table records values
         if (this.metadata.inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.getRow) {
+            const row = this.containerManager.getRow({
+              containerUuid: this.metadata.containerUuid,
+              rowIndex: this.metadata.rowIndex
+            })
+
+            return row[columnName]
+          }
+
           const row = this.$store.getters.getRowData({
             containerUuid,
             index: this.metadata.tableIndex

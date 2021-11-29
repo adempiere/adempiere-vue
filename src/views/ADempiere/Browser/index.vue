@@ -270,7 +270,17 @@ export default defineComponent({
 
       isMandatoryColumn,
 
-      isReadOnlyColumn,
+      isReadOnlyColumn({
+        field,
+        row
+      }) {
+        // read only with metadata
+        if (isReadOnlyColumn(field)) {
+          true
+        }
+
+        return false
+      },
 
       seekRecord: ({
         containerUuid,
@@ -286,6 +296,13 @@ export default defineComponent({
         root.$store.commit('setBrowserSelectionsList', {
           containerUuid,
           selectionsList: recordsSelected
+        })
+      },
+
+      getRow: ({ containerUuid, rowIndex }) => {
+        return root.$store.getters.getBrowserRowData({
+          containerUuid,
+          rowIndex
         })
       },
 

@@ -17,9 +17,22 @@
 -->
 
 <template>
-  <div v-if="isDisplayedField" class="field-definition">
+  <div class="field-definition">
+    <component
+      :is="componentRender"
+      v-if="inTable"
+      :id="field.panelType !== 'form' ? field.columnName : ''"
+      key="is-table-template"
+      :class="classField"
+      :parent-uuid="parentUuid"
+      :container-uuid="containerUuid"
+      :container-manager="containerManager"
+      :metadata="fieldAttributes"
+      :in-table="true"
+    />
+
     <el-col
-      v-if="!inTable"
+      v-else-if="!inTable && isDisplayedField"
       key="is-panel-template"
       :xs="sizeField.xs"
       :sm="sizeField.sm"
@@ -44,27 +57,10 @@
           :parent-uuid="parentUuid"
           :container-uuid="containerUuid"
           :container-manager="containerManager"
-          :field-metadata="fieldAttributes"
           :metadata="fieldAttributes"
-          :value-model="recordDataFields"
         />
       </el-form-item>
     </el-col>
-
-    <component
-      :is="componentRender"
-      v-else
-      :id="field.panelType !== 'form' ? field.columnName : ''"
-      key="is-table-template"
-      :class="classField"
-      :parent-uuid="parentUuid"
-      :container-uuid="containerUuid"
-      :container-manager="containerManager"
-      :field-metadata="fieldAttributes"
-      :metadata="fieldAttributes"
-      :value-model="recordDataFields"
-      :in-table="true"
-    />
   </div>
 </template>
 
@@ -106,17 +102,9 @@ export default {
       required: true
     },
     // receives the property that is an object with all the attributes
-    fieldMetadata: {
-      type: Object,
-      default: () => ({})
-    },
     metadataField: {
       type: Object,
       default: () => ({})
-    },
-    recordDataFields: {
-      type: [Number, String, Boolean, Array, Object, Date],
-      default: undefined
     },
     inGroup: {
       type: Boolean,
@@ -131,11 +119,13 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       field: {}
     }
   },
+
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'
@@ -238,6 +228,12 @@ export default {
      * Idicate if field is read only
      */
     isReadOnlyField() {
+      if (this.inTable) {
+        // table manage with isReadOnlyColumn method
+        // if rendered the component is editable
+        return false
+      }
+
       // TODO: Add validate method to record uuid uuid without route.action
       // edit mode is diferent to create new
       const isWithRecord = this.recordUuid !== 'create-new' &&
@@ -246,7 +242,6 @@ export default {
       // validate with container manager
       return this.containerManager.isReadOnlyField({
         field: this.field,
-        preferenceClientId: this.preferenceClientId,
         // record values
         clientId: this.containerClientId,
         isActive: this.containerIsActive,
@@ -304,9 +299,6 @@ export default {
         columnName: CLIENT
       })
     },
-    preferenceClientId() {
-      return this.$store.getters.getPreferenceClientId
-    },
 
     isFieldOnly() {
       if (this.inTable || this.field.isFieldOnly) {
@@ -329,11 +321,13 @@ export default {
       return ''
     }
   },
+
   watch: {
     metadataField(value) {
       this.field = value
     }
   },
+
   created() {
     // assined field with prop
     this.field = this.metadataField
@@ -355,6 +349,7 @@ export default {
       }
     }
   },
+
   methods: {
     focusField() {
       if (this.field.handleRequestFocus || (this.field.displayed && !this.field.readonly)) {

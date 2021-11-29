@@ -26,6 +26,9 @@ import {
   deleteEntity
 } from '@/api/ADempiere/common/persistence.js'
 
+// constants
+import { ROW_ATTRIBUTES } from '@/utils/ADempiere/constants/table'
+
 // utils and helper methods
 import { getContext } from '@/utils/ADempiere/contextUtils.js'
 import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils.js'
@@ -208,8 +211,13 @@ const windowManager = {
           pageToken
         })
           .then(dataResponse => {
-            const dataToStored = dataResponse.recordsList.map(record => {
-              return record.attributes
+            const dataToStored = dataResponse.recordsList.map((record, rowIndex) => {
+              return {
+                ...record.attributes,
+                // datatables app attributes
+                ...ROW_ATTRIBUTES,
+                rowIndex
+              }
             })
 
             commit('setTabData', {
@@ -306,11 +314,12 @@ const windowManager = {
     getTabPageToken: (state, getters) => ({ containerUuid }) => {
       return getters.getTabData({ containerUuid }).nextPageToken
     },
-    getTabRowData: (state, getters) => ({ containerUuid, recordUuid, indexRow }) => {
+    getTabRowData: (state, getters) => ({ containerUuid, recordUuid, rowIndex }) => {
       const recordsList = getters.getTabRecordsList({ containerUuid })
-      if (!isEmptyValue(indexRow)) {
-        return recordsList[indexRow]
+      if (!isEmptyValue(rowIndex)) {
+        return recordsList[rowIndex]
       }
+
       return recordsList.find(itemData => {
         if (itemData.UUID === recordUuid) {
           return true

@@ -17,17 +17,35 @@
 -->
 
 <template>
-  <document-status-tag
-    v-if="fieldAttributes.isColumnDocumentStatus"
-    key="document-status"
-    size="small"
-    :value="fieldValue"
-    :displayed-value="displayedValue"
-  />
+  <span v-if="isRowCanBeEdited(dataRow)" key="field-component">
+    <field-definition
+      key="field-definition"
+      :container-uuid="containerUuid"
+      :container-manager="containerManager"
+      :is-data-table="true"
+      :is-show-label="false"
+      :in-table="true"
+      :metadata-field="{
+        ...fieldAttributes,
+        rowIndex: scope.$index,
+        recordUuid: dataRow.UUID
+      }"
+      size="mini"
+    />
+  </span>
 
   <span v-else key="info-value">
+    <document-status-tag
+      v-if="fieldAttributes.isColumnDocumentStatus"
+      key="document-status"
+      size="small"
+      :value="fieldValue"
+      :displayed-value="displayedValue"
+    />
+
     <p
-      v-if="!isEmptyValue(displayedValue) && displayedValue.length >= 23"
+      v-else-if="!isEmptyValue(displayedValue) && displayedValue.length >= 23"
+      key="display-column"
       style="max-height: 40px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;"
     >
       <el-popover
@@ -49,7 +67,7 @@
       </el-popover>
     </p>
 
-    <p v-else>
+    <p v-else key="only-value">
       {{ displayedValue }}
     </p>
   </span>
@@ -60,6 +78,7 @@ import { defineComponent, computed } from '@vue/composition-api'
 
 // components and mixins
 import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import FieldDefinition from '@/components/ADempiere/Field/index.vue'
 
 // utils and helpers methods
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
@@ -75,13 +94,26 @@ export default defineComponent({
   name: 'CellInfo',
 
   components: {
-    DocumentStatusTag
+    DocumentStatusTag,
+    FieldDefinition
   },
 
   props: {
+    containerUuid: {
+      type: String,
+      required: true
+    },
     fieldAttributes: {
       type: Object,
       required: true
+    },
+    containerManager: {
+      type: Object,
+      required: true
+    },
+    scope: {
+      type: Object,
+      default: () => {}
     },
     dataRow: {
       type: Object,
@@ -98,6 +130,13 @@ export default defineComponent({
 
     const displayedValue = computed(() => {
       return formatValue(props.dataRow, props.fieldAttributes)
+    })
+
+    const isReadOnly = computed(() => {
+      return props.containerManager.isReadOnlyColumn({
+        field: props.fieldAttributes,
+        row: props.dataRow
+      })
     })
 
     const formatNumber = ({ displayType, value }) => {
@@ -163,10 +202,20 @@ export default defineComponent({
       return valueToShow
     }
 
+    function isRowCanBeEdited(record) {
+      if (!isReadOnly.value && record.isEditRow) {
+        return true
+      }
+
+      return false
+    }
+
     return {
       // computeds
       fieldValue,
-      displayedValue
+      displayedValue,
+      // methods
+      isRowCanBeEdited
     }
   }
 })

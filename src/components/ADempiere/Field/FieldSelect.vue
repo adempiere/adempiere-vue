@@ -148,6 +148,15 @@ export default {
         const { columnName, containerUuid } = this.metadata
         // table records values
         if (this.metadata.inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.getRow) {
+            const row = this.containerManager.getRow({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex
+            })
+            return row[columnName]
+          }
+
           const row = this.$store.getters.getRowData({
             containerUuid,
             index: this.metadata.tableIndex
@@ -204,6 +213,15 @@ export default {
         const { displayColumnName: columnName, containerUuid } = this.metadata
         // table records values
         if (this.metadata.inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.getRow) {
+            const row = this.containerManager.getRow({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex
+            })
+            return row[columnName]
+          }
+
           const row = this.$store.getters.getRowData({
             containerUuid,
             index: this.metadata.tableIndex

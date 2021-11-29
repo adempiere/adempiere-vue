@@ -18,8 +18,8 @@
  * Row default app attributes
  */
 export const ROW_ATTRIBUTES = {
-  isNew: false,
-  isEdit: false,
+  isNewRow: false,
+  isEditRow: false,
   indexRow: 0,
   isReadOnlyFromRow: false
 }

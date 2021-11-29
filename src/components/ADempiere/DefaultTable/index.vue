@@ -75,7 +75,10 @@
           <template slot-scope="scope">
             <!-- formatted displayed value -->
             <cell-info
+              :container-uuid="containerUuid"
               :field-attributes="fieldAttributes"
+              :container-manager="containerManager"
+              :scope="scope"
               :data-row="scope.row"
             />
           </template>
@@ -194,6 +197,10 @@ export default defineComponent({
         row,
         tableName: props.panelMetadata.tableName
       })
+
+      if (!row.isEditRow) {
+        row.isEditRow = true
+      }
     }
 
     function headerLabel(field) {
