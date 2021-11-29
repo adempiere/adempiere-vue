@@ -14,7 +14,116 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import store from '@/store'
+
+import {
+  // currencies
+  isCurrencyField,
+  //
+  NUMBER,
+  QUANTITY,
+  // integers
+  isIntegerField
+} from '@/utils/ADempiere/references.js'
+
 import { charInText, isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+
+/**
+ * Get Default currency ISO code
+ */
+export function getCurrency() {
+  return store.getters.getCurrencyCode
+}
+
+export function getStandardPrecision() {
+  return store.getters.getStandardPrecision
+}
+
+/**
+ * Get country code from store
+ */
+export function getCountryCode() {
+  return store.getters.getCountryLanguage
+}
+
+export function formatNumber({
+  value,
+  displayType,
+  currency,
+  country
+}) {
+  if (isEmptyValue(value)) {
+    value = 0
+  }
+
+  let formattedNumber
+  switch (displayType) {
+    case (isCurrencyField(displayType) && displayType):
+      formattedNumber = formatPrice({ value, currency, country })
+      break
+
+    case NUMBER.id:
+    case QUANTITY.id:
+      formattedNumber = formatQuantity({ value })
+      break
+
+    case (isIntegerField(displayType) && displayType):
+    default:
+      formattedNumber = formatQuantity({ value, isInteger: true })
+      break
+  }
+
+  return formattedNumber
+}
+
+//  Format Quantity
+export function formatQuantity({ number, isInteger = false }) {
+  if (isEmptyValue(number)) {
+    number = 0
+  }
+
+  let precision = getStandardPrecision()
+  // without decimals
+  // if (Number.isInteger(value)) {
+  if (isInteger) {
+    precision = 0
+  }
+
+  // get formatted decimal number
+  return new Intl.NumberFormat(undefined, {
+    useGrouping: true, // thousands separator
+    minimumIntegerDigits: 1,
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision
+  }).format(number)
+}
+
+//  Get Formatted Price
+export function formatPrice({ number, currency, country = '' }) {
+  if (isEmptyValue(number)) {
+    number = 0
+  }
+
+  if (isEmptyValue(currency)) {
+    currency = getCurrency()
+  }
+
+  // const precision = getStandardPrecision()
+
+  if (isEmptyValue(country)) {
+    country = getCountryCode()
+  }
+
+  // get formatted currency number
+  return new Intl.NumberFormat(country, {
+    style: 'currency',
+    currency,
+    useGrouping: true,
+    // minimumFractionDigits: precision,
+    // maximumFractionDigits: precision,
+    minimumIntegerDigits: 1
+  }).format(number)
+}
 
 /**
  * zero pad
@@ -114,4 +223,28 @@ export function calculationValue(value, event) {
     }
     return null
   }
+}
+
+/**
+ * Convert exponetial to decimals quantity
+ * @param {number} value ej: 314e-2, 4e+3
+ * @returns ej: 3.14, 400
+ */
+export function formatExponential(value) {
+  const regExpr = /(\d{1,})(e-)/g // number end e-
+  const strValue = value.toString()
+
+  if (regExpr.test(strValue)) {
+    let exponential = strValue.replace(regExpr, '')
+
+    if (isEmptyValue(exponential) || exponential <= 0) {
+      exponential = getStandardPrecision()
+    }
+
+    // TODO: Verify with formatQuantity
+    return Number.parseFloat(value)
+      .toFixed(exponential)
+  }
+
+  return value
 }

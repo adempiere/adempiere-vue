@@ -655,6 +655,15 @@ export const FIELDS_CURRENCY = [
 ]
 
 /**
+ * Is currency field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isCurrencyField(displayType) {
+  return FIELDS_CURRENCY.includes(displayType)
+}
+
+/**
  * Is number field
  * @param {number} displayType
  * @returns {boolean}
@@ -663,13 +672,18 @@ export function isNumberField(displayType) {
   return FIELDS_QUANTITY.includes(displayType)
 }
 
+export const FIELDS_INTEGER = [
+  INTEGER.id,
+  ID.id
+]
+
 /**
  * Is intenger number field
  * @param {number} displayType
  * @returns {boolean}
  */
 export function isIntegerField(displayType) {
-  return [ID.id, INTEGER.id].includes(displayType)
+  return FIELDS_INTEGER.includes(displayType)
 }
 
 /**

@@ -3,7 +3,7 @@ import {
   requestLanguagesList
 } from '@/api/ADempiere/system-core.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { convertDateFormat } from '@/utils/ADempiere/valueFormat'
+import { convertDateFormat } from '@/utils/ADempiere/formatValue/dateFormat.js'
 
 const system = {
   state: {
