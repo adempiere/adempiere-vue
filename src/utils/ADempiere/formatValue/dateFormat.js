@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
+// Contributor(s): Yamel Senih ysenih@erpya.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -21,9 +21,14 @@ import moment from 'moment'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { zeroPad } from '@/utils/ADempiere/formatValue/numberFormat.js'
 
-// This function just convert all java date format to moment format.
-// For know about java format pattern see: https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
-// Also you can read moment docus: https://momentjs.com/docs/
+/**
+ * This function just convert all java date format to moment format.
+ * For know about java format pattern see:
+ * https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
+ * Also you can read moment docus: https://momentjs.com/docs/
+ * @param {string} dateFormat
+ * @returns
+ */
 export function convertDateFormat(dateFormat) {
   return dateFormat
     //	Year
@@ -50,7 +55,11 @@ export function convertDateFormat(dateFormat) {
     .replace(/\bz\b/g, 'Z')
 }
 
-// Get default format or optional
+/**
+ * Get default format or optional
+ * @param {string} format
+ * @param {boolean} isTime
+ */
 export function getDateFormat({
   format,
   isTime
@@ -65,14 +74,21 @@ export function getDateFormat({
   }
 }
 
-// Get default format without format pattern
+/**
+ * Get default format without format pattern
+ * @param {boolean} isTime
+ */
 export function getDefaultFormat(isTime) {
   return getDateFormat({
     isTime
   })
 }
 
-// Format a date with specific format, if format is void use default date format for language
+/**
+ * Format a date with specific format, if format is void use default date format for language
+ * @param {string|date} object
+ * @param {boolean} isTime
+ */
 export function formatDate(date, isTime = false) {
   if (isEmptyValue(date)) {
     return undefined
@@ -123,6 +139,11 @@ export function clientDateTime(date = null, type = '') {
   return currentDateTime.date + ' ' + currentDateTime.time
 }
 
+/**
+ * Send date to server
+ * @param {string} date
+ * @returns
+ */
 export function formatDateToSend(date) {
   if (isEmptyValue(date)) {
     return undefined
