@@ -5,11 +5,11 @@
   },
   "adempiere": {
     "api": {
-      "url": "http://localhost:8085/api/adempiere/",
-      "timeout": 100000
+      "url": "https://api.erpya.com/api/adempiere/",
+      "timeout": 10000
     },
     "images": {
-      "url": "http://localhost:8085/adempiere-api/img/"
+      "url": "https://api.erpya.com/adempiere-api/img/"
     }
   },
   "repository": {
