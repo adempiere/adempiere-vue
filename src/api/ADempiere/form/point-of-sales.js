@@ -748,8 +748,8 @@ export function overdrawnInvoice({
         description: parameter.description,
         amount: parameter.amount,
         tender_type_code: parameter.tenderTypeCode,
-        payment_ate: parameter.paymentDate,
-        currency_uid: parameter.currencyUuid
+        payment_date: parameter.paymentDate,
+        currency_uuid: parameter.currencyUuid
       }
     })
   }
@@ -980,10 +980,40 @@ export function createCustomerBankAccount({
     }
   })
     .then(responseCreateCustomerBankAccount => {
-      return responseCreateCustomerBankAccount
+      return camelizeObjectKeys(responseCreateCustomerBankAccount)
     })
 }
-
+export function listCustomerBankAccounts({
+  customerUuid,
+  pageToken
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/customer-bank-accounts`,
+    method: 'get',
+    params: {
+      customer_uuid: customerUuid,
+      page_token: pageToken
+    }
+  })
+    .then(responseListCustomerBankAccounts => {
+      return camelizeObjectKeys(responseListCustomerBankAccounts)
+    })
+}
+export function daleteCustomerBankAccounts({
+  customerBankAccountUuid
+}) {
+  console.log({ customerBankAccountUuid })
+  return request({
+    url: `${config.pointOfSales.endpoint}/delete-bank-account`,
+    method: 'post',
+    data: {
+      customer_bank_account_uuid: customerBankAccountUuid
+    }
+  })
+    .then(responseCreateCustomerBankAccount => {
+      return camelizeObjectKeys(responseCreateCustomerBankAccount)
+    })
+}
 /**
  * Create Shipment
  * @param {string} posUuidd - POS UUID reference
@@ -1006,6 +1036,74 @@ export function createShipment({
   })
     .then(responseShipment => {
       return camelizeObjectKeys(responseShipment)
+    })
+}
+export function RefundReferenceRequest({
+  posUuid,
+  description,
+  amount,
+  date,
+  tenderTypeCode,
+  currencyUuid,
+  conversionTypeUuid,
+  paymentMethodUuid,
+  paymentAccountDate,
+  customerBankAccountUuid,
+  orderUuid,
+  salesRepresentativeUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/create-refund-reference`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      description,
+      amount,
+      payment_date: date,
+      tender_type_code: tenderTypeCode,
+      currency_uuid: currencyUuid,
+      conversion_type_uuid: conversionTypeUuid,
+      payment_method_uuid: paymentMethodUuid,
+      payment_account_date: paymentAccountDate,
+      customer_bank_account_uuid: customerBankAccountUuid,
+      order_uuid: orderUuid,
+      sales_representative_uuid: salesRepresentativeUuid
+    }
+  })
+    .then(responseCreateCustomerBankAccount => {
+      return camelizeObjectKeys(responseCreateCustomerBankAccount)
+    })
+}
+export function listRefundReference({
+  posUuid,
+  customerUuid,
+  orderUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/refund-references`,
+    method: 'get',
+    params: {
+      pos_uuid: posUuid,
+      customer_uuid: customerUuid,
+      order_uuid: orderUuid
+    }
+  })
+    .then(responseCreateCustomerBankAccount => {
+      return camelizeObjectKeys(responseCreateCustomerBankAccount)
+    })
+}
+export function deleteRefundReference({
+  uuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/delete-refund-reference`,
+    method: 'post',
+    data: {
+      uuid
+    }
+  })
+    .then(responseShipmentLine => {
+      return camelizeObjectKeys(responseShipmentLine)
     })
 }
 

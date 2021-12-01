@@ -72,5 +72,14 @@ export default {
   },
   getListCashSummary: (state) => {
     return state.listCashSummary
+  },
+  getCurrentCustomerBankAccount: (state) => {
+    return state.currentCustomerBankAccount
+  },
+  getListCustomerBankAccount: (state) => {
+    return state.listCustomerBankAccounts
+  },
+  getListRefundReference: (state) => {
+    return state.listRefundReference
   }
 }

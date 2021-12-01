@@ -91,5 +91,14 @@ export default {
   },
   setListWithdrawal(state, list) {
     state.listWithdrawal = list
+  },
+  setCurrentCustomerBankAccount(state, bankAccount) {
+    state.currentCustomerBankAccount = bankAccount
+  },
+  setListCustomerBankAccounts(state, list) {
+    state.listCustomerBankAccounts = list
+  },
+  setListRefundReference(state, list) {
+    state.listRefundReference = list
   }
 }

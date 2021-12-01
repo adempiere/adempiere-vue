@@ -201,6 +201,10 @@ export default {
     size: {
       type: Number,
       default: 12
+    },
+    isRefundReference: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -275,7 +279,8 @@ export default {
     },
     labelTenderType(tenderType) {
       const currentTenderType = this.availablePaymentMethods.find(label => {
-        if (label.uuid === tenderType.paymentMethodUuid) {
+        const params = this.isRefundReference ? tenderType.payment_method_uuid : tenderType.paymentMethodUuid
+        if (label.uuid === params) {
           return label
         }
       })
@@ -379,7 +384,8 @@ export default {
     },
     imageCard(typePayment, currency) {
       let image
-      switch (typePayment.tenderTypeCode) {
+      const params = this.isRefundReference ? typePayment.tender_type_code : typePayment.tenderTypeCode
+      switch (params) {
         case 'D':
           image = 'MobilePayment.jpg'
           break
@@ -410,9 +416,12 @@ export default {
     deleteCollect(key) {
       const orderUuid = key.orderUuid
       const paymentUuid = key.uuid
-      this.$store.dispatch('deletetPayments', {
+      const deletetPayments = this.isRefundReference ? 'deleteRefundReferences' : 'deletetPayments'
+      this.$store.dispatch(deletetPayments, {
         posUuid: this.currentPointOfSales.uuid,
         orderUuid,
+        uuid: key.uuid,
+        customerUuid: this.currentPointOfSales.currentOrder.businessPartner.uuid,
         paymentUuid
       })
     },

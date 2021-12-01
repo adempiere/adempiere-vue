@@ -35,14 +35,61 @@ export default [
       displayLogicPayment: 'X'
     }
   },
-  // Currency
+
+  {
+    elementColumnName: 'Name',
+    columnName: 'Name',
+    fieldUuid: '8cf0a87c-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8cf0a87c-fb40-11e8-a479-7a0060f0aa01',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      isCustomField: true,
+      sequence: 2,
+      size: 24,
+      displayLogicPayment: 'D,K,T,A,P,C',
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // Value
+  {
+    elementColumnName: 'Value',
+    columnName: 'Value',
+    fieldUuid: '8d382fa8-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8d382fa8-fb40-11e8-a479-7a0060f0aa01',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      isCustomField: true,
+      handleFocusGained: true,
+      handleFocusLost: true,
+      sequence: 2,
+      size: 24,
+      displayLogicPayment: 'D,K,T,A,P,C',
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  {
+    elementColumnName: 'BankAccountType',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 2,
+      handleActionKeyPerformed: true,
+      handleActionPerformed: true,
+      handleContentSelection: true,
+      size: 24,
+      displayLogicPayment: 'D,K,T,A,P,C',
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
   // Bank
   {
     tableName,
     columnName: 'C_Bank_ID',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 2,
+      sequence: 3,
       name: language.t('form.pos.collect.overdrawnInvoice.fieldList.bank'),
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
@@ -74,35 +121,31 @@ export default [
     }
   },
   {
-    elementColumnName: 'EMail',
-    columnName: 'EMail',
+    elementColumnName: 'Phone',
+    columnName: 'Phone',
     tableName: 'AD_user',
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 5,
-      handleActionKeyPerformed: true,
-      handleContentSelection: true,
-      handleActionPerformed: true,
-      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.name'),
+      isCustomField: true,
       size: 24,
-      displayLogicPayment: 'Z',
-      isActiveLogics: true,
+      displayLogicPayment: 'D,K,T,A,P,C',
       isMandatory: true
     }
   },
-  // ReferenceNo
   {
-    tableName: 'HR_Attribute',
-    elementColumnName: 'ReferenceNo',
-    columnName: 'ReferenceNo',
+    elementColumnName: 'EMail',
+    columnName: 'EMail',
+    tableName: 'AD_user',
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 6,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
-      displayLogicPayment: 'K,Z,P,D,K,T,A',
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.name'),
       size: 24,
+      displayLogicPayment: 'Z',
       isActiveLogics: true,
       isMandatory: true
     }
@@ -114,7 +157,7 @@ export default [
     columnName: 'CreditCardType',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 7,
+      sequence: 8,
       defaultValue: 'M',
       handleActionKeyPerformed: true,
       handleContentSelection: true,
@@ -132,7 +175,7 @@ export default [
     columnName: 'CreditCardNumber',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 8,
+      sequence: 9,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
@@ -149,12 +192,12 @@ export default [
     columnName: 'AccountNo',
     isFromDictionary: true,
     overwriteDefinition: {
-      sequence: 9,
+      sequence: 10,
       handleActionKeyPerformed: true,
       handleContentSelection: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogicPayment: 'M,A',
+      displayLogicPayment: 'D',
       isActiveLogics: true,
       isMandatory: true
     }

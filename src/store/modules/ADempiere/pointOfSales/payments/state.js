@@ -44,5 +44,8 @@ export default {
     type: 0,
     success: false
   },
-  shipment: {}
+  shipment: {},
+  currentCustomerBankAccount: {},
+  listCustomerBankAccounts: [],
+  listRefundReference: []
 }

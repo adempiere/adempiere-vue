@@ -424,7 +424,7 @@ export default {
         fieldsList: fieldLogic,
         isValidate: true
       })
-      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate) && this.currentFieldCurrency !== this.currentPointOfSales.currentPriceList.currency.iSOCode) {
+      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate) && this.isEmptyValue(this.currentFieldCurrency) && this.currentFieldCurrency !== this.currentPointOfSales.currentPriceList.currency.iSOCode) {
         return true
       }
       const paymentMethods = this.availablePaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
@@ -778,7 +778,7 @@ export default {
       let sum = 0
       if (!this.isEmptyValue(cash)) {
         cash.forEach((pay) => {
-          const searchConversion = this.$store.state['pointOfSales/point/index'].conversionsList.find(currency => currency.currencyTo.uuid === pay.currencyUuid)
+          const searchConversion = this.$store.state['pointOfSales/point/index'].conversionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === pay.currencyUuid)
           if (!this.isEmptyValue(pay.divideRate) && !this.isEmptyValue(searchConversion)) {
             sum += pay.amount * searchConversion.divideRate
           } else {
