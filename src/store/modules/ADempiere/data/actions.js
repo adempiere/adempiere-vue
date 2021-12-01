@@ -21,9 +21,6 @@ import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references'
 
 // api request methods
 import {
-  getEntity
-} from '@/api/ADempiere/common/persistence.js'
-import {
   requestGetContextInfoValue
 } from '@/api/ADempiere/window'
 
@@ -230,87 +227,7 @@ const actions = {
       data: dataStore
     })
   },
-  /**
-   * Is load context in true when panel is set context
-   * @param {string}  containerUuid
-   */
-  setIsloadContext({ commit, state }, { containerUuid }) {
-    const dataStore = state.recordSelection.find(recordItem => {
-      return recordItem.containerUuid === containerUuid
-    })
-    if (dataStore) {
-      commit('setIsloadContext', {
-        data: dataStore,
-        isLoadedContext: true
-      })
-    }
-  },
-  /**
-   * Set record, selection, page number, token, and record count, with container uuid
-   * @param {string}  parameters.containerUuid
-   * @param {array}   parameters.record
-   * @param {array}   parameters.selection
-   * @param {integer} parameters.pageNumber
-   * @param {integer} parameters.recordCount
-   * @param {string}  parameters.nextPageToken
-   * @param {string}  parameters.panelType
-   */
-  setRecordSelection({ state, commit }, parameters) {
-    const {
-      parentUuid, containerUuid, panelType = 'window', record = [],
-      query, whereClause, orderByClause,
-      selection = [], pageNumber = 1, recordCount = 0, nextPageToken,
-      originalNextPageToken, isAddRecord = false, isLoaded = true
-    } = parameters
 
-    const dataStore = state.recordSelection.find(recordItem => {
-      return recordItem.containerUuid === containerUuid
-    })
-
-    const newDataStore = {
-      parentUuid,
-      containerUuid,
-      record,
-      selection,
-      pageNumber,
-      recordCount,
-      nextPageToken,
-      originalNextPageToken,
-      panelType,
-      isLoaded,
-      isLoadedContext: false,
-      query,
-      whereClause,
-      orderByClause
-    }
-
-    if (dataStore) {
-      if (isAddRecord) {
-        newDataStore.record = dataStore.record.concat(newDataStore.record)
-      }
-      commit('setRecordSelection', {
-        dataStore,
-        newDataStore
-      })
-    } else {
-      commit('addRecordSelection', newDataStore)
-    }
-  },
-  /**
-   * Set selection in data list associated in container
-   * @param {string} containerUuid
-   * @param {array} selection
-   */
-  setSelection({ commit, getters }, {
-    containerUuid,
-    selection = []
-  }) {
-    const recordSelection = getters.getDataRecordAndSelection(containerUuid)
-    commit('setSelection', {
-      newSelection: selection,
-      data: recordSelection
-    })
-  },
   /**
    * Delete record result in container
    * @param {string}  viewUuid // As parentUuid in window
@@ -349,30 +266,6 @@ const actions = {
         })
       })
     }
-  },
-  /**
-   * @param {string} tableName
-   * @param {string} recordUuid
-   * @param {number} recordId
-   */
-  getEntity({ commit }, {
-    tableName,
-    recordUuid,
-    recordId
-  }) {
-    return new Promise(resolve => {
-      getEntity({
-        tableName,
-        recordUuid,
-        recordId
-      })
-        .then(responseGetEntity => {
-          resolve(responseGetEntity.attributes)
-        })
-        .catch(error => {
-          console.warn(`Error Get Entity ${error.message}. Code: ${error.code}.`)
-        })
-    })
   },
 
   /**

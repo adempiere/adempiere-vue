@@ -27,17 +27,7 @@ const getters = {
   getDataRecordSelection: (state, getters) => (containerUuid) => {
     return getters.getDataRecordAndSelection(containerUuid).selection
   },
-  getRowData: (state, getters) => ({ containerUuid, recordUuid, index }) => {
-    const recordsList = getters.getDataRecordsList(containerUuid)
-    if (!isEmptyValue(index)) {
-      return recordsList[index]
-    }
-    return recordsList.find(itemData => {
-      if (itemData.UUID === recordUuid) {
-        return true
-      }
-    })
-  },
+
   /**
    * Getter converter selection data record in format
    * @param {string} containerUuid

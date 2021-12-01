@@ -117,11 +117,14 @@
 </template>
 
 <script>
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin'
 
+// constants
 import preferenceFields from './preferenceValueFieldsList.js'
 import { CLIENT, ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
 
+// api request methods
 import { setPreference, deletePreference } from '@/api/ADempiere/field/preference.js'
 
 const containerUuid = `field-preference`
@@ -138,6 +141,10 @@ export default {
       type: [Object],
       required: true,
       default: null
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({})
     }
   },
 
@@ -166,12 +173,13 @@ export default {
       const { columnName, containerUuid, inTable } = this.fieldAttributes
       // table records values
       if (inTable) {
-        const row = this.$store.getters.getRowData({
+        return this.containerManager.getCell({
           containerUuid,
-          index: this.fieldAttributes.tableIndex
+          rowIndex: this.fieldAttributes.rowIndex,
+          columnName
         })
-        return row[columnName]
       }
+
       return this.$store.getters.getValueOfField({
         parentUuid: this.fieldAttributes.parentUuid,
         containerUuid,
@@ -183,12 +191,13 @@ export default {
       const { displayColumnName: columnName, containerUuid, inTable } = this.fieldAttributes
       // table records values
       if (inTable) {
-        const row = this.$store.getters.getRowData({
+        return this.containerManager.getCell({
           containerUuid,
-          index: this.fieldAttributes.tableIndex
+          rowIndex: this.fieldAttributes.rowIndex,
+          columnName
         })
-        return row[columnName]
       }
+
       return this.$store.getters.getValueOfField({
         parentUuid: this.fieldAttributes.parentUuid,
         containerUuid,

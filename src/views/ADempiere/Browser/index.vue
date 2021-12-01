@@ -76,7 +76,7 @@
 <script>
 import { computed, defineComponent, ref } from '@vue/composition-api'
 
-// componets
+// componets and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
@@ -220,11 +220,11 @@ export default defineComponent({
         })
         return
       }
-      // set default values into data
-      // this.$store.dispatch('setRecordSelection', {
-      //   containerUuid: this.browserUuid,
-      //   panelType: this.panelType
-      // })
+
+      // set empty values into container data
+      root.$store.commit('setBrowserData', {
+        containerUuid: browserUuid
+      })
     }
 
     const containerManager = {
@@ -303,6 +303,13 @@ export default defineComponent({
         return root.$store.getters.getBrowserRowData({
           containerUuid,
           rowIndex
+        })
+      },
+      getCell: ({ containerUuid, rowIndex, columnName }) => {
+        return root.$store.getters.getBrowserCellData({
+          containerUuid,
+          rowIndex,
+          columnName
         })
       },
 

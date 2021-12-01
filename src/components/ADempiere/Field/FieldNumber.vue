@@ -66,11 +66,9 @@
 // components and mixins
 import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
-// constants
-import { FIELDS_CURRENCY, isDecimalField } from '@/utils/ADempiere/references'
-
 // utils and helper methods
-import { calculationValue, INPUT_NUMBER_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
+import { isDecimalField } from '@/utils/ADempiere/references.js'
+import { calculationValue, formatNumber, INPUT_NUMBER_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
 
 export default {
   name: 'FieldNumber',
@@ -115,9 +113,9 @@ export default {
       return Number(this.metadata.valueMin)
     },
     precision() {
-      // Amount, Costs+Prices, Number
-      if (this.isDecimal) {
-        return this.currencyDefinition.standardPrecision
+      // Amount, Costs+Prices, Number, Quantity
+      if (isDecimalField(this.metadata.displayType)) {
+        return this.$store.getters.getStandardPrecision
       }
       return undefined
     },
@@ -139,55 +137,21 @@ export default {
       // show right controls
       return 'right'
     },
-    isDecimal() {
-      return isDecimalField(this.metadata.displayType)
-    },
-    isCurrency() {
-      return FIELDS_CURRENCY.includes(this.metadata.displayType)
-    },
     displayedValue() {
-      let value = this.value
-      if (this.isEmptyValue(value)) {
-        value = 0
-      }
-      if (!this.isDecimal) {
-        return value
-      }
-
-      let options = {
-        useGrouping: true,
-        minimumIntegerDigits: 1,
-        minimumFractionDigits: this.precision,
-        maximumFractionDigits: this.precision
-      }
-      let lang
-      if (this.isCurrency) {
-        lang = this.countryLanguage
-        options = {
-          ...options,
-          style: 'currency',
-          currency: this.currencyCode
-        }
-      }
-
-      // TODO: Check the grouping of thousands
-      const formatterInstance = new Intl.NumberFormat(lang, options)
-      return formatterInstance.format(value)
-    },
-    countryLanguage() {
-      return this.$store.getters.getCountryLanguage
+      return formatNumber({
+        value: this.value,
+        displayType: this.metadata.displayType,
+        currency: this.currencyCode
+      })
     },
     currencyCode() {
+      const currencyIsoCode = this.$store.getters.getCurrencyCode
       if (!this.isEmptyValue(this.metadata.labelCurrency)) {
-        if (this.metadata.labelCurrency.iSOCode === this.currencyDefinition.iSOCode) {
-          return this.currencyDefinition.iSOCode
+        if (this.metadata.labelCurrency.iSOCode !== currencyIsoCode) {
+          return this.metadata.labelCurrency.iSOCode
         }
-        return this.metadata.labelCurrency.iSOCode
       }
-      return this.currencyDefinition.iSOCode
-    },
-    currencyDefinition() {
-      return this.$store.getters.getCurrency
+      return currencyIsoCode
     }
   },
 

@@ -325,6 +325,27 @@ const windowManager = {
           return true
         }
       })
+    },
+    getTabCellData: (state, getters) => ({ containerUuid, recordUuid, rowIndex, columnName }) => {
+      const recordsList = getters.getTabRecordsList({ containerUuid })
+
+      let row = {}
+      if (!isEmptyValue(rowIndex)) {
+        row = recordsList[rowIndex]
+      }
+
+      if (isEmptyValue(row) && !isEmptyValue(recordUuid)) {
+        row = recordsList.find(itemData => {
+          if (itemData.UUID === recordUuid) {
+            return true
+          }
+        })
+      }
+
+      if (!isEmptyValue(row)) {
+        return row[columnName]
+      }
+      return undefined
     }
   }
 }

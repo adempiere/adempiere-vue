@@ -192,25 +192,18 @@ export default {
     },
     value: {
       get() {
-        const { columnName, containerUuid } = this.metadata
+        const { columnName, containerUuid, inTable } = this.metadata
 
         // table records values
-        if (this.metadata.inTable) {
+        if (inTable) {
           // implement container manager row
-          if (this.containerManager && this.containerManager.getRow) {
-            const row = this.containerManager.getRow({
-              containerUuid: this.metadata.containerUuid,
-              rowIndex: this.metadata.rowIndex
+          if (this.containerManager && this.containerManager.getCell) {
+            return this.containerManager.getCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName
             })
-
-            return row[columnName]
           }
-
-          const row = this.$store.getters.getRowData({
-            containerUuid,
-            index: this.metadata.tableIndex
-          })
-          return row[columnName]
         }
 
         // main panel values

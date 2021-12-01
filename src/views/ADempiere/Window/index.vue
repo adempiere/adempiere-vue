@@ -186,6 +186,15 @@ export default defineComponent({
         })
       },
 
+      getCell: ({ containerUuid, rowIndex, rowUuid, columnName }) => {
+        return root.$store.getters.getTabCellData({
+          containerUuid,
+          rowIndex,
+          rowUuid,
+          columnName
+        })
+      },
+
       changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
         root.$store.dispatch('changeTabFieldShowedFromUser', {
           parentUuid,

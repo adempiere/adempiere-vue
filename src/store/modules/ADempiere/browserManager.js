@@ -219,18 +219,20 @@ const browserControl = {
     getBrowserPageToken: (state, getters) => (containerUuid) => {
       return getters.getBrowserData(containerUuid).nextPageToken
     },
-    getBrowserRowData: (state, getters) => ({ containerUuid, recordUuid, rowIndex }) => {
+    getBrowserRowData: (state, getters) => ({ containerUuid, rowIndex }) => {
       const recordsList = getters.getBrowserRecordsList(containerUuid)
-      if (!isEmptyValue(rowIndex)) {
-        return recordsList[rowIndex]
-      }
-
-      return recordsList.find(itemData => {
-        if (itemData.UUID === recordUuid) {
-          return true
-        }
-      })
+      return recordsList[rowIndex]
     },
+    getBrowserCellData: (state, getters) => ({ containerUuid, rowIndex, columnName }) => {
+      const recordsList = getters.getBrowserRecordsList(containerUuid)
+
+      const row = recordsList[rowIndex]
+      if (!isEmptyValue(row)) {
+        return row[columnName]
+      }
+      return undefined
+    },
+
     /**
      * Getter converter selection data record in format
      * @param {string} containerUuid

@@ -120,15 +120,7 @@ export function formatQuantity(number) {
 }
 
 // Format percentage based on Intl library
-export function formatPercent(number) {
-  if (isEmptyValue(number)) {
-    return undefined
-  }
-  //  Get formatted number
-  return new Intl.NumberFormat(getCountryCode(), {
-    style: 'percent'
-  }).format(number)
-}
+export { formatPercent } from '@/utils/ADempiere/formatValue/numberFormat.js'
 
 //  Get country code from store
 function getCountryCode() {

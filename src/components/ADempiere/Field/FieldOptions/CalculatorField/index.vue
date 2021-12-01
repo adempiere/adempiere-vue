@@ -131,9 +131,11 @@
 </template>
 
 <script>
+// utils and helper methods
 import { calculationValue, INPUT_NUMBER_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
 import { isIntegerField } from '@/utils/ADempiere/references'
 
+// constants
 import buttons from './buttons.js'
 
 export default {
@@ -165,11 +167,11 @@ export default {
 
       // table records values
       if (inTable) {
-        const row = this.$store.getters.getRowData({
-          containerUuid,
-          index: this.fieldAttributes.tableIndex
+        return this.containerManager.getCell({
+          containerUuid: this.metadata.containerUuid,
+          rowIndex: this.metadata.rowIndex,
+          columnName
         })
-        return row[columnName]
       }
 
       // main panel values

@@ -46,6 +46,14 @@ export function getCountryCode() {
   return store.getters.getCountryLanguage
 }
 
+/**
+ * Fromat number based on diplay type
+ * @param {number} value
+ * @param {number} displayType
+ * @param {string} currency
+ * @param {string} country
+ * @returns {string|number}
+ */
 export function formatNumber({
   value,
   displayType,
@@ -76,10 +84,14 @@ export function formatNumber({
   return formattedNumber
 }
 
-//  Format Quantity
-export function formatQuantity({ number, isInteger = false }) {
-  if (isEmptyValue(number)) {
-    number = 0
+/**
+ * Format Quantity
+ * @param {number} value
+ * @param {boolean} isInteger
+ */
+export function formatQuantity({ value, isInteger = false }) {
+  if (isEmptyValue(value)) {
+    value = 0
   }
 
   let precision = getStandardPrecision()
@@ -95,13 +107,18 @@ export function formatQuantity({ number, isInteger = false }) {
     minimumIntegerDigits: 1,
     minimumFractionDigits: precision,
     maximumFractionDigits: precision
-  }).format(number)
+  }).format(value)
 }
 
-//  Get Formatted Price
-export function formatPrice({ number, currency, country = '' }) {
-  if (isEmptyValue(number)) {
-    number = 0
+/**
+ * Get Formatted Price
+ * @param {number} value
+ * @param {string} currency
+ * @param {string} country
+ */
+export function formatPrice({ value, currency, country = '' }) {
+  if (isEmptyValue(value)) {
+    value = 0
   }
 
   if (isEmptyValue(currency)) {
@@ -122,7 +139,23 @@ export function formatPrice({ number, currency, country = '' }) {
     // minimumFractionDigits: precision,
     // maximumFractionDigits: precision,
     minimumIntegerDigits: 1
-  }).format(number)
+  }).format(value)
+}
+
+/**
+ * Format percentage based on Intl library
+ * @param {number} value
+ */
+export function formatPercent(value) {
+  if (isEmptyValue(value)) {
+    value = 0
+  }
+
+  //  Get formatted number
+  return new Intl.NumberFormat(getCountryCode(), {
+    style: 'percent',
+    minimumIntegerDigits: 1
+  }).format(value)
 }
 
 /**
