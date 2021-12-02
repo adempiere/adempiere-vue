@@ -129,7 +129,7 @@
           </div>
         </el-card>
         <type-collection
-          v-if="!isEmptyValue(listPaymentsRefund)"
+          v-if="!isEmptyValue(listPaymentsRefund) && option === 1"
           id="cardCollection"
           :is-add-type-pay="listPaymentsRefund"
           :currency="pointOfSalesCurrency"
@@ -271,12 +271,16 @@
               @click="undoPatment"
             />
           </div>
+          <br>
+          <br>
+          <el-divider v-if="!isEmptyValue(listRefundsReference)" content-position="center" style="padding: 10px;"><h2> Reembolso Posterior </h2></el-divider>
           <type-collection
             v-if="!isEmptyValue(listRefundsReference)"
             id="cardCollection"
             :is-add-type-pay="listRefundsReference"
             :currency="pointOfSalesCurrency"
             :is-refund-reference="true"
+            :size="6"
           />
           <type-collection
             v-if="!isEmptyValue(listPaymentsRefund)"
@@ -316,7 +320,7 @@
           type="primary"
           class="custom-button-create-bp"
           icon="el-icon-check"
-          :disabled=" option === 1 ? isEmptyValue(listPaymentsRefund) : false"
+          :disabled="validateOverdrawnInvoice"
           @click="addRefund"
         />
       </span>
@@ -387,6 +391,14 @@ export default {
     }
   },
   computed: {
+    validateOverdrawnInvoice() {
+      if (this.option === 1) {
+        return this.isEmptyValue(this.listPaymentsRefund)
+      } else if (this.option === 3) {
+        return this.isEmptyValue(this.listRefundsReference)
+      }
+      return false
+    },
     listRefundsReference() {
       return this.$store.getters.getListRefundReference
     },
@@ -493,7 +505,7 @@ export default {
     refundReferenceCurrency() {
       if (!this.isEmptyValue(this.currentFieldPaymentMethods)) {
         const currency = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
-        if (!this.isEmptyValue) {
+        if (!this.isEmptyValue(currency)) {
           return currency.reference_currency.iso_code
         }
       }
@@ -693,20 +705,74 @@ export default {
         containerUuid: 'OverdrawnInvoice',
         format: 'object'
       })
+      const nameAccount = this.$store.getters.getValueOfField({
+        containerUuid: 'OverdrawnInvoice',
+        columnName: 'Name'
+      })
+      const value = this.$store.getters.getValueOfField({
+        containerUuid: 'OverdrawnInvoice',
+        columnName: 'Value'
+      })
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
       const refund = this.convertValuesToSend(values)
-      refund.currencyUuid = 'a5671df0-fb40-11e8-a479-7a0060f0aa01'
-      refund.tenderTypeCode = payment.tender_type
+      const currencySelected = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       if (this.isEmptyValue(this.currentBankAccount)) {
-        this.$store.dispatch('customerBankAccount', this.convertValuesToSend(values))
+        this.$store.dispatch('customerBankAccount', {
+          customerUuid: refund.customerUuid,
+          posUuid: refund.posUuid,
+          email: refund.email,
+          driverLicense: value,
+          socialSecurityNumber: value,
+          name: nameAccount,
+          zip: value,
+          bankAccountType: refund.bankAccountType,
+          bankUuid: refund.bankAccountType,
+          paymentMethodUuid: payment.uuid,
+          isAch: true,
+          routingNo: refund.routingNo
+        })
           .then(response => {
-            refund.customerBankAccountUuid = response.customerBankAccountUuid
-            this.$store.dispatch('refundReference', refund)
+            this.$store.dispatch('refundReference', {
+              ...refund,
+              customerBankAccountUuid: response.customerBankAccountUuid,
+              currencyUuid: this.isEmptyValue(currencySelected) ? this.defaultReferenceCurrency : currencySelected.uuid,
+              tenderTypeCode: payment.tender_type,
+              customerUuid: refund.customerUuid,
+              posUuid: refund.posUuid,
+              email: refund.email,
+              driverLicense: value,
+              socialSecurityNumber: value,
+              name: nameAccount,
+              zip: value,
+              bankAccountType: refund.bankAccountType,
+              bankUuid: refund.bankAccountType,
+              paymentMethodUuid: payment.uuid,
+              isAch: true,
+              routingNo: refund.routingNo
+            })
           })
+        this.clearAccountData()
         return
       }
-      refund.customerBankAccountUuid = this.currentBankAccount.customerBankAccountUuid
-      this.$store.dispatch('refundReference', refund)
+      this.$store.dispatch('refundReference', {
+        ...refund,
+        customerBankAccountUuid: this.currentBankAccount,
+        currencyUuid: this.isEmptyValue(currencySelected) ? this.defaultReferenceCurrency : currencySelected.uuid,
+        tenderTypeCode: payment.tender_type,
+        customerUuid: refund.customerUuid,
+        posUuid: refund.posUuid,
+        email: refund.email,
+        driverLicense: value,
+        socialSecurityNumber: value,
+        name: nameAccount,
+        zip: value,
+        bankAccountType: refund.bankAccountType,
+        bankUuid: refund.bankAccountType,
+        paymentMethodUuid: payment.uuid,
+        isAch: true,
+        routingNo: refund.routingNo
+      })
+      this.clearAccountData()
       return
     },
 
@@ -788,7 +854,7 @@ export default {
           },
           {
             columnName: 'Value',
-            value: value.zip
+            value: this.isEmptyValue(value.zip) ? value.social_security_number : value.zip
           },
           {
             columnName: 'AccountNo',
@@ -804,10 +870,51 @@ export default {
           },
           {
             columnName: 'EMail',
-            value: this.empty(value, 'email')
+            value: this.isEmptyValue(value.email) ? value.name : value.email
           }
         ]
       })
+    },
+    clearAccountData() {
+      const containerUuid = 'OverdrawnInvoice'
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [
+          {
+            columnName: 'Name',
+            value: undefined
+          },
+          {
+            columnName: 'Value',
+            value: undefined
+          },
+          {
+            columnName: 'AccountNo',
+            value: undefined
+          },
+          {
+            columnName: 'C_Bank_ID_UUID',
+            value: undefined
+          },
+          {
+            columnName: 'BankAccountType',
+            value: undefined
+          },
+          {
+            columnName: 'C_Bank_ID',
+            value: undefined
+          },
+          {
+            columnName: 'Phone',
+            value: undefined
+          },
+          {
+            columnName: 'EMail',
+            value: undefined
+          }
+        ]
+      })
+      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
     },
     undoPatment() {
       const list = this.listPaymentsRefund[this.listPaymentsRefund.length - 1]
@@ -842,6 +949,8 @@ export default {
         containerUuid,
         columnName: 'DateTrx'
       })
+      const currencySelected = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
+      const currencyUuid = this.isEmptyValue(currencySelected) ? this.defaultReferenceCurrency : currencySelected.uuid
       const tenderTypeCode = this.currentAvailablePaymentMethods.tender_type
       const paymentMethodUuid = this.currentAvailablePaymentMethods.uuid
       const referenceNo = this.$store.getters.getValueOfField({
@@ -858,7 +967,7 @@ export default {
         paymentDate,
         tenderTypeCode,
         paymentMethodUuid,
-        currencyUuid: this.defaultReferenceCurrency.uuid
+        currencyUuid
       })
       this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
     },
@@ -918,7 +1027,7 @@ export default {
       const orderUuid = this.currentOrder.uuid
       const payments = this.currentOrder.listPayments.payments
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: this.renderComponentContainer, formatReturn: 'name' })
-      if (this.caseOrder === 1 && (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.defaultReferenceCurrency.uuid))) {
+      if (this.caseOrder === 1 && (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency))) {
         this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
         if (this.option !== 4) {
           this.$message({
@@ -1011,9 +1120,22 @@ export default {
             }
             this.visible = true
             this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+          } else if (Math.abs(this.currentOrder.refundAmount) > this.currentPointOfSales.writeOffAmountTolerance) {
+            const attributePin = {
+              posUuid: this.currentPointOfSales.uuid,
+              orderUuid: this.currentOrder.uuid,
+              payments: this.$store.getters.getListRefund,
+              typeRefund: this.option,
+              action: 'openBalanceInvoice',
+              type: 'actionPos',
+              label: 'Cambio Incomleto'
+            }
+            this.visible = true
+            this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+          } else {
+            this.completePreparedOrder(posUuid, orderUuid, payments)
+            this.$store.commit('dialogoInvoce', { show: false, success: true })
           }
-          this.completePreparedOrder(posUuid, orderUuid, payments)
-          this.$store.commit('dialogoInvoce', { show: false, success: true })
           break
         case 2:
           this.completePreparedOrder(posUuid, orderUuid, payments)

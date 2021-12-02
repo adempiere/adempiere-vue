@@ -844,6 +844,7 @@ export default {
     if (this.isNewOrder) {
       this.$refs.ProductValue[0].$refs.product.focus()
     }
+    this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
   },
   methods: {
     formatDate,

@@ -65,13 +65,13 @@
                         style="padding-bottom: 20px;"
                       >
                         <p v-if="!isEmptyValue(value.currencyConvertion)" class="total">
-                          <b style="float: right;">
+                          <b :style=" isRefundReference ? 'float: right;color: red' : 'float: right;'">
                             {{ amountConvertion(value) }}
                           </b>
                         </p>
                         <br>
                         <p class="total">
-                          <b style="float: right;">
+                          <b :style=" isRefundReference ? 'float: right;color: red' : 'float: right;'">
                             {{ formatPrice(value.amount, iSOCode(value)) }}
                           </b>
                         </p>
@@ -85,8 +85,8 @@
         </template>
       </el-row>
     </el-main>
-    <el-divider v-if="!isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
-    <el-footer v-if="!isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
+    <el-divider v-if="!isRefundReference && !isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
+    <el-footer v-if="!isRefundReference && !isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
       <el-row :gutter="24">
         <template v-for="(value, key) in listRefund">
           <el-col v-if="value.isRefund" :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
@@ -216,6 +216,7 @@ export default {
   },
   computed: {
     typesPayment() {
+      console.log(this.isAddTypePay)
       return this.$store.getters.getListsPaymentTypes
     },
     listCurrency() {
