@@ -259,17 +259,17 @@ export default defineComponent({
       return props.dataTable
     })
 
-    function handleSelection(rowsSelectionList, rowSelected) {
+    function handleSelection(selections, rowSelected) {
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
-        recordsSelected: rowsSelectionList
+        recordsSelected: selections
       })
     }
 
-    function handleSelectionAll(rowsSelectionList) {
+    function handleSelectionAll(selections) {
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
-        recordsSelected: rowsSelectionList
+        recordsSelected: selections
       })
     }
 
