@@ -15,21 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 const mutations = {
-  addRecordSelection(state, payload) {
-    state.recordSelection.push(payload)
-  },
-  setRecordSelection(state, payload) {
-    payload.dataStore.record = payload.newDataStore.record
-    payload.dataStore.selection = payload.newDataStore.selection
-    payload.dataStore.pageNumber = payload.newDataStore.pageNumber
-    payload.dataStore.recordCount = payload.newDataStore.recordCount
-    payload.dataStore.nextPageToken = payload.newDataStore.nextPageToken
-    payload.dataStore.isLoadedContext = payload.newDataStore.isLoadedContext
-    payload.dataStore.isLoaded = payload.newDataStore.isLoaded
-  },
-  setSelection(state, payload) {
-    payload.data.selection = payload.newSelection
-  },
+
   deleteRecordContainer(state, payload) {
     state.recordSelection = payload
   },
@@ -52,9 +38,7 @@ const mutations = {
   notifyRowTableChange: (state, payload) => {
     Object.assign(payload.row, payload.newRow)
   },
-  setIsloadContext(state, payload) {
-    payload.data.isLoadedContext = payload.isLoadedContext
-  },
+
   addNewRow(state, payload) {
     payload.data = payload.data.unshift(payload.values)
   },

@@ -195,6 +195,23 @@ export default defineComponent({
         })
       },
 
+      setSelection: ({
+        containerUuid,
+        recordsSelected
+      }) => {
+        root.$store.commit('setTabSelectionsList', {
+          containerUuid,
+          selectionsList: recordsSelected
+        })
+      },
+      getSelection: ({
+        containerUuid
+      }) => {
+        return root.$store.getters.getTabSelectionsList({
+          containerUuid
+        })
+      },
+
       changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
         root.$store.dispatch('changeTabFieldShowedFromUser', {
           parentUuid,

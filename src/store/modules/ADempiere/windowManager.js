@@ -45,6 +45,7 @@ const windowManager = {
       parentUuid,
       containerUuid,
       recordsList = [],
+      selectionsList = [],
       nextPageToken,
       recordCount = 0,
       isLoaded = true,
@@ -55,6 +56,7 @@ const windowManager = {
         parentUuid,
         containerUuid,
         recordsList,
+        selectionsList,
         nextPageToken,
         recordCount,
         isLoaded,
@@ -62,6 +64,13 @@ const windowManager = {
         pageNumber
       }
       Vue.set(state.tabData, containerUuid, dataTab)
+    },
+
+    setTabSelectionsList(state, {
+      containerUuid,
+      selectionsList
+    }) {
+      Vue.set(state.tabData[containerUuid], 'selectionsList', selectionsList)
     },
 
     resetStateWindowManager(state) {
@@ -298,6 +307,7 @@ const windowManager = {
         parentUuid: undefined,
         containerUuid,
         recordsList: [],
+        selectionsList: [],
         nextPageToken: undefined,
         recordCount: 0,
         isLoadedContext: false,
@@ -307,6 +317,9 @@ const windowManager = {
     },
     getTabRecordsList: (state, getters) => ({ containerUuid }) => {
       return getters.getTabData({ containerUuid }).recordsList
+    },
+    getTabSelectionsList: (state, getters) => ({ containerUuid }) => {
+      return getters.getTabData({ containerUuid }).selectionsList
     },
     getTabPageNumber: (state, getters) => ({ containerUuid }) => {
       return getters.getTabData({ containerUuid }).pageNumber

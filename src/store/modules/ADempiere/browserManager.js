@@ -119,7 +119,9 @@ const browserControl = {
       let pageToken
       if (!isEmptyValue(pageNumber)) {
         pageNumber-- // TODO: Remove with fix in backend
-        const token = getters.getBrowserPageToken(containerUuid)
+        const token = getters.getBrowserPageToken({
+          containerUuid
+        })
         pageToken = generatePageToken({ pageNumber, token })
       }
 
@@ -207,24 +209,28 @@ const browserControl = {
         isLoaded: false
       }
     },
-    getBrowserRecordsList: (state, getters) => (containerUuid) => {
+    getBrowserRecordsList: (state, getters) => ({ containerUuid }) => {
       return getters.getBrowserData(containerUuid).recordsList
     },
-    getBrowserSelectionsList: (state, getters) => (containerUuid) => {
+    getBrowserSelectionsList: (state, getters) => ({ containerUuid }) => {
       return getters.getBrowserData(containerUuid).selectionsList
     },
-    getBrowserPageNumber: (state, getters) => (containerUuid) => {
+    getBrowserPageNumber: (state, getters) => ({ containerUuid }) => {
       return getters.getBrowserData(containerUuid).pageNumber
     },
-    getBrowserPageToken: (state, getters) => (containerUuid) => {
+    getBrowserPageToken: (state, getters) => ({ containerUuid }) => {
       return getters.getBrowserData(containerUuid).nextPageToken
     },
     getBrowserRowData: (state, getters) => ({ containerUuid, rowIndex }) => {
-      const recordsList = getters.getBrowserRecordsList(containerUuid)
+      const recordsList = getters.getBrowserRecordsList({
+        containerUuid
+      })
       return recordsList[rowIndex]
     },
     getBrowserCellData: (state, getters) => ({ containerUuid, rowIndex, columnName }) => {
-      const recordsList = getters.getBrowserRecordsList(containerUuid)
+      const recordsList = getters.getBrowserRecordsList({
+        containerUuid
+      })
 
       const row = recordsList[rowIndex]
       if (!isEmptyValue(row)) {
@@ -249,7 +255,9 @@ const browserControl = {
       const selectionToServer = []
 
       if (isEmptyValue(selectionsList)) {
-        selectionsList = getters.getBrowserSelectionsList(containerUuid)
+        selectionsList = getters.getBrowserSelectionsList({
+          containerUuid
+        })
       }
 
       if (isEmptyValue(selectionsList)) {

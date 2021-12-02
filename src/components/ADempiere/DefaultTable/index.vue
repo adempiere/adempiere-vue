@@ -56,6 +56,7 @@
     >
       <!-- column with the checkbox -->
       <el-table-column
+        v-if="isTableSelection"
         type="selection"
         :prop="keyColumn"
         fixed
@@ -97,10 +98,10 @@
 </template>
 
 <script>
-import { defineComponent, computed, ref } from '@vue/composition-api'
+import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
 
-// components
-import CellInfo from './CellInfo'
+// components and mixins
+import CellInfo from './CellInfo.vue'
 import ColumnsDisplayOption from './ColumnsDisplayOption'
 import CustomPagination from './CustomPagination.vue'
 
@@ -148,10 +149,15 @@ export default defineComponent({
     recordCount: {
       type: Number,
       default: 0
+    },
+    // Show check column from selection row
+    isTableSelection: {
+      type: Boolean,
+      default: true
     }
   },
 
-  setup(props, { root }) {
+  setup(props, { root, refs }) {
     const valueToSearch = ref('')
 
     const currentOption = computed(() => {
@@ -253,19 +259,43 @@ export default defineComponent({
       return props.dataTable
     })
 
-    function handleSelection(rowsSelection, rowsSelected) {
+    function handleSelection(rowsSelectionList, rowSelected) {
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
-        recordsSelected: rowsSelection
+        recordsSelected: rowsSelectionList
       })
     }
 
-    function handleSelectionAll(rowsSelection) {
+    function handleSelectionAll(rowsSelectionList) {
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
-        recordsSelected: rowsSelection
+        recordsSelected: rowsSelectionList
       })
     }
+
+    /**
+     * Select or unselect rows
+     * USE ONLY MOUNTED
+     */
+    function toggleSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          refs.multipleTable.toggleRowSelection(row)
+        })
+      } else {
+        refs.multipleTable.clearSelection()
+      }
+    }
+
+    onMounted(() => {
+      if (props.isTableSelection) {
+        const selectionsList = props.containerManager.getSelection({
+          containerUuid: props.containerUuid
+        })
+
+        toggleSelection(selectionsList)
+      }
+    })
 
     return {
       // data

@@ -289,16 +289,6 @@ export default defineComponent({
         console.log(containerUuid, row)
       },
 
-      setSelection: ({
-        containerUuid,
-        recordsSelected
-      }) => {
-        root.$store.commit('setBrowserSelectionsList', {
-          containerUuid,
-          selectionsList: recordsSelected
-        })
-      },
-
       getRow: ({ containerUuid, rowIndex }) => {
         return root.$store.getters.getBrowserRowData({
           containerUuid,
@@ -317,6 +307,23 @@ export default defineComponent({
         root.$store.commit('getBrowserSearch', {
           containerUuid,
           pageNumber
+        })
+      },
+
+      setSelection: ({
+        containerUuid,
+        recordsSelected
+      }) => {
+        root.$store.commit('setBrowserSelectionsList', {
+          containerUuid,
+          selectionsList: recordsSelected
+        })
+      },
+      getSelection: ({
+        containerUuid
+      }) => {
+        return root.$store.getters.getBrowserSelectionsList({
+          containerUuid
         })
       }
     }
@@ -345,11 +352,15 @@ export default defineComponent({
 
     // get records list
     const recordsList = computed(() => {
-      return root.$store.getters.getBrowserRecordsList(browserUuid)
+      return root.$store.getters.getBrowserRecordsList({
+        containerUuid: browserUuid
+      })
     })
 
     const recordCount = computed(() => {
-      const data = root.$store.getters.getBrowserData(browserUuid)
+      const data = root.$store.getters.getBrowserData({
+        containerUuid: browserUuid
+      })
       if (data && data.recordCount) {
         return data.recordCount
       }

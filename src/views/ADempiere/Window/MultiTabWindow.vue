@@ -161,12 +161,6 @@ export default defineComponent({
           containerUuid,
           pageNumber
         })
-      },
-      setSelection: ({ containerUuid, recordsSelected }) => {
-        console.info('setSelection callback', containerUuid, recordsSelected)
-      },
-      setSelectionAll: ({ containerUuid, recordsSelected }) => {
-        console.info('setSelectionAll callback', containerUuid, recordsSelected)
       }
     }
 
