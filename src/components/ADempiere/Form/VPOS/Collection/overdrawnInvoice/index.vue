@@ -259,7 +259,7 @@
               style="float: right"
               type="success"
               icon="el-icon-plus"
-              :disabled="validPay"
+              :disabled="validPay && (currentOrder.refundAmount === 0)"
               @click="addPostPayment"
             />
             <el-button
@@ -271,21 +271,9 @@
               @click="undoPatment"
             />
           </div>
-          <br>
-          <br>
-          <el-divider v-if="!isEmptyValue(listRefundsReference)" content-position="center" style="padding: 10px;"><h2> Reembolso Posterior </h2></el-divider>
           <type-collection
-            v-if="!isEmptyValue(listRefundsReference)"
+            v-if="!isEmptyValue(listRefund)"
             id="cardCollection"
-            :is-add-type-pay="listRefundsReference"
-            :currency="pointOfSalesCurrency"
-            :is-refund-reference="true"
-            :size="6"
-          />
-          <type-collection
-            v-if="!isEmptyValue(listPaymentsRefund)"
-            id="cardCollection"
-            :is-add-type-pay="listPaymentsRefund"
             :currency="pointOfSalesCurrency"
             :size="6"
           />
@@ -398,6 +386,12 @@ export default {
         return this.isEmptyValue(this.listRefundsReference)
       }
       return false
+    },
+    listRefund() {
+      const refund = this.$store.getters.getListRefund.filter(refund => refund.isRefund)
+      const listRefundsReference = this.$store.getters.getListRefundReference
+      const list = listRefundsReference.concat(refund)
+      return list
     },
     listRefundsReference() {
       return this.$store.getters.getListRefundReference
@@ -715,21 +709,30 @@ export default {
       })
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
       const refund = this.convertValuesToSend(values)
+      if (refund.amount > this.currentOrder.refundAmount) {
+        this.$message({
+          type: 'warning',
+          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
+          duration: 1500,
+          showClose: true
+        })
+        return
+      }
       const currencySelected = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       if (this.isEmptyValue(this.currentBankAccount)) {
         this.$store.dispatch('customerBankAccount', {
+          ...refund,
           customerUuid: refund.customerUuid,
           posUuid: refund.posUuid,
           email: refund.email,
           driverLicense: value,
           socialSecurityNumber: value,
           name: nameAccount,
-          zip: value,
           bankAccountType: refund.bankAccountType,
-          bankUuid: refund.bankAccountType,
+          bankUuid: refund.bankUuid,
           paymentMethodUuid: payment.uuid,
           isAch: true,
-          routingNo: refund.routingNo
+          AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
         })
           .then(response => {
             this.$store.dispatch('refundReference', {
@@ -743,12 +746,11 @@ export default {
               driverLicense: value,
               socialSecurityNumber: value,
               name: nameAccount,
-              zip: value,
               bankAccountType: refund.bankAccountType,
-              bankUuid: refund.bankAccountType,
+              bankUuid: refund.bankID,
               paymentMethodUuid: payment.uuid,
               isAch: true,
-              routingNo: refund.routingNo
+              AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
             })
           })
         this.clearAccountData()
@@ -765,12 +767,11 @@ export default {
         driverLicense: value,
         socialSecurityNumber: value,
         name: nameAccount,
-        zip: value,
         bankAccountType: refund.bankAccountType,
         bankUuid: refund.bankAccountType,
         paymentMethodUuid: payment.uuid,
         isAch: true,
-        routingNo: refund.routingNo
+        AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
       })
       this.clearAccountData()
       return
@@ -824,7 +825,7 @@ export default {
             valuesToSend['bank'] = value
             break
           case 'AccountNo':
-            valuesToSend['routingNo'] = value
+            valuesToSend['AccountNo'] = value
             break
           case 'DateTrx':
             valuesToSend['paymentAccountDate'] = value
@@ -854,7 +855,7 @@ export default {
           },
           {
             columnName: 'Value',
-            value: this.isEmptyValue(value.zip) ? value.social_security_number : value.zip
+            value: this.isEmptyValue(value.driver_license) ? value.social_security_number : value.driver_license
           },
           {
             columnName: 'AccountNo',
@@ -1128,7 +1129,7 @@ export default {
               typeRefund: this.option,
               action: 'openBalanceInvoice',
               type: 'actionPos',
-              label: 'Cambio Incomleto'
+              label: this.$t('form.pos.collect.overdrawnInvoice.incompleteChange')
             }
             this.visible = true
             this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
@@ -1167,26 +1168,23 @@ export default {
               }
               this.visible = true
               this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+            } else if (Math.abs(this.currentOrder.refundAmount) > this.currentPointOfSales.writeOffAmountTolerance) {
+              const attributePin = {
+                posUuid: this.currentPointOfSales.uuid,
+                orderUuid: this.currentOrder.uuid,
+                payments: this.$store.getters.getListRefund,
+                typeRefund: this.option,
+                action: 'openBalanceInvoice',
+                type: 'actionPos',
+                label: this.$t('form.pos.collect.overdrawnInvoice.incompleteChange')
+              }
+              this.visible = true
+              this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
             } else {
               this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
                 .then(response => {
                   if (response.type === 'success') {
-                    const { BankAccountType, A_Ident_SSN, C_Bank_ID_UUID, EMail, IsACH } = !this.isEmptyValue(this.$store.getters.getAddRefund) ? this.$store.getters.getAddRefund.customer.customerAccount : ''
                     this.completePreparedOrder(posUuid, orderUuid, payments)
-                    this.$store.dispatch('reloadOrder', response.uuid)
-                    this.$store.dispatch('customerBankAccount', {
-                      customerUuid: this.currentOrder.businessPartner.uuid,
-                      posUuid: this.currentPointOfSales.uuid,
-                      email: EMail,
-                      socialSecurityNumber: A_Ident_SSN,
-                      name: this.currentOrder.businessPartner.name,
-                      bankAccountType: BankAccountType,
-                      bankUuid: C_Bank_ID_UUID,
-                      isAch: IsACH
-                    })
-                      .then(response => {
-                        this.refundAllowed(posUuid, orderUuid, payments)
-                      })
                     this.$message({
                       type: 'success',
                       message: this.$t('notifications.completed'),

@@ -952,6 +952,7 @@ export function createCustomerBankAccount({
   isAch,
   addressVerified,
   zipVerified,
+  AccountNo,
   routingNo,
   iban
 }) {
@@ -968,6 +969,7 @@ export function createCustomerBankAccount({
       social_security_number: socialSecurityNumber,
       name,
       state,
+      account_no: AccountNo,
       street,
       zip,
       bank_account_type: bankAccountType,

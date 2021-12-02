@@ -313,6 +313,7 @@ export default {
           payments: response.listPayments.reverse(),
           isLoaded: true
         })
+        dispatch('listRefunds', { posUuid, orderUuid })
         dispatch('reloadOrder', { posUuid, orderUuid })
       })
       .catch(error => {
@@ -462,6 +463,7 @@ export default {
     addressVerified,
     zipVerified,
     routingNo,
+    AccountNo,
     iban
   }) {
     return createCustomerBankAccount({
@@ -480,6 +482,7 @@ export default {
       paymentMethodUuid,
       bankUuid,
       isAch,
+      AccountNo,
       addressVerified,
       zipVerified,
       routingNo,
@@ -546,16 +549,15 @@ export default {
           customerUuid,
           orderUuid
         })
+        dispatch('reloadOrder', { posUuid, orderUuid })
       })
   },
   listRefunds({ commit }, {
     posUuid,
-    customerUuid,
     orderUuid
   }) {
     listRefundReference({
       posUuid,
-      customerUuid,
       orderUuid
     })
       .then(response => {
@@ -574,7 +576,6 @@ export default {
       .then(response => {
         dispatch('listRefunds', {
           posUuid,
-          customerUuid,
           orderUuid
         })
       })

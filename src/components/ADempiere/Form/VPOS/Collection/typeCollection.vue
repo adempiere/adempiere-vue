@@ -85,11 +85,11 @@
         </template>
       </el-row>
     </el-main>
-    <el-divider v-if="!isRefundReference && !isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
+    <el-divider v-if="!isRefundReference && !isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} / Otros </h2></el-divider>
     <el-footer v-if="!isRefundReference && !isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
       <el-row :gutter="24">
         <template v-for="(value, key) in listRefund">
-          <el-col v-if="value.isRefund" :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
+          <el-col :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
             <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
@@ -216,7 +216,6 @@ export default {
   },
   computed: {
     typesPayment() {
-      console.log(this.isAddTypePay)
       return this.$store.getters.getListsPaymentTypes
     },
     listCurrency() {
@@ -239,11 +238,10 @@ export default {
       return this.$store.getters.getPaymentTypeList
     },
     listRefund() {
-      const refund = this.$store.getters.getListRefund
-      if (this.isEmptyValue(refund)) {
-        return []
-      }
-      return refund.filter(refund => refund.isRefund)
+      const refund = this.$store.getters.getListRefund.filter(refund => refund.isRefund)
+      const listRefundsReference = this.$store.getters.getListRefundReference
+      const list = listRefundsReference.concat(refund)
+      return list
     }
   },
   watch: {
@@ -280,7 +278,7 @@ export default {
     },
     labelTenderType(tenderType) {
       const currentTenderType = this.availablePaymentMethods.find(label => {
-        const params = this.isRefundReference ? tenderType.payment_method_uuid : tenderType.paymentMethodUuid
+        const params = !this.isEmptyValue(tenderType.is_paid) ? tenderType.payment_method_uuid : tenderType.paymentMethodUuid
         if (label.uuid === params) {
           return label
         }
@@ -385,7 +383,7 @@ export default {
     },
     imageCard(typePayment, currency) {
       let image
-      const params = this.isRefundReference ? typePayment.tender_type_code : typePayment.tenderTypeCode
+      const params = !this.isEmptyValue(typePayment.is_paid) ? typePayment.tender_type_code : typePayment.tenderTypeCode
       switch (params) {
         case 'D':
           image = 'MobilePayment.jpg'
@@ -415,12 +413,11 @@ export default {
       return this.availablePaymentMethods.find(pay => pay.uuid === value.paymentMethodUuid)
     },
     deleteCollect(key) {
-      const orderUuid = key.orderUuid
       const paymentUuid = key.uuid
-      const deletetPayments = this.isRefundReference ? 'deleteRefundReferences' : 'deletetPayments'
+      const deletetPayments = !this.isEmptyValue(key.is_paid) ? 'deleteRefundReferences' : 'deletetPayments'
       this.$store.dispatch(deletetPayments, {
         posUuid: this.currentPointOfSales.uuid,
-        orderUuid,
+        orderUuid: this.currentOrder.uuid,
         uuid: key.uuid,
         customerUuid: this.currentPointOfSales.currentOrder.businessPartner.uuid,
         paymentUuid

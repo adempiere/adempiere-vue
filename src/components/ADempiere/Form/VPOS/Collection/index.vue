@@ -135,7 +135,7 @@
                 <div style="border: 1px solid rgb(54, 163, 247);padding-left: 10px;padding-right: 10px;">
                   <p class="total">
                     <b>
-                      {{ $t('form.pos.collect.orderTotal') }}:
+                      {{ $t('form.pos.collect.orderTotal') }} {{ '(' + currentOrder.documentNo + ')' }}:
                     </b>
                     <b style="float: right;">
                       {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}

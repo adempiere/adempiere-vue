@@ -554,6 +554,8 @@ export default {
           emptyPayment: 'Unsupported payment method',
           emptyListPayment: 'You do not have any payment method associated with this option',
           addPayment: 'You must add a change type to complete the operation',
+          amountChange: 'Amount greater than change',
+          incompleteChange: 'Incomplete Change',
           fieldList: {
             code: 'Cedula',
             name: 'Holder Name',
