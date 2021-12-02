@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import router from '@/router'
+
 // api request methods
 import { requestWindowMetadata } from '@/api/ADempiere/dictionary/window.js'
 
@@ -113,5 +115,83 @@ export default {
         })
       }
     }
+  },
+
+  /**
+   * Set default values to panel
+   * @param {string}  parentUuid
+   * @param {string}  containerUuid
+   * TODO: Evaluate if it is necessary to parse the default values
+   */
+  setTabDefaultValues({ commit, dispatch, rootGetters }, {
+    parentUuid,
+    containerUuid,
+    isOverWriteParent = true
+  }) {
+    return new Promise(resolve => {
+      const tab = rootGetters.getStoredTab(parentUuid, containerUuid)
+
+      const currentRoute = router.app._route
+      delete currentRoute.query.filters
+      // set action
+      router.push({
+        name: currentRoute.name,
+        params: {
+          ...currentRoute.params
+        },
+        query: {
+          ...currentRoute.query,
+          action: 'create-new'
+        }
+      }, () => {})
+
+      let defaultAttributes = rootGetters.getParsedDefaultValues({
+        parentUuid,
+        containerUuid,
+        isSOTrxMenu: currentRoute.meta.isSalesTransaction,
+        fieldsList: tab.fieldsList
+      })
+
+      // set vales with permant link
+      if (!rootGetters['permantLink/isReadFilters'] &&
+        containerUuid === rootGetters['permantLink/getLinkContainerUuid']) {
+        const parsedFilters = rootGetters['permantLink/getParsedFilters']
+        if (!isEmptyValue(parsedFilters)) {
+          // merge values
+          defaultAttributes = defaultAttributes.map(attribute => {
+            const filterValue = parsedFilters[attribute.columnName]
+            return {
+              ...attribute,
+              value: filterValue
+            }
+          })
+        }
+
+        commit('permantLink/setIsReadFilters', null, {
+          root: true
+        })
+      }
+
+      defaultAttributes.forEach(attribute => {
+        commit('addChangeToPersistenceQueue', {
+          ...attribute,
+          containerUuid
+        }, {
+          root: true
+        })
+      })
+
+      dispatch('updateValuesOfContainer', {
+        parentUuid,
+        containerUuid,
+        isOverWriteParent,
+        attributes: defaultAttributes
+      }, {
+        root: true
+      })
+
+      resolve(defaultAttributes)
+    })
   }
+
 }

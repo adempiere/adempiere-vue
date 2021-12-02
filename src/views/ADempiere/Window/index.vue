@@ -88,6 +88,13 @@ export default defineComponent({
         return new Promise()
       },
 
+      setDefaultValues: ({ parentUuid, containerUuid }) => {
+        root.$store.dispatch('setTabDefaultValues', {
+          parentUuid,
+          containerUuid
+        })
+      },
+
       seekRecord: function(eventInfo) {
         console.log('seekRecord: ', eventInfo)
         // return new Promise()

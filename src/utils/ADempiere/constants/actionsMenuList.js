@@ -30,7 +30,7 @@ export const createNewRecord = {
   icon: 'el-icon-circle-plus-outline',
   actionName: 'createNewRecord',
   createNewRecord: ({ root, parentUuid, containerUuid }) => {
-    root.$store.dispatch('dataManager/setDefaultValues', {
+    root.$store.dispatch('setTabDefaultValues', {
       parentUuid,
       containerUuid
     })

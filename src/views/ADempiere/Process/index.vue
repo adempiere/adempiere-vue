@@ -179,6 +179,12 @@ export default defineComponent({
         // })
       },
 
+      setDefaultValues: ({ containerUuid }) => {
+        root.$store.dispatch('setProcessDefaultValues', {
+          containerUuid
+        })
+      },
+
       isDisplayedField,
 
       isReadOnlyField({

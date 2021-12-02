@@ -237,6 +237,13 @@ export default defineComponent({
         })
       },
 
+      setDefaultValues: ({ parentUuid, containerUuid }) => {
+        root.$store.dispatch('setBrowserDefaultValues', {
+          parentUuid,
+          containerUuid
+        })
+      },
+
       /**
        * Is displayed field in panel single record
        */

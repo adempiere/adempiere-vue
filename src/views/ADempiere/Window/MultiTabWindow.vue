@@ -104,7 +104,7 @@ export default defineComponent({
 
       seekRecord: ({ row, tableName, parentUuid, containerUuid }) => {
         if (root.isEmptyValue(row)) {
-          root.$store.dispatch('dataManager/setDefaultValues', {
+          root.$store.dispatch('setTabDefaultValues', {
             parentUuid,
             containerUuid
           })

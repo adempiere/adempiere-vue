@@ -55,7 +55,7 @@ export default defineComponent({
     const metadata = ref({})
 
     if (root.$route.query.action === 'create-new') {
-      root.$store.dispatch('dataManager/setDefaultValues', {
+      props.containerManager.setDefaultValues({
         parentUuid: props.parentUuid,
         containerUuid: props.containerUuid
       })
