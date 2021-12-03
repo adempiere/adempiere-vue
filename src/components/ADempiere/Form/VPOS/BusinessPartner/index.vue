@@ -282,6 +282,9 @@ export default {
           // DisplayColumn_'ColumnName'
           columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.displayColumnName
         })
+        if (display === undefined) {
+          return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer.name
+        }
         if (this.isEmptyValue(this.selectAddress)) {
           return this.customerValue + display
         }
@@ -359,6 +362,9 @@ export default {
         return value
       }
     },
+    updatedCustomerValue() {
+      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner.value
+    },
     copyShippingAddress() {
       return this.$store.getters.getCopyShippingAddress
     }
@@ -392,6 +398,11 @@ export default {
     },
     showUpdateCustomer(value) {
       this.visible = value
+    },
+    updatedCustomerValue(value) {
+      if (!this.isEmptyValue(value)) {
+        this.customerValue = value
+      }
     }
   },
   methods: {
