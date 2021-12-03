@@ -239,7 +239,9 @@ export default {
       visible: false,
       selectAddress: '',
       labelAddress: '',
-      visibleAddress: false
+      visibleAddress: false,
+      customerValue: '',
+      selectCustomerValue: ''
     }
   },
   computed: {
@@ -281,9 +283,9 @@ export default {
           columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.displayColumnName
         })
         if (this.isEmptyValue(this.selectAddress)) {
-          return display
+          return this.customerValue + display
         }
-        return display + '-' + this.selectAddress.first_name
+        return this.customerValue + '-' + display + '-' + this.selectAddress.first_name
       },
       set(value) {
         this.$store.commit('updateValueOfField', {
@@ -405,12 +407,14 @@ export default {
       this.labelAddress = address
     },
     setNewDisplayedValue() {
+      this.customerValue = ''
       const displayValue = this.displayedValue
       if (this.controlDisplayed !== displayValue) {
         this.controlDisplayed = displayValue
       }
     },
     setOldDisplayedValue() {
+      this.customerValue = this.selectCustomerValue
       if (this.controlDisplayed !== this.displayedValue) {
         this.displayedValue = this.controlDisplayed
       }
@@ -489,7 +493,8 @@ export default {
       if (this.isEmptyValue(businessPartner)) {
         businessPartner = this.blankBPartner
       }
-      businessPartner.name = businessPartner.value + '-' + businessPartner.name
+      this.customerValue = businessPartner.value
+      this.selectCustomerValue = businessPartner.value
       this.setBusinessPartner(businessPartner, false)
     },
     onClose() {
