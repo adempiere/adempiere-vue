@@ -556,6 +556,7 @@ export default {
     },
     closeDialog() {
       this.dialogVisible = false
+      this.$store.commit('setConfirmDelivery', false)
     }
   }
 }
