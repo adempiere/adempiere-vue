@@ -61,7 +61,10 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
     },
     allowsCollectOrder() {
-      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCollectOrder
+      if (this.isValidForDeleteLine(this.listOrderLine)) {
+        return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCollectOrder
+      }
+      return false
     },
     allowsModifyQuantity() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsModifyQuantity
@@ -78,9 +81,9 @@ export default {
     isSetTemplateBP() {
       const currentPOS = this.currentPointOfSales
       if (!this.isEmptyValue(currentPOS) &&
-        !this.isEmptyValue(currentPOS.templateBusinessPartner) &&
+        !this.isEmptyValue(currentPOS.templateCustomer) &&
         this.isEmptyValue(this.$route.query.action)) {
-        return currentPOS.templateBusinessPartner
+        return currentPOS.templateCustomer
       }
       return false
     },
@@ -379,17 +382,15 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
+        isOpenRefund: true,
         createPayments: !this.isEmptyValue(payments),
         payments: payments
       })
         .then(response => {
-          this.$store.dispatch('reloadOrder', response.uuid)
-          this.$message({
-            type: 'success',
-            message: this.$t('notifications.completed'),
-            showClose: true
-          })
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
+          this.clearOrder()
+          this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
+          this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
         })
         .catch(error => {
           this.$message({
@@ -543,7 +544,10 @@ export default {
           columnName: 'C_DocTypeTarget_ID_UUID'
         })
         if (this.isEmptyValue(customerUuid) || id === 1000006) {
-          customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+          customerUuid = this.currentPointOfSales.templateCustomer.uuid
+        }
+        if (customer) {
+          customerUuid = customer
         }
         if (customer) {
           customerUuid = customer
@@ -560,6 +564,8 @@ export default {
           .then(response => {
             // this.order = response
             this.reloadOrder(true, response.uuid)
+            this.$store.dispatch('listPayments', { posUuid, orderUuid: response.uuid })
+            this.$store.commit('setShowPOSCollection', false)
             this.$router.push({
               params: {
                 ...this.$route.params
@@ -729,8 +735,8 @@ export default {
               break
             case 'C_BPartner_ID_UUID': {
               const bPartnerValue = mutation.payload.value
-              if (!this.isEmptyValue(this.currentPointOfSales.templateBusinessPartner) && this.$route.meta.uuid === mutation.payload.containerUuid) {
-                const bPartnerPOS = this.currentPointOfSales.templateBusinessPartner.uuid
+              if (!this.isEmptyValue(this.currentPointOfSales.templateCustomer) && this.$route.meta.uuid === mutation.payload.containerUuid) {
+                const bPartnerPOS = this.currentPointOfSales.templateCustomer.uuid
                 this.updateOrder(mutation.payload)
                 // Does not send values to server, when empty values are set or
                 // if BPartner set equal to BPartner POS template
@@ -810,7 +816,7 @@ export default {
       }).catch(() => {
       }).finally(() => {
         this.$store.commit('setListPayments', {})
-        const { templateBusinessPartner } = this.currentPointOfSales
+        const { templateCustomer } = this.currentPointOfSales
         this.$store.commit('updateValuesOfContainer', {
           containerUuid: this.metadata.containerUuid,
           attributes: [{
@@ -823,15 +829,15 @@ export default {
           },
           {
             columnName: 'C_BPartner_ID',
-            value: templateBusinessPartner.id
+            value: templateCustomer.id
           },
           {
             columnName: 'DisplayColumn_C_BPartner_ID',
-            value: templateBusinessPartner.name
+            value: templateCustomer.name
           },
           {
             columnName: ' C_BPartner_ID_UUID',
-            value: templateBusinessPartner.uuid
+            value: templateCustomer.uuid
           }]
         })
         this.$store.dispatch('setOrder', {

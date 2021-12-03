@@ -69,7 +69,7 @@ export default {
   },
   computed: {
     dataResult() {
-      if (this.search.length) {
+      if (this.search.length > 0) {
         return this.filterResult(this.search, this.recentItems)
       }
       return this.recentItems

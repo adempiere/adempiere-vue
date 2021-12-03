@@ -27,9 +27,20 @@ const initStateUtils = {
   overdrawnInvoice: {
     visible: false
   },
+  searchCompleteOrders: false,
+  searchToDeliveOrders: false,
   isNewOrder: false,
   showProductList: false,
-  confirmDelivery: false
+  confirmDelivery: false,
+  showConfirmDelivery: false,
+  showFastConfirmDelivery: false,
+  showAddNewAddress: false,
+  showAddressUpdate: false,
+  showCashOpen: false,
+  showCashWithdrawl: false,
+  showCashSummaryMovements: false,
+  showAssignSeller: false,
+  quickSearchOrder: {}
 }
 
 export default {
@@ -108,6 +119,12 @@ export default {
     showUpdateCustomer(state, show) {
       state.updateCustomer = show
     },
+    setShowFastCompleteOrders(state, show) {
+      state.searchCompleteOrders = show
+    },
+    setShowsearchToDeliveOrders(state, show) {
+      state.searchToDeliveOrders = show
+    },
     focusNewOrder(state, payload) {
       state.isNewOrder = payload
     },
@@ -119,6 +136,33 @@ export default {
     },
     setConfirmDelivery(state, payload) {
       state.confirmDelivery = payload
+    },
+    setShowConfirmDelivery(state, payload) {
+      state.showConfirmDelivery = payload
+    },
+    setShowFastConfirmDelivery(state, payload) {
+      state.showFastConfirmDelivery = payload
+    },
+    setShowAddNewAddress(state, payload) {
+      state.showAddNewAddress = payload
+    },
+    setShowAddressUpdate(state, payload) {
+      state.showAddressUpdate = payload
+    },
+    setshowCashOpen(state, payload) {
+      state.showCashOpen = payload
+    },
+    setShowCashWithdrawl(state, payload) {
+      state.showCashWithdrawl = payload
+    },
+    setShowCashSummaryMovements(state, payload) {
+      state.showCashSummaryMovements = payload
+    },
+    setShowAssignSeller(state, payload) {
+      state.showAssignSeller = payload
+    },
+    setQuickSearchOrder(state, order) {
+      state.quickSearchOrder = order
     }
   },
   actions: {
@@ -294,6 +338,39 @@ export default {
     },
     getConfirmDelivery: (state) => {
       return state.confirmDelivery
+    },
+    getShowConfirmDelivery: (state) => {
+      return state.showConfirmDelivery
+    },
+    showConfirmDelivery: (state) => {
+      return state.showFastConfirmDelivery
+    },
+    getSearchCompleteOrderss: (state) => {
+      return state.searchCompleteOrders
+    },
+    getSearchToDeliveOrders: (state) => {
+      return state.searchToDeliveOrders
+    },
+    getShowAddNewAddress: (state) => {
+      return state.showAddNewAddress
+    },
+    getShowAddressUpdate: (state) => {
+      return state.showAddressUpdate
+    },
+    getShowCashOpen: (state) => {
+      return state.showCashOpen
+    },
+    getShowCashWithdrawl: (state) => {
+      return state.showCashWithdrawl
+    },
+    getShowCashSummaryMovements: (state) => {
+      return state.showCashSummaryMovements
+    },
+    getShowAssignSeller: (state) => {
+      return state.showAssignSeller
+    },
+    getQuickSearchOrder: (state) => {
+      return state.quickSearchOrder
     }
   }
 }

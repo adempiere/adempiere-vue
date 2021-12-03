@@ -18,6 +18,7 @@
 <template>
   <el-main
     v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+    style="height: -webkit-fill-available;overflow: hidden;"
     @shortkey.native="actionCreate"
   >
     <el-form
@@ -25,60 +26,67 @@
       size="small"
       class="create-bp"
     >
-      <el-row :gutter="24">
-        <el-col :span="24">
-          <el-card class="box-card" shadow="never" style="height: 150px;">
-            <div slot="header" class="clearfix">
-              <span>
-                {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
-              </span>
-            </div>
-            <div class="text item">
-              <field-definition
-                v-for="(field) in datos"
-                :ref="field.columnName"
-                :key="field.columnName"
-                :metadata-field="field"
+      <el-scrollbar wrap-class="scroll-customer-create">
+        <el-row :gutter="24">
+          <el-col :span="24">
+            <el-card class="box-card" shadow="never" style="height: 230px;">
+              <div slot="header" class="clearfix">
+                <span>
+                  {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
+                </span>
+              </div>
+              <div class="text item">
+                <field-definition
+                  v-for="(field) in datos"
+                  :ref="field.columnName"
+                  :key="field.columnName"
+                  :metadata-field="field"
+                />
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+        <el-row v-show="isVisibleAddress" :gutter="24">
+          <el-scrollbar wrap-class="scroll-child">
+            <billing-address />
+            <shipping-address v-if="!copyShippingAddress" />
+          </el-scrollbar>
+        </el-row>
+        <el-row :gutter="24">
+          <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
+            <samp style="float: right; padding-right: 10px;">
+              <el-checkbox v-model="isVisibleAddress">
+                {{ $t('form.pos.order.BusinessPartnerCreate.addBillingAddress') }}
+              </el-checkbox>
+              <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
+                {{ $t('form.byInvoice.copyShippingAddress') }}
+              </el-checkbox>
+            </samp>
+          </el-col>
+          <el-col :span="24">
+            <samp style="float: right; padding-right: 10px;">
+              <el-button
+                type="primary"
+                class="custom-button-create-bp"
+                icon="el-icon-check"
+                @click="createBusinessParter"
               />
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-      <el-row :gutter="24">
-        <billing-address />
-        <shipping-address v-if="!copyShippingAddress" />
-      </el-row>
-      <el-row :gutter="24">
-        <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
-          <samp style="float: right; padding-right: 10px;">
-            <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
-              {{ $t('form.byInvoice.copyShippingAddress') }}
-            </el-checkbox>
-          </samp>
-        </el-col>
-        <el-col :span="24">
-          <samp style="float: right; padding-right: 10px;">
-            <el-button
-              type="primary"
-              class="custom-button-create-bp"
-              icon="el-icon-check"
-              @click="createBusinessParter"
-            />
-            <el-button
-              type="danger"
-              class="custom-button-create-bp"
-              icon="el-icon-close"
-              @click="clearValues"
-            />
-          </samp>
-        </el-col>
-      </el-row>
+              <el-button
+                type="danger"
+                class="custom-button-create-bp"
+                icon="el-icon-close"
+                @click="clearValues()"
+              />
+            </samp>
+          </el-col>
+        </el-row>
+      </el-scrollbar>
     </el-form>
   </el-main>
 </template>
 
 <script>
-import { createCustomer } from '@/api/ADempiere/form/point-of-sales.js'
+import { createCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldsListCreate.js'
 import BillingAddress from './billingAddress.vue'
@@ -118,6 +126,8 @@ export default {
       fieldsList,
       checked: true,
       isCustomForm: true,
+      isVisibleAddress: false,
+      isExistingCustomer: false,
       unsubscribe: () => {}
     }
   },
@@ -149,6 +159,9 @@ export default {
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
     },
+    currentCustomerTemplatePointOfSales() {
+      return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
+    },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
     },
@@ -159,6 +172,12 @@ export default {
       set(value) {
         this.$store.dispatch('changeCopyShippingAddress', value)
       }
+    },
+    getCodigo() {
+      return this.$store.getters.getValueOfField({
+        containerUuid: 'Business-Partner-Create',
+        columnName: 'Value'
+      })
     }
   },
   watch: {
@@ -166,12 +185,25 @@ export default {
       if (value) {
         setTimeout(() => {
           this.focusValue()
+          this.defaultTemplateAddress(this.currentCustomerTemplatePointOfSales)
         }, 1500)
+      }
+    },
+    getCodigo(value) {
+      if (!this.isEmptyValue(value)) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Business-Partner-Create',
+          columnName: 'TaxID',
+          value
+        })
       }
     },
     copyShippingAddress(value) {
       this.checked = value
     }
+  },
+  created() {
+    this.unsubscribe = this.subscribeChanges()
   },
   beforeDestroy() {
     this.unsubscribe()
@@ -192,16 +224,95 @@ export default {
     focusValue() {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
     },
+    defaultTemplateAddress(customer) {
+      if (this.isEmptyValue(customer)) {
+        return
+      }
+      this.loadAddresses(customer.addresses[0], 'Shipping-Address')
+      this.loadAddresses(customer.addresses[0], 'Billing-Address')
+    },
+    loadAddresses(address, containerUuid) {
+      if (this.isEmptyValue(address)) {
+        return
+      }
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [{
+          columnName: 'C_Country_ID_UUID',
+          value: undefined
+        }, {
+          columnName: 'Postal',
+          value: this.empty(address.postal_code)
+        }, {
+          columnName: 'C_Region_ID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.id) : ''
+        }, {
+          columnName: 'C_Region_ID_UUID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.uuid) : ''
+        }, {
+          columnName: 'DisplayColumn_C_Region_ID',
+          value: !this.isEmptyValue(address.region) ? this.empty(address.region.name) : ''
+        }, {
+          columnName: 'C_City_ID',
+          value: this.empty(address.city.id)
+        }, {
+          columnName: 'C_City_ID_UUID',
+          value: this.empty(address.city.uuid)
+        }, {
+          columnName: 'DisplayColumn_C_City_ID',
+          value: this.empty(address.city.name)
+        }, {
+          columnName: 'Address1',
+          value: address.address_1
+        }, {
+          columnName: 'Address2',
+          value: address.address_2
+        }, {
+          columnName: 'Address3',
+          value: address.address_3
+        }, {
+          columnName: 'Address4',
+          value: address.address_4
+        }]
+      })
+    },
+    empty(value) {
+      if (this.isEmptyValue(value)) {
+        return ''
+      }
+      return value
+    },
     // TODO: Get locations values.
     createBusinessParter() {
       const values = this.datesForm(this.$store.getters.getValuesView({
-        containerUuid: this.containerUuid,
+        containerUuid: 'Business-Partner-Create',
         format: 'object'
       }))
       const billingAddress = this.billingAddress
-      if (this.isEmptyValue(billingAddress.last_name)) {
-        billingAddress.last_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
-        billingAddress.first_name = this.billingAddress.countryName + '/' + this.billingAddress.regionName
+      if (this.isEmptyValue(billingAddress.first_name)) {
+        const region = this.$store.getters.getValueOfField({
+          containerUuid: 'Billing-Address',
+          columnName: 'DisplayColumn_C_Region_ID'
+        })
+        const city = this.$store.getters.getValueOfField({
+          containerUuid: 'Billing-Address',
+          columnName: 'DisplayColumn_C_City_ID'
+        })
+        billingAddress.first_name = region + '/' + city
+      }
+      const validateValueCustomer = this.$store.getters.getValueOfField({
+        containerUuid: 'Business-Partner-Create',
+        columnName: 'Value'
+      })
+      this.billingAddress.email = values.email
+      this.shippingAddress.email = values.email
+      if (this.isEmptyValue(validateValueCustomer)) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Business-Partner-Create',
+          columnName: 'Value',
+          value: values.taxId
+        })
+        values.value = values.taxId
       }
       values.addresses = [this.billingAddress, this.shippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
@@ -254,7 +365,7 @@ export default {
         containerUuid: this.containerUuid,
         panelType: this.panelType
       })
-      this.clearAddresses('Billing-Address')
+      this.clearAddresses('Location-Address-Create')
       this.clearAddresses('Shipping-Address')
       this.clearDataCustomer(this.containerUuid)
     },
@@ -281,6 +392,9 @@ export default {
           case 'Phone':
             valuesToSend['phone'] = value
             break
+          case 'EMail':
+            valuesToSend['email'] = value
+            break
         }
       })
       valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
@@ -288,6 +402,49 @@ export default {
     },
     changeShipping(value) {
       this.$store.dispatch('changeCopyShippingAddress', value)
+    },
+    loadDataCustomer(customer, containerUuid) {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [{
+          columnName: 'Name',
+          value: customer.name
+        }, {
+          columnName: 'Value',
+          value: customer.value
+        }, {
+          columnName: 'TaxID',
+          value: customer.value
+        }]
+      })
+    },
+    getCustomer(searchValue) {
+      customer({
+        searchValue
+      })
+        .then(response => {
+          if (!this.isEmptyValue(response.uuid)) {
+            this.billing = response.addresses.find(address => address.is_default_billing)
+            this.shipping = response.addresses.find(address => address.is_default_shipping)
+            this.loadAddresses(this.shipping, 'Shipping-Address')
+            this.loadAddresses(this.billing, 'Location-Address-Create')
+            this.loadDataCustomer(response, this.containerUuid)
+            this.isExistingCustomer = true
+            this.currentCustomer = response
+            this.loading = false
+          }
+        })
+        .catch(error => {
+          console.warn(error)
+          this.isExistingCustomer = false
+        })
+    },
+    subscribeChanges() {
+      return this.$store.subscribe((mutation, state) => {
+        if (mutation.type === 'addFocusLost' && mutation.payload.columnName === 'Value' && !this.isEmptyValue(this.getCodigo) && mutation.payload.containerUuid === 'Business-Partner-Create') {
+          this.getCustomer(this.getCodigo)
+        }
+      })
     }
   }
 }
@@ -299,7 +456,10 @@ export default {
         margin-bottom: 0px !important;
     }
   }
-
+  .scroll-customer-create {
+    max-height: 250px;
+    max-width: 1000px;
+  }
   .custom-button-create-bp {
     float: right;
     margin-right: 10px;

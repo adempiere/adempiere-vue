@@ -31,7 +31,7 @@ export function convertPointOfSales(pos) {
   convertedPos.documentType = convertDocumentType(pos.document_type)
   convertedPos.cashBankAccount = convertBankAccount(pos.cash_bank_account)
   convertedPos.cashTransferBankAccount = convertBankAccount(pos.cash_transfer_bank_account)
-  convertedPos.templateBusinessPartner = convertBusinessPartner(pos.template_business_partner)
+  convertedPos.templateCustomer = convertBusinessPartner(pos.template_customer)
   convertedPos.priceList = convertPriceList(pos.price_list)
   return convertedPos
 }

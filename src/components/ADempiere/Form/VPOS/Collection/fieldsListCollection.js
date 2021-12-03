@@ -43,6 +43,7 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 2,
+      name: language.t('form.pos.collect.overdrawnInvoice.fieldList.bank'),
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       handleContentSelection: true,
@@ -59,6 +60,8 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 4,
+      // TODO: Add translate
+      name: 'Fecha',
       handleFocusGained: true,
       handleFocusLost: true,
       handleKeyPressed: true,
@@ -66,7 +69,7 @@ export default [
       handleActionKeyPerformed: true,
       handleActionPerformed: true,
       size: 24,
-      displayLogicPayment: 'K',
+      displayLogicPayment: 'K,Z,P,D,K,T,A',
       isActiveLogics: true,
       isMandatory: true
     }

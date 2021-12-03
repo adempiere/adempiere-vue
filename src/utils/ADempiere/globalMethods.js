@@ -20,13 +20,13 @@ export {
   currencyFind,
   tenderTypeFind,
   formatConversionCurrenty,
-  round,
   convertValuesToSend,
   typeValue,
   tableColumnDataType
 } from '@/utils/ADempiere/valueUtils.js'
 
 export {
+  round,
   zeroPad
 } from '@/utils/ADempiere/formatValue/numberFormat.js'
 

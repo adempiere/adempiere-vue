@@ -69,8 +69,11 @@ export default {
   },
   computed: {
     getRecordNotification() {
+      if (this.isEmptyValue(this.$store.getters.getNotificationProcess)) {
+        return []
+      }
       return this.$store.getters.getNotificationProcess.map(item => {
-        if (item.typeActivity) {
+        if (!this.isEmptyValue(item) && item.typeActivity) {
           return {
             ...item,
             name: item.name + ' ' + item.quantityActivities

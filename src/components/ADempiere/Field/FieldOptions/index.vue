@@ -104,7 +104,7 @@
 <script>
 import { defineComponent, computed, ref, watch } from '@vue/composition-api'
 
-// components
+// components and mixins
 import LabelField from './LabelField.vue'
 import LabelPopoverOption from './LabelPopoverOption.vue'
 

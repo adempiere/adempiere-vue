@@ -177,11 +177,6 @@ export function generatePageToken({ pageNumber = 1, token }) {
   return onlyToken + '-' + pageNumber
 }
 
-/**
- * @param {number} number
- */
-export { round } from '@/utils/ADempiere/formatValue/numberFormat.js'
-
 export function convertFieldsListToShareLink(fieldsList) {
   let attributesListLink = ''
   fieldsList.map(fieldItem => {

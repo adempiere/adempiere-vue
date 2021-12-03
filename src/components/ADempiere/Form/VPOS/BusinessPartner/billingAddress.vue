@@ -22,18 +22,22 @@
         <span>{{ $t('form.pos.order.BusinessPartnerCreate.billingAddress') }}</span>
       </div>
       <div class="text item">
-        <el-scrollbar wrap-class="scroll-child">
+        <template
+          v-for="(field) in fieldsList"
+        >
           <field-definition
-            v-for="(field) in fieldsListLocationBillingAddress"
-            :ref="field.columnName"
             :key="field.columnName"
+            :ref="field.columnName"
             :metadata-field="{
               ...field,
+              size: { 'xs': fieldSize, 'sm': fieldSize, 'md': fieldSize, 'lg': fieldSize, 'xl': fieldSize },
               isReadOnly: disabled
             }"
           />
-        </el-scrollbar>
+        </template>
       </div>
+      <br>
+      <br>
     </el-card>
   </el-col>
 </template>
@@ -71,6 +75,7 @@ export default {
   },
   data() {
     return {
+      input: '',
       businessPartnerRecord: {},
       isLoadingRecord: false,
       fieldsList,
@@ -80,10 +85,14 @@ export default {
     }
   },
   computed: {
+    fieldSize() {
+      return !this.$store.getters.getCopyShippingAddress ? 24 : 12
+    },
     fieldsListLocationBillingAddress() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
       }
+
       return this.fieldsList.map(billing => {
         if (!this.$store.getters.getCopyShippingAddress) {
           return {

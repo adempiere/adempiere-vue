@@ -17,7 +17,7 @@
 -->
 <template>
   <div>
-    <el-form-item>
+    <el-form-item @submit.native.prevent="notSubmitForm">
       <template slot="label">
         {{ $t('form.productInfo.codeProduct') }}
         <el-popover

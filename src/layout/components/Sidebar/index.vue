@@ -67,8 +67,13 @@ export default {
       const router = this.permission_routes.map(menu => {
         if (menu.path === '/PriceChecking') {
           return {
-            ...viewSearch,
+            ...menu,
             hidden: false
+          }
+        } else if (menu.path === '/ProductInfo') {
+          return {
+            ...viewSearch,
+            hidden: !this.$store.state['user'].role.isAllowInfoProduct
           }
         }
         return menu

@@ -28,7 +28,7 @@
     >
       <el-row :gutter="24">
         <el-col :span="24">
-          <el-card class="box-card" shadow="never" style="height: 150px;">
+          <el-card class="box-card" shadow="never" style="height: 230px;">
             <div slot="header" class="clearfix">
               <span>
                 {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
@@ -36,7 +36,7 @@
             </div>
             <div class="text item">
               <field-definition
-                v-for="(field) in datos"
+                v-for="(field) in fieldsList"
                 :ref="field.columnName"
                 :key="field.columnName"
                 :metadata-field="{
@@ -48,13 +48,40 @@
           </el-card>
         </el-col>
       </el-row>
-      <el-row :gutter="24">
-        <billing-address
-          :disabled="validateCustomerTemplate"
-        />
-        <shipping-address
-          :disabled="validateCustomerTemplate"
-        />
+      <el-row :gutter="12">
+        <el-scrollbar wrap-class="scroll-child">
+          <el-col v-for="(address) in currentCustomer.addresses" :key="address.uuid" :span="8">
+            <el-card
+              :body-style="{ padding: '10px' }"
+              shadow="never"
+              :style="(currentAddressSelect === address.first_name) ? 'border: 2px solid #36a3f7;min-height: 300px;max-height: 300px;padding: 20px;' : 'min-height: 300px;max-height: 300px;padding: 10px;'"
+            >
+              <div slot="header" class="clearfix">
+                <span style="font-size: 16px;font-weight: bold;">{{ address.first_name }}</span>
+                <el-button
+                  style="float: right; padding: 3px 0"
+                  type="text"
+                  @click="openEditAddress(address)"
+                >
+                  Editar
+                </el-button>
+              </div>
+              <el-scrollbar wrap-class="scroll-customer-description">
+                <el-descriptions class="margin-top" :title="$t('form.pos.order.BusinessPartnerCreate.address.managementDescription')" :column="1">
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.addressType')">
+                    <el-tag size="small" :type="address.is_default_billing ? 'success' : ''">
+                      {{ labelDirecction(address) }}
+                    </el-tag>
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.region')"> {{ labelAddress(address.region) }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.city')"> {{ labelAddress(address.city) }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.address')"> {{ address.address_1 }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.postCode')"> {{ address.postal_code }} </el-descriptions-item>
+                </el-descriptions>
+              </el-scrollbar>
+            </el-card>
+          </el-col>
+        </el-scrollbar>
       </el-row>
       <el-row :gutter="24">
         <el-col :span="24">
@@ -75,6 +102,18 @@
         </el-col>
       </el-row>
     </el-form>
+    <el-dialog
+      :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
+      :visible.sync="showAddressUpdate"
+      :modal="false"
+      :show-close="false"
+    >
+      <add-address
+        :is-updated-address="showAddressUpdate"
+        :address-to-update="addressUpdate"
+        :shows-popovers="showAddNewAddress"
+      />
+    </el-dialog>
   </el-main>
 </template>
 
@@ -83,16 +122,13 @@ import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
-import BillingAddress from './billingAddress.vue'
-import ShippingAddress from './shippingAddress.vue'
-// import { getSequenceAsList } from '@/utils/ADempiere/location'
+import AddAddress from './addAddress'
 import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
 
 export default {
   name: 'BusinessPartnerUpdate',
   components: {
-    ShippingAddress,
-    BillingAddress
+    AddAddress
   },
   mixins: [
     formMixin,
@@ -112,6 +148,10 @@ export default {
     showsPopovers: {
       type: Boolean,
       default: false
+    },
+    currentAddressSelect: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -122,6 +162,8 @@ export default {
       isCustomForm: true,
       loading: true,
       index: 0,
+      isShowEditAddress: false,
+      addressUpdate: {},
       currentCustomer: {},
       shipping: {
         uuid: ''
@@ -138,6 +180,18 @@ export default {
     }
   },
   computed: {
+    showAddNewAddress: {
+      get() {
+        return this.$store.getters.getShowAddNewAddress
+      },
+      set(value) {
+        this.$store.commit('setShowAddNewAddress', value)
+        return value
+      }
+    },
+    showAddressUpdate() {
+      return this.$store.getters.getShowAddressUpdate
+    },
     fieldsListLocation() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
@@ -170,7 +224,7 @@ export default {
       if (!this.isEmptyValue(currentOrder.listPayments.payments)) {
         return !this.isEmptyValue(currentOrder.listPayments.payments)
       }
-      return currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner.id
+      return currentOrder.businessPartner.id === this.$store.getters.posAttributes.currentPointOfSales.templateCustomer.id
     },
     showCustomer() {
       return this.$store.getters.getShowUpdateCustomer
@@ -179,7 +233,7 @@ export default {
       return this.$store.getters.getCopyShippingAddress
     },
     validateCustomerTemplate() {
-      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateBusinessPartner
+      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
       if (this.isEmptyValue(templateCustomer) || this.isEmptyValue(this.currentBusinessPartner)) {
         return false
       }
@@ -212,14 +266,20 @@ export default {
       this.$refs.Value[0].$children[0].$children[0].$children[1].$children[0].focus()
     },
     update() {
-      const values = this.$store.getters.getValuesView({
+      const values = this.datesForm(this.$store.getters.getValuesView({
         containerUuid: 'Business-Partner-Update',
         format: 'object'
-      })
+      }))
       this.shippingAddress.uuid = this.isEmptyValue(this.shipping) ? '' : this.shipping.uuid
       this.billingAddress.uuid = this.isEmptyValue(this.billing) ? '' : this.billing.uuid
+      this.billingAddress.email = values.email
+      this.shippingAddress.email = values.email
       values.addresses = [this.billingAddress, this.shippingAddress]
-      values.uuid = this.currentBusinessPartner.uuid
+      values.uuid = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'C_BPartner_ID_UUID' // this.parentMetadata.columnName
+      })
+      values.taxId = values.value
       values.posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
       updateCustomer(values)
         .then(response => {
@@ -228,8 +288,13 @@ export default {
     },
     getCustomer() {
       this.$store.dispatch('changeCopyShippingAddress', false)
+      const displayCustomer = this.$store.getters.getValueOfField({
+        containerUuid: this.$route.meta.uuid,
+        columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.columnName
+      }).split(['-'])
+      const searchValue = this.isEmptyValue(this.currentBusinessPartner.value) ? displayCustomer[0] : this.currentBusinessPartner.value
       customer({
-        searchValue: this.currentBusinessPartner.value
+        searchValue
       })
         .then(response => {
           this.billing = response.addresses.find(address => address.is_default_billing)
@@ -261,13 +326,10 @@ export default {
         containerUuid,
         attributes: [{
           columnName: 'Name',
-          value: address.last_name
+          value: address.first_name
         }, {
           columnName: 'Description',
           value: address.description
-        }, {
-          columnName: 'Name2',
-          value: address.first_name
         }, {
           columnName: 'Phone',
           value: address.phone
@@ -329,14 +391,17 @@ export default {
           columnName: 'Name',
           value: customer.name
         }, {
+          columnName: 'Name2',
+          value: customer.lastName
+        }, {
+          columnName: 'EMail',
+          value: customer.addresses[0].email
+        }, {
           columnName: 'Value',
           value: customer.value
         }, {
           columnName: 'TaxID',
           value: customer.value
-        }, {
-          columnName: 'Name2',
-          value: customer.last_name
         }]
       })
     },
@@ -362,6 +427,9 @@ export default {
             break
           case 'Phone':
             valuesToSend['phone'] = value
+            break
+          case 'EMail':
+            valuesToSend['email'] = value
             break
         }
       })
@@ -419,6 +487,30 @@ export default {
         }]
       })
       this.$store.dispatch('changeShowUpdateCustomer', false)
+    },
+    labelDirecction(value) {
+      if (value.is_default_billing) {
+        return this.$t('form.pos.order.BusinessPartnerCreate.billingAddress')
+      } else if (value.is_default_shipping) {
+        return this.$t('form.pos.order.BusinessPartnerCreate.shippingAddress')
+      }
+      return ''
+    },
+    labelAddress(address) {
+      if (!this.isEmptyValue(address) && !this.isEmptyValue(address.name)) {
+        return address.name
+      }
+      return ''
+    },
+    openEditAddress(address) {
+      this.$store.commit('setShowAddressUpdate', true)
+      this.addressUpdate = address
+      this.loadAddresses(address, 'Add-Location-Address')
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'Add-Location-Address',
+        columnName: 'C_Country_ID',
+        value: address.country_id
+      })
     }
   }
 }
@@ -433,5 +525,8 @@ export default {
   .custom-button-create-bp {
     float: right;
     margin-right: 10px;
+  }
+  .scroll-customer-description {
+    max-height: 150px;
   }
 </style>

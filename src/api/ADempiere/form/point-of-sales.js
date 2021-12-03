@@ -19,6 +19,7 @@ import { request } from '@/utils/ADempiere/request'
 import { config } from '@/utils/ADempiere/config'
 import { isEmptyValue } from '@/utils/ADempiere'
 import { camelizeObjectKeys } from '@/utils/ADempiere/transformObject.js'
+
 /**
  * method in api/price-checking.js as getProductPrice
  * @author elsiosanchez <elsiosanches@gmail.com>
@@ -34,7 +35,7 @@ export function getPointOfSales({
     url: `${config.pointOfSales.endpoint}/point-of-sales`,
     method: 'get',
     params: {
-      point_of_sales_uuid: posUuid
+      pos_uuid: posUuid
     }
   })
     .then(posResponse => {
@@ -79,7 +80,8 @@ export function createOrder({
   documentTypeUuid,
   salesRepresentativeUuid,
   priceListUuid,
-  warehouseUuid
+  warehouseUuid,
+  campaignUuid
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/create-order`,
@@ -90,7 +92,8 @@ export function createOrder({
       document_type_uuid: documentTypeUuid,
       sales_representative_uuid: salesRepresentativeUuid,
       price_list_uuid: priceListUuid,
-      warehouse_uuid: warehouseUuid
+      warehouse_uuid: warehouseUuid,
+      campaign_uuid: campaignUuid
     }
   })
     .then(createOrderResponse => {
@@ -108,7 +111,8 @@ export function updateOrder({
   documentTypeUuid,
   description,
   priceListUuid,
-  warehouseUuid
+  warehouseUuid,
+  campaignUuid
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/update-order`,
@@ -120,7 +124,8 @@ export function updateOrder({
       document_type_uuid: documentTypeUuid,
       description,
       price_list_uuid: priceListUuid,
-      warehouse_uuid: warehouseUuid
+      warehouse_uuid: warehouseUuid,
+      campaign_uuid: campaignUuid
     }
   })
     .then(updateOrderResponse => {
@@ -165,14 +170,15 @@ export function createCustomer({
 // Update Customer
 export function updateCustomer({
   uuid,
-  Value,
-  TaxId,
-  Duns,
-  Naics,
-  Name,
-  Name2,
+  value,
+  taxId,
+  duns,
+  naics,
+  name,
+  lastName,
   description,
   addresses,
+  phone,
   posUuid
 }) {
   return request({
@@ -180,13 +186,12 @@ export function updateCustomer({
     method: 'post',
     data: {
       uuid,
-      value: Value,
-      tax_id: TaxId,
-      duns: Duns,
-      naics: Naics,
-      name: Name,
-      last_name: Name2,
+      value,
+      tax_id: taxId,
+      name,
+      last_name: lastName,
       description,
+      phone,
       addresses,
       pos_uuid: posUuid
     }
@@ -274,10 +279,11 @@ export function listOrders({
   businessPartnerUuid,
   grandTotal,
   openAmount,
-  isPaid,
-  isProcessed,
-  isAisleSeller,
-  isInvoiced,
+  isWaitingForPay,
+  isOnlyProcessed,
+  isOnlyAisleSeller,
+  isWaitingForInvoice,
+  isWaitingForShipment,
   dateOrderedFrom,
   dateOrderedTo,
   salesRepresentativeUuid,
@@ -294,10 +300,11 @@ export function listOrders({
       sales_representative_uuid: salesRepresentativeUuid,
       grand_total: grandTotal,
       open_amount: openAmount,
-      is_paid: isPaid,
-      is_processed: isProcessed,
-      is_aisle_seller: isAisleSeller,
-      is_invoiced: isInvoiced,
+      is_waiting_for_pay: isWaitingForPay,
+      is_only_processed: isOnlyProcessed,
+      is_only_aisle_seller: isOnlyAisleSeller,
+      is_waiting_for_invoice: isWaitingForInvoice,
+      is_waiting_for_shipment: isWaitingForShipment,
       date_ordered_from: dateOrderedFrom,
       date_ordered_to: dateOrderedTo,
       page_size: pageSize,
@@ -525,13 +532,6 @@ export function createNewReturnOrder({
   console.info(`New Customer Return Order ${orderUuid}`)
 }
 
-export function cashClosing({
-  posId,
-  posUuid
-}) {
-  console.info(`Cash closing with POS id ${posId}, and uuid ${posUuid}`)
-}
-
 // Create Payment
 
 export function createPayment({
@@ -545,6 +545,7 @@ export function createPayment({
   paymentDate,
   tenderTypeCode,
   paymentMethodUuid,
+  chargeUuid,
   isRefund,
   currencyUuid
 }) {
@@ -559,6 +560,7 @@ export function createPayment({
       reference_no: referenceNo,
       description: description,
       amount: amount,
+      charge_uuid: chargeUuid,
       payment_date: paymentDate,
       tender_type_code: tenderTypeCode,
       payment_method_uuid: paymentMethodUuid,
@@ -621,14 +623,18 @@ export function deletePayment({
 
 export function getPaymentsList({
   posUuid,
-  orderUuid
+  orderUuid,
+  isOnlyRefund,
+  isOnlyReceipt
 }) {
   return request({
     url: `${config.pointOfSales.endpoint}/payments`,
     method: 'get',
     params: {
       pos_uuid: posUuid,
-      order_uuid: orderUuid
+      order_uuid: orderUuid,
+      is_only_refund: isOnlyRefund,
+      is_only_receipt: isOnlyReceipt
     }
   })
     .then(listPaymentsResponse => {
@@ -743,8 +749,8 @@ export function overdrawnInvoice({
         description: parameter.description,
         amount: parameter.amount,
         tender_type_code: parameter.tenderTypeCode,
-        payment_ate: parameter.paymentDate,
-        currency_uid: parameter.currencyUuid
+        payment_date: parameter.paymentDate,
+        currency_uuid: parameter.currencyUuid
       }
     })
   }
@@ -947,6 +953,7 @@ export function createCustomerBankAccount({
   isAch,
   addressVerified,
   zipVerified,
+  AccountNo,
   routingNo,
   iban
 }) {
@@ -963,6 +970,7 @@ export function createCustomerBankAccount({
       social_security_number: socialSecurityNumber,
       name,
       state,
+      account_no: AccountNo,
       street,
       zip,
       bank_account_type: bankAccountType,
@@ -975,14 +983,394 @@ export function createCustomerBankAccount({
     }
   })
     .then(responseCreateCustomerBankAccount => {
-      return responseCreateCustomerBankAccount
+      return camelizeObjectKeys(responseCreateCustomerBankAccount)
     })
 }
-
+export function listCustomerBankAccounts({
+  customerUuid,
+  pageToken
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/customer-bank-accounts`,
+    method: 'get',
+    params: {
+      customer_uuid: customerUuid,
+      page_token: pageToken
+    }
+  })
+    .then(responseListCustomerBankAccounts => {
+      return camelizeObjectKeys(responseListCustomerBankAccounts)
+    })
+}
+export function daleteCustomerBankAccounts({
+  customerBankAccountUuid
+}) {
+  console.log({ customerBankAccountUuid })
+  return request({
+    url: `${config.pointOfSales.endpoint}/delete-bank-account`,
+    method: 'post',
+    data: {
+      customer_bank_account_uuid: customerBankAccountUuid
+    }
+  })
+    .then(responseCreateCustomerBankAccount => {
+      return camelizeObjectKeys(responseCreateCustomerBankAccount)
+    })
+}
+/**
+ * Create Shipment
+ * @param {string} posUuidd - POS UUID reference
+ * @param {string} orderUuid - Order UUID reference
+ * @param {string} salesRepresentativeUuid - Sales Representative UUID reference
+ */
 export function createShipment({
   posUuid,
   orderUuid,
-  listProduct
+  salesRepresentativeUuid
 }) {
-  console.info(`Create Shipment pos uuid ${posUuid}, order uuid ${orderUuid} and list prouct ${listProduct}`)
+  return request({
+    url: `${config.pointOfSales.endpoint}/create-shipment`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      order_uuid: orderUuid,
+      sales_representative_uuid: salesRepresentativeUuid
+    }
+  })
+    .then(responseShipment => {
+      return camelizeObjectKeys(responseShipment)
+    })
+}
+export function RefundReferenceRequest({
+  posUuid,
+  description,
+  amount,
+  date,
+  tenderTypeCode,
+  currencyUuid,
+  conversionTypeUuid,
+  paymentMethodUuid,
+  paymentAccountDate,
+  customerBankAccountUuid,
+  orderUuid,
+  salesRepresentativeUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/create-refund-reference`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      description,
+      amount,
+      payment_date: date,
+      tender_type_code: tenderTypeCode,
+      currency_uuid: currencyUuid,
+      conversion_type_uuid: conversionTypeUuid,
+      payment_method_uuid: paymentMethodUuid,
+      payment_account_date: paymentAccountDate,
+      customer_bank_account_uuid: customerBankAccountUuid,
+      order_uuid: orderUuid,
+      sales_representative_uuid: salesRepresentativeUuid
+    }
+  })
+    .then(responseCreateCustomerBankAccount => {
+      return camelizeObjectKeys(responseCreateCustomerBankAccount)
+    })
+}
+export function listRefundReference({
+  posUuid,
+  customerUuid,
+  orderUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/refund-references`,
+    method: 'get',
+    params: {
+      pos_uuid: posUuid,
+      customer_uuid: customerUuid,
+      order_uuid: orderUuid
+    }
+  })
+    .then(responseCreateCustomerBankAccount => {
+      return camelizeObjectKeys(responseCreateCustomerBankAccount)
+    })
+}
+export function deleteRefundReference({
+  uuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/delete-refund-reference`,
+    method: 'post',
+    data: {
+      uuid
+    }
+  })
+    .then(responseShipmentLine => {
+      return camelizeObjectKeys(responseShipmentLine)
+    })
+}
+
+/**
+ * Create Shipment Line
+ * @param {string} posUuidd - POS UUID reference
+ * @param {string} orderUuid - Order UUID reference
+ * @param {string} salesRepresentativeUuid - Sales Representative UUID reference
+ */
+export function createShipmentLine({
+  shipmentUuid,
+  orderLineUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/create-shipment-line`,
+    method: 'post',
+    data: {
+      shipment_uuid: shipmentUuid,
+      order_line_uuid: orderLineUuid
+    }
+  })
+    .then(responseShipmentLine => {
+      return camelizeObjectKeys(responseShipmentLine)
+    })
+}
+
+// Delete Shipment
+export function deleteShipment({
+  shipmentLineUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/delete-shipment-line`,
+    method: 'post',
+    data: {
+      shipment_line_uuid: shipmentLineUuid
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+// List Shipment
+export function shipments({
+  shipmentUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/shipment-lines`,
+    method: 'get',
+    params: {
+      shipment_uuid: shipmentUuid
+    }
+  })
+    .then(response => {
+      return camelizeObjectKeys(response)
+    })
+}
+
+/**
+ * POST Process Shipment
+ *
+ * req.query.token - user token
+ * Body:
+ * req.body.shipment_uuid - POS UUID shipment uuid
+ * req.body.description - POS UUID description
+ * req.body.document_action - Sales Representative UUID reference
+ * Details:
+ */
+
+export function processShipment({
+  shipmentUuid,
+  description
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/process-shipment`,
+    method: 'post',
+    data: {
+      shipment_uuid: shipmentUuid,
+      description,
+      document_action: 'CO'
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+/**
+ * POST Reverse Sales
+ *
+ * req.query.token - user token
+ * Body:
+ * req.body.order_uuid - Order UUID
+ * req.body.pos_uuid - POS UUID
+ * req.body.description - POS UUID description
+ * Details:
+ */
+
+export function reverseSales({
+  posUuid,
+  orderUuid,
+  description
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/reverse-sales`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      order_uuid: orderUuid,
+      description
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+/**
+ * POST Reverse Sales
+ *
+ * req.query.token - user token
+ * Body:
+ * req.body.order_uuid - Order UUID
+ * req.body.pos_uuid - POS UUID
+ * req.body.description - POS UUID description
+ * Details:
+ */
+
+export function cashOpening({
+  posUuid,
+  collectingAgentUuid,
+  description,
+  payments
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/cash-opening`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      collecting_agent_uuid: collectingAgentUuid,
+      description,
+      payments
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+/**
+ * POST Reverse Sales
+ *
+ * req.query.token - user token
+ * Body:
+ * req.body.order_uuid - Order UUID
+ * req.body.pos_uuid - POS UUID
+ * req.body.description - POS UUID description
+ * Details:
+ */
+
+export function cashWithdrawal({
+  posUuid,
+  collectingAgentUuid,
+  description,
+  payments
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/cash-withdrawal`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      collecting_agent_uuid: collectingAgentUuid,
+      description,
+      payments
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+
+export function cashSummaryMovements({
+  posUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/cash-summary-movements`,
+    method: 'get',
+    params: {
+      pos_uuid: posUuid
+    }
+  })
+    .then(response => {
+      return camelizeObjectKeys(response)
+    })
+}
+
+export function cashClosing({
+  posUuid,
+  id,
+  uuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/cash-closing`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      id,
+      uuid
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+export function allocateSeller({
+  posUuid,
+  salesRepresentativeUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/allocate-seller`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      sales_representative_uuid: salesRepresentativeUuid
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
+export function releaseOrder({
+  posUuid,
+  salesRepresentativeUuid,
+  orderUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/release-order`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      sales_representative_uuid: salesRepresentativeUuid,
+      order_uuid: orderUuid
+    }
+  })
+    .then(response => {
+      return camelizeObjectKeys(response)
+    })
+}
+
+export function holdOrder({
+  posUuid,
+  salesRepresentativeUuid,
+  orderUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/hold-order`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      sales_representative_uuid: salesRepresentativeUuid,
+      order_uuid: orderUuid
+    }
+  })
+    .then(response => {
+      return camelizeObjectKeys(response)
+    })
 }

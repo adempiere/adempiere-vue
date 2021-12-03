@@ -341,6 +341,7 @@ export default {
     exportRecord: 'Exportar Registro',
     lockRecord: 'Bloquear Registro',
     noDescription: 'Sin Descripción',
+    addDescription: 'Agregue una Descripción',
     recordAccess: {
       modeMobile: {
         accessRoles: 'Roles con Acceso',
@@ -402,8 +403,11 @@ export default {
     pos: {
       title: 'Punto de Venta',
       priceList: 'Lista de Precio',
+      releaseOrder: 'Liberar',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
+        emptyAvailablePaymentMethods: 'Este terminal no tiene configurado los metodos de pagos',
+        emptyListCashSummary: 'No hay moviemineto en caja',
         salesOrder: {
           title: 'Orden de Venta',
           newOrder: 'Nueva Orden',
@@ -417,13 +421,18 @@ export default {
           orderRemoved: 'Orden Borrada',
           copyOrder: 'Copiar Orden',
           createNewReturnOrder: 'Crear una nueva orden de devolución',
-          confirmDelivery: 'Confirmar Entrega'
+          confirmDelivery: 'Confirmar Entrega',
+          emptyProductDelivery: 'Producto no se Encuentra en la Orden'
         },
         cashManagement: {
           title: 'Gestión de Caja',
           cashOpening: 'Apertura de Caja',
+          cashOpenBox: 'Caja Aperturada',
           cashwithdrawal: 'Retiro de Efectivo',
-          closeBox: 'Cierre de Caja'
+          successfulCashWithdrawal: 'Retiro de caja exitoso',
+          cashCloseBox: 'Caja Cerrada',
+          closeBox: 'Cierre de Caja',
+          assignSeller: 'Asignar vendedor'
         },
         generalOptions: {
           title: 'Opciones Generales',
@@ -436,6 +445,10 @@ export default {
           dateFrom: 'Fecha Desde'
         }
       },
+      generalNotifications: {
+        orderReleased: 'Orden Liberada: ',
+        selectedOrder: 'Orden Seleccionada: '
+      },
       tableProduct: {
         product: 'Producto',
         quantity: 'Cantidad',
@@ -443,8 +456,8 @@ export default {
         editQuantities: 'Editar Cantidades',
         pin: 'Ingrese Pin',
         remove: 'Eliminar',
-        displayTaxAmount: 'Impuesto',
-        displayTaxIMP: '%Imp',
+        taxAmount: 'Impuesto',
+        taxRate: '% Imp',
         displayDiscuentAmount: 'Descuento',
         empty: 'Ingrese el nombre del producto, código o UPC'
       },
@@ -454,7 +467,7 @@ export default {
         date: 'Fecha',
         subTotal: 'Sub-Total',
         type: 'Tipo',
-        discount: '%Dcto',
+        discount: '% Dcto',
         tax: 'Impuesto',
         total: 'Total',
         itemQuantity: 'Cantidad de Artículos',
@@ -462,13 +475,32 @@ export default {
         pointSale: 'Punto de Venta',
         collect: 'Cobrar',
         collections: 'Cobros',
+        campaign: 'Campaña',
+        noCampaignSelected: 'Sin Campaña seleccionada',
         BusinessPartnerCreate: {
+          phone: 'Telefono',
           businessPartner: 'Socio de Negocios',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
           customerData: 'Datos del Cliente',
+          addBillingAddress: 'Agregar Dirección de Facturación',
           billingAddress: 'Dirección de Facturación',
-          shippingAddress: 'Dirección de Envió',
-          taxId: 'Identificación Fiscal'
+          shippingAddress: 'Dirección de Envío',
+          taxId: 'Identificación Fiscal',
+          address: {
+            edit: 'Editar',
+            selectAddress: 'Seleccionar Dirección',
+            saveAddress: 'Dirección guardada',
+            addNewAddress: 'Agregar Nueva Dirección',
+            editAddress: 'Editar Dirección',
+            billingAddress: 'Dirección de Facturación',
+            shippingAddress: 'Dirección de Envió',
+            managementDescription: 'Descripción de la Dirección',
+            addressType: 'Tipo de Dirección',
+            region: 'Región',
+            city: 'Ciudad',
+            address: 'Dirección',
+            postCode: 'Código Postal'
+          }
         }
       },
       collect: {
@@ -511,6 +543,8 @@ export default {
           emptyPayment: 'Método de pago no soportado',
           emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
+          amountChange: 'Monto superior al cambio',
+          incompleteChange: 'Cambio Incompleto',
           fieldList: {
             code: 'Cedula',
             name: 'Nombre del Titular',
@@ -542,7 +576,9 @@ export default {
     },
     byInvoice: {
       title: 'Pedidos Vendedor de Pasillo por Facturar',
+      searchCompleteOrders: 'Solo Completas',
       label: 'Por Facturar',
+      toDeliver: 'Por Entregar',
       salesRepresentative: 'Agente Comercial',
       businessPartner: 'Socio de Negocio',
       copyShippingAddress: 'Copiar dirección para el envío',
@@ -562,6 +598,7 @@ export default {
       quantityOnHand: 'Existencia',
       price: 'Precio',
       taxAmount: 'Monto de Impuesto',
+      totalIncludingTax: 'Total con Impuesto',
       grandTotal: 'Total General',
       grandTotalConverted: 'Gran Total Convertido',
       quantityAvailable: 'Disponible',

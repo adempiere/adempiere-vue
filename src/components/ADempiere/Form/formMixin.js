@@ -60,14 +60,6 @@ export default {
   methods: {
     createFieldFromDefinition,
     createFieldFromDictionary,
-    /**
-     * Using forms and events with the enter key prevents the page from reloading
-     * with @submit.native.prevent="notSubmitForm" in el-form component
-     */
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    },
     async getPanel() {
       const panel = this.getterPanel
       if (!this.isEmptyValue(panel)) {

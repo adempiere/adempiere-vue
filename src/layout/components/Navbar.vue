@@ -175,6 +175,21 @@ export default {
       this.$router.push({
         path: '/login'
       }, () => {})
+      this.$store.commit('setPointOfSalesList', [])
+      this.$store.commit('setListOrderLine', [])
+      this.$store.commit('setOrder', {
+        documentType: {},
+        documentStatus: {
+          value: ''
+        },
+        totalLines: 0,
+        grandTotal: 0,
+        salesRepresentative: {},
+        businessPartner: {
+          value: '',
+          uuid: ''
+        }
+      })
     },
     handleClick() {
       this.$router.push({

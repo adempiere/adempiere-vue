@@ -41,13 +41,15 @@ export default {
     documentTypeUuid,
     warehouseUuid
   }) {
-    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
+    const { currentPriceList, currentWarehouse, defaultCampaignUuid } = rootGetters.posAttributes.currentPointOfSales
     return createOrder({
       posUuid,
       customerUuid,
       documentTypeUuid,
+      salesRepresentativeUuid: rootGetters['user/getUserUuid'],
       priceListUuid: currentPriceList.uuid,
-      warehouseUuid: currentWarehouse.uuid
+      warehouseUuid: currentWarehouse.uuid,
+      campaignUuid: defaultCampaignUuid
     })
       .then(order => {
         commit('setOrder', order)
@@ -75,8 +77,13 @@ export default {
     orderUuid,
     posUuid,
     customerUuid,
-    documentTypeUuid
+    documentTypeUuid,
+    campaignUuid
   }) {
+    const isCompleted = rootGetters.posAttributes.currentPointOfSales.currentOrder.isProcessed
+    if (isCompleted) {
+      return
+    }
     const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
     updateOrder({
       orderUuid,
@@ -84,7 +91,8 @@ export default {
       documentTypeUuid,
       customerUuid,
       priceListUuid: currentPriceList.uuid,
-      warehouseUuid: currentWarehouse.uuid
+      warehouseUuid: currentWarehouse.uuid,
+      campaignUuid
     })
       .then(response => {
         dispatch('reloadOrder', { orderUuid: response.uuid })
@@ -180,6 +188,7 @@ export default {
     setToStore = true
   }) {
     const orderToPush = {
+      ...attribute,
       uuid: attribute.uuid,
       id: attribute.id,
       businessPartner: attribute.businessPartner, // description, duns, id, lastName, naics, name, taxId, uuid, value
@@ -189,6 +198,7 @@ export default {
       documentType: attribute.documentType, // name, printName
       salesRepresentative: attribute.salesRepresentative, // id, uuid, name, description,
       totalLines: attribute.totalLines,
+      isDelivered: attribute.isDelivered,
       grandTotal: attribute.grandTotal
     }
     // if (setToStore) {
@@ -225,20 +235,24 @@ export default {
       containerUuid: 'Orders-List'
     })
     values = convertValuesToSendListOrders(values)
-    const { documentNo, businessPartnerUuid, grandTotal, openAmount, isPaid, isProcessed, isAisleSeller, isInvoiced, dateOrderedFrom, dateOrderedTo, salesRepresentativeUuid } = values
+    const isWaitingForPay = values.isPaid
+    const isOnlyProcessed = values.isProcessed
+    const isOnlyAisleSeller = values.isAisleSeller
+    const isWaitingForInvoice = values.isInvoiced
+    const { documentNo, businessPartnerUuid, grandTotal, openAmount, dateOrderedFrom, dateOrderedTo } = values
     listOrders({
       posUuid,
       documentNo,
       businessPartnerUuid,
       grandTotal,
       openAmount,
-      isPaid,
-      isProcessed,
-      isAisleSeller,
-      isInvoiced,
+      isWaitingForPay,
+      isOnlyProcessed,
+      isOnlyAisleSeller,
+      isWaitingForInvoice,
       dateOrderedFrom,
       dateOrderedTo,
-      salesRepresentativeUuid,
+      salesRepresentativeUuid: getters['user/getUserUuid'],
       pageToken
     })
       .then(responseOrdersList => {

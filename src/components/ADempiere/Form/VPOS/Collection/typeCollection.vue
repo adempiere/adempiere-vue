@@ -20,13 +20,13 @@
     <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; overflow: auto; padding-left: 0px;">
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
-          <el-col v-if="!value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
-            <el-card :body-style="{ padding: '0px' }">
+          <el-col v-if="!value.isRefund" :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
+            <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value, iSOCode(value))" fit="contain" />
                 </el-col>
-                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
+                <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
                     v-if="!isDisabled"
                     type="text"
@@ -65,13 +65,13 @@
                         style="padding-bottom: 20px;"
                       >
                         <p v-if="!isEmptyValue(value.currencyConvertion)" class="total">
-                          <b style="float: right;">
+                          <b :style=" isRefundReference ? 'float: right;color: red' : 'float: right;'">
                             {{ amountConvertion(value) }}
                           </b>
                         </p>
                         <br>
                         <p class="total">
-                          <b style="float: right;">
+                          <b :style=" isRefundReference ? 'float: right;color: red' : 'float: right;'">
                             {{ formatPrice(value.amount, iSOCode(value)) }}
                           </b>
                         </p>
@@ -85,17 +85,17 @@
         </template>
       </el-row>
     </el-main>
-    <el-divider v-if="!isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
-    <el-footer v-if="!isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
+    <el-divider v-if="!isRefundReference && !isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} / Otros </h2></el-divider>
+    <el-footer v-if="!isRefundReference && !isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
       <el-row :gutter="24">
         <template v-for="(value, key) in listRefund">
-          <el-col v-if="value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
-            <el-card :body-style="{ padding: '0px' }">
+          <el-col :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
+            <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value)" fit="contain" />
                 </el-col>
-                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
+                <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
                     v-if="!isDisabled"
                     type="text"
@@ -197,6 +197,14 @@ export default {
     isLoaded: {
       type: Boolean,
       default: false
+    },
+    size: {
+      type: Number,
+      default: 12
+    },
+    isRefundReference: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -233,16 +241,15 @@ export default {
       return this.$store.getters.getPaymentTypeList
     },
     listRefund() {
-      const refund = this.$store.getters.getListRefund
-      if (this.isEmptyValue(refund)) {
-        return []
-      }
-      return refund.filter(refund => refund.isRefund)
+      const refund = this.$store.getters.getListRefund.filter(refund => refund.isRefund)
+      const listRefundsReference = this.$store.getters.getListRefundReference
+      const list = listRefundsReference.concat(refund)
+      return list
     }
   },
   watch: {
     listPaymentType(value) {
-      if (!this.isEmptyValue(value.reference)) {
+      if (!this.isEmptyValue(value) && !this.isEmptyValue(value.reference)) {
         this.tenderTypeDisplaye({
           tableName: value.reference.tableName,
           query: value.reference.query
@@ -254,7 +261,7 @@ export default {
     if (!this.isEmptyValue(this.isAddTypePay)) {
       this.convertingPaymentMethods()
     }
-    if (!this.isEmptyValue(this.listPaymentType.reference)) {
+    if (!this.isEmptyValue(this.listPaymentType) && !this.isEmptyValue(this.listPaymentType.reference)) {
       this.tenderTypeDisplaye({
         tableName: this.listPaymentType.reference.tableName,
         query: this.listPaymentType.reference.query
@@ -274,7 +281,8 @@ export default {
     },
     labelTenderType(tenderType) {
       const currentTenderType = this.availablePaymentMethods.find(label => {
-        if (label.uuid === tenderType.paymentMethodUuid) {
+        const params = !this.isEmptyValue(tenderType.is_paid) ? tenderType.payment_method_uuid : tenderType.paymentMethodUuid
+        if (label.uuid === params) {
           return label
         }
       })
@@ -284,9 +292,13 @@ export default {
       return ''
     },
     iSOCode(value) {
-      const currencyPay = this.listCurrency.find(currency => currency.uuid === value.currencyUuid)
-      if (!currencyPay) {
-        return ''
+      const currencyPay = this.listCurrency.find(currency => {
+        if (currency.uuid === value.currencyUuid) {
+          return currency
+        }
+      })
+      if (this.isEmptyValue(currencyPay)) {
+        return this.currency.iSOCode
       }
       return currencyPay.iso_code
     },
@@ -372,9 +384,10 @@ export default {
       }
       return require('@/image/' + image + '.jpg')
     },
-    imageCard(typePayment) {
+    imageCard(typePayment, currency) {
       let image
-      switch (typePayment) {
+      const params = !this.isEmptyValue(typePayment.is_paid) ? typePayment.tender_type_code : typePayment.tenderTypeCode
+      switch (params) {
         case 'D':
           image = 'MobilePayment.jpg'
           break
@@ -399,12 +412,17 @@ export default {
       }
       return require('@/image/ADempiere/pos/typePayment/' + image)
     },
+    findTypePay(value) {
+      return this.availablePaymentMethods.find(pay => pay.uuid === value.paymentMethodUuid)
+    },
     deleteCollect(key) {
-      const orderUuid = key.orderUuid
       const paymentUuid = key.uuid
-      this.$store.dispatch('deletetPayments', {
+      const deletetPayments = !this.isEmptyValue(key.is_paid) ? 'deleteRefundReferences' : 'deletetPayments'
+      this.$store.dispatch(deletetPayments, {
         posUuid: this.currentPointOfSales.uuid,
-        orderUuid,
+        orderUuid: this.currentOrder.uuid,
+        uuid: key.uuid,
+        customerUuid: this.currentPointOfSales.currentOrder.businessPartner.uuid,
         paymentUuid
       })
     },

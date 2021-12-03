@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div
     v-if="isLoaded"
@@ -63,9 +64,6 @@
                 </span>
               </el-tag>
               <fast-ordes-list style="margin-right: 2%;margin-left: 2%;font-size: 12px;" />
-              <el-button type="primary" style="font-size: 12px;" plain @click="newOrder">
-                {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
-              </el-button>
             </el-col>
           </el-row>
         </el-form>
@@ -100,11 +98,11 @@
                     <template v-if="isEditQtyOrdered && fileColumnNameEdit === 'CurrentPrice' && valueOrder.columnName === 'CurrentPrice' && !isEmptyValue(isEditLine.uuid) && isEditLine.uuid === scope.row.uuid">
                       <el-input-number
                         ref="editField"
-                        v-model="scope.row.priceList"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        v-model="currentEditLine"
+                        v-shortkey="shortKeysInputTable"
                         :autofocus="true"
                         controls-position="right"
-                        @change="changeEdit(scope.row.priceList, 'PriceEntered')"
+                        @change="changeEdit(currentEditLine, 'PriceEntered')"
                         @shortkey.native="theActionEdit"
                       />
                     </template>
@@ -112,7 +110,7 @@
                       <el-input-number
                         ref="editField"
                         v-model="scope.row.quantityOrdered"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        v-shortkey="shortKeysInputTable"
                         :autofocus="true"
                         controls-position="right"
                         @change="changeEdit(scope.row.quantityOrdered, valueOrder.columnName)"
@@ -123,7 +121,7 @@
                       <el-input-number
                         ref="editField"
                         v-model="scope.row.discount"
-                        v-shortkey="isEditQtyOrdered ? {close: ['esc']} : {}"
+                        v-shortkey="shortKeysInputTable"
                         :autofocus="true"
                         controls-position="right"
                         @change="changeEdit(scope.row.discount, valueOrder.columnName)"
@@ -147,9 +145,9 @@
                     placement="right-start"
                     trigger="click"
                     width="300"
-                    :title="$t('form.productInfo.productInformation')"
                     :hide="closeInfo"
                   >
+                    {{ $t('form.productInfo.productInformation') }} <el-button icon="el-icon-close" style="float: right;" />
                     <el-form
                       label-position="top"
                       style="float: right;display: contents;line-height: 30px;"
@@ -177,7 +175,7 @@
                             <b>{{ scope.row.taxRate.name }}</b>
                             <br>
                             {{ $t('form.productInfo.grandTotal') }}:
-                            <b>{{ formatPrice((scope.row.priceList * scope.row.taxRate.rate / 100) + scope.row.priceList * scope.row.quantityOrdered, pointOfSalesCurrency.iSOCode) }}</b>
+                            <b>{{ formatPrice(scope.row.totalAmountWithTax, pointOfSalesCurrency.iSOCode) }}</b>
                             <br>
                             {{ $t('form.pos.tableProduct.quantity') }}:
                             <b>{{ formatQuantity(scope.row.quantityOrdered) }}</b>
@@ -234,14 +232,22 @@
           <el-footer :class="classOrderFooter">
             <div class="keypad">
               <el-row :gutter="24">
-                <el-button type="primary" icon="el-icon-top" :disabled="isDisabled" @click="arrowTop" />
-                <el-button type="primary" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
+                <el-button type="info" icon="el-icon-top" :disabled="isDisabled" @click="arrowTop" />
+                <el-button type="info" icon="el-icon-bottom" :disabled="isDisabled" @click="arrowBottom" />
                 <el-button v-show="isValidForDeleteLine(listOrderLine)" type="danger" icon="el-icon-delete" :disabled="isDisabled" @click="deleteOrderLine(currentOrderLine)" />
                 <el-button
-                  v-show="isValidForDeleteLine(listOrderLine)"
+                  v-show="isValidToRelease"
+                  type="primary"
+                  @click="releaseSalesOrder()"
+                >
+                  <i class="el-icon-document-checked" />
+                  {{ $t('form.pos.releaseOrder') }}
+                </el-button>
+                <el-button
+                  v-show="allowsCollectOrder"
+                  :disabled="!allowsCollectOrder"
                   type="success"
                   icon="el-icon-bank-card"
-                  :disabled="!allowsCollectOrder"
                   @click="openCollectionPanel"
                 >
                   {{ labelButtonCollections }}
@@ -334,9 +340,33 @@
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
+                <br>
+                <el-dropdown
+                  v-if="!isEmptyValue(currentOrder) && !isEmptyValue(listCampaign)"
+                  trigger="click"
+                  class="info-pos"
+                  @command="changeCampaign"
+                >
+                  <span>
+                    <i class="el-icon-guide" />
+                    {{ $t('form.pos.order.campaign') }}:
+                    <b style="cursor: pointer">
+                      {{ currentCampaign }}
+                    </b>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      v-for="item in listCampaign"
+                      :key="item.uuid"
+                      :command="item"
+                    >
+                      {{ item.values.DisplayColumn }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
               </p>
             </div>
-            <span v-if="isMobile" style="float: right;padding-right: 3%;">
+            <span v-if="isMobile" style="float: right;padding-right: 1%;">
               <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.date') }}:
@@ -344,7 +374,7 @@
                   {{ orderDate }}
                 </b>
               </p>
-              <p class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
+              <p v-if="!isEmptyValue(currentOrder.documentType)" class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.itemQuantity') }}
                 <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
@@ -358,20 +388,24 @@
                 </b></p>
             </span>
             <span style="float: right;">
-              <p class="total">{{ $t('form.pos.order.seller') }}:<b style="float: right;">
-                {{ currentOrder.salesRepresentative.name }}
-              </b></p>
-              <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
-              <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
-              <p class="total">
-                <b>
-                  {{ $t('form.pos.order.total') }}:
-                </b>
-                <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">
-                  {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                </b>
-              </p>
-              <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+              <div style="padding-left: 10px;padding-right: 10px;">
+                <p class="total">{{ $t('form.pos.order.seller') }}:<b style="float: right;">
+                  {{ currentOrder.salesRepresentative.name }}
+                </b></p>
+                <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
+                <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ getOrderTax(pointOfSalesCurrency.iSOCode) }}</b> </p>
+              </div>
+              <div style="border: 1px solid rgb(54, 163, 247);padding-left: 10px;padding-right: 10px;">
+                <p class="total">
+                  <b>
+                    {{ $t('form.pos.order.total') }}:
+                  </b>
+                  <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">
+                    {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
+                  </b>
+                </p>
+                <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+              </div>
             </span>
             <span v-if="!isMobile" style="float: right;padding-right: 3%;">
               <p class="total">{{ $t('form.pos.order.order') }}: <b class="order-info">{{ currentOrder.documentNo }}</b></p>
@@ -381,7 +415,7 @@
                   {{ orderDate }}
                 </b>
               </p>
-              <p class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
+              <p v-if="!isEmptyValue(currentOrder.documentType)" class="total">{{ $t('form.pos.order.type') }}:<b class="order-info">{{ currentOrder.documentType.name }}</b></p>
               <p class="total">
                 {{ $t('form.pos.order.itemQuantity') }}:
                 <b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">
@@ -401,13 +435,14 @@
     </el-container>
     <div v-if="isMobile && isShowedPOSKeyLayout" :style="classButtomRight">
       <el-button
+        v-show="!isEmptyValue(currentPointOfSales.keyLayoutUuid)"
         :circle="true"
         type="primary"
         :icon="isShowedPOSKeyLayout ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"
         @click="isShowedPOSKeyLayout = !isShowedPOSKeyLayout"
       />
     </div>
-    <div v-if="!isMobile" :style="classButtomRight">
+    <div v-if="!isMobile && !isEmptyValue(currentPointOfSales.keyLayoutUuid)" :style="classButtomRight">
       <el-button
         id="buttonPanelRightPos"
         :circle="true"
@@ -446,7 +481,8 @@ import {
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
-// import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
+import { requestLookupList } from '@/api/ADempiere/window.js'
+import { releaseOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'Order',
@@ -474,10 +510,21 @@ export default {
       isEditQtyOrdered: false,
       isEditLine: {},
       fileColumnNameEdit: '',
-      showInfo: false
+      editPrice: 0,
+      showInfo: false,
+      listCampaign: []
     }
   },
   computed: {
+    isValidToRelease() {
+      if (!this.isEmptyValue(this.currentOrder) && this.currentOrder.documentStatus.value === 'DR') {
+        return true
+      }
+      return false
+    },
+    fieldCampaign() {
+      return this.fieldsList.find(field => field.columnName === 'C_Campaign_ID')
+    },
     isMobile() {
       return this.$store.state.app.device === 'mobile'
     },
@@ -525,12 +572,20 @@ export default {
         popoverConvet: ['ctrl', 'x']
       }
     },
+    shortKeysInputTable() {
+      return {
+        close: ['esc'],
+        enter: ['enter']
+      }
+    },
     isShowedPOSKeyLayout: {
       get() {
         return this.$store.getters.getShowPOSKeyLayout
       },
       set(val) {
-        this.$store.commit('setShowPOSKeyLayout', val)
+        if (!this.isEmptyValue(this.currentPointOfSales.keyLayoutUuid)) {
+          this.$store.commit('setShowPOSKeyLayout', val)
+        }
       }
     },
     styleTab() {
@@ -646,6 +701,21 @@ export default {
       }
       return {}
     },
+    currentEditLine: {
+      get() {
+        if (this.isEmptyValue(this.currentLineOrder)) {
+          return {}
+        }
+        if (this.editPrice > 0 && this.editPrice !== this.currentValuePriceLine(this.currentLineOrder)) {
+          return this.editPrice
+        }
+        return this.currentValuePriceLine(this.currentLineOrder)
+      },
+      set(val) {
+        this.editPrice = val
+        return val
+      }
+    },
     currentPriceList() {
       if (!this.isEmptyValue(this.$store.getters.currentPriceList)) {
         return this.$store.getters.currentPriceList
@@ -671,6 +741,9 @@ export default {
           return this.currentOrder.documentType
         }
         return this.$store.getters.getCurrentDocumentTypePos
+      }
+      if (this.isEmptyValue(this.$store.getters.getCurrentDocumentTypePos)) {
+        return {}
       }
       return {}
     },
@@ -700,6 +773,16 @@ export default {
         return this.$store.getters.getOverdrawnInvoice.attributePin
       }
       return ''
+    },
+    currentCampaign() {
+      if (!this.isEmptyValue(this.currentOrder.campaignUuid)) {
+        const campaig = this.listCampaign.find(campaign => campaign.uuid === this.currentOrder.campaignUuid)
+        return campaig.values.DisplayColumn
+      } else if (!this.isEmptyValue(this.currentPointOfSales.defaultCampaignUuid)) {
+        const campaig = this.listCampaign.find(campaign => campaign.uuid === this.currentPointOfSales.defaultCampaignUuid)
+        return campaig.values.DisplayColumn
+      }
+      return this.$t('form.pos.order.noCampaignSelected')
     }
   },
   watch: {
@@ -736,20 +819,14 @@ export default {
           this.$refs.editField[0].select()
         }, 500)
       }
-    },
-    currentPriceList(value) {
-      if (!this.isEmptyValue(value)) {
-        this.$store.dispatch('updateOrder', {
-          orderUuid: this.$route.query.action,
-          posUuid: this.currentPointOfSales.uuid,
-          priceListUuid: value.uuid,
-          warehouseUuid: this.currentWarehouse.uuid,
-          documentTypeUuid: this.currentDocumentType.uuid
-        })
-      }
     }
   },
   mounted() {
+    setTimeout(() => {
+      if (!this.isEmptyValue(this.fieldCampaign.reference) && this.isEmptyValue(this.listCampaign)) {
+        this.getListCampaign(this.fieldCampaign.reference)
+      }
+    }, 500)
     if (!this.isEmptyValue(this.$route.query.action)) {
       this.$store.dispatch('reloadOrder', { orderUuid: this.$route.query.action })
     }
@@ -767,12 +844,41 @@ export default {
     if (this.isNewOrder) {
       this.$refs.ProductValue[0].$refs.product.focus()
     }
+    this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
   },
   methods: {
     formatDate,
     formatDateToSend,
     formatPrice,
     formatQuantity,
+    releaseSalesOrder() {
+      releaseOrder({
+        posUuid: this.currentPointOfSales.uuid,
+        salesRepresentativeUuid: this.$store.getters['user/getUserUuid'],
+        orderUuid: this.currentOrder.uuid
+      })
+        .then(response => {
+          this.clearOrder()
+          this.$message.success(this.$t('form.pos.generalNotifications.orderReleased') + response.documentNo)
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error Hold Order ${error.message}. Code: ${error.code}.`)
+        })
+    },
+    getListCampaign(campaing) {
+      requestLookupList({
+        tableName: campaing.tableName,
+        query: campaing.query
+      })
+        .then(responseLookupItem => {
+          this.listCampaign = responseLookupItem.recordsList
+        })
+    },
     focusProducto(value) {
       this.$refs.ProductValue[0].$refs.product.focus()
     },
@@ -822,6 +928,8 @@ export default {
       switch (event.srcKey) {
         case 'enter':
           this.$refs.editField[0].select()
+          this.exitEdit()
+          this.focusProducto()
           break
         case 'close':
           this.exitEdit()
@@ -846,7 +954,7 @@ export default {
       this.isShowedPOSKeyLayout = this.isMobile ? !this.isShowedPOSKeyLayout : true
       this.$store.commit('setShowPOSCollection', true)
       const orderUuid = this.$route.query.action
-      this.$store.dispatch('listPayments', { orderUuid })
+      this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid })
       this.$store.commit('setShowPOSOptions', false)
     },
     open() {
@@ -862,7 +970,7 @@ export default {
         const attributePin = {
           withLine: false,
           newOrder: true,
-          customer: this.currentPointOfSales.templateBusinessPartner.uuid,
+          customer: this.currentPointOfSales.templateCustomer.uuid,
           action: 'newOrder',
           type: 'actionPos',
           label: this.$t('form.pos.pinMessage.newOrder')
@@ -873,11 +981,24 @@ export default {
       }
       this.clearOrder()
       this.$store.commit('setShowPOSCollection', false)
-      this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateBusinessPartner.uuid })
+      this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
+      this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
     },
     changePos(pointOfSales) {
-      this.$store.dispatch('setCurrentPOS', pointOfSales)
-      this.clearOrder()
+      if (!this.isEmptyValue(this.currentPointOfSales.id) && this.currentPointOfSales.id !== pointOfSales.id) {
+        this.$store.dispatch('setCurrentPOS', pointOfSales)
+        this.clearOrder()
+      }
+    },
+    changeCampaign(item) {
+      this.$store.dispatch('updateOrder', {
+        orderUuid: this.currentOrder.uuid,
+        posUuid: this.currentPointOfSales.uuid,
+        documentTypeUuid: this.currentOrder.documentStatus.uuid,
+        priceListUuid: this.currentPointOfSales.priceList.uuid,
+        warehouseUuid: this.currentPointOfSales.warehouse.uuid,
+        campaignUuid: item.uuid
+      })
     },
     changeWarehouse(warehouse) {
       if (warehouse.id !== this.currentWarehouse.id) {

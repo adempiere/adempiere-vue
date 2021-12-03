@@ -15,90 +15,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // List of fields to send for create new
+import language from '@/lang'
+
 const tableName = 'C_BPartner'
 const fieldBase = {
   tableName: 'C_Location',
   isFromDictionary: true,
   overwriteDefinition: {
-    size: 12,
+    size: 24,
     index: 0
   }
 }
 
 export default [
-  {
-    elementColumnName: 'Name',
-    columnName: 'Name',
-    tableName,
-    isFromDictionary: true,
-    overwriteDefinition: {
-      tabindex: 1,
-      isCustomField: true,
-      size: 12,
-      sequence: 1,
-      isMandatory: true
-    }
-  },
-  {
-    elementColumnName: 'Name2',
-    columnName: 'Name2',
-    tableName,
-    isFromDictionary: true,
-    overwriteDefinition: {
-      tabindex: 2,
-      isCustomField: true,
-      sequence: 2,
-      size: 12
-    }
-  },
-  {
-    elementColumnName: 'ContactName',
-    columnName: 'ContactName',
-    tableName,
-    isFromDictionary: true,
-    overwriteDefinition: {
-      tabindex: 3,
-      isCustomField: true,
-      sequence: 2,
-      size: 12
-    }
-  },
-  {
-    elementColumnName: 'Description',
-    columnName: 'Description',
-    tableName,
-    isFromDictionary: true,
-    overwriteDefinition: {
-      tabindex: 3,
-      isCustomField: true,
-      sequence: 2,
-      size: 12
-    }
-  },
-  {
-    elementColumnName: 'EMail',
-    columnName: 'EMail',
-    tableName: 'AD_user',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      tabindex: 4,
-      isCustomField: true,
-      sequence: 3,
-      size: 12
-    }
-  },
-  {
-    elementColumnName: 'Phone',
-    columnName: 'Phone',
-    tableName: 'AD_user',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      tabindex: 2,
-      isCustomField: true,
-      sequence: 4,
-      size: 12
-    }
-  },
   {
     ...fieldBase,
     elementColumnName: 'C_Country_ID',
@@ -108,7 +37,7 @@ export default [
       isActiveLogics: true, // enable logics
       defaultValue: '@#C_Country_ID@',
       tabindex: 5,
-      size: 12,
+      size: 24,
       sequenceFields: 'CO',
       isMandatory: false
     }
@@ -119,8 +48,8 @@ export default [
     columnName: 'C_Region_ID',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 8,
-      size: 12,
+      tabindex: 6,
+      size: 24,
       sequenceFields: 'R',
       isMandatory: false
     }
@@ -132,7 +61,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 7,
-      size: 12,
+      size: 24,
       sequenceFields: 'C',
       isMandatory: false
     }
@@ -143,8 +72,9 @@ export default [
     columnName: 'Address1',
     overwriteDefinition: {
       isCustomField: true,
-      tabindex: 8,
-      size: 12,
+      tabindex: 6,
+      size: 24,
+      isMandatory: true,
       sequenceFields: 'A1'
     }
   },
@@ -155,7 +85,8 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 9,
-      size: 12,
+      size: 24,
+      isDisplayed: false,
       sequenceFields: 'A2'
     }
   },
@@ -166,7 +97,8 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       tabindex: 10,
-      size: 12,
+      size: 24,
+      isDisplayed: false,
       sequenceFields: 'A3'
     }
   },
@@ -177,7 +109,8 @@ export default [
     overwriteDefinition: {
       tabindex: 11,
       isCustomField: true,
-      size: 12,
+      size: 24,
+      isDisplayed: false,
       sequenceFields: 'A4'
     }
   },
@@ -188,8 +121,23 @@ export default [
     overwriteDefinition: {
       tabindex: 12,
       isCustomField: true,
-      size: 12,
+      size: 24,
       sequenceFields: 'P'
+    }
+  },
+  {
+    elementColumnName: 'Name',
+    columnName: 'Name',
+    tableName,
+    isFromDictionary: true,
+    overwriteDefinition: {
+      tabindex: 1,
+      isCustomField: true,
+      size: 24,
+      name: language.t('components.contextMenuReferences'),
+      sequence: 24,
+      sequenceFields: 'P',
+      isMandatory: true
     }
   }
 ]

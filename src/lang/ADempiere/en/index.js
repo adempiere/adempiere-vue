@@ -341,6 +341,7 @@ export default {
     exportRecord: 'Export Record',
     lockRecord: 'Lock Record',
     noDescription: 'No Description',
+    addDescription: 'Add Description',
     recordAccess: {
       modeMobile: {
         accessRoles: 'Access Roles',
@@ -402,8 +403,11 @@ export default {
     pos: {
       title: 'POS',
       priceList: 'Price List',
+      releaseOrder: 'Release It',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
+        emptyAvailablePaymentMethods: 'This terminal has no payment methods configured',
+        emptyListCashSummary: 'There is no cash movement',
         salesOrder: {
           title: 'Sale Order',
           newOrder: 'New Order',
@@ -417,13 +421,18 @@ export default {
           orderRemoved: 'Order Deleted',
           copyOrder: 'Copy Order',
           createNewReturnOrder: 'Create a new return order',
-          confirmDelivery: 'Confirmar Entrega'
+          confirmDelivery: 'Confirm Delivery',
+          emptyProductDelivery: 'Product not in Order'
         },
         cashManagement: {
           title: 'Cash Management',
           cashOpening: 'Cash Opening',
-          cashwithdrawal: 'Cash withdrawa',
-          closeBox: 'Close the box'
+          closeBox: 'Close the box',
+          assignSeller: 'Assign seller',
+          cashOpenBox: 'Cashbox Opened',
+          cashwithdrawal: 'Cash Withdrawal',
+          successfulCashWithdrawal: 'Cash withdrawal successful',
+          cashCloseBox: 'Cashbox Closed'
         },
         generalOptions: {
           title: 'General Options',
@@ -436,6 +445,10 @@ export default {
           dateFrom: 'Date From'
         }
       },
+      generalNotifications: {
+        orderReleased: 'Order was released: ',
+        selectedOrder: 'Selected Order: '
+      },
       tableProduct: {
         product: 'Product',
         quantity: 'Quantity',
@@ -443,8 +456,8 @@ export default {
         editQuantities: 'Edit Quantities',
         pin: 'Insert Pin',
         remove: 'Remove',
-        displayTaxAmount: 'Tax',
-        displayTaxIMP: '%Imp',
+        taxAmount: 'Tax',
+        taxRate: '% Imp',
         displayDiscountAmount: 'Discount',
         empty: 'Enter the product name, code or UPC'
       },
@@ -454,7 +467,7 @@ export default {
         date: 'Date',
         subTotal: 'Sub-Total',
         type: 'Type',
-        discount: '%Dcto',
+        discount: '% Dcto',
         tax: 'Tax',
         total: 'Total',
         itemQuantity: 'Item Quantity',
@@ -462,13 +475,32 @@ export default {
         pointSale: 'Point of Sale',
         collect: 'Collect',
         collections: 'Cobros',
+        campaign: 'Campaign',
+        noCampaignSelected: 'No Campaign selected',
         BusinessPartnerCreate: {
+          phone: 'Phone',
           businessPartner: 'Business Partner',
-          successfullyCreated: 'Socio de Negocio Creado Exitosamente',
+          successfullyCreated: 'Business Partner Successfully Created',
           customerData: 'Customer Data',
+          addBillingAddress: 'Add Billing Address',
           billingAddress: 'Billing Address',
           shippingAddress: 'Shipping Address',
-          taxId: 'Tax Identification'
+          taxId: 'Tax Identification',
+          address: {
+            edit: 'Edit',
+            selectAddress: 'Select Address',
+            saveAddress: 'Save Address',
+            addNewAddress: 'Add New Address',
+            editAddress: 'Edit Address',
+            billingAddress: 'Billing Address',
+            shippingAddress: 'Shipping Address',
+            managementDescription: 'Address Description',
+            addressType: 'Address Type',
+            region: 'Region',
+            city: 'City',
+            address: 'Address',
+            postCode: 'Post Code'
+          }
         }
       },
       collect: {
@@ -511,6 +543,8 @@ export default {
           emptyPayment: 'Unsupported payment method',
           emptyListPayment: 'You do not have any payment method associated with this option',
           addPayment: 'You must add a change type to complete the operation',
+          amountChange: 'Amount greater than change',
+          incompleteChange: 'Incomplete Change',
           fieldList: {
             code: 'Cedula',
             name: 'Holder Name',
@@ -542,6 +576,7 @@ export default {
     },
     byInvoice: {
       title: 'Aisle Vendor Orders to be Invoiced',
+      searchCompleteOrders: 'Search complete orders',
       label: 'To be invoiced',
       salesRepresentative: 'Sales Agent',
       businessPartner: 'Business Partner',
@@ -561,6 +596,7 @@ export default {
       price: 'Price',
       quantityOnHand: 'Quantity On Hand',
       taxAmount: 'Tax Amount',
+      totalIncludingTax: 'Total Including Tax',
       grandTotal: 'Grand Total',
       grandTotalConverted: 'Grand Total Converted',
       quantityAvailable: 'Available',

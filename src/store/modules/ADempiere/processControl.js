@@ -12,6 +12,10 @@ import { getToken } from '@/utils/auth'
  * @author Edwin Betancourt <EdwinBetanc0urt@outlook.com>
  */
 export default {
+  updateNotificationProcess(state, update) {
+    state.notificationProcess = update
+  },
+
   processActionPerformed({ commit }, {
     containerUuid,
     field,

@@ -113,7 +113,7 @@
         width="120"
       >
         <template slot-scope="scope">
-          {{ formatPrice(scope.row.grandTotal) }}
+          {{ formatPrice(scope.row.grandTotal, scope.row.priceList.currency.iso_code) }}
         </template>
       </el-table-column>
     </el-table>
@@ -291,6 +291,7 @@ export default {
       this.changeOrder = row
     },
     selectionChangeOrder() {
+      const posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
       const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
       if (!this.isEmptyValue(this.changeOrder) && this.changeOrder.documentNo !== currentOrder.documentNo) {
         this.$store.state['pointOfSales/point/index'].conversionsList = []
@@ -306,7 +307,7 @@ export default {
           }
         }, () => {})
         const orderUuid = this.$route.query.action
-        this.$store.dispatch('listPayments', { orderUuid })
+        this.$store.dispatch('listPayments', { posUuid, orderUuid })
       }
       this.clear()
     },
@@ -333,6 +334,7 @@ export default {
         columnName: 'C_Order_ID',
         value: row.id
       }]
+      console.log({ parametersList })
       this.$store.dispatch('addParametersProcessPos', parametersList)
     },
     setFieldsList() {
