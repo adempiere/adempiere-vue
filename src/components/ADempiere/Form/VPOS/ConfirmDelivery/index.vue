@@ -435,7 +435,6 @@ export default {
     },
     querySearchAsyncDelivery(queryString, callBack) {
       const results = queryString ? this.currentOrderLine.filter(this.createFilter(queryString)) : this.currentOrderLine
-      console.log(queryString, queryString.length)
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
         if (this.isEmptyValue(results)) {
