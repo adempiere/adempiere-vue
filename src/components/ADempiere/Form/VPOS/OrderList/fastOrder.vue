@@ -145,7 +145,17 @@ export default {
       dateOrdered: '',
       searchCriteria: {},
       currentOptions: {},
-      quickOptions: [
+      orderList: [],
+      openPopover: false,
+      isStatus: ''
+    }
+  },
+  computed: {
+    allowsConfirmShipment() {
+      return this.currentPointOfSales.isAllowsConfirmShipment
+    },
+    quickOptions() {
+      return [
         {
           title: this.$t('form.byInvoice.label'),
           params: {
@@ -172,15 +182,7 @@ export default {
           isVisible: false,
           isShow: true
         }
-      ],
-      orderList: [],
-      openPopover: false,
-      isStatus: ''
-    }
-  },
-  computed: {
-    allowsConfirmShipment() {
-      return this.currentPointOfSales.isAllowsConfirmShipment
+      ]
     },
     isProcessed() {
       if (!this.isEmptyValue(this.currentOrder.documentStatus.value) && this.currentOrder.documentStatus.value === 'CO' && this.allowsConfirmShipment) {

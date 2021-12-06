@@ -435,6 +435,7 @@ export default {
     },
     querySearchAsyncDelivery(queryString, callBack) {
       const results = queryString ? this.currentOrderLine.filter(this.createFilter(queryString)) : this.currentOrderLine
+      console.log(queryString, queryString.length)
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
         if (this.isEmptyValue(results)) {
@@ -444,6 +445,16 @@ export default {
             duration: 3500,
             showClose: true
           })
+        }
+        const suggestionOpen = results.length
+        if (this.isEmptyValue(queryString) || queryString.length < 4) {
+          // not show list
+          callBack(results)
+          return
+        }
+        if (suggestionOpen <= 1) {
+          this.searchProduct(results[0])
+          this.$refs.searchValue.close()
         }
         callBack(results)
       }, 500)
