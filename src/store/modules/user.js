@@ -44,12 +44,12 @@ const state = {
   userInfo: {},
   organizationsList: [],
   organization: {},
+  currentOrganizationId: 0,
   warehousesList: [],
   warehouse: {},
   isSession: false,
   sessionInfo: {},
-  corporateBrandingImage: '',
-  currentOrganization: 0
+  corporateBrandingImage: ''
 }
 
 const mutations = {
@@ -74,8 +74,8 @@ const mutations = {
   SET_ORGANIZATIONS_LIST: (state, payload) => {
     state.organizationsList = payload
   },
-  SET_CURRENT_ORGANIZATIONS: (state, payload) => {
-    state.currentOrganization = payload
+  SET_CURRENT_ORGANIZATION_ID: (state, payload) => {
+    state.currentOrganizationId = payload
   },
   SET_ORGANIZATION: (state, organization) => {
     state.organization = organization
@@ -183,7 +183,7 @@ const actions = {
               return context
             }
           })
-          commit('SET_CURRENT_ORGANIZATIONS', currentOrganizationSession.value)
+          commit('SET_CURRENT_ORGANIZATION_ID', currentOrganizationSession.value)
 
           // wait to establish the client and organization to generate the menu
           await dispatch('getOrganizationsListFromServer', role.uuid)
@@ -343,31 +343,41 @@ const actions = {
     return requestOrganizationsList({ roleUuid })
       .then(response => {
         commit('SET_ORGANIZATIONS_LIST', response.organizationsList)
+
+        // TODO: Change id from session context server
+        const currentOrganizationId = getters.getCurrentOrgId
+        // set organization with AD_Org_ID context
         let organization = response.organizationsList.find(item => {
-          if (item.uuid === getCurrentOrganization()) {
+          if (item.id === currentOrganizationId) {
             return item
           }
         })
+
+        // set organization with cookie uuid
+        if (isEmptyValue(organization)) {
+          organization = response.organizationsList.find(item => {
+            if (item.uuid === getCurrentOrganization()) {
+              return item
+            }
+          })
+        }
+
+        // set first organization list
         if (isEmptyValue(organization)) {
           organization = response.organizationsList[0]
         }
+
         if (isEmptyValue(organization)) {
           removeCurrentOrganization()
           organization = undefined
         } else {
           setCurrentOrganization(organization.uuid)
         }
-        const currentOrganization = getters.getCurrentOrg
-        if (!isEmptyValue(currentOrganization)) {
-          organization = response.organizationsList.find(item => {
-            if (item.id === currentOrganization) {
-              return item
-            }
-          })
-        }
+
         commit('SET_ORGANIZATION', organization)
+        commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
         commit('setPreferenceContext', {
-          columnName: '#' + ORGANIZATION,
+          columnName: `#${ORGANIZATION}`,
           value: organization.id
         }, {
           root: true
@@ -549,27 +559,15 @@ const actions = {
 }
 
 const getters = {
+  getIsSession: (state) => {
+    return state.isSession
+  },
   getRoles: (state) => {
     return state.rolesList
-  },
-  getOrganizations: (state) => {
-    return state.organizationsList
-  },
-  getWarehouses: (state) => {
-    return state.warehousesList
   },
   // current role info
   getRole: (state) => {
     return state.role
-  },
-  getOrganization: (state) => {
-    return state.organization
-  },
-  getWarehouse: (state) => {
-    return state.warehouse
-  },
-  getIsSession: (state) => {
-    return state.isSession
   },
   getUserUuid: (state) => {
     return state.userUuid
@@ -577,11 +575,23 @@ const getters = {
   userInfo: (state) => {
     return state.userInfo
   },
+  getOrganizations: (state) => {
+    return state.organizationsList
+  },
+  getOrganization: (state) => {
+    return state.organization
+  },
+  getCurrentOrgId: (state) => {
+    return state.currentOrganizationId
+  },
+  getWarehouses: (state) => {
+    return state.warehousesList
+  },
+  getWarehouse: (state) => {
+    return state.warehouse
+  },
   getIsPersonalLock: (state) => {
     return state.role.isPersonalLock
-  },
-  getCurrentOrg: (state) => {
-    return state.currentOrganization
   }
 }
 
