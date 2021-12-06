@@ -297,13 +297,13 @@ export default {
         searchValue
       })
         .then(response => {
+          this.loading = false
           this.billing = response.addresses.find(address => address.is_default_billing)
           this.shipping = response.addresses.find(address => address.is_default_shipping)
           this.loadAddresses(this.shipping, 'Shipping-Address')
           this.loadAddresses(this.billing, 'Billing-Address')
           this.loadDataCustomer(response, this.containerUuid)
           this.currentCustomer = response
-          this.loading = false
         })
     },
     clearValues() {
@@ -395,7 +395,7 @@ export default {
           value: customer.lastName
         }, {
           columnName: 'EMail',
-          value: customer.addresses[0].email
+          value: this.isEmptyValue(customer.addresses) ? '' : customer.addresses[0].email
         }, {
           columnName: 'Value',
           value: customer.value

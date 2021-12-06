@@ -305,6 +305,8 @@ export default {
         columnName: 'Value'
       })
       this.billingAddress.email = values.email
+      this.billingAddress.phone = values.phone
+      this.shippingAddress.phone = values.phone
       this.shippingAddress.email = values.email
       if (this.isEmptyValue(validateValueCustomer)) {
         this.$store.commit('updateValueOfField', {
