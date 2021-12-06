@@ -27,7 +27,7 @@
           <el-dropdown-item>
             <el-popover
               v-model="popoverCreateBusinessParnet"
-              placement="bottom-start"
+              placement="left-start"
               width="900"
               trigger="click"
             >
@@ -51,7 +51,7 @@
           <el-dropdown-item>
             <el-popover
               v-model="popoverListBusinessParnet"
-              placement="bottom-start"
+              placement="left-start"
               width="900"
               trigger="click"
             >
@@ -77,8 +77,8 @@
             <el-popover
               v-if="!isEmptyValue(currentOrder)"
               v-model="showUpdate"
-              placement="right"
-              width="1250"
+              placement="left-start"
+              width="900"
               trigger="click"
             >
               <business-partner-update
@@ -101,8 +101,8 @@
           <el-dropdown-item v-show="!isEmptyValue(currentOrder)">
             <el-popover
               v-model="showAddNewAddress"
-              placement="right"
-              width="600"
+              placement="left-start"
+              width="900"
               trigger="click"
             >
               <el-row>

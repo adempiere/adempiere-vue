@@ -112,7 +112,7 @@
                   <el-col :span="24" class="container-reverse">
                     <p class="container-popover">
                       <b class="container-popover">
-                        {{ $t('data.addDescription') }}
+                        {{ $t('data.addDescription') }} qlq
                       </b>
                     </p>
                   </el-col>
@@ -154,7 +154,7 @@
                 <el-button slot="reference" type="text" style="min-height: 50px;width: -webkit-fill-available;white-space: normal;">
                   <i class="el-icon-error" />
                   <br>
-                  {{ $t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction') }}
+                  {{ $t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction') }} qlq
                 </el-button>
               </el-popover>
             </el-card>

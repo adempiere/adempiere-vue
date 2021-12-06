@@ -50,7 +50,7 @@
       highlight-current-row
       border
       fit
-      height="350"
+      height="250"
       @current-change="handleCurrentChange"
     >
       <p slot="empty" style="width: 100%;">
