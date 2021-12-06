@@ -16,6 +16,7 @@ export default {
   },
   methods: {
     click() {
+      console.log(document)
       if (this.isFullscreen) {
         this.closeFullscreen()
         this.isFullscreen = true

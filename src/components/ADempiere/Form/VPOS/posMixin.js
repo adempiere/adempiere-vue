@@ -268,7 +268,6 @@ export default {
         })
     },
     pinAction(action) {
-      const { BankAccountType, A_Ident_SSN, C_Bank_ID_UUID, EMail, IsACH } = !this.isEmptyValue(this.$store.getters.getAddRefund) ? this.$store.getters.getAddRefund.customer.customerAccount : ''
       action = this.isEmptyValue(action) ? this.$store.getters.getOverdrawnInvoice.attributePin : action
       if (action.type === 'updateOrder') {
         switch (action.columnName) {
@@ -333,27 +332,10 @@ export default {
                 this.refundAllowed(this.currentPointOfSales.uuid, this.currentOrder.uuid, action.payment)
                 break
               case 1:
-                this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
-                  .then(response => {
-                    if (response.type === 'success') {
-                      this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
-                    }
-                  })
+                this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
                 break
               case 3:
-                this.$store.dispatch('customerBankAccount', {
-                  customerUuid: this.currentOrder.businessPartner.uuid,
-                  posUuid: this.currentPointOfSales.uuid,
-                  email: EMail,
-                  socialSecurityNumber: A_Ident_SSN,
-                  name: this.currentOrder.businessPartner.name,
-                  bankAccountType: BankAccountType,
-                  bankUuid: C_Bank_ID_UUID,
-                  isAch: IsACH
-                })
-                  .then(response => {
-                    this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
-                  })
+                this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
                 break
             }
             this.$store.commit('dialogoInvoce', { show: true, type: 2 })
