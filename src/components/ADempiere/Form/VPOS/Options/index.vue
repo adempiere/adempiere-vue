@@ -247,7 +247,7 @@
               </el-popover>
             </el-card>
           </el-col>
-          <el-col v-if="allowsConfirmShipment" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isDisplayCount" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
                 v-model="showCount"
@@ -255,8 +255,8 @@
                 :title="$t('form.pos.addDiscountToOrder')"
                 placement="top"
               >
-                <div style="padding 20px">
-                  <el-input-number v-model="count" :min="0" :max="100" controls-position="right" style="width: auto;" />
+                <div style="padding: 20px;">
+                  <el-input-number v-model="count" :min="0" :controls="false" :max="100" style="width: auto;" />
                   <div style="text-align: right; margin: 0">
                     <el-button
                       type="danger"
@@ -581,6 +581,9 @@ export default {
     },
     allowsConfirmShipment() {
       return this.currentPointOfSales.isAllowsConfirmShipment
+    },
+    isDisplayCount() {
+      return this.currentPointOfSales.isDisplayDiscount
     },
     infowOverdrawnInvoice() {
       if (this.$store.getters.getOverdrawnInvoice.attributePin) {
