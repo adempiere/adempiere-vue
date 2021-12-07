@@ -154,7 +154,7 @@
                 <el-button slot="reference" type="text" style="min-height: 50px;width: -webkit-fill-available;white-space: normal;">
                   <i class="el-icon-error" />
                   <br>
-                  {{ $t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction') }} qlq
+                  {{ $t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction') }}
                 </el-button>
               </el-popover>
             </el-card>
@@ -933,7 +933,8 @@ export default {
           const posUuid = this.currentPointOfSales.uuid
           const orderUuid = response.uuid
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
-          this.$store.dispatch('reloadOrder', { orderUuid })
+          this.$store.dispatch('setCurrentPOS', this.currentPointOfSales)
+          this.clearOrder()
         })
         .catch(error => {
           console.error(error.message)
