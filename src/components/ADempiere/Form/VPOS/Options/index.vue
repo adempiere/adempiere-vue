@@ -112,7 +112,7 @@
                   <el-col :span="24" class="container-reverse">
                     <p class="container-popover">
                       <b class="container-popover">
-                        {{ $t('data.addDescription') }} qlq
+                        {{ $t('data.addDescription') }}
                       </b>
                     </p>
                   </el-col>
@@ -930,7 +930,9 @@ export default {
         description: this.messageReverseSales
       })
         .then(response => {
-          const orderUuid = this.currentOrder.uuid
+          const posUuid = this.currentPointOfSales.uuid
+          const orderUuid = response.uuid
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
           this.$store.dispatch('reloadOrder', { orderUuid })
         })
         .catch(error => {
