@@ -274,6 +274,8 @@ export default {
       this.billingAddress.uuid = this.isEmptyValue(this.billing) ? '' : this.billing.uuid
       this.billingAddress.email = values.email
       this.shippingAddress.email = values.email
+      this.billingAddress.phone = values.phone
+      this.shippingAddress.phone = values.phone
       values.addresses = [this.billingAddress, this.shippingAddress]
       values.uuid = this.$store.getters.getValueOfField({
         containerUuid: this.$route.meta.uuid,
