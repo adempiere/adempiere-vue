@@ -709,7 +709,7 @@ export default {
       })
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
       const refund = this.convertValuesToSend(values)
-      if (refund.amount > this.currentOrder.refundAmount) {
+      if ((refund.amount * this.dayRate.divideRate) > this.currentOrder.refundAmount) {
         this.$message({
           type: 'warning',
           message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
