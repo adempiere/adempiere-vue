@@ -252,7 +252,7 @@
               <el-popover
                 v-model="showCount"
                 width="350"
-                :title="$t('form.pos.addDiscountToOrder')"
+                :title="$t('form.pos.discountRate')"
                 placement="top"
               >
                 <div style="padding: 20px;">
@@ -279,7 +279,7 @@
                 >
                   <i class="el-icon-document-remove" />
                   <br>
-                  {{ $t('form.pos.addDiscountToOrder') }}
+                  {{ $t('form.pos.applyDiscountOnOrder') }}
                 </el-button>
               </el-popover>
             </el-card>

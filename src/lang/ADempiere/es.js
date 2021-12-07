@@ -391,7 +391,8 @@ export default {
       title: 'Punto de Venta',
       priceList: 'Lista de Precio',
       releaseOrder: 'Liberar',
-      addDiscountToOrder: 'Agregar descuento a la Orden',
+      applyDiscountOnOrder: 'Apply Discount on Order',
+      discountRate: 'Discount Percentage',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
         emptyAvailablePaymentMethods: 'Este terminal no tiene configurado los metodos de pagos',
