@@ -37,10 +37,10 @@
         </el-form>
         <el-card v-if="option === 1" class="box-card">
           <div slot="header" class="clearfix">
-            <span v-if="isEmptyValue(selectionTypeRefund)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
+            <span v-if="isEmptyValue(selectionTypeRefund) || isEmptyValue(currentFieldPaymentMethods)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <template v-else>
               <span>
-                {{ selectionTypeRefund.name }}
+                {{ currentPaymentMethods }}
               </span>
               <span style="float: right;text-align: end">
                 <b>
@@ -129,7 +129,7 @@
           </div>
         </el-card>
         <type-collection
-          v-if="!isEmptyValue(listPaymentsRefund) && option === 1"
+          v-if="!isEmptyValue(listRefund) && option === 1"
           id="cardCollection"
           :is-add-type-pay="listPaymentsRefund"
           :currency="pointOfSalesCurrency"
@@ -167,7 +167,7 @@
             <span v-if="isEmptyValue(selectionTypeRefund)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <template v-else>
               <span>
-                {{ selectionTypeRefund.name }}
+                {{ currentPaymentMethods }}
               </span>
               <span style="float: right;text-align: end">
                 <b>
@@ -388,9 +388,7 @@ export default {
       return false
     },
     listRefund() {
-      const refund = this.$store.getters.getListRefund.filter(refund => refund.isRefund)
-      const listRefundsReference = this.$store.getters.getListRefundReference
-      const list = listRefundsReference.concat(refund)
+      const list = this.listRefundsReference.concat(this.listPaymentsRefund)
       return list
     },
     listRefundsReference() {
@@ -427,6 +425,15 @@ export default {
       return {
         name: ''
       }
+    },
+    currentPaymentMethods() {
+      if (!this.isEmptyValue(this.currentFieldPaymentMethods)) {
+        const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+        if (!this.isEmptyValue(payment)) {
+          return payment.name
+        }
+      }
+      return ''
     },
     componentRender() {
       let typePay
@@ -479,6 +486,12 @@ export default {
       return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.type
     },
     maximumRefundAllowed() {
+      if (!this.isEmptyValue(this.currentFieldPaymentMethods)) {
+        const currency = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+        if (!this.isEmptyValue(currency)) {
+          return currency.maximum_refund_allowed
+        }
+      }
       if (!this.isEmptyValue(this.selectionTypeRefund) && !this.isEmptyValue(this.selectionTypeRefund.maximum_refund_allowed) && this.selectionTypeRefund.maximum_refund_allowed > 0) {
         return this.selectionTypeRefund.maximum_refund_allowed
       }
@@ -491,6 +504,12 @@ export default {
       return this.paymentTypeListRefund
     },
     maximumDailyRefundAllowed() {
+      if (!this.isEmptyValue(this.currentFieldPaymentMethods)) {
+        const currency = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+        if (!this.isEmptyValue(currency)) {
+          return currency.maximum_daily_refund_allowed
+        }
+      }
       if (!this.isEmptyValue(this.selectionTypeRefund) && !this.isEmptyValue(this.selectionTypeRefund.maximum_daily_refund_allowed) && this.selectionTypeRefund.maximum_daily_refund_allowed > 0) {
         return this.selectionTypeRefund.maximum_daily_refund_allowed
       }
@@ -615,9 +634,6 @@ export default {
       if (!this.isEmptyValue(paymentMethods) && paymentMethods.tender_type === 'X') {
         return false
       }
-      if (this.isEmptyValue(this.currentFieldPaymentMethods)) {
-        return this.isEmptyValue(this.currentFieldPaymentMethods)
-      }
       if (this.isEmptyValue(fieldsEmpty)) {
         return false
       }
@@ -684,7 +700,7 @@ export default {
   mounted() {
     const containerUuid = 'OverdrawnInvoice'
     this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
-    this.selectionTypeRefund = {}
+    this.selectionTypeRefund = this.paymentTypeListRefund[0]
     this.$store.commit('updateValueOfField', {
       containerUuid,
       columnName: 'PayAmt',
@@ -694,6 +710,31 @@ export default {
   methods: {
     formatPrice,
     formatDateToSend,
+    sumRefund(cash) {
+      let sum = 0
+      if (!this.isEmptyValue(cash)) {
+        cash.forEach((pay) => {
+          sum += pay.amount
+        })
+      }
+      return sum
+    },
+    showDayRateAmount(rate) {
+      const currency = this.listCurrency.find(currency => !this.isEmptyValue(rate) && currency.iso_code === rate)
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+          return convert
+        }
+      })
+      if (!this.isEmptyValue(convert)) {
+        return convert
+      }
+      return {
+        currencyTo: this.currentPointOfSales.currentPriceList.currency,
+        divideRate: 1,
+        iSOCode: this.currentPointOfSales.currentPriceList.currency.iSOCode
+      }
+    },
     addPostPayment(customerBankAccountUuid) {
       const values = this.$store.getters.getValuesView({
         containerUuid: 'OverdrawnInvoice',
@@ -710,6 +751,17 @@ export default {
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
       const refund = this.convertValuesToSend(values)
       if ((refund.amount * this.dayRate.divideRate) > this.currentOrder.refundAmount) {
+        this.$message({
+          type: 'warning',
+          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
+          duration: 1500,
+          showClose: true
+        })
+        return
+      }
+      const filterPayment = this.listRefund.filter(list => list.paymentMethodUuid === payment.uuid)
+      const allPayMaximunRefund = this.sumRefund(filterPayment)
+      if (refund.amount > this.maximumRefundAllowed || (this.maximumRefundAllowed - allPayMaximunRefund) < refund.amount) {
         this.$message({
           type: 'warning',
           message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
@@ -958,6 +1010,43 @@ export default {
         containerUuid,
         columnName: 'ReferenceNo'
       })
+      const filterPayment = this.listRefund.filter(payment => payment.paymentMethodUuid === paymentMethodUuid)
+      const allPayMaximunRefund = this.sumRefund(filterPayment)
+      if ((amount * this.dayRate.divideRate) > this.currentOrder.refundAmount) {
+        this.$message({
+          type: 'warning',
+          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
+          duration: 1500,
+          showClose: true
+        })
+        return
+      }
+      if (this.maximumRefundAllowed < amount || (this.maximumRefundAllowed - allPayMaximunRefund) < amount) {
+        const attributePin = {
+          posUuid: this.currentPointOfSales.uuid,
+          orderUuid: this.currentOrder.uuid,
+          payments: {
+            posUuid,
+            orderUuid,
+            bankUuid,
+            referenceNo,
+            amount: amount,
+            convertedAmount: amount * this.dayRate.divideRate,
+            paymentDate,
+            tenderTypeCode,
+            paymentMethodUuid,
+            currencyUuid
+          },
+          typeRefund: this.option,
+          action: 'maximumRefundAllowed',
+          type: 'actionPos',
+          label: 'Monto superior al limite de la orden'
+        }
+        this.visible = true
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+        return
+      }
       this.$store.dispatch('sendCreateCustomerAccount', {
         posUuid,
         orderUuid,
