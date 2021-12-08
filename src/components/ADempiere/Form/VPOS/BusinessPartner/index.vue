@@ -109,6 +109,7 @@
                 <el-col :span="24">
                   <add-address
                     :shows-popovers="showAddNewAddress"
+                    :address-to-update="selectCustomerValue"
                   />
                 </el-col>
               </el-row>
@@ -237,11 +238,12 @@ export default {
       showFieldList: false,
       showCreate: false,
       visible: false,
-      selectAddress: '',
+      selectAddress: {},
       labelAddress: '',
       visibleAddress: false,
       customerValue: '',
-      selectCustomerValue: ''
+      visibleSelectAddress: false,
+      selectCustomerValue: {}
     }
   },
   computed: {
@@ -282,19 +284,18 @@ export default {
           // DisplayColumn_'ColumnName'
           columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.displayColumnName
         })
-        if (display === undefined) {
+        if (display === undefined && !this.visibleSelectAddress) {
           return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer.name
         }
-        if (this.isEmptyValue(this.selectAddress)) {
-          return this.customerValue + display
+        if (!this.isEmptyValue(this.selectAddress) && this.visibleSelectAddress) {
+          return this.customerValue + ' - ' + display + ' - ' + this.selectAddress.first_name
         }
-        return this.customerValue + '-' + display + '-' + this.selectAddress.first_name
+        return this.customerValue + display
       },
       set(value) {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.parentMetadata.containerUuid,
-          // DisplayColumn_'ColumnName'
-          columnName: 'DisplayColumn_C_BPartner_ID', // this.parentMetadata.displayColumnName,
+          columnName: 'DisplayColumn_C_BPartner_ID',
           value
         })
       }
@@ -419,13 +420,15 @@ export default {
     },
     setNewDisplayedValue() {
       this.customerValue = ''
+      this.visibleSelectAddress = false
       const displayValue = this.displayedValue
       if (this.controlDisplayed !== displayValue) {
         this.controlDisplayed = displayValue
       }
     },
     setOldDisplayedValue() {
-      this.customerValue = this.selectCustomerValue
+      this.visibleSelectAddress = true
+      this.customerValue = this.updatedCustomerValue
       if (this.controlDisplayed !== this.displayedValue) {
         this.displayedValue = this.controlDisplayed
       }
@@ -504,8 +507,9 @@ export default {
       if (this.isEmptyValue(businessPartner)) {
         businessPartner = this.blankBPartner
       }
+      this.selectAddress = {}
       this.customerValue = businessPartner.value
-      this.selectCustomerValue = businessPartner.value
+      this.selectCustomerValue = businessPartner
       this.setBusinessPartner(businessPartner, false)
     },
     onClose() {

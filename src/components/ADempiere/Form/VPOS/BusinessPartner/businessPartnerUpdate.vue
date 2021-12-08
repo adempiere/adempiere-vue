@@ -106,7 +106,7 @@
       :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
       :visible.sync="showAddressUpdate"
       :modal="false"
-      :show-close="false"
+      :show-close="true"
     >
       <add-address
         :is-updated-address="showAddressUpdate"
@@ -122,7 +122,7 @@ import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
-import AddAddress from './addAddress'
+import AddAddress from './addAddress.vue'
 import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
 
 export default {
@@ -189,8 +189,14 @@ export default {
         return value
       }
     },
-    showAddressUpdate() {
-      return this.$store.getters.getShowAddressUpdate
+    showAddressUpdate: {
+      get() {
+        return this.$store.getters.getShowAddressUpdate
+      },
+      set(value) {
+        this.$store.commit('setShowAddNewAddress', value)
+        return value
+      }
     },
     fieldsListLocation() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
