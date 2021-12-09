@@ -779,7 +779,7 @@ export default {
           email: refund.email,
           driverLicense: value,
           socialSecurityNumber: value,
-          name: nameAccount,
+          name: this.isEmptyValue(nameAccount) ? this.currentOrder.businessPartner.name : nameAccount,
           bankAccountType: refund.bankAccountType,
           bankUuid: refund.bankUuid,
           paymentMethodUuid: payment.uuid,
