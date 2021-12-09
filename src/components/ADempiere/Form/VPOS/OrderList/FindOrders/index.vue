@@ -18,7 +18,7 @@
 <template>
   <el-container>
     <el-header style="height: 2%;">
-      <p style="text-align: center;"> <b> {{ data.title }} </b></p>
+      <p style="text-align: center;"> <b> {{ data.title + ' (' + currentPointOfSales.name + ')' }} </b></p>
       <slot />
     </el-header>
     <el-main>
@@ -187,6 +187,9 @@ export default {
     sortFieldsListOrder() {
       return this.fieldsList.find(field => field.columnName === 'C_BPartner_ID')
     },
+    currentPointOfSales() {
+      return this.$store.getters.posAttributes.currentPointOfSales
+    },
     dateOrderedFrom() {
       return this.fieldsList.find(field => {
         if (field.columnName === 'DateOrdered') {
@@ -211,8 +214,8 @@ export default {
       this.$store.commit('setQuickSearchOrder', row)
     },
     selectionChangeOrder() {
-      const posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
-      const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
+      const posUuid = this.currentPointOfSales.uuid
+      const currentOrder = this.currentPointOfSales.currentOrder
       if (!this.isEmptyValue(this.changeOrder) && this.changeOrder.documentNo !== currentOrder.documentNo) {
         this.$store.state['pointOfSales/point/index'].conversionsList = []
         this.$store.dispatch('currentOrder', this.changeOrder)

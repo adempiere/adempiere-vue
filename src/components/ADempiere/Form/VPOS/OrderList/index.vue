@@ -23,7 +23,7 @@
     <el-collapse v-model="activeAccordion" accordion>
       <el-collapse-item name="query-criteria">
         <template slot="title">
-          Ver Histórico de Órdenes
+          <p style="text-align: center;width: 100%"> <b> {{ $t('form.pos.optionsPoinSales.salesOrder.ordersHistory') + ' (' + currentPointOfSales.name + ')' }} </b></p>
         </template>
         <el-form
           v-if="!isEmptyValue(sortFieldsListOrder)"
@@ -197,9 +197,9 @@ export default {
   computed: {
     heightTable() {
       if (this.isEmptyValue(this.activeAccordion)) {
-        return 600
+        return 400
       }
-      return 350
+      return 200
     },
     highlightRow() {
       if (!this.isEmptyValue(this.selectOrder)) {
@@ -376,3 +376,15 @@ export default {
   }
 }
 </script>
+
+<style>
+  .el-collapse-item__wrap {
+    will-change: height;
+    background-color: #FFFFFF;
+    overflow: hidden;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-bottom: 1px solid #e6ebf5;
+    padding-bottom: 10px;
+  }
+</style>
