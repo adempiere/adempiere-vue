@@ -589,6 +589,8 @@ export default {
       title: 'Aisle Vendor Orders to be Invoiced',
       searchCompleteOrders: 'Search complete orders',
       label: 'To be invoiced',
+      toDeliver: 'To be delivered',
+      toCollect: 'Receivable',
       salesRepresentative: 'Sales Agent',
       businessPartner: 'Business Partner',
       copyShippingAddress: 'Copy shipping address',

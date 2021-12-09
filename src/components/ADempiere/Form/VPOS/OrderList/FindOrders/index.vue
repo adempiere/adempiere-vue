@@ -34,12 +34,13 @@
       >
         <el-table-column
           prop="documentNo"
+          sortable
           :label="$t('form.byInvoice.documentNo')"
-          width="135"
+          width="155"
         />
         <el-table-column
           label="Fecha de Orden"
-          width="135"
+          width="130"
         >
           <template slot-scope="scope">
             {{ formatDate(scope.row.dateOrdered) }}
@@ -58,7 +59,7 @@
         <el-table-column
           prop="salesRepresentative.name"
           :label="$t('form.byInvoice.salesRepresentative')"
-          min-width="100"
+          min-width="120"
         />
 
         <el-table-column
@@ -85,20 +86,10 @@
         </el-table-column>
       </el-table>
     </el-main>
-    <el-footer>
-      <custom-pagination
-        :total="total"
-        :current-page="currentPage"
-        :handle-change-page="handleChangePage"
-        layout="total, prev, pager, next"
-        style="float: right;"
-      />
-    </el-footer>
   </el-container>
 </template>
 
 <script>
-import CustomPagination from '@/components/ADempiere/Pagination'
 import {
   formatDate,
   formatPrice
@@ -107,9 +98,6 @@ import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
   name: 'FindOrders',
-  components: {
-    CustomPagination
-  },
   props: {
     metadata: {
       type: Object,

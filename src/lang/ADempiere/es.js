@@ -566,6 +566,7 @@ export default {
       searchCompleteOrders: 'Solo Completas',
       label: 'Por Facturar',
       toDeliver: 'Por Entregar',
+      toCollect: 'Por Cobrar',
       salesRepresentative: 'Agente Comercial',
       businessPartner: 'Socio de Negocio',
       copyShippingAddress: 'Copiar dirección para el envío',

@@ -58,6 +58,13 @@
                   </el-form-item>
                 </el-form>
               </find-orders>
+              <custom-pagination
+                :total="total"
+                :current-page="currentPage"
+                :handle-change-page="handleChangePage"
+                layout="total, prev, pager, next"
+                style="float: right;"
+              />
               <el-row :gutter="24">
                 <el-col :span="24">
                   <samp style="float: right; padding-right: 10px;">
@@ -89,6 +96,7 @@
 
 <script>
 import fieldsListOrders from './fieldsListOrders.js'
+import CustomPagination from '@/components/ADempiere/Pagination'
 import {
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
@@ -107,6 +115,7 @@ import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 export default {
   name: 'AisleVendorList',
   components: {
+    CustomPagination,
     FindOrders,
     Field
   },
@@ -161,6 +170,14 @@ export default {
           params: {
             isOnlyAisleSeller: true,
             isWaitingForInvoice: false
+          },
+          isVisible: false,
+          isShow: true
+        },
+        {
+          title: this.$t('form.byInvoice.toCollect'),
+          params: {
+            isWaitingForPay: true
           },
           isVisible: false,
           isShow: true
@@ -469,8 +486,8 @@ export default {
         .then(response => {
           this.isloading = false
           this.orderList = response.ordersList
-          // this.tokenPage = this.extractPagingToken(response.nextPageToken)
-          // this.total = response.recordCount
+          this.tokenPage = this.extractPagingToken(response.nextPageToken)
+          this.total = response.recordCount
           // this.ordersInvoiced = response.ordersList
         })
         .catch(error => {
