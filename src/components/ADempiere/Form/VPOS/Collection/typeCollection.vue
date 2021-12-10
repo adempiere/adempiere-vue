@@ -319,7 +319,6 @@ export default {
     },
     // If there are payments in another currency, search for conversion
     convertingPaymentMethods() {
-      console.log(this.paymentCurrency, 123123)
       if (!this.isEmptyValue(this.paymentCurrency)) {
         requestGetConversionRate({
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,

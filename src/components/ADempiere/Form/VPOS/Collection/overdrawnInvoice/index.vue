@@ -764,7 +764,7 @@ export default {
       const refund = this.convertValuesToSend(values)
       const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', fieldsList: fieldLogic, isValidate: true, formatReturn: 'name' })
-      if (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency)) {
+      if (!this.isEmptyValue(this.fieldLogic) && !this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency)) {
         this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
         this.$message({
           type: 'warning',
@@ -798,6 +798,12 @@ export default {
         })
         return
       }
+      let account = this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+      if (this.isEmptyValue(refund.AccountNo) && payment.tender_type === 'Z') {
+        account = refund.email
+      } else if (this.isEmptyValue(refund.AccountNo) && payment.tender_type === 'P') {
+        account = refund.phone
+      }
       const currencySelected = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       if (this.isEmptyValue(this.currentBankAccount)) {
         this.$store.dispatch('customerBankAccount', {
@@ -807,12 +813,12 @@ export default {
           email: refund.email,
           driverLicense: value,
           socialSecurityNumber: value,
-          name: this.isEmptyValue(nameAccount) ? this.currentOrder.businessPartner.name + this.currentPaymentMethods : nameAccount + this.currentPaymentMethods,
+          name: this.isEmptyValue(nameAccount) ? this.currentOrder.businessPartner.name + '-' + this.currentPaymentMethods : nameAccount + '-' + this.currentPaymentMethods,
           bankAccountType: refund.bankAccountType,
           bankUuid: refund.bankUuid,
           paymentMethodUuid: payment.uuid,
           isAch: true,
-          AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+          AccountNo: account
         })
           .then(response => {
             this.$store.dispatch('refundReference', {
@@ -830,7 +836,7 @@ export default {
               bankUuid: refund.bankID,
               paymentMethodUuid: payment.uuid,
               isAch: true,
-              AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+              AccountNo: account
             })
           })
         this.clearAccountData()
@@ -851,7 +857,7 @@ export default {
         bankUuid: refund.bankAccountType,
         paymentMethodUuid: payment.uuid,
         isAch: true,
-        AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+        AccountNo: account
       })
       this.clearAccountData()
       return
