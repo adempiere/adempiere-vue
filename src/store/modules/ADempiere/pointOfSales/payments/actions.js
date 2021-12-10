@@ -578,6 +578,7 @@ export default {
           posUuid,
           orderUuid
         })
+        dispatch('reloadOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)

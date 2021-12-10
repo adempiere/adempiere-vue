@@ -229,7 +229,7 @@ export default {
     },
     // Validate if there is a payment in a different type of currency to the point
     paymentCurrency() {
-      return this.currentPointOfSales.currentOrder.listPayments.payments.find(pay => pay.currencyUuid !== this.currency.uuid)
+      return this.listRefund.find(pay => pay.currencyUuid !== this.currency.uuid)
     },
     convertionsList() {
       return this.$store.state['pointOfSales/point/index'].conversionsList
@@ -237,11 +237,16 @@ export default {
     availablePaymentMethods() {
       return this.$store.getters.getPaymentTypeList
     },
-    listRefund() {
-      const refund = this.$store.getters.getListRefund.filter(refund => refund.isRefund)
-      const listRefundsReference = this.$store.getters.getListRefundReference
-      const list = listRefundsReference.concat(refund)
-      return list
+    listRefund: {
+      get() {
+        const refund = this.$store.getters.getListRefund.filter(refund => refund.isRefund)
+        const listRefundsReference = this.$store.getters.getListRefundReference
+        const list = listRefundsReference.concat(refund)
+        return list
+      },
+      set(value) {
+        return value
+      }
     }
   },
   watch: {
@@ -314,6 +319,7 @@ export default {
     },
     // If there are payments in another currency, search for conversion
     convertingPaymentMethods() {
+      console.log(this.paymentCurrency, 123123)
       if (!this.isEmptyValue(this.paymentCurrency)) {
         requestGetConversionRate({
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
@@ -322,6 +328,14 @@ export default {
         })
           .then(response => {
             this.$store.getters.posAttributes.currentPointOfSales.currentOrder.listPayments.payments.forEach(element => {
+              if (element.currencyUuid !== this.pointOfSalesCurrency.uuid) {
+                element.multiplyRate = element.amount / response.multiplyRate
+                element.amountConvertion = element.amount * response.divideRate
+                element.divideRate = response.multiplyRate
+                element.currencyConvertion = response.currencyTo
+              }
+            })
+            this.listRefund.forEach(element => {
               if (element.currencyUuid !== this.pointOfSalesCurrency.uuid) {
                 element.multiplyRate = element.amount / response.multiplyRate
                 element.amountConvertion = element.amount * response.divideRate
@@ -422,6 +436,7 @@ export default {
         customerUuid: this.currentPointOfSales.currentOrder.businessPartner.uuid,
         paymentUuid
       })
+      this.$store.dispatch('reloadOrder', this.currentOrder.uuid)
     },
     // Payment card label
     tenderTypeDisplaye({
