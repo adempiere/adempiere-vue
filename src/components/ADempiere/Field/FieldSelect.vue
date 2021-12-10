@@ -97,6 +97,12 @@ export default {
         !this.metadata.displayed) {
         return [this.blankOption]
       }
+      console.log({
+        parentUuid: this.metadata.parentUuid,
+        containerUuid: this.metadata.containerUuid,
+        query: this.metadata.reference.query,
+        tableName: this.metadata.reference.tableName
+      })
       return this.$store.getters.getLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,

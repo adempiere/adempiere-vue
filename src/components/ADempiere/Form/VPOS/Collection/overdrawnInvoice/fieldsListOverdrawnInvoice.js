@@ -85,7 +85,7 @@ export default [
   },
   // Bank
   {
-    tableName,
+    tableName: 'C_BP_BankAccount',
     columnName: 'C_Bank_ID',
     isFromDictionary: true,
     overwriteDefinition: {
@@ -129,7 +129,7 @@ export default [
       sequence: 5,
       isCustomField: true,
       size: 24,
-      displayLogicPayment: 'D,K,T,A,P,C',
+      displayLogicPayment: 'K,T,A,P,C',
       isMandatory: true
     }
   },

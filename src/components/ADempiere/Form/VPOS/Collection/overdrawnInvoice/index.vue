@@ -830,12 +830,22 @@ export default {
     },
 
     selectedBanckAccount(value) {
+      const fieldBank = this.fieldsList.find(fields => fields.columnName === 'C_Bank_ID')
+      let listBank
+      if (!this.isEmptyValue(fieldBank) && fieldBank.reference) {
+        listBank = this.$store.getters.getLookupList({
+          containerUuid: this.metadata.containerUuid,
+          query: fieldBank.reference.query,
+          tableName: fieldBank.reference.tableName
+        })
+      }
       const account = this.bankAccountList.find(banck => banck.customer_bank_account_uuid === value)
       this.$store.dispatch('listRefunds', {
         posUuid: this.currentPointOfSales.uuid,
         customerUuid: this.customer_uuid,
         orderUuid: this.currentOrder.uuid
       })
+      account.bank = this.isEmptyValue(listBank) ? { uuid: '', id: 0, labe: '' } : listBank.find(bank => bank.uuid === account.bank_uuid)
       this.uploadAccountData(account)
     },
     convertValuesToSend(values) {
@@ -911,11 +921,23 @@ export default {
           },
           {
             columnName: 'AccountNo',
-            value: value.routing_no
+            value: value.account_no
+          },
+          {
+            columnName: 'Phone',
+            value: value.account_no
+          },
+          {
+            columnName: 'C_Bank_ID',
+            value: value.bank.id
           },
           {
             columnName: 'C_Bank_ID_UUID',
-            value: value.bank_uuid
+            value: value.bank.uuid
+          },
+          {
+            columnName: 'DisplayColumn_C_Bank_ID',
+            value: value.bank.label
           },
           {
             columnName: 'BankAccountType',
