@@ -1167,13 +1167,6 @@ export default {
         containerUuid: this.renderComponentContainer,
         format: 'object'
       })
-      const customer = {
-        customerAccount: values,
-        currencyUuid: this.$store.getters.getCurrencyRedund.uuid,
-        orderUuid: this.currentOrder.uuid,
-        posUuid: this.currentPointOfSales.uuid,
-        tenderTypeCode: this.selectionTypeRefund.tender_type
-      }
       const posUuid = this.currentPointOfSales.uuid
       const orderUuid = this.currentOrder.uuid
       const payments = this.currentOrder.listPayments.payments
@@ -1194,19 +1187,7 @@ export default {
         this.success()
         return
       }
-      this.$store.dispatch('addCreateCustomerAccount', {
-        posUuid,
-        customer,
-        orderUuid,
-        bankUuid: customer.C_Bank_ID_UUID,
-        amount: this.round(this.change / this.dayRate.divideRate, this.defaultReferenceCurrency.standard_precision),
-        tenderTypeCode: this.selectionTypeRefund.tender_type,
-        paymentMethodUuid: this.selectionTypeRefund.uuid,
-        currencyUuid: this.defaultReferenceCurrency.uuid
-      })
-        .then(response => {
-          this.success()
-        })
+      this.success()
     },
     success() {
       const customerDetails = []
@@ -1319,18 +1300,13 @@ export default {
               this.visible = true
               this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
             } else {
-              this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
-                .then(response => {
-                  if (response.type === 'success') {
-                    this.completePreparedOrder(posUuid, orderUuid, payments)
-                    this.$message({
-                      type: 'success',
-                      message: this.$t('notifications.completed'),
-                      showClose: true
-                    })
-                    this.$store.commit('dialogoInvoce', { show: false, success: true })
-                  }
-                })
+              this.completePreparedOrder(posUuid, orderUuid, payments)
+              this.$message({
+                type: 'success',
+                message: this.$t('notifications.completed'),
+                showClose: true
+              })
+              this.$store.commit('dialogoInvoce', { show: false, success: true })
             }
           } else {
             this.$message({
