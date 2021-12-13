@@ -653,7 +653,6 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        // value: this.round(value, this.standardPrecision)
         value: this.currentOrder.openAmount / this.amountForTheRate
       })
     },
@@ -668,7 +667,6 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          // value: this.round(this.pending, this.standardPrecision)
           value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
@@ -678,14 +676,12 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          // value: this.round(this.pending / value.divideRate, this.standardPrecision)
           value: this.currentOrder.openAmount / this.amountForTheRate
         })
       } else {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          // value: this.round(this.pending, this.standardPrecision)
           value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
@@ -741,7 +737,6 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          // value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
           value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
@@ -909,7 +904,6 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          // value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
           value: this.currentOrder.openAmount / this.amountForTheRate
         })
       })
@@ -940,7 +934,6 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        // value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
         value: this.currentOrder.openAmount / this.amountForTheRate
       })
       this.defaultValueCurrency()
