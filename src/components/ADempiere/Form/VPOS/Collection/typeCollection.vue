@@ -64,15 +64,15 @@
                         class="clearfix"
                         style="padding-bottom: 20px;"
                       >
-                        <p v-if="!isEmptyValue(value.currencyConvertion)" class="total">
+                        <p v-if="!isEmptyValue(value.orderCurrencyRate) && value.orderCurrencyRate !== 1" class="total">
                           <b :style=" isRefundReference ? 'float: right;color: red' : 'float: right;'">
-                            {{ amountConvertion(value) }}
+                            {{ formatPrice(value.amount, iSOCode(value)) }}
                           </b>
                         </p>
                         <br>
                         <p class="total">
                           <b :style=" isRefundReference ? 'float: right;color: red' : 'float: right;'">
-                            {{ formatPrice(value.amount, iSOCode(value)) }}
+                            {{ formatPrice(value.amount * value.orderCurrencyRate, currency.iSOCode) }}
                           </b>
                         </p>
                       </div>
@@ -86,7 +86,7 @@
       </el-row>
     </el-main>
     <el-divider v-if="!isRefundReference && !isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} / Otros </h2></el-divider>
-    <el-footer v-if="!isRefundReference && !isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
+    <el-footer v-if="!isRefundReference && !isEmptyValue(listRefund)" style="height: 50%;padding: 0px;overflow: auto;">
       <el-row :gutter="24">
         <template v-for="(value, key) in listRefund">
           <el-col :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
@@ -133,15 +133,16 @@
                         class="clearfix"
                         style="padding-bottom: 20px;"
                       >
-                        <p v-if="!isEmptyValue(value.currencyConvertion)" class="total">
+                        <p class="total">
                           <b style="float: right;color: red;">
-                            {{ amountConvertion(value) }}
+                            {{ formatPrice(value.amount, searchRate(value).currencyTo.iSOCode) }}
                           </b>
                         </p>
                         <br>
-                        <p class="total">
+                        <br>
+                        <p v-if="(!isEmptyValue(value.orderCurrencyRate) && value.orderCurrencyRate !== 1) || ( isEmptyValue(value.is_paid) || searchRate(value).multiplyRate !== 1)" class="total">
                           <b style="float: right;color: red;">
-                            {{ formatPrice(value.amount, labelCurrency(value.currencyUuid)) }}
+                            {{ formatPrice(value.amount * (isEmptyValue(value.orderCurrencyRate) ? searchRate(value).divideRate : value.orderCurrencyRate), currentPointOfSales.currentPriceList.currency.iSOCode) }}
                           </b>
                         </p>
                       </div>
@@ -274,6 +275,37 @@ export default {
     formatDate,
     formatDateToSend,
     formatPrice,
+    searchRate(value) {
+      if (!this.isEmptyValue(value)) {
+        const currency = this.listCurrency.find(currency => {
+          if ((!this.isEmptyValue(value.currencyUuid) && currency.uuid === value.currencyUuid) || (!this.isEmptyValue(value.currency) && currency.uuid === value.currency.uuid)) {
+            return currency
+          }
+        })
+        if (currency === undefined) {
+          return {
+            currencyTo: this.currentPointOfSales.priceList.currency,
+            divideRate: 1,
+            multiplyRate: 1,
+            iSOCode: this.currentPointOfSales.priceList.currency.iSOCode
+          }
+        }
+        const convert = this.convertionsList.find(convert => {
+          if (!this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+            return convert
+          }
+        })
+        if (!this.isEmptyValue(convert)) {
+          return convert
+        }
+      }
+      return {
+        currencyTo: this.currentPointOfSales.priceList.currency,
+        divideRate: 1,
+        multiplyRate: 1,
+        iSOCode: this.currentPointOfSales.priceList.currency.iSOCode
+      }
+    },
     labelCurrency(refunds) {
       const label = this.listCurrency.find(label => label.uuid === refunds)
       if (this.isEmptyValue(label)) {
