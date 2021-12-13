@@ -26,6 +26,7 @@
         v-loading="isLoadingTable"
         :data="dataList"
         height="250"
+        :default-sort="{prop: 'documentNo', order: 'descending'}"
         border
         :empty-text="$t('form.byInvoice.emptyList')"
         fit
