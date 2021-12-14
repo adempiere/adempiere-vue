@@ -48,7 +48,6 @@
               <el-popover
                 v-model="showListOrdes"
                 placement="right"
-                width="900"
                 trigger="click"
                 @show="seeOrderList"
               >

@@ -67,14 +67,51 @@
     >
       <el-table-column
         prop="documentNo"
-        label="Nro. Documento"
-        width="130"
-      />
+        width="155"
+      >
+        <template slot="header" slot-scope="scope">
+          {{ $t('form.byInvoice.documentNo') }}
+          <el-button-group
+            style="display: inline-grid;vertical-align: inherit;"
+          >
+            <el-button
+              type="text"
+              icon="el-icon-caret-top"
+              style="margin: 0px;padding: 0px;"
+              @click="sortAscendingTable(sortTableOrderList, scope.column.property)"
+            />
+            <el-button
+              type="text"
+              icon="el-icon-caret-bottom"
+              style="margin: 0px;padding: 0px;"
+              @click="sortDescendingTable(sortTableOrderList, scope.column.property)"
+            />
+          </el-button-group>
+        </template>
+      </el-table-column>
 
       <el-table-column
-        label="Estado"
         width="100"
       >
+        <template slot="header">
+          {{ $t('table.ProcessActivity.Status') }}
+          <el-button-group
+            style="display: inline-grid;vertical-align: inherit;"
+          >
+            <el-button
+              type="text"
+              icon="el-icon-caret-top"
+              style="margin: 0px;padding: 0px;"
+              @click="sortAscendingTable(sortTableOrderList, 'documentStatus', 'name')"
+            />
+            <el-button
+              type="text"
+              icon="el-icon-caret-bottom"
+              style="margin: 0px;padding: 0px;"
+              @click="sortDescendingTable(sortTableOrderList, 'documentStatus', 'name')"
+            />
+          </el-button-group>
+        </template>
         <template slot-scope="scope">
           <el-tag
             :type="tagStatus(scope.row.documentStatus.value)"
@@ -86,32 +123,104 @@
 
       <el-table-column
         prop="salesRepresentative.name"
-        label="Agente Comercial"
         min-width="170"
-      />
-
-      <el-table-column
-        label="Socio de Negocio"
-        min-width="150"
       >
+        <template slot="header">
+          {{ $t('form.byInvoice.salesRepresentative') }}
+          <el-button-group
+            style="display: inline-grid;vertical-align: inherit;"
+          >
+            <el-button
+              type="text"
+              icon="el-icon-caret-top"
+              style="margin: 0px;padding: 0px;"
+              @click="sortAscendingTable(sortTableOrderList, 'salesRepresentative', 'name')"
+            />
+            <el-button
+              type="text"
+              icon="el-icon-caret-bottom"
+              style="margin: 0px;padding: 0px;"
+              @click="sortDescendingTable(sortTableOrderList, 'salesRepresentative', 'name')"
+            />
+          </el-button-group>
+        </template>
+      </el-table-column>
+      <el-table-column
+        min-width="160"
+      >
+        <template slot="header">
+          {{ $t('form.byInvoice.businessPartner') }}
+          <el-button-group
+            style="display: inline-grid;vertical-align: inherit;"
+          >
+            <el-button
+              type="text"
+              icon="el-icon-caret-top"
+              style="margin: 0px;padding: 0px;"
+              @click="sortAscendingTable(sortTableOrderList, 'businessPartner', 'name')"
+            />
+            <el-button
+              type="text"
+              icon="el-icon-caret-bottom"
+              style="margin: 0px;padding: 0px;"
+              @click="sortDescendingTable(sortTableOrderList, 'businessPartner', 'name')"
+            />
+          </el-button-group>
+        </template>
         <template slot-scope="scope">
           {{ scope.row.businessPartner.name }}
         </template>
       </el-table-column>
 
       <el-table-column
-        label="Fecha de Orden"
-        width="135"
+        width="155"
       >
+        <template slot="header">
+          Fecha de Orden
+          <el-button-group
+            style="display: inline-grid;vertical-align: inherit;"
+          >
+            <el-button
+              type="text"
+              icon="el-icon-caret-top"
+              style="margin: 0px;padding: 0px;"
+              @click="sortAscendingDate(sortTableOrderList)"
+            />
+            <el-button
+              type="text"
+              icon="el-icon-caret-bottom"
+              style="margin: 0px;padding: 0px;"
+              @click="sortDescendingDate(sortTableOrderList)"
+            />
+          </el-button-group>
+        </template>
         <template slot-scope="scope">
           {{ formatDate(scope.row.dateOrdered) }}
         </template>
       </el-table-column>
       <el-table-column
-        label="Total General"
         align="right"
-        width="120"
+        width="150"
       >
+        <template slot="header">
+          {{ $t('form.productInfo.grandTotal') }}
+          <el-button-group
+            style="display: inline-grid;vertical-align: inherit;"
+          >
+            <el-button
+              type="text"
+              icon="el-icon-caret-top"
+              style="margin: 0px;padding: 0px;"
+              @click="sortAscendingTable(sortTableOrderList, 'grandTotal')"
+            />
+            <el-button
+              type="text"
+              icon="el-icon-caret-bottom"
+              style="margin: 0px;padding: 0px;"
+              @click="sortDescendingTable(sortTableOrderList, 'grandTotal')"
+            />
+          </el-button-group>
+        </template>
         <template slot-scope="scope">
           {{ formatPrice(scope.row.grandTotal, scope.row.priceList.currency.iso_code) }}
         </template>
@@ -230,11 +339,17 @@ export default {
     sortFieldsListOrder() {
       return this.sortfield(this.metadataList)
     },
-    sortTableOrderList() {
-      if (this.isEmptyValue(this.ordersList.ordersList)) {
-        return []
+    sortTableOrderList: {
+      get() {
+        if (this.isEmptyValue(this.ordersList.ordersList)) {
+          return []
+        }
+        return this.ordersList.ordersList
+      },
+      set(value) {
+        return value
       }
-      return this.sortDate(this.ordersList.ordersList)
+
     }
   },
   watch: {
@@ -260,6 +375,38 @@ export default {
     formatDate,
     formatQuantity,
     createFieldFromDictionary,
+    sortAscendingDate(listDate) {
+      return listDate.sort((elementA, elementB) => {
+        return new Date().setTime(new Date(elementB.dateOrdered).getTime()) - new Date().setTime(new Date(elementA.dateOrdered).getTime())
+      })
+    },
+    sortDescendingDate(listDate) {
+      return listDate.sort((elementA, elementB) => {
+        return new Date().setTime(new Date(elementA.dateOrdered).getTime()) - new Date().setTime(new Date(elementB.dateOrdered).getTime())
+      })
+    },
+    sortDescendingTable(listDate, column, params) {
+      return listDate.sort((element, item) => {
+        if ((!this.isEmptyValue(params) && element[column][params] > item[column][params]) || element[column] > item[column]) {
+          return 1
+        }
+        if ((!this.isEmptyValue(params) && element[column][params] < item[column][params]) || (element[column] < item[column])) {
+          return -1
+        }
+        return 0
+      })
+    },
+    sortAscendingTable(listDate, column, params) {
+      return listDate.sort((element, item) => {
+        if ((!this.isEmptyValue(params) && element[column][params] < item[column][params]) || (element[column] < item[column])) {
+          return 1
+        }
+        if ((!this.isEmptyValue(params) && element[column][params] > item[column][params]) || (element[column] > item[column])) {
+          return -1
+        }
+        return 0
+      })
+    },
     keyAction(event) {
       switch (event.srcKey) {
         case 'refreshList':
@@ -334,7 +481,6 @@ export default {
         columnName: 'C_Order_ID',
         value: row.id
       }]
-      console.log({ parametersList })
       this.$store.dispatch('addParametersProcessPos', parametersList)
     },
     setFieldsList() {
