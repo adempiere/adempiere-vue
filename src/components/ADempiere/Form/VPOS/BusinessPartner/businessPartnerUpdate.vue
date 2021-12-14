@@ -279,8 +279,8 @@ export default {
       this.shippingAddress.uuid = this.isEmptyValue(this.shipping) ? '' : this.shipping.uuid
       this.billingAddress.uuid = this.isEmptyValue(this.billing) ? '' : this.billing.uuid
       this.billingAddress.email = values.email
-      this.shippingAddress.email = values.email
       this.billingAddress.phone = values.phone
+      this.shippingAddress.email = values.email
       this.shippingAddress.phone = values.phone
       values.addresses = [this.billingAddress, this.shippingAddress]
       values.uuid = this.$store.getters.getValueOfField({
@@ -406,7 +406,7 @@ export default {
           value: this.isEmptyValue(customer.addresses) ? '' : customer.addresses[0].email
         }, {
           columnName: 'Phone',
-          value: this.isEmptyValue(customer.addresses) ? '' : customer.addresses[0].phone
+          value: this.isEmptyValue(customer.addresses) ? '' : this.isEmptyValue(customer.addresses[0].phone) ? customer.addresses[1].phone : customer.addresses[0].phone
         }, {
           columnName: 'Value',
           value: customer.value
