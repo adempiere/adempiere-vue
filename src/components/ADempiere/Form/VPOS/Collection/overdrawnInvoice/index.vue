@@ -624,7 +624,14 @@ export default {
     validPay() {
       const containerUuid = this.metadata.containerUuid
       // filter by visible fields
+      const amount = this.$store.getters.getValueOfField({
+        containerUuid,
+        columnName: 'PayAmt'
+      })
       const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
+      if (amount <= 0) {
+        return true
+      }
       const fieldsEmpty = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid,
         fieldsList: fieldLogic,
