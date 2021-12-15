@@ -260,7 +260,7 @@
               type="success"
               icon="el-icon-plus"
               :disabled="validPay && (currentOrder.refundAmount === 0)"
-              @click="addPostPayment"
+              @click="validateSubsequentPayment()"
             />
             <el-button
               style="float: right;margin-left: 9px;margin-right: 5px;"
@@ -277,6 +277,31 @@
             :currency="pointOfSalesCurrency"
             :size="6"
           />
+          <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + $t('form.pos.collect.overdrawnInvoice.amountChange')" width="40%" :visible.sync="visiblePin" :append-to-body="true">
+            <el-input
+              id="pin"
+              ref="pinPostPayment"
+              v-model="pinPostPayment"
+              v-shortkey="visiblePin ? {close: ['esc'], enter: ['enter']} : {}"
+              autofocus
+              type="password"
+              :placeholder="$t('form.pos.tableProduct.pin')"
+              :focus="true"
+              @shortkey.native="theActionPin"
+            />
+            <span style="float: right;">
+              <el-button
+                type="danger"
+                icon="el-icon-close"
+                @click="closePinPayment()"
+              />
+              <el-button
+                type="primary"
+                icon="el-icon-check"
+                @click="openPinPayment(pin)"
+              />
+            </span>
+          </el-dialog>
         </el-card>
       </div>
       <div v-if="caseOrder === 2">
@@ -323,6 +348,7 @@ import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOverdrawnInvoice from './fieldsListOverdrawnInvoice.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
+import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 // import typeRefund from './typeRefund/index.vue'
 
 export default {
@@ -375,6 +401,8 @@ export default {
       currentFieldCurrency: '',
       currentFieldPaymentMethods: '',
       currentPaymentType: '',
+      visiblePin: false,
+      pinPostPayment: '',
       currentBankAccount: ''
     }
   },
@@ -760,44 +788,7 @@ export default {
         columnName: 'Value'
       })
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
-      const referencePaymentCurrency = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       const refund = this.convertValuesToSend(values)
-      const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
-      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', fieldsList: fieldLogic, isValidate: true, formatReturn: 'name' })
-      if (!this.isEmptyValue(this.fieldLogic) && !this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency)) {
-        this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
-        this.$message({
-          type: 'warning',
-          message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
-          duration: 1500,
-          showClose: true
-        })
-        return
-      }
-      if ((refund.amount / this.showDayRateAmount(referencePaymentCurrency.uuid).multiplyRate) > this.currentOrder.refundAmount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
-          duration: 1500,
-          showClose: true
-        })
-        return
-      }
-      const filterPayment = this.listRefund.filter(list => {
-        if (list.paymentMethodUuid === payment.uuid || list.payment_method_uuid === payment.uuid) {
-          return list
-        }
-      })
-      const allPayMaximunRefund = this.sumRefund(filterPayment)
-      if (refund.amount > this.maximumRefundAllowed || (this.maximumRefundAllowed - allPayMaximunRefund) < refund.amount) {
-        this.$message({
-          type: 'warning',
-          message: 'Monto Superior al limete de cambio de la orden',
-          duration: 1500,
-          showClose: true
-        })
-        return
-      }
       let account = this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
       if (this.isEmptyValue(refund.AccountNo) && payment.tender_type === 'Z') {
         account = refund.email
@@ -862,7 +853,95 @@ export default {
       this.clearAccountData()
       return
     },
-
+    validateSubsequentPayment() {
+      const values = this.$store.getters.getValuesView({
+        containerUuid: 'OverdrawnInvoice',
+        format: 'object'
+      })
+      const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+      const referencePaymentCurrency = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
+      const refund = this.convertValuesToSend(values)
+      const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
+      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', fieldsList: fieldLogic, isValidate: true, formatReturn: 'name' })
+      if (!this.isEmptyValue(this.fieldLogic) && !this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency)) {
+        this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
+        this.$message({
+          type: 'warning',
+          message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
+          duration: 1500,
+          showClose: true
+        })
+        return
+      }
+      if ((refund.amount / this.showDayRateAmount(referencePaymentCurrency.uuid).multiplyRate) > this.currentOrder.refundAmount) {
+        this.$message({
+          type: 'warning',
+          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
+          duration: 1500,
+          showClose: true
+        })
+        return
+      }
+      const filterPayment = this.listRefund.filter(list => {
+        if (list.paymentMethodUuid === payment.uuid || list.payment_method_uuid === payment.uuid) {
+          return list
+        }
+      })
+      const allPayMaximunRefund = this.sumRefund(filterPayment)
+      if (refund.amount > this.maximumRefundAllowed || (this.maximumRefundAllowed - allPayMaximunRefund) < refund.amount) {
+        this.visiblePin = true
+        setTimeout(() => {
+          this.$refs.pinPostPayment.focus()
+        }, 500)
+        return
+      }
+      this.addPostPayment()
+    },
+    theActionPin(event) {
+      if (this.visiblePin) {
+        switch (event.srcKey) {
+          case 'enter':
+            this.openPinPayment(this.pinPostPayment)
+            break
+          case 'close':
+            this.closePinPayment()
+            break
+        }
+      }
+    },
+    openPinPayment(pin) {
+      validatePin({
+        posUuid: this.currentPointOfSales.uuid,
+        pin
+      })
+        .then(response => {
+          this.pinPostPayment = ''
+          this.visiblePin = false
+          this.$message({
+            type: 'success',
+            message: 'Acción a realizar',
+            showClose: true
+          })
+          this.addPostPayment()
+        })
+        .catch(error => {
+          console.error(error.message)
+          this.$message({
+            type: 'error',
+            message: error.message,
+            showClose: true
+          })
+          this.pinPostPayment = ''
+        })
+        .finally(() => {
+          this.visiblePin = false
+          this.pinPostPayment = ''
+        })
+    },
+    closePinPayment() {
+      this.visiblePin = false
+      this.pinPostPayment = ''
+    },
     selectedBanckAccount(value) {
       const fieldBank = this.fieldsList.find(fields => fields.columnName === 'C_Bank_ID')
       let listBank
