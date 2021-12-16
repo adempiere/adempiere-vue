@@ -39,5 +39,8 @@
   },
   "Weight": {
     "endpoint": "/form/addons/weight"
+  },
+  "Session": {
+    "timeOut": 300000
   }
 }

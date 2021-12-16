@@ -13,7 +13,6 @@ import VueSplit from 'vue-split-panel'
 import 'vue-resize/dist/vue-resize.css'
 import VueResize from 'vue-resize'
 import WorkflowChart from 'vue-workflow-chart'
-import IdleVue from 'idle-vue'
 /**
  * TODO: Waiting for PR to:
  * https://github.com/vue-extend/v-markdown/pull/4
@@ -50,19 +49,12 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
-const eventsHub = new Vue()
 Vue.use(VueCompositionApi)
 Vue.use(VMarkdown)
 Vue.use(VueShortkey)
 Vue.use(VueSplit)
 Vue.use(VueResize)
 Vue.use(WorkflowChart)
-Vue.use(IdleVue, {
-  eventEmitter: eventsHub,
-  store,
-  idleTime: 300000, // 5 minutes
-  startAtIdle: false
-})
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
   i18n: (key, value) => i18n.t(key, value),

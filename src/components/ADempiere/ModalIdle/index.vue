@@ -20,7 +20,16 @@
 </template>
 
 <script>
-// import { showNotification } from '@/utils/ADempiere/notification'
+import { config } from '@/utils/ADempiere/config'
+import Vue from 'vue'
+import IdleVue from 'idle-vue'
+import store from '../../../store'
+Vue.use(IdleVue, {
+  eventEmitter: new Vue(),
+  store,
+  idleTime: `${config.Session.timeOut}`,
+  startAtIdle: false
+})
 export default {
   name: 'ModalIdle',
   props: {
