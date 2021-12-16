@@ -951,7 +951,6 @@ export default {
       this.seeConversion = false
     },
     openCollectionPanel() {
-      this.isShowedPOSKeyLayout = this.isMobile ? !this.isShowedPOSKeyLayout : true
       this.$store.commit('setShowPOSCollection', true)
       const orderUuid = this.$route.query.action
       this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid })

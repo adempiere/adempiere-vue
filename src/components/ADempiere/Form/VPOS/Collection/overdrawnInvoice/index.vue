@@ -429,6 +429,9 @@ export default {
       }
       return []
     },
+    listAllPayments() {
+      return this.$store.getters.getListRefund
+    },
     hiddenFieldsList() {
       return this.fieldsList.filter(field => {
         if (field.sequence > 1 && field.displayLogicPayment.includes(this.currentAvailablePaymentMethods.tender_type)) {
@@ -652,7 +655,14 @@ export default {
     validPay() {
       const containerUuid = this.metadata.containerUuid
       // filter by visible fields
+      const amount = this.$store.getters.getValueOfField({
+        containerUuid,
+        columnName: 'PayAmt'
+      })
       const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
+      if (amount <= 0) {
+        return true
+      }
       const fieldsEmpty = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid,
         fieldsList: fieldLogic,
@@ -1150,7 +1160,7 @@ export default {
         containerUuid,
         columnName: 'ReferenceNo'
       })
-      const filterPayment = this.listRefund.filter(payment => payment.paymentMethodUuid === paymentMethodUuid)
+      const filterPayment = this.listRefund.filter(payment => payment.paymentMethodUuid === paymentMethodUuid || payment.payment_method_uuid === paymentMethodUuid)
       const allPayMaximunRefund = this.sumRefund(filterPayment)
       if ((amount * this.dayRate.divideRate) > this.currentOrder.refundAmount) {
         this.$message({
@@ -1162,29 +1172,12 @@ export default {
         return
       }
       if (this.maximumRefundAllowed < amount || (this.maximumRefundAllowed - allPayMaximunRefund) < amount) {
-        const attributePin = {
-          posUuid: this.currentPointOfSales.uuid,
-          orderUuid: this.currentOrder.uuid,
-          payments: {
-            posUuid,
-            orderUuid,
-            bankUuid,
-            referenceNo,
-            amount: amount,
-            convertedAmount: amount * this.dayRate.divideRate,
-            paymentDate,
-            tenderTypeCode,
-            paymentMethodUuid,
-            currencyUuid
-          },
-          typeRefund: this.option,
-          action: 'maximumRefundAllowed',
-          type: 'actionPos',
-          label: 'Monto superior al limite de la orden'
-        }
-        this.visible = true
-        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-        this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+        this.$message({
+          type: 'warning',
+          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
+          duration: 1500,
+          showClose: true
+        })
         return
       }
       this.$store.dispatch('sendCreateCustomerAccount', {
@@ -1438,8 +1431,8 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
-        createPayments: !this.isEmptyValue(payments),
-        payments: payments
+        createPayments: !this.isEmptyValue(this.listAllPayments),
+        payments: this.listAllPayments
       })
         .then(response => {
           this.$store.dispatch('printTicket', { posUuid, orderUuid })

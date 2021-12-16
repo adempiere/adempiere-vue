@@ -1053,6 +1053,7 @@ export default {
           this.$store.dispatch('updateOrderPos', false)
           // close panel lef
           this.$store.commit('setShowPOSOptions', false)
+          this.newOrder()
         })
     },
     seeOrderList() {

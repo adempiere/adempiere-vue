@@ -26,6 +26,7 @@
         v-loading="isLoadingTable"
         :data="dataList"
         height="250"
+        style="width: 100%"
         border
         :empty-text="$t('form.byInvoice.emptyList')"
         fit
@@ -40,7 +41,7 @@
         />
         <el-table-column
           label="Fecha de Orden"
-          width="130"
+          width="140"
         >
           <template slot-scope="scope">
             {{ formatDate(scope.row.dateOrdered) }}
@@ -49,7 +50,7 @@
 
         <el-table-column
           :label="$t('form.byInvoice.businessPartner')"
-          min-width="120"
+          min-width="130"
         >
           <template slot-scope="scope">
             {{ scope.row.businessPartner.name }}
@@ -59,12 +60,12 @@
         <el-table-column
           prop="salesRepresentative.name"
           :label="$t('form.byInvoice.salesRepresentative')"
-          min-width="120"
+          min-width="130"
         />
 
         <el-table-column
           :label="$t('table.ProcessActivity.Status')"
-          width="100"
+          width="90"
         >
           <template slot-scope="scope">
             <el-tag
