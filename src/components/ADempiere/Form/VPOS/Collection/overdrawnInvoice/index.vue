@@ -401,6 +401,9 @@ export default {
       }
       return []
     },
+    listAllPayments() {
+      return this.$store.getters.getListRefund
+    },
     hiddenFieldsList() {
       return this.fieldsList.filter(field => {
         if (field.sequence > 1 && field.displayLogicPayment.includes(this.currentAvailablePaymentMethods.tender_type)) {
@@ -1359,8 +1362,8 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
-        createPayments: !this.isEmptyValue(payments),
-        payments: payments
+        createPayments: !this.isEmptyValue(this.listAllPayments),
+        payments: this.listAllPayments
       })
         .then(response => {
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
