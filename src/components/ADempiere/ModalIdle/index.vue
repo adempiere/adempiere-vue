@@ -27,7 +27,7 @@ import store from '../../../store'
 Vue.use(IdleVue, {
   eventEmitter: new Vue(),
   store,
-  idleTime: `${config.Session.timeOut}`,
+  idleTime: `${config.session.timeout}`,
   startAtIdle: false
 })
 export default {

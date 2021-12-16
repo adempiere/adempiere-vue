@@ -37,10 +37,10 @@
   "match": {
     "endpoint": "/form/addons/match"
   },
-  "Weight": {
+  "weight": {
     "endpoint": "/form/addons/weight"
   },
-  "Session": {
-    "timeOut": 300000
+  "session": {
+    "timeout": 300000
   }
 }
