@@ -288,7 +288,7 @@ export default {
           return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer.name
         }
         if (!this.isEmptyValue(this.selectAddress) && this.visibleSelectAddress) {
-          return this.customerValue + ' - ' + display + ' - ' + this.selectAddress.first_name
+          return this.customerValue + display + ' - ' + this.selectAddress.first_name
         }
         return this.customerValue + display
       },
@@ -428,7 +428,7 @@ export default {
     },
     setOldDisplayedValue() {
       this.visibleSelectAddress = true
-      this.customerValue = this.updatedCustomerValue
+      this.customerValue = this.updatedCustomerValue + ' - '
       if (this.controlDisplayed !== this.displayedValue) {
         this.displayedValue = this.controlDisplayed
       }
