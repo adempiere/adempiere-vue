@@ -26,6 +26,7 @@
         v-loading="isLoadingTable"
         :data="dataList"
         height="250"
+        style="width: 100%"
         border
         :empty-text="$t('form.byInvoice.emptyList')"
         fit

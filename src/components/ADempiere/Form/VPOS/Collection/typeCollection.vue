@@ -139,8 +139,7 @@
                           </b>
                         </p>
                         <br>
-                        <br>
-                        <p v-if="(!isEmptyValue(value.orderCurrencyRate) && value.orderCurrencyRate !== 1) || ( isEmptyValue(value.is_paid) || searchRate(value).multiplyRate !== 1)" class="total">
+                        <p v-if="(!isEmptyValue(value.currencyUuid) && currentPointOfSales.priceList.currency.uuid !== value.currencyUuid) || (!isEmptyValue(value.currency) && currentPointOfSales.priceList.currency.uuid !== value.currency.uuid)" class="total">
                           <b style="float: right;color: red;">
                             {{ formatPrice(value.amount * (isEmptyValue(value.orderCurrencyRate) ? searchRate(value).divideRate : value.orderCurrencyRate), currentPointOfSales.currentPriceList.currency.iSOCode) }}
                           </b>
