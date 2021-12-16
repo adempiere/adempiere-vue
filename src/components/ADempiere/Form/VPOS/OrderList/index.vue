@@ -155,6 +155,7 @@ import {
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 import Field from '@/components/ADempiere/Field'
+import { holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 
 export default {
@@ -308,6 +309,24 @@ export default {
         }, () => {})
         const orderUuid = this.$route.query.action
         this.$store.dispatch('listPayments', { posUuid, orderUuid })
+      }
+      if (this.changeOrder.documentStatus.value === 'DR') {
+        holdOrder({
+          posUuid: this.currentPointOfSales.uuid,
+          salesRepresentativeUuid: this.$store.getters['user/getUserUuid'],
+          orderUuid: this.changeOrder.uuid
+        })
+          .then(response => {
+            this.$message.success(this.$t('form.pos.generalNotifications.selectedOrder') + response.documentNo)
+          })
+          .catch(error => {
+            this.$message({
+              message: error.message,
+              isShowClose: true,
+              type: 'error'
+            })
+            console.warn(`Error Hold Order ${error.message}. Code: ${error.code}.`)
+          })
       }
       this.clear()
     },

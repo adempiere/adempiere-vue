@@ -324,22 +324,24 @@ export default {
         const orderUuid = this.getSearchOrder.uuid
         this.$store.dispatch('listPayments', { posUuid, orderUuid })
       }
-      holdOrder({
-        posUuid: this.currentPointOfSales.uuid,
-        salesRepresentativeUuid: this.$store.getters['user/getUserUuid'],
-        orderUuid: this.getSearchOrder.uuid
-      })
-        .then(response => {
-          this.$message.success(this.$t('form.pos.generalNotifications.selectedOrder') + response.documentNo)
+      if (this.getSearchOrder.documentStatus.value === 'DR') {
+        holdOrder({
+          posUuid: this.currentPointOfSales.uuid,
+          salesRepresentativeUuid: this.$store.getters['user/getUserUuid'],
+          orderUuid: this.getSearchOrder.uuid
         })
-        .catch(error => {
-          this.$message({
-            message: error.message,
-            isShowClose: true,
-            type: 'error'
+          .then(response => {
+            this.$message.success(this.$t('form.pos.generalNotifications.selectedOrder') + response.documentNo)
           })
-          console.warn(`Error Hold Order ${error.message}. Code: ${error.code}.`)
-        })
+          .catch(error => {
+            this.$message({
+              message: error.message,
+              isShowClose: true,
+              type: 'error'
+            })
+            console.warn(`Error Hold Order ${error.message}. Code: ${error.code}.`)
+          })
+      }
       this.closeSearch(command)
     },
     validaTypeDocument(type) {
