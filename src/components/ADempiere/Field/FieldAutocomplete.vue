@@ -53,12 +53,19 @@
 </template>
 
 <script>
+// mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import { convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
+
+// utils and helper methods
+import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
 export default {
   name: 'FieldAutocomplete',
-  mixins: [fieldMixin],
+
+  mixins: [
+    fieldMixin
+  ],
+
   data() {
     // label with '' value is assumed to be undefined non-existent
     const label = ' '
@@ -79,6 +86,7 @@ export default {
       timeOut: null
     }
   },
+
   computed: {
     isPanelWindow() {
       return this.metadata.panelType === 'window'
@@ -185,9 +193,11 @@ export default {
       }
     }
   },
+
   created() {
     this.changeBlankOption()
   },
+
   methods: {
     parseValue(value) {
       if (typeof value === 'boolean') {

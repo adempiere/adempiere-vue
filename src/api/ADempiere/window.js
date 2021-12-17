@@ -132,20 +132,6 @@ export function requestReferencesList({
     })
 }
 
-// Get default value for a field
-export function requestDefaultValue(query) {
-  return request({
-    url: '/user-interface/window/default-value',
-    method: 'get',
-    params: {
-      query
-    }
-  })
-    .then(respose => {
-      return respose
-    })
-}
-
 /**
  * Get context information for a window, tab or field
  * @param {string} query
@@ -210,7 +196,7 @@ export function runCallOutRequest({
       old_value: oldValue,
       value,
       window_no: windowNo,
-      attributes: attributesList
+      context_attributes: attributesList
     }
   })
     .then(response => {

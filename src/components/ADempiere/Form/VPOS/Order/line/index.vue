@@ -173,10 +173,6 @@ export default {
   },
   methods: {
     createFieldFromDictionary,
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    },
     setFieldsList() {
       const fieldsList = []
       // Product Code

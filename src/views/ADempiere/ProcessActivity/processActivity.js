@@ -16,7 +16,7 @@
 
 import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
 
-import { recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 export default defineComponent({
   name: 'ProcessActivity',
@@ -95,10 +95,6 @@ export default defineComponent({
       return root.$store.getters.language
     })
 
-    const permissionRoutes = computed(() => {
-      return root.$store.getters.permission_routes
-    })
-
     onMounted(() => {
       root.$store.dispatch('getSessionProcessFromServer', {
         pageToken: pageToken.value,
@@ -113,7 +109,7 @@ export default defineComponent({
       return root.$store.getters.getProcess(uuid)
     }
 
-    const handleCommand = (activity) => {
+    function handleCommand(activity) {
       if (activity.command === 'seeReport') {
         root.$router.push({
           name: 'Report Viewer',
@@ -124,23 +120,13 @@ export default defineComponent({
           }
         }, () => {})
       } else if (activity.command === 'zoomIn') {
-        const viewSearch = recursiveTreeSearch({
-          treeData: permissionRoutes.value,
-          attributeValue: activity.uuid,
-          attributeName: 'meta',
-          secondAttribute: 'uuid',
-          attributeChilds: 'children'
+        zoomIn({
+          uuid: activity.uuid,
+          query: {
+            ...root.$route.query,
+            ...activity.parametersList
+          }
         })
-
-        if (viewSearch) {
-          root.$router.push({
-            name: viewSearch.name,
-            query: {
-              ...root.$route.query,
-              ...activity.parametersList
-            }
-          }, () => {})
-        }
       }
     }
 
@@ -191,9 +177,7 @@ export default defineComponent({
       getRunProcessAll,
       getProcessLog,
       language,
-      permissionRoutes,
       // methods
-      getProcessMetadata,
       handleCommand,
       checkStatus,
       generateTitle,

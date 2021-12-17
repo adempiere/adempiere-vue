@@ -500,6 +500,7 @@ export default {
         columnName: 'C_Order_ID',
         value: row.id
       }]
+      console.log({ parametersList })
       this.$store.dispatch('addParametersProcessPos', parametersList)
     },
     setFieldsList() {

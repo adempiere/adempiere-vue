@@ -15,128 +15,238 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-container
     v-if="isLoadedMetadata"
     key="process-loaded"
-    class="view-base"
+    class="view-base process-view"
     style="height: 84vh;"
   >
     <el-header
       v-if="showContextMenu"
-      style="height: 39px;"
+      style="height: 30px;"
     >
-      <context-menu
-        :menu-parent-uuid="$route.meta.parentUuid"
-        :container-uuid="processUuid"
-        :panel-type="panelType"
-        :is-report="processMetadata.isReport"
+      <action-menu
+        :parent-uuid="processUuid"
+        :actions-manager="actionsManager"
+        :relations-manager="relationsManager"
       />
     </el-header>
-    <el-main>
-      <el-row :gutter="20">
-        <el-col :span="24">
-          <el-card class="content-collapse">
-            <title-and-help
-              :name="processMetadata.name"
-              :help="processMetadata.help"
-            />
 
-            <main-panel
-              :position-tab="processMetadata.accesLevel"
-              :container-uuid="processUuid"
-              :metadata="processMetadata"
-              :is-edit="isEdit"
-              :panel-type="panelType"
-            />
-          </el-card>
-        </el-col>
-      </el-row>
+    <el-main>
+      <el-card class="content-collapse card-process">
+        <title-and-help
+          :name="processMetadata.name"
+          :help="processMetadata.help"
+        />
+
+        <panel-definition
+          :container-uuid="processUuid"
+          :panel-metadata="processMetadata"
+          :container-manager="containerManager"
+        />
+      </el-card>
     </el-main>
   </el-container>
-  <div
+
+  <loading-view
     v-else
-    key="process-loading"
-    v-loading="!isLoadedMetadata"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="view-loading"
+    key="window-loading"
   />
 </template>
 
 <script>
-// When supporting the processes, smart browser and reports,
-// the ContextMenu and sticky must be placed in the layout
-import ContextMenu from '@/components/ADempiere/ContextMenu'
-import MainPanel from '@/components/ADempiere/Panel'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+import { defineComponent, computed, ref } from '@vue/composition-api'
 
-export default {
+// components and mixins
+import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
+import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
+
+import { convertProcess } from '@/utils/ADempiere/apiConverts/dictionary.js'
+import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
+
+// utils and helper methods
+import {
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField
+} from '@/utils/ADempiere/dictionary/process.js'
+
+// constants
+import {
+  runProcessOrReport,
+  sharedLink
+} from '@/utils/ADempiere/constants/actionsMenuList'
+
+export default defineComponent({
   name: 'ProcessView',
+
   components: {
-    MainPanel,
-    ContextMenu,
+    ActionMenu,
+    LoadingView,
+    PanelDefinition,
     TitleAndHelp
   },
+
   props: {
-    isEdit: {
-      type: Boolean,
-      default: false
+    // implement by test view
+    uuid: {
+      type: String,
+      default: ''
     }
   },
-  data() {
-    return {
-      processMetadata: {},
-      processUuid: this.$route.meta.uuid,
-      isLoadedMetadata: false,
-      panelType: 'process'
+
+  setup(props, { root }) {
+    const isLoadedMetadata = ref(false)
+    const processMetadata = ref({})
+
+    let processUuid = root.$route.meta.uuid
+    // set uuid from test
+    if (!root.isEmptyValue(props.uuid)) {
+      processUuid = props.uuid
     }
-  },
-  computed: {
-    showContextMenu() {
-      return this.$store.state.settings.showContextMenu
-    },
-    getterProcess() {
-      return this.$store.getters.getPanel(this.processUuid)
-    }
-  },
-  created() {
-    this.getProcess()
-    this.$store.dispatch('settings/changeSetting', {
+
+    const showContextMenu = computed(() => {
+      return root.$store.state.settings.showContextMenu
+    })
+
+    const storedProcess = computed(() => {
+      return root.$store.getters.getStoredProcess(processUuid)
+    })
+
+    const storedPrintFormatList = computed(() => {
+      if (root.$route.meta.type === 'report') {
+        return root.$store.getters.getPrintFormatList(processUuid)
+      }
+      return []
+    })
+
+    root.$store.dispatch('settings/changeSetting', {
       key: 'showContextMenu',
       value: true
     })
-  },
-  methods: {
-    getProcess() {
-      const process = this.getterProcess
+
+    // get process/report from vuex store or request from server
+    const getProcess = async() => {
+      let process = storedProcess.value
       if (process) {
-        this.processMetadata = process
-        this.isLoadedMetadata = true
-      } else {
-        this.$store.dispatch('getPanelAndFields', {
-          containerUuid: this.processUuid,
-          panelType: this.panelType,
-          routeToDelete: this.$route
-        }).then(processResponse => {
-          this.processMetadata = processResponse
+        processMetadata.value = process
+        isLoadedMetadata.value = true
+        return
+      }
+
+      // metadata props use for test
+      if (!root.isEmptyValue(props.metadata)) {
+        // from server response
+        process = convertProcess(props.metadata)
+        // add apps properties
+        process = generateProcess(process)
+        // add into store
+        return root.$store.dispatch('addProcess', process)
+          .then(processResponse => {
+            // to obtain the load effect
+            setTimeout(() => {
+              processMetadata.value = processResponse
+              isLoadedMetadata.value = true
+            }, 1000)
+          })
+      }
+
+      root.$store.dispatch('getProcessDefinitionFromServer', {
+        uuid: processUuid
+      })
+        .then(processResponse => {
+          processMetadata.value = processResponse
+        }).catch(error => {
+          console.warn(error)
         }).finally(() => {
-          this.isLoadedMetadata = true
+          isLoadedMetadata.value = true
+        })
+    }
+
+    const containerManager = {
+      actionPerformed: ({ field, value }) => {
+        // let action = 'processActionPerformed'
+        // if (field.isReport) {
+        //   action = 'reportActionPerformed'
+        // }
+        // root.$store.dispatch(action, {
+        //   field,
+        //   value
+        // })
+      },
+
+      setDefaultValues: ({ containerUuid }) => {
+        root.$store.dispatch('setProcessDefaultValues', {
+          containerUuid
+        })
+      },
+
+      isDisplayedField,
+
+      isReadOnlyField({
+        field
+      }) {
+        return isReadOnlyField(field)
+      },
+
+      isMandatoryField,
+
+      changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
+        root.$store.dispatch('changeProcessFieldShowedFromUser', {
+          containerUuid,
+          fieldsShowed
         })
       }
     }
+
+    getProcess()
+
+    const actionsManager = ref({
+      containerUuid: processUuid,
+
+      getActionList: () => [
+        runProcessOrReport,
+        sharedLink
+      ]
+    })
+
+    const relationsManager = ref({
+      menuParentUuid: root.$route.meta.parentUuid
+    })
+
+    return {
+      processUuid,
+      isLoadedMetadata,
+      processMetadata,
+      containerManager,
+      actionsManager,
+      relationsManager,
+      // computeds
+      showContextMenu,
+      storedPrintFormatList,
+      // methods
+      getProcess
+    }
   }
-}
+})
 </script>
 
-<style>
-  .el-card__body {
-    padding-top: 0px !important;
-    padding-right: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
+<style lang="scss">
+.process-view {
+  .card-process {
+    >.el-card__body {
+      padding-top: 0px;
+      padding-right: 20px;
+      padding-bottom: 20px;
+      padding-left: 20px;
+      height: 100%;
+    }
   }
+}
 </style>
 <style scoped >
   .el-card {

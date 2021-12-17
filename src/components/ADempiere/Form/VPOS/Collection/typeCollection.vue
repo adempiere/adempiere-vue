@@ -215,6 +215,9 @@ export default {
     }
   },
   computed: {
+    listRefunds() {
+      return this.currentPointOfSales.currentOrder.listPayments.payments.filter(payments => payments.isRefund)
+    },
     typesPayment() {
       return this.$store.getters.getListsPaymentTypes
     },

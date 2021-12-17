@@ -29,6 +29,7 @@ import {
 import { resetRouter } from '@/router'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
 import language from '@/lang'
 
 const state = {
@@ -176,12 +177,18 @@ const actions = {
           const { role } = sessionInfo
           commit('SET_ROLE', role)
           setCurrentRole(role.uuid)
-          const organizationIdOfSession = sessionInfo.defaultContext.find(context => {
-            if (context.key === '#AD_Org_ID') {
+          // const currentOrganizationSession = sessionInfo.defaultContext.find(context => {
+          //   if (context.key === '#' + ORGANIZATION) {
+          //     return context
+          //   }
+          // })
+          // commit('SET_CURRENT_ORGANIZATION_ID', organizationIdOfSession.value)
+          const currentOrganizationSession = sessionInfo.defaultContext.find(context => {
+            if (context.key === '#' + ORGANIZATION) {
               return context
             }
           })
-          commit('SET_CURRENT_ORGANIZATION_ID', organizationIdOfSession.value)
+          commit('SET_CURRENT_ORGANIZATIONS', currentOrganizationSession.value)
 
           // wait to establish the client and organization to generate the menu
           await dispatch('getOrganizationsListFromServer', role.uuid)
@@ -263,12 +270,6 @@ const actions = {
       removeToken()
 
       commit('setIsSession', false)
-      dispatch('resetStateBusinessData', null, {
-        root: true
-      })
-      dispatch('dictionaryResetCache', null, {
-        root: true
-      })
 
       // reset visited views and cached views
       // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
@@ -386,7 +387,7 @@ const actions = {
         commit('SET_ORGANIZATION', organization)
         commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
         commit('setPreferenceContext', {
-          columnName: '#AD_Org_ID',
+          columnName: '#' + ORGANIZATION,
           value: organization.id
         }, {
           root: true
@@ -434,15 +435,15 @@ const actions = {
           root: true
         })
 
+        // commit('setPreferenceContext', {
+        //   columnName: '#' + ORGANIZATION,
+        //   value: organizationId
+        // }, {
+        //   root: true
+        // })
+
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
-
-        dispatch('resetStateBusinessData', null, {
-          root: true
-        })
-        dispatch('dictionaryResetCache', null, {
-          root: true
-        })
 
         dispatch('getWarehousesList', organizationUuid)
 
@@ -547,13 +548,6 @@ const actions = {
 
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
-
-        dispatch('resetStateBusinessData', null, {
-          root: true
-        })
-        dispatch('dictionaryResetCache', null, {
-          root: true
-        })
 
         showMessage({
           message: language.t('notifications.successChangeRole'),

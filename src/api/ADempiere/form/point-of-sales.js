@@ -19,6 +19,7 @@ import { request } from '@/utils/ADempiere/request'
 import { config } from '@/utils/ADempiere/config'
 import { isEmptyValue } from '@/utils/ADempiere'
 import { camelizeObjectKeys } from '@/utils/ADempiere/transformObject.js'
+
 /**
  * method in api/price-checking.js as getProductPrice
  * @author elsiosanchez <elsiosanches@gmail.com>

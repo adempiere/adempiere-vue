@@ -12,7 +12,7 @@
     <breadcrumb v-show="!isMenuMobile || device!=='mobile'" id="breadcrumb-container" class="breadcrumb-container" :style="isMobile ? { width: '40%' } : { width: 'auto' } " />
     <div v-show="isMenuMobile && isMobile" style="display: inline-flex; float: right;">
       <search id="header-search" class="right-menu-item" style="padding-top: 10px;" />
-      <badge style="padding-top: 6px;" />
+      <header-notification style="padding-top: 6px;" />
     </div>
     <div class="right-menu">
       <template v-if="device!=='mobile'">
@@ -20,7 +20,7 @@
           <el-button icon="el-icon-info" type="text" style="color: black;font-size: larger" @click.prevent.stop="guide" />
         </el-tooltip>
         <search id="header-search" class="right-menu-item" />
-        <badge id="badge-navar" />
+        <header-notification id="badge-navar" />
         <error-log class="errLog-container right-menu-item hover-effect" />
 
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
@@ -64,7 +64,7 @@ import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import Search from '@/components/HeaderSearch'
-import Badge from '@/components/ADempiere/Badge'
+import HeaderNotification from '@/components/ADempiere/HeaderNotification'
 import { getImagePath } from '@/utils/ADempiere/resource.js'
 import Driver from 'driver.js' // import driver.js
 import 'driver.js/dist/driver.min.css' // import driver.js css
@@ -72,7 +72,7 @@ import 'driver.js/dist/driver.min.css' // import driver.js css
 export default {
   components: {
     Breadcrumb,
-    Badge,
+    HeaderNotification,
     Hamburger,
     ErrorLog,
     Screenfull,

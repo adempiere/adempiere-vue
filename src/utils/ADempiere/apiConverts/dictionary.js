@@ -37,7 +37,9 @@ export function convertReportExportType(reportExportType) {
 
 export function convertBrowser(browser) {
   const convertedBrowser = camelizeObjectKeys(browser)
-  convertedBrowser.window = convertWindow(browser.window)
+  if (!isEmptyValue(browser.window)) {
+    convertedBrowser.window = convertWindow(browser.window)
+  }
   if (!isEmptyValue(browser.process)) {
     convertedBrowser.process = convertProcess(browser.process)
   }

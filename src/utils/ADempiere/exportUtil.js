@@ -17,7 +17,7 @@
 import { export_json_to_excel } from '@/vendor/Export2Excel'
 import { export_txt_to_zip } from '@/vendor/Export2Zip'
 import language from '@/lang'
-import { convertBooleanToTranslationLang } from '@/utils/ADempiere/valueFormat.js'
+import { convertBooleanToTranslationLang } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 export const reportFormatsList = [
@@ -31,7 +31,22 @@ export const reportFormatsList = [
   'xlsx',
   'arxml'
 ]
+export const excelFormatList = [
+  'csv',
+  'xls',
+  'xlsx'
+]
 
+export const viewerSupportedFormats = [
+  'csv',
+  'xls',
+  'xlsx',
+  'pdf',
+  'txt',
+  'html'
+]
+
+// export file with records
 export const supportedTypes = {
   xlsx: language.t('report.ExportXlsx'),
   xls: language.t('report.ExportXls'),
@@ -42,32 +57,54 @@ export const supportedTypes = {
 }
 
 /**
- * Export data from json
- * @autor Edwin Betancourt <EdwinBetanc0urt@outlook.com>
+ * Convert json data to array
  * @param {array} header
  * @param {array} data
+ * @returns array
+ */
+export function cellFromJson({
+  header,
+  data,
+  isFormat = false
+}) {
+  return data.map(row => {
+    // Object.value not working if value in property is undefined
+    // return Object.values(row)
+
+    // loop header convert as value
+    return header.map(column => {
+      // translate boolean
+      if (isFormat && typeof row[column] === 'boolean') {
+        return convertBooleanToTranslationLang(row[column])
+      }
+      return row[column]
+    })
+  })
+}
+
+/**
+ * Export data from json
+ * @param {array} header
+ * @param {array} data array of object (json format)
  * @param {string} exportType, supportedTypes array
  * @param {string} fileName .xlsx file name
  */
 export function exportFileFromJson({
   header,
   data,
+  isFormat = false,
   exportType,
-  fileName = ''
+  fileName = 'xlsx'
 }) {
-  const jsonData = data.map(row => {
-    Object.keys(row).forEach(column => {
-      if (typeof row[column] === 'boolean') {
-        row[column] = convertBooleanToTranslationLang(row[column])
-      }
-    })
-
-    return row
+  data = cellFromJson({
+    header,
+    isFormat,
+    data
   })
-
+  // TODO: Convert header ascii values
   export_json_to_excel({
     header,
-    data: jsonData,
+    data,
     filename: fileName,
     bookType: exportType
   })

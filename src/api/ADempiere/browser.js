@@ -38,10 +38,7 @@ export function requestBrowserSearch({
   uuid,
   parametersList = [],
   tableName,
-  query,
-  whereClause,
-  orderByClause,
-  limit,
+  contextAttriburesList = [],
   nextPageToken: pageToken,
   pageSize
 }) {
@@ -63,10 +60,7 @@ export function requestBrowserSearch({
       // DSL Query
       filters,
       // Custom Query
-      query,
-      where_clause: whereClause,
-      order_by_clause: orderByClause,
-      limit
+      context_attributes: contextAttriburesList
     },
     params: {
       // Page Data

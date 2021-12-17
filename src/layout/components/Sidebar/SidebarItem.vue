@@ -57,6 +57,7 @@ import Item from './Item'
 import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
 import { mapGetters } from 'vuex'
+import { capitalize } from '@/utils/ADempiere/formatValue/stringFormat'
 
 export default {
   name: 'SidebarItem',
@@ -132,18 +133,12 @@ export default {
         } = view.meta
 
         if (panelType !== 'window') {
-          this.$store.dispatch('setDefaultValues', {
+          this.$store.dispatch(`set${capitalize(panelType)}DefaultValues`, {
             parentUuid,
             containerUuid,
             panelType,
             isNewRecord: false
           })
-
-          if (['browser'].includes(panelType)) {
-            this.$store.dispatch('deleteRecordContainer', {
-              viewUuid: containerUuid
-            })
-          }
         }
       }
     },

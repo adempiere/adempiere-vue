@@ -25,7 +25,6 @@ import DataTable from '@/components/ADempiere/DataTable'
 import splitPane from 'vue-splitpane'
 // Container Info
 import ChatEntries from '@/components/ADempiere/ChatEntries'
-import Attachment from '@/components/ADempiere/Attachment/index.vue'
 import ListChatEntry from '@/components/ADempiere/ChatEntries/listChatEntry'
 import RecordLogs from '@/components/ADempiere/ContainerInfo/recordLogs'
 import WorkflowLogs from '@/components/ADempiere/ContainerInfo/workflowLogs'
@@ -53,7 +52,6 @@ export default {
     RightPanel,
     ChatEntries,
     ListChatEntry,
-    Attachment,
     RecordLogs,
     WorkflowLogs,
     WorkflowStatusBar,
@@ -339,10 +337,6 @@ export default {
       return currentRecord
     },
     isDocumentTab() {
-      if (this.isEmptyValue(this.windowMetadata)) {
-        return false
-      }
-
       const panel = this.isEmptyValue(this.windowMetadata.currentTabUuid) ? '' : this.$store.getters.getPanel(this.windowMetadata.currentTabUuid)
       if (!this.isEmptyValue(panel)) {
         return panel.isDocument

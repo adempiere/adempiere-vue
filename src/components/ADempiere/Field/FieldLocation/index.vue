@@ -31,6 +31,7 @@
     <el-button slot="reference" type="text" style="width: -webkit-fill-available;" @click="setShowedLocationForm(true)">
       <el-input
         v-model="displayedValue"
+        :class="cssClassStyle"
         readonly
       >
         <i slot="prefix" class="el-icon-location-information el-input__icon" />
@@ -45,29 +46,48 @@
 </template>
 
 <script>
+// mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 import mixinLocation from './mixinLocation.js'
+
+// components
 import LocationAddressForm from './locationAddressForm'
 
 export default {
   name: 'FieldLocation',
+
   components: {
     LocationAddressForm
   },
+
   mixins: [
     fieldMixin,
     mixinLocation
   ],
+
   data() {
     return {
       localValues: {}
     }
   },
+
   computed: {
+    cssClassStyle() {
+      let styleClass = ' custom-field-location '
+      if (!this.isEmptyValue(this.metadata.cssClassName)) {
+        styleClass += this.metadata.cssClassName
+      }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
+      return styleClass
+    },
     displayedValue: {
       get() {
         /**
-         * TODO: Add DisplayColumn (to locator's and location's fields) in entities
+         * TODO: Add DisplayColumnName (to locator's and location's fields) in entities
          * list response, to set value or empty value in fieldValue state when
          * change records with dataTable.
          */
@@ -96,11 +116,13 @@ export default {
       return this.metadata.popoverPlacement || 'top'
     }
   },
+
   mounted() {
     if (!this.metadata.isAdvancedQuery) {
       this.getLocation()
     }
   },
+
   methods: {
     getLocation() {
       if (!this.isEmptyValue(this.displayedValue)) {

@@ -27,20 +27,7 @@ const getters = {
   getDataRecordSelection: (state, getters) => (containerUuid) => {
     return getters.getDataRecordAndSelection(containerUuid).selection
   },
-  getPageNumber: (state, getters) => (containerUuid) => {
-    return getters.getDataRecordAndSelection(containerUuid).pageNumber
-  },
-  getRowData: (state, getters) => ({ containerUuid, recordUuid, index }) => {
-    const recordsList = getters.getDataRecordsList(containerUuid)
-    if (!isEmptyValue(index)) {
-      return recordsList[index]
-    }
-    return recordsList.find(itemData => {
-      if (itemData.UUID === recordUuid) {
-        return true
-      }
-    })
-  },
+
   /**
    * Getter converter selection data record in format
    * @param {string} containerUuid
@@ -104,15 +91,8 @@ const getters = {
         return info
       }
     })
-  },
-  getRecordPrivateAccess: (state) => (tableName, recordId) => {
-    if (!isEmptyValue(tableName) && !isEmptyValue(recordId)) {
-      if (state.recordPrivateAccess.tableName === tableName && state.recordPrivateAccess.recordId === recordId) {
-        return state.recordPrivateAccess
-      }
-      return undefined
-    }
   }
+
 }
 
 export default getters

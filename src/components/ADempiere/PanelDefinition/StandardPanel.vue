@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div class="wrapper" style="margin: 15px">
+  <div class="wrapper" style="margin-right: 10px">
     <el-form
       label-position="top"
       label-width="200px"
@@ -25,8 +25,11 @@
       <div class="cards-not-group">
         <div class="card">
           <filter-fields
+            :parent-uuid="parentUuid"
             :container-uuid="containerUuid"
-            :panel-type="panelType"
+            :fields-list="fieldsList"
+            :filter-manager="containerManager.changeFieldShowedFromUser"
+            :showed-manager="containerManager.isDisplayedField"
           />
           <el-card
             :shadow="shadowGroup"
@@ -35,11 +38,12 @@
             <el-row>
               <template v-for="(fieldAttributes, subKey) in fieldsList">
                 <field-definition
-                  :ref="fieldAttributes.columnName"
                   :key="subKey"
-                  :metadata-field="{
-                    ...fieldAttributes
-                  }"
+                  :parent-uuid="parentUuid"
+                  :container-uuid="containerUuid"
+                  :container-manager="containerManager"
+                  :field-metadata="fieldAttributes"
+                  :metadata-field="fieldAttributes"
                 />
               </template>
             </el-row>
@@ -51,9 +55,9 @@
 </template>
 
 <script>
-import { defineComponent, computed, ref } from '@vue/composition-api'
+import { defineComponent, computed } from '@vue/composition-api'
 
-import FieldDefinition from '@/components/ADempiere/Field'
+import FieldDefinition from '@/components/ADempiere/Field/index.vue'
 import FilterFields from '@/components/ADempiere/FilterFields'
 
 export default defineComponent({
@@ -65,8 +69,16 @@ export default defineComponent({
   },
 
   props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
     containerUuid: {
       type: String,
+      required: true
+    },
+    containerManager: {
+      type: Object,
       required: true
     },
     panelMetadata: {
@@ -76,7 +88,6 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const panelType = ref(props.panelMetadata.panelType)
     let fieldsList = []
 
     const generatePanel = () => {
@@ -97,7 +108,6 @@ export default defineComponent({
 
     return {
       fieldsList,
-      panelType,
       shadowGroup
     }
   }
