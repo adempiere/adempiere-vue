@@ -410,9 +410,9 @@ export default {
   computed: {
     validateOverdrawnInvoice() {
       if (this.option === 1) {
-        return this.isEmptyValue(this.listPaymentsRefund)
+        return this.isEmptyValue(this.listRefund)
       } else if (this.option === 3) {
-        return this.isEmptyValue(this.listRefundsReference)
+        return this.isEmptyValue(this.listRefund)
       }
       return false
     },
@@ -708,9 +708,19 @@ export default {
       if (value === 3) {
         this.$store.dispatch('listCustomerBankAccounts', { customerUuid: this.currentOrder.businessPartner.uuid })
       }
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'OverdrawnInvoice',
+        columnName: 'PayAmt',
+        value: this.refundAmount / this.dayRate.divideRate
+      })
     },
     showDialogo(value) {
       if (value) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'OverdrawnInvoice',
+          columnName: 'PayAmt',
+          value: this.refundAmount / this.dayRate.divideRate
+        })
         if (this.option === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
           this.selectPayment(this.paymentTypeListRefund[0])
         }
@@ -806,15 +816,6 @@ export default {
       } else if (this.isEmptyValue(refund.AccountNo) && payment.tender_type === 'P') {
         account = refund.phone
       }
-      if (refund.amount > this.currentOrder.refundAmount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
-          duration: 1500,
-          showClose: true
-        })
-        return
-      }
       const currencySelected = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       if (this.isEmptyValue(this.currentBankAccount)) {
         this.$store.dispatch('customerBankAccount', {
@@ -893,7 +894,7 @@ export default {
         })
         return
       }
-      if ((refund.amount / this.showDayRateAmount(referencePaymentCurrency.uuid).multiplyRate) > this.currentOrder.refundAmount || refund.amount > this.currentOrder.refundAmount) {
+      if ((refund.amount / this.showDayRateAmount(referencePaymentCurrency.uuid).multiplyRate) > this.currentOrder.refundAmount) {
         this.$message({
           type: 'warning',
           message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
