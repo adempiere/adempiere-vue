@@ -50,10 +50,18 @@
                     :key="field.columnName"
                   >
                     <field
+                      v-if="field.columnName === 'DateOrderedFrom'"
                       :metadata-field="{
                         ...field,
                         size: 6,
                         name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
+                      }"
+                    />
+                    <field
+                      v-else-if="field.columnName === 'C_BPartner_ID'"
+                      :metadata-field="{
+                        ...field,
+                        size: 6
                       }"
                     />
                   </el-form-item>
