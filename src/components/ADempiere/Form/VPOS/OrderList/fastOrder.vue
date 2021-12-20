@@ -32,7 +32,6 @@
               v-model="option.isVisible"
               placement="right"
               trigger="click"
-              width="900"
             >
               <find-orders
                 :data="option"
@@ -59,14 +58,16 @@
                   </el-form-item>
                 </el-form>
               </find-orders>
-              <custom-pagination
-                :total="total"
-                :current-page="currentPage"
-                :handle-change-page="handleChangePage"
-                layout="total, prev, pager, next"
-                style="float: right;"
-              />
               <el-row :gutter="24">
+                <el-col :span="24">
+                  <custom-pagination
+                    :total="total"
+                    :current-page="currentPage"
+                    :handle-change-page="handleChangePage"
+                    layout="total, prev, pager, next"
+                    style="float: right;"
+                  />
+                </el-col>
                 <el-col :span="24">
                   <samp style="float: right; padding-right: 10px;">
                     <el-button
