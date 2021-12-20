@@ -542,7 +542,7 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'No hay producto disponible Regresar al Principio'
+        noProducto: 'Producto no Disponible'
       },
       pinMessage: {
         pin: 'Ingrese Pin para ',

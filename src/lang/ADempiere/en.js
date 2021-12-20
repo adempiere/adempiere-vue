@@ -566,7 +566,7 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'No product available. Back to top'
+        noProducto: 'Product not Avilable'
       },
       pinMessage: {
         pin: 'Enter Pin for ',
