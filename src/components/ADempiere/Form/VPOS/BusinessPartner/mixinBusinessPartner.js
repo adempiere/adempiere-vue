@@ -42,7 +42,7 @@ export default {
     },
     billingAddress() {
       const billingAddress = this.addressForm(this.$store.getters.getValuesView({
-        containerUuid: 'Billing-Address',
+        containerUuid: 'Billing-Address-Location-Address',
         format: 'object'
       }))
       billingAddress.is_default_billing = true
@@ -51,7 +51,7 @@ export default {
     },
     shippingAddress() {
       let shippingAddress = this.addressForm(this.$store.getters.getValuesView({
-        containerUuid: 'Shipping-Address',
+        containerUuid: 'Shipping-Address-Location-Address',
         format: 'object'
       }))
       shippingAddress.is_default_shipping = true
@@ -79,14 +79,14 @@ export default {
   watch: {
     showPopover(value) {
       if (!value) {
-        this.clearAddresses('Billing-Address')
-        this.clearAddresses('Shipping-Address')
+        this.clearAddresses('Billing-Address-Location-Address')
+        this.clearAddresses('Shipping-Address-Location-Address')
       }
     },
     showCustomer(value) {
       if (value) {
-        this.clearAddresses('Billing-Address')
-        this.clearAddresses('Shipping-Address')
+        this.clearAddresses('Billing-Address-Location-Address')
+        this.clearAddresses('Shipping-Address-Location-Address')
       }
     }
   },

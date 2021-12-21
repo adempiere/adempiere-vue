@@ -21,21 +21,14 @@
       <div slot="header" class="clearfix">
         <span>{{ $t('form.pos.order.BusinessPartnerCreate.billingAddress') }}</span>
       </div>
-      <div class="text item">
-        <template
-          v-for="(field) in fieldsList"
-        >
-          <field-definition
-            :key="field.columnName"
-            :ref="field.columnName"
-            :metadata-field="{
-              ...field,
-              size: { 'xs': fieldSize, 'sm': fieldSize, 'md': fieldSize, 'lg': fieldSize, 'xl': fieldSize },
-              isReadOnly: disabled
-            }"
-          />
-        </template>
-      </div>
+      <field-location
+        :ref="fieldsList[0].columnName"
+        :metadata="{
+          ...fieldsList[0],
+          size: { 'xs': fieldSize, 'sm': fieldSize, 'md': fieldSize, 'lg': fieldSize, 'xl': fieldSize }
+        }"
+        :value-model="fieldsList[0].value"
+      />
       <br>
       <br>
     </el-card>
@@ -46,8 +39,12 @@
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListBillingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
+import FieldLocation from './billingAddressFieldLocation'
 export default {
   name: 'BillingAddress',
+  components: {
+    FieldLocation
+  },
   mixins: [
     formMixin,
     BParterMixin
