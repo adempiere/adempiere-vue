@@ -97,14 +97,14 @@ export default {
   },
   computed: {
     fieldsListLocation() {
-      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
-        return this.$store.getters.getFieldLocation
+      if (!this.isEmptyValue(this.$store.getters.getFieldsListLocationShipping)) {
+        return this.$store.getters.getFieldsListLocationShipping
       }
       return this.fieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({
-        containerUuid: this.parentMetadata.containerUuid,
+        containerUuid: 'Shipping-Address-Location-Address',
         columnName: this.parentMetadata.columnName
       })
     }
@@ -165,7 +165,7 @@ export default {
                       isDisplayed: false
                     }
                   })
-                  this.$store.dispatch('changeSequence', newFieldsList.sort(this.sortSequence))
+                  this.$store.dispatch('changeSequenceShipping', newFieldsList.sort(this.sortSequence))
                 })
                 .catch(error => {
                   this.$message({
@@ -324,7 +324,7 @@ export default {
           })
           console.warn(`Error update Location Address: ${error.message}. Code: ${error.code}.`)
         })
-      this.$store.dispatch('changeSequence', fieldsList)
+      this.$store.dispatch('changeSequenceShipping', fieldsList)
     },
     getLocation() {
       if (this.request > 0) {

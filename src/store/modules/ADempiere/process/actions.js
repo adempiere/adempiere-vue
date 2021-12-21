@@ -1231,7 +1231,7 @@ export default {
     update
   ) {
     const notification = state.notificationProcess.map(notification => {
-      if (notification.name === update.name && notification.typeActivity && notification.quantityActivities !== update.quantityActivities) {
+      if (!isEmptyValue(notification.name) && !isEmptyValue(update.name) && notification.name === update.name && notification.typeActivity && notification.quantityActivities !== update.quantityActivities) {
         return {
           ...update
         }

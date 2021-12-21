@@ -97,8 +97,8 @@ export default {
   },
   computed: {
     fieldsListLocation() {
-      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
-        return this.$store.getters.getFieldLocation
+      if (!this.isEmptyValue(this.$store.getters.getFieldsListLocationBilling)) {
+        return this.$store.getters.getFieldsListLocationBilling
       }
       return this.fieldsList
     },
@@ -165,7 +165,7 @@ export default {
                       isDisplayed: false
                     }
                   })
-                  this.$store.dispatch('changeSequence', newFieldsList.sort(this.sortSequence))
+                  this.$store.dispatch('changeSequenceBilling', newFieldsList.sort(this.sortSequence))
                 })
                 .catch(error => {
                   this.$message({
@@ -324,7 +324,7 @@ export default {
           })
           console.warn(`Error update Location Address: ${error.message}. Code: ${error.code}.`)
         })
-      this.$store.dispatch('changeSequence', fieldsList)
+      this.$store.dispatch('changeSequenceBilling', fieldsList)
     },
     getLocation() {
       if (this.request > 0) {

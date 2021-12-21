@@ -5,6 +5,8 @@ const initStateLookup = {
   fieldsList: [],
   validationRuleList: [],
   fieldsListLocation: [],
+  fieldsListLocationShipping: [],
+  fieldsListLocationBilling: [],
   isShowedLocation: false
 }
 
@@ -28,6 +30,12 @@ const field = {
     },
     setFieldsListLocation(state, fieldsListLocation) {
       state.fieldsListLocation = fieldsListLocation
+    },
+    setFieldsListLocationShipping(state, fieldsListLocation) {
+      state.fieldsListLocationShipping = fieldsListLocation
+    },
+    setFieldsListLocationBilling(state, fieldsListLocation) {
+      state.fieldsListLocationBilling = fieldsListLocation
     }
   },
   actions: {
@@ -71,6 +79,12 @@ const field = {
     },
     changeSequence({ commit }, params) {
       commit('setFieldsListLocation', params)
+    },
+    changeSequenceShipping({ commit }, params) {
+      commit('setFieldsListLocationShipping', params)
+    },
+    changeSequenceBilling({ commit }, params) {
+      commit('setFieldsListLocationBilling', params)
     }
   },
   getters: {
@@ -107,6 +121,12 @@ const field = {
     },
     getFieldLocation: (state) => {
       return state.fieldsListLocation
+    },
+    getFieldsListLocationShipping: (state) => {
+      return state.fieldsListLocationShipping
+    },
+    getFieldsListLocationBilling: (state) => {
+      return state.fieldsListLocationBilling
     }
   }
 }
