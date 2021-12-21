@@ -20,7 +20,7 @@ import { generatePanelAndFields } from '@/utils/ADempiere/dictionary/panel.js'
 import { isHiddenField } from '@/utils/ADempiere/references.js'
 
 /**
- * Is displayed field in panel tab
+ * Is displayed field in panel single record
  */
 export function isDisplayedField({ isDisplayed, isDisplayedFromLogic, isActive, displayType }) {
   // button field not showed
@@ -28,12 +28,8 @@ export function isDisplayedField({ isDisplayed, isDisplayedFromLogic, isActive, 
     return false
   }
 
-  // verify if field is active
-  if (!isActive) {
-    return false
-  }
-
-  return isDisplayed && isDisplayedFromLogic
+  // verify if field is active and displayed
+  return isActive && isDisplayed && isDisplayedFromLogic
 }
 
 /**
@@ -53,18 +49,13 @@ export function isReadOnlyField({ isQueryCriteria, isReadOnlyFromLogic }) {
  * Is displayed column in table multi record
  */
 export function isDisplayedColumn({ isDisplayedGrid, isDisplayedFromLogic, isActive, isKey, displayType }) {
-  // button field not showed
-  if (isHiddenField(displayType)) {
-    return false
-  }
-
-  // verify if field is active
-  if (!isActive) {
+  // key or button field not showed
+  if (isKey || isHiddenField(displayType)) {
     return false
   }
 
   // window (table) result
-  return isDisplayedGrid && isDisplayedFromLogic && !isKey
+  return isActive && isDisplayedGrid && isDisplayedFromLogic
 }
 
 export function isMandatoryColumn({ isMandatory, isMandatoryFromLogic }) {

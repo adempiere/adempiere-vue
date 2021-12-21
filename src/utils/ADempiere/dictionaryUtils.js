@@ -228,6 +228,7 @@ export function generateField({
   // hidden field type button
   if (isHiddenField(field.displayType)) {
     field.isDisplayedFromLogic = false
+    field.isDisplayedGrid = false
     field.isDisplayed = false
   }
 
