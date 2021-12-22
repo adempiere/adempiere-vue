@@ -23,12 +23,15 @@
     :effect="tagRender.effect"
     disable-transitions
   >
-    {{ displayedValue }}
+    {{ displayText }}
   </el-tag>
 </template>
 
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
+
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 export default defineComponent({
   name: 'DocumentStatusTag',
@@ -50,6 +53,7 @@ export default defineComponent({
 
   setup(props) {
     /**
+     * Get tag type of the document status
      * add a tab depending on the status of the document
      * @param {string} status, document status key
      */
@@ -107,7 +111,16 @@ export default defineComponent({
       }
     })
 
+    const displayText = computed(() => {
+      if (!isEmptyValue(props.displayedValue)) {
+        return props.displayedValue
+      }
+      return props.value
+    })
+
     return {
+      // computeds
+      displayText,
       tagRender
     }
   }

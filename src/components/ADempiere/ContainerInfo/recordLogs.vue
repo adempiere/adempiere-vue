@@ -44,16 +44,18 @@
               <el-collapse-transition>
                 <div v-show="(currentKey === key)">
                   <span v-for="(list, index) in listLogs.changeLogsList" :key="index">
-                    <p v-if="list.columnName === 'DocStatus'">
+                    <p v-if="DOCUMENT_STATUS_COLUMNS_LIST.includes(list.columnName)">
                       <b> {{ list.displayColumnName }} :</b>
                       <strike>
-                        <el-tag :type="tagStatus(list.oldValue)">
-                          {{ list.oldDisplayValue }}
-                        </el-tag>
+                        <document-status-tag
+                          :value="list.oldValue"
+                          :displayed-value="list.oldDisplayValue"
+                        />
                       </strike>
-                      <el-tag :type="tagStatus(list.newValue)">
-                        {{ list.newDisplayValue }}
-                      </el-tag>
+                      <document-status-tag
+                        :value="list.newValue"
+                        :displayed-value="list.newDisplayValue"
+                      />
                     </p>
                     <p v-else>
                       <b> {{ list.displayColumnName }} :</b>
@@ -78,19 +80,32 @@
 </template>
 
 <script>
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 import MixinInfo from './mixinInfo.js'
+
+// constants
+import { DOCUMENT_STATUS_COLUMNS_LIST } from '@/utils/ADempiere/constants/systemColumns'
 
 export default {
   name: 'RecordLogs',
+
+  components: {
+    DocumentStatusTag
+  },
+
   mixins: [
     MixinInfo
   ],
+
   data() {
     return {
+      DOCUMENT_STATUS_COLUMNS_LIST,
       currentKey: 0,
       typeAction: 0
     }
   },
+
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'

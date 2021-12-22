@@ -20,7 +20,7 @@ import { getContext, getParentFields, getPreference, parseContext } from '@/util
 import REFERENCES, { BUTTON, YES_NO, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
 import { FIELD_OPERATORS_LIST } from '@/utils/ADempiere/dataUtils'
 import {
-  DOCUMENT_STATUS_COLUMNS_LIST,
+  isDocumentStatus,
   READ_ONLY_FORM_COLUMNS,
   readOnlyColumn
 } from '@/utils/ADempiere/constants/systemColumns'
@@ -147,8 +147,10 @@ export function generateField({
     })
 
     // manage document status and tag document status
-    isColumnDocumentStatus = DOCUMENT_STATUS_COLUMNS_LIST.includes(columnName) ||
-      DOCUMENT_STATUS_COLUMNS_LIST.includes(fieldToGenerate.elementColumnName)
+    isColumnDocumentStatus = isDocumentStatus({
+      columnName,
+      elementColumnName: fieldToGenerate.elementColumnName
+    })
   }
 
   const field = {
