@@ -38,6 +38,7 @@
       :controls="isShowControls"
       :controls-position="controlsPosition"
       :class="cssClassStyle"
+      style="text-align-last: end !important"
       autofocus
       @change="preHandleChange"
       @focus="focusGained"
