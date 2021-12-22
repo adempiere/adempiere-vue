@@ -382,40 +382,6 @@ export function parsedValueComponent({
 }
 
 /**
- * Get tag type of the document status
- * @author Elsio Sanchez <elsiosanches@gmail.com>
- * @param {string} status, document status key
- */
-export function tagStatus(status) {
-  let type
-  switch (status) {
-    case 'AP':
-    case 'CO':
-      type = 'success'
-      break
-    case '??':
-    case 'DR':
-      type = 'info'
-      break
-    case 'CL':
-      type = 'primary'
-      break
-    case 'IP':
-    case 'WC':
-    case 'WP':
-      type = 'warning'
-      break
-    case 'VO':
-    case 'NA':
-    case 'IN':
-    case 'RE':
-      type = 'danger'
-      break
-  }
-  return type
-}
-
-/**
  * Payment method icon element-ui supported
  * @author Elsio Sanchez <elsiosanches@gmail.com>
  * @param {string} paymentMethod, value the payment

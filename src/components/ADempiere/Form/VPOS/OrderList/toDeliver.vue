@@ -82,11 +82,10 @@
           width="100"
         >
           <template slot-scope="scope">
-            <el-tag
-              :type="tagStatus(scope.row.documentStatus.value)"
-            >
-              {{ scope.row.documentStatus.name }}
-            </el-tag>
+            <document-status-tag
+              :value="scope.row.documentStatus.value"
+              :displayed-value="scope.row.documentStatus.name"
+            />
           </template>
         </el-table-column>
 
@@ -132,6 +131,8 @@
 </template>
 
 <script>
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 import CustomPagination from '@/components/ADempiere/Pagination'
 import fieldsListOrders from './fieldsListOrders.js'
 import {
@@ -149,10 +150,13 @@ import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
   name: 'ToDeliver',
+
   components: {
     CustomPagination,
+    DocumentStatusTag,
     Field
   },
+
   props: {
     metadata: {
       type: Object,
