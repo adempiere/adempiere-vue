@@ -14,7 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// utils and helpers methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { isDisplayedField, isMandatoryField } from '@/utils/ADempiere/dictionary/window.js'
 
 /**
  * Dictionary Window Getters
@@ -64,5 +66,52 @@ export default {
     const window = getters.getStoredWindow(windowUuid)
 
     return window.currentTabChild
+  },
+
+  /**
+   * Determinate if panel is ready to send, all fields mandatory and displayed with values
+   * @param {string}  containerUuid
+   * @param {object}  row, data to compare if is table
+   * @returns {object}
+   */
+  getTabFieldsEmptyMandatory: (state, getters, rootState, rootGetters) => ({
+    parentUuid,
+    containerUuid,
+    fieldsList,
+    formatReturn = 'name'
+  }) => {
+    if (isEmptyValue(fieldsList)) {
+      fieldsList = getters.getStoredFieldsFromTab(parentUuid, containerUuid)
+    }
+
+    const fieldsEmpty = fieldsList.filter(fieldItem => {
+      const isMandatory = isMandatoryField(fieldItem)
+      const isDisplayed = isDisplayedField(fieldItem)
+
+      if (!(isDisplayed && isMandatory)) {
+        return false
+      }
+
+      const value = rootGetters.getValueOfField({
+        containerUuid,
+        columnName: fieldItem.columnName
+      })
+
+      if (!isEmptyValue(value)) {
+        return false
+      }
+
+      // displayed or madatory and empty
+      return true
+    })
+
+    if (formatReturn) {
+      return fieldsEmpty.map(fieldItem => {
+        // fieldItem.name by default
+        return fieldItem[formatReturn]
+      })
+    }
+
+    return fieldsEmpty
   }
 }

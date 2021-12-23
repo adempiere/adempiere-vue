@@ -24,6 +24,7 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { parseContext } from '@/utils/ADempiere/contextUtils'
 
 const initState = {
+  inRequest: new Map(),
   storedDefaultValue: {}
 }
 
@@ -49,29 +50,40 @@ const defaultValueManager = {
     /**
      * @param {string} parentUuid
      * @param {string} containerUuid
+     * @param {string} columnName
      * @param {string} query
      */
-    getValueBySQL({ commit, rootGetters }, {
+    getDefaultValue({ state, commit, rootGetters }, {
       parentUuid,
       containerUuid,
       columnName,
       query
     }) {
-      // TODO: Change to promise all
       return new Promise(resolve => {
         let parsedQuery = query
         if (query.includes('@')) {
-          parsedQuery = parseContext({
+          const context = parseContext({
             parentUuid,
             containerUuid,
             isSQL: true,
             value: query
-          }).query
+          })
+          if (context.isError) {
+            return undefined
+          }
+          parsedQuery = context.query
         }
 
+        const clientId = rootGetters.getPreferenceClientId
+        const key = `${clientId}_${parsedQuery}`
+
+        // if it is the same request, it is not made
+        if (state.inRequest.get(key)) {
+          return
+        }
+        state.inRequest.set(key, true)
         requestDefaultValue(parsedQuery)
           .then(valueResponse => {
-            const clientId = rootGetters.getPreferenceClientId
             commit('setDefaultValue', {
               clientId,
               parsedQuery,
@@ -89,6 +101,10 @@ const defaultValueManager = {
           })
           .catch(error => {
             console.warn(`Error getting default value from server. Error code ${error.code}: ${error.message}.`)
+          })
+          .finally(() => {
+            // current request finalized
+            state.inRequest.set(key, false)
           })
       })
     }
