@@ -393,7 +393,8 @@ export default {
       releaseOrder: 'Liberar',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
-        emptyAvailablePaymentMethods: 'Este terminal no tiene configurado los metodos de pagos',
+        emptyAvailablePaymentMethods: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso',
+        emptyAvailablePaymentMethodsRefudn: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso Pendiente',
         emptyListCashSummary: 'No hay moviemineto en caja',
         salesOrder: {
           title: 'Orden de Venta',

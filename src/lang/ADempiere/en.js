@@ -417,7 +417,8 @@ export default {
       releaseOrder: 'Release It',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
-        emptyAvailablePaymentMethods: 'This terminal has no payment methods configured',
+        emptyAvailablePaymentMethodsRefudn: 'This Terminal does not have a Payment Method configured to allow Pending Refund',
+        emptyAvailablePaymentMethods: 'This Terminal does not have a Payment Method configured to allow Refund',
         emptyListCashSummary: 'There is no cash movement',
         salesOrder: {
           title: 'Sale Order',

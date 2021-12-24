@@ -35,7 +35,8 @@
             <el-radio v-model="option" :label="4"> {{ $t('form.pos.collect.overdrawnInvoice.adjustDocument') }}</el-radio>
           </el-form-item>
         </el-form>
-        <el-card v-if="option === 1" class="box-card">
+        <el-empty v-if="option === 1 && isEmptyValue(paymentTypeListRefund)" :description="$t('form.pos.optionsPoinSales.emptyAvailablePaymentMethods')" />
+        <el-card v-else-if="option === 1" class="box-card">
           <div slot="header" class="clearfix">
             <span v-if="isEmptyValue(currentFieldPaymentMethods)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <template v-else>
@@ -162,7 +163,8 @@
             </el-form>
           </div>
         </el-card>
-        <el-card v-if="option === 3" class="box-card">
+        <el-empty v-if="option === 3 && isEmptyValue(paymentTypeList)" :description="$t('form.pos.optionsPoinSales.emptyAvailablePaymentMethodsRefudn')" />
+        <el-card v-else-if="option === 3" class="box-card">
           <div slot="header" class="clearfix">
             <span v-if="isEmptyValue(currentFieldPaymentMethods)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <template v-else>
@@ -689,7 +691,7 @@ export default {
     searchRefundCurrency(value) {
       const clear = false
       this.clearAccountData(clear)
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       if (this.isEmptyValue(value) && this.showDialogo) {
         this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
       }
@@ -697,7 +699,7 @@ export default {
     option(value) {
       const clear = false
       this.clearAccountData(clear)
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       this.selectionTypeRefund = {}
       if (value === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
         this.selectPayment(this.paymentTypeListRefund[0])
@@ -759,7 +761,7 @@ export default {
   },
   mounted() {
     const containerUuid = 'OverdrawnInvoice'
-    this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+    this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
     this.selectionTypeRefund = this.paymentTypeListRefund[0]
     this.$store.commit('updateValueOfField', {
       containerUuid,
@@ -1133,7 +1135,7 @@ export default {
         ]
       })
       if (clear) {
-        this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+        this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       }
     },
     undoPatment() {
@@ -1145,7 +1147,7 @@ export default {
         orderUuid,
         paymentUuid
       })
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
     },
     empty(value, params) {
       if (this.isEmptyValue(value[params])) {
@@ -1219,7 +1221,7 @@ export default {
         paymentMethodUuid,
         currencyUuid
       })
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
     },
     actionOverdrawnInvoice(commands) {
       if (commands.srcKey === 'close') {
@@ -1309,7 +1311,7 @@ export default {
     },
     close() {
       this.selectionTypeRefund = {}
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       this.$store.commit('dialogoInvoce', { show: false })
     },
     changeCurrency(value) {
