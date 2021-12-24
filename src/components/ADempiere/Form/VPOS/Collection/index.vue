@@ -280,9 +280,9 @@ export default {
     },
     listPayments() {
       const listLocal = this.$store.getters.getPaymentBox
-      const listServer = this.currentOrder.listPayments
+      const listServer = this.$store.getters.getListRefund
       if (!this.sendToServer && !this.isEmptyValue(listServer)) {
-        return listServer.payments.filter(payment => !payment.isRefund)
+        return listServer.filter(payment => !payment.isRefund)
       }
       return listLocal.paymentBox
     },
