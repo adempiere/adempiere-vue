@@ -110,19 +110,21 @@ export default defineComponent({
           })
           return
         }
-
-        root.$router.push({
-          name: root.$route.name,
-          query: {
-            ...root.$route.query,
-            action: row.UUID
-          },
-          params: {
-            ...root.$router.params,
-            tableName,
-            recordId: row[`${tableName}_ID`]
-          }
-        }, () => {})
+        const tab = root.$store.getters.getStoredTab(parentUuid, containerUuid)
+        if (tab.isParentTab) {
+          root.$router.push({
+            name: root.$route.name,
+            query: {
+              ...root.$route.query,
+              action: row.UUID
+            },
+            params: {
+              ...root.$router.params,
+              tableName,
+              recordId: row[`${tableName}_ID`]
+            }
+          }, () => {})
+        }
 
         const fieldsList = root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
         const defaultValues = root.$store.getters.getParsedDefaultValues({
