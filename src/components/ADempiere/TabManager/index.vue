@@ -274,6 +274,7 @@ export default defineComponent({
         parentUuid: props.parentUuid,
         containerUuid: tabUuid.value
       }).then(responseData => {
+        const tab = root.$store.getters.getStoredTab(props.parentUuid, tabUuid.value)
         if (!isCreateNew.value && !root.isEmptyValue(responseData)) {
           let row
           const { action } = root.$route.query
@@ -288,14 +289,29 @@ export default defineComponent({
               row = responseData.find(rowData => {
                 return rowData.UUID === action
               })
+
+              // search link value
+              if (root.isEmptyValue(row) && !tab.isParentTab) {
+                const { linkColumnName } = tab
+                const value = root.$store.getters.getValueOfField({
+                  parentUuid: props.parentUuid,
+                  columnName: linkColumnName
+                })
+                if (linkColumnName && !root.isEmptyValue(value)) {
+                  row = responseData.find(rowData => {
+                    return rowData[linkColumnName] === value
+                  })
+                }
+              }
             }
           }
+
           // set first record
           if (root.isEmptyValue(row)) {
             row = responseData[0]
           }
 
-          const tableName = props.tabsList[currentTab.value].tableName
+          const { tableName } = tab
           // set values in panel
           props.containerManager.seekRecord({
             parentUuid: props.parentUuid,

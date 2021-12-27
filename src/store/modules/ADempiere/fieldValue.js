@@ -15,11 +15,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Vue from 'vue'
-import { isEmptyValue, typeValue } from '@/utils/ADempiere/valueUtils.js'
-import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+
+// constants
 import {
   ACTIVE, PROCESSING, PROCESSED
 } from '@/utils/ADempiere/constants/systemColumns'
+
+// utils and helpers methods
+import { isEmptyValue, typeValue } from '@/utils/ADempiere/valueUtils.js'
+import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
 const UUID_KEY = 'UUID'
 
@@ -34,8 +38,9 @@ const value = {
         field: {}
       }
     },
+
     /**
-     *
+     * Set value into column names
      * @param {string}  parentUuid
      * @param {string}  containerUuid
      * @param {string}  columnName
@@ -52,8 +57,43 @@ const value = {
       // Only Parent
       if (parentUuid) {
         const keyParent = parentUuid + '_' + columnName
-        const valueParent = state.field[keyParent]
-        if (value !== valueParent) {
+        if (isOverWriteParent) {
+          Vue.set(state.field, keyParent, value)
+        } else {
+          if (!isEmptyValue(value)) {
+            // tab child no replace parent context with empty
+            Vue.set(state.field, keyParent, value)
+          }
+        }
+      }
+
+      // Only Container
+      if (containerUuid) {
+        const keyContainer = containerUuid + '_' + columnName
+        Vue.set(state.field, keyContainer, value)
+      }
+    },
+
+    /**
+     * Set values into container column names
+     * @param {string}  parentUuid
+     * @param {string}  containerUuid
+     * @param {string}  columnName
+     * @param {mixed}   value
+     * @param {boolean} isOverWriteParent // overwite parent context values
+     */
+    updateValuesOfContainer(state,
+      parentUuid,
+      containerUuid,
+      attributes = [],
+      isOverWriteParent = false
+    ) {
+      attributes.forEach(attribute => {
+        const { value, columnName } = attribute
+
+        // Only Parent
+        if (parentUuid) {
+          const keyParent = parentUuid + '_' + columnName
           if (isOverWriteParent) {
             Vue.set(state.field, keyParent, value)
           } else {
@@ -63,43 +103,11 @@ const value = {
             }
           }
         }
-      }
-
-      // Only Container
-      if (containerUuid) {
-        const keyContainer = containerUuid + '_' + columnName
-        if (value !== state.field[keyContainer]) {
-          Vue.set(state.field, keyContainer, value)
-        }
-      }
-    },
-    updateValuesOfContainer(state, payload) {
-      const { parentUuid, containerUuid, isOverWriteParent } = payload
-      payload.attributes.forEach(attribute => {
-        const { value, columnName } = attribute
-
-        // Only Parent
-        if (parentUuid) {
-          const keyParent = parentUuid + '_' + columnName
-          const valueParent = state.field[keyParent]
-          if (value !== valueParent) {
-            if (isOverWriteParent) {
-              Vue.set(state.field, keyParent, value)
-            } else {
-              if (!isEmptyValue(value)) {
-                // tab child no replace parent context with empty
-                Vue.set(state.field, keyParent, value)
-              }
-            }
-          }
-        }
 
         // Only Container
         if (containerUuid) {
           const keyContainer = containerUuid + '_' + columnName
-          if (value !== state.field[keyContainer]) {
-            Vue.set(state.field, keyContainer, value)
-          }
+          Vue.set(state.field, keyContainer, value)
         }
       })
     }
