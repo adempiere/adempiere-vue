@@ -173,7 +173,8 @@ export default defineComponent({
     })
 
     function isDisabledTab(key) {
-      return key > 0 && isCreateNew.value
+      return (key > 0 || !props.isParentTabs) &&
+        (isCreateNew.value || root.isEmptyValue(recordUuidTabParent.value))
     }
 
     function setCurrentTab() {
@@ -240,6 +241,9 @@ export default defineComponent({
 
     // get records list
     const recordsList = computed(() => {
+      if (!props.isParentTabs && root.isEmptyValue(recordUuidTabParent.value)) {
+        return []
+      }
       return tabData.value.recordsList
     })
 
@@ -255,6 +259,14 @@ export default defineComponent({
       }
       // TODO: add is loaded context columns
       return isLoadedParentRecords.value && !tabData.value.isLoaded
+    })
+
+    const recordUuidTabParent = computed(() => {
+      return root.$store.getters.getValueOfField({
+        parentUuid: props.parentUuid,
+        containerUuid: currentTabMetadata.value.firstTabUuid,
+        columnName: 'UUID'
+      })
     })
 
     const getData = () => {
@@ -314,6 +326,13 @@ export default defineComponent({
     } else {
       watch(isReadyFromGetData, (newValue, oldValue) => {
         if (newValue) {
+          getData()
+        }
+      })
+
+      watch(recordUuidTabParent, (newValue, oldValue) => {
+        console.log(oldValue !== newValue, isReadyFromGetData.value)
+        if (newValue !== oldValue && !root.isEmptyValue(newValue)) {
           getData()
         }
       })

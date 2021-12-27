@@ -103,8 +103,7 @@ export default defineComponent({
             {
               ...refreshRecords,
               callBack: () => {
-                console.log('call getEntities')
-                root.$store.dispatch('dataManager/getEntities', {
+                root.$store.dispatch('getEntities', {
                   parentUuid: props.parentUuid,
                   containerUuid: uuid,
                   tableName

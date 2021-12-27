@@ -98,7 +98,7 @@ export const deleteRecord = {
   type: 'deleteEntity',
   actionName: 'deleteRecord',
   deleteRecord: ({ root, parentUuid, containerUuid, recordId, recordUuid }) => {
-    root.$store.dispatch('dataManager/deleteEntity', {
+    root.$store.dispatch('deleteEntity', {
       parentUuid,
       containerUuid,
       recordId,
@@ -146,7 +146,7 @@ export const refreshRecords = {
   actionName: 'refreshRecords',
   refreshRecords: ({ root, parentUuid, containerUuid, tableName }) => {
     // used to window
-    root.$store.dispatch('dataManager/getEntities', {
+    root.$store.dispatch('getEntities', {
       parentUuid,
       containerUuid
     })
