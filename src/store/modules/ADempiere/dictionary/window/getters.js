@@ -68,6 +68,13 @@ export default {
     return window.currentTabChild
   },
 
+  getStoredFieldFromTab: (state, getters) => ({ windowUuid, tabUuid, columnName, fieldUuid }) => {
+    return getters.getStoredFieldsFromTab(windowUuid, tabUuid)
+      .map(field => {
+        return field.columnName === columnName || field.uuid === fieldUuid
+      })
+  },
+
   /**
    * Determinate if panel is ready to send, all fields mandatory and displayed with values
    * @param {string}  containerUuid

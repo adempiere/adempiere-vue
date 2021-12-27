@@ -81,7 +81,7 @@ export default defineComponent({
       ...props.windowManager,
 
       actionPerformed: ({ field, value }) => {
-        root.$store.dispatch('actionPerformed', {
+        return root.$store.dispatch('actionPerformed', {
           field,
           value
         })
@@ -144,6 +144,15 @@ export default defineComponent({
           containerUuid,
           attributes,
           isOverWriteParent: true
+        })
+
+        // active logics with set records values
+        fieldsList.forEach(field => {
+          // change Dependents
+          root.$store.dispatch('changeDependentFieldsList', {
+            field,
+            fieldsList
+          })
         })
       },
 

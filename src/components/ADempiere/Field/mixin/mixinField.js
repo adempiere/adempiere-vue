@@ -226,8 +226,16 @@ export default {
       // if is custom field, set custom handle change value
       if (this.metadata.isCustomField) {
         if (this.metadata.isActiveLogics) {
+          let fieldsList = []
+          if (this.containerManager.getFieldsList) {
+            fieldsList = this.containerManager.getFieldsList({
+              parentUuid: this.metadata.parentUuid,
+              containerUuid: this.metadata.containerUuid
+            })
+          }
           this.$store.dispatch('changeDependentFieldsList', {
-            field: this.metadata
+            field: this.metadata,
+            fieldsList
           })
         }
         return
