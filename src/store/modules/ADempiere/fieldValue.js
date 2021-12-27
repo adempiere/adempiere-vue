@@ -82,12 +82,12 @@ const value = {
      * @param {mixed}   value
      * @param {boolean} isOverWriteParent // overwite parent context values
      */
-    updateValuesOfContainer(state,
+    updateValuesOfContainer(state, {
       parentUuid,
       containerUuid,
       attributes = [],
       isOverWriteParent = false
-    ) {
+    }) {
       attributes.forEach(attribute => {
         const { value, columnName } = attribute
 
