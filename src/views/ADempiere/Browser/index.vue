@@ -331,6 +331,8 @@ export default defineComponent({
     const actionsManager = ref({
       containerUuid: browserUuid,
 
+      defaultActionName: root.$t('actionMenu.runProcessOrReport'),
+
       getActionList: () => root.$store.getters.getStoredActionsMenu({
         containerUuid: browserUuid
       })

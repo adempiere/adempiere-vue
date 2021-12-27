@@ -29,7 +29,7 @@
     @command="runAction"
     @click="runDefaultAction"
   >
-    {{ defaultActionName }}
+    {{ actionsManager.defaultActionName }}
 
     <el-dropdown-menu slot="dropdown">
       <el-dropdown-item
@@ -170,16 +170,6 @@ export default defineComponent({
       return false
     })
 
-    const defaultActionName = computed(() => {
-      if (!root.isEmptyValue(tableName)) {
-        if (isWithRecord.value) {
-          return root.$t('window.newRecord')
-        }
-        return root.$t('data.undo')
-      }
-      return root.$t('actionMenu.runProcessOrReport')
-    })
-
     const defaultActionToRun = computed(() => {
       if (isUndoAction.value) {
         return actionsList.value[2]
@@ -212,8 +202,6 @@ export default defineComponent({
 
     return {
       actionsList,
-      // computeds
-      defaultActionName,
       // methods
       runAction,
       runDefaultAction
