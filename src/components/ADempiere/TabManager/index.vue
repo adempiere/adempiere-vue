@@ -331,7 +331,6 @@ export default defineComponent({
       })
 
       watch(recordUuidTabParent, (newValue, oldValue) => {
-        console.log(oldValue !== newValue, isReadyFromGetData.value)
         if (newValue !== oldValue && !root.isEmptyValue(newValue)) {
           getData()
         }
