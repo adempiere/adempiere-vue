@@ -131,6 +131,7 @@ export const zoomWindow = {
   icon: 'el-icon-zoom-in',
   type: 'zoom',
   actionName: 'zoomWindow',
+  uuid: null,
   zoomWindow: ({ uuid }) => {
     zoomIn({
       uuid
@@ -216,6 +217,7 @@ export const runProcessOrReport = {
   svg: false,
   icon: 'el-icon-setting',
   actionName: 'runProcessOrReport',
+  uuid: null,
   runProcessOrReport: ({ root, containerUuid }) => {
     root.$store.dispatch('startProcess', {
       containerUuid

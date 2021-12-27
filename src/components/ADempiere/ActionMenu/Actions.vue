@@ -84,14 +84,13 @@
                       </b>
                     </span>
 
-                    <p
-                      v-if="!isEmptyValue(childs.description)"
-                      class="description"
-                    >
-                      {{ childs.description }}
-                    </p>
-                    <p v-else class="description">
-                      {{ $t('data.noDescription') }}
+                    <p class="description">
+                      <template v-if="isEmptyValue(childs.description)">
+                        {{ $t('data.noDescription') }}
+                      </template>
+                      <template v-else>
+                        {{ childs.description }}
+                      </template>
                     </p>
                   </el-dropdown-item>
                 </el-scrollbar>
@@ -104,8 +103,14 @@
                   {{ action.name }}
                 </b>
               </span>
+
               <p class="description">
-                {{ $t('data.noDescription') }}
+                <template v-if="isEmptyValue(action.description)">
+                  {{ $t('data.noDescription') }}
+                </template>
+                <template v-else>
+                  {{ action.description }}
+                </template>
               </p>
             </div>
           </div>

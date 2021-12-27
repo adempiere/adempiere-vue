@@ -96,7 +96,7 @@ export default {
   },
 
   /**
-   * Determinate if panel is ready fron send, all fiedls mandatory and displayed with values
+   * Determinate if panel is ready to send, all fields mandatory and displayed with values
    * @param {string}  containerUuid
    * @param {object}  row, data to compare if is table
    * @returns {object}

@@ -90,13 +90,6 @@ import {
   isReadOnlyField, isReadOnlyColumn
 } from '@/utils/ADempiere/dictionary/browser.js'
 
-// constants
-import {
-  refreshBrowserSearh,
-  sharedLink,
-  zoomWindow
-} from '@/utils/ADempiere/constants/actionsMenuList'
-
 export default defineComponent({
   name: 'BrowserView',
 
@@ -338,19 +331,9 @@ export default defineComponent({
     const actionsManager = ref({
       containerUuid: browserUuid,
 
-      getActionList: () => [
-        refreshBrowserSearh,
-        {
-          ...zoomWindow,
-          uuid: root.isEmptyValue(storedBrowser.value)
-            ? null
-            : storedBrowser.value.window
-              ? storedBrowser.value.window.uuid
-              : null
-        },
-
-        sharedLink
-      ]
+      getActionList: () => root.$store.getters.getStoredActionsMenu({
+        containerUuid: browserUuid
+      })
     })
 
     const relationsManager = ref({
