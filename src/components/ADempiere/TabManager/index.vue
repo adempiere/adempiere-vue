@@ -173,7 +173,8 @@ export default defineComponent({
     })
 
     function isDisabledTab(key) {
-      return key > 0 && isCreateNew.value
+      return (key > 0 || !props.isParentTabs) &&
+        (isCreateNew.value || root.isEmptyValue(recordUuidTabParent.value))
     }
 
     function setCurrentTab() {
@@ -240,6 +241,9 @@ export default defineComponent({
 
     // get records list
     const recordsList = computed(() => {
+      if (!props.isParentTabs && root.isEmptyValue(recordUuidTabParent.value)) {
+        return []
+      }
       return tabData.value.recordsList
     })
 
@@ -257,11 +261,20 @@ export default defineComponent({
       return isLoadedParentRecords.value && !tabData.value.isLoaded
     })
 
+    const recordUuidTabParent = computed(() => {
+      return root.$store.getters.getValueOfField({
+        parentUuid: props.parentUuid,
+        containerUuid: currentTabMetadata.value.firstTabUuid,
+        columnName: 'UUID'
+      })
+    })
+
     const getData = () => {
       root.$store.dispatch('getEntities', {
         parentUuid: props.parentUuid,
         containerUuid: tabUuid.value
       }).then(responseData => {
+        const tab = root.$store.getters.getStoredTab(props.parentUuid, tabUuid.value)
         if (!isCreateNew.value && !root.isEmptyValue(responseData)) {
           let row
           const { action } = root.$route.query
@@ -276,14 +289,29 @@ export default defineComponent({
               row = responseData.find(rowData => {
                 return rowData.UUID === action
               })
+
+              // search link value
+              if (root.isEmptyValue(row) && !tab.isParentTab) {
+                const { linkColumnName } = tab
+                const value = root.$store.getters.getValueOfField({
+                  parentUuid: props.parentUuid,
+                  columnName: linkColumnName
+                })
+                if (linkColumnName && !root.isEmptyValue(value)) {
+                  row = responseData.find(rowData => {
+                    return rowData[linkColumnName] === value
+                  })
+                }
+              }
             }
           }
+
           // set first record
           if (root.isEmptyValue(row)) {
             row = responseData[0]
           }
 
-          const tableName = props.tabsList[currentTab.value].tableName
+          const { tableName } = tab
           // set values in panel
           props.containerManager.seekRecord({
             parentUuid: props.parentUuid,
@@ -314,6 +342,12 @@ export default defineComponent({
     } else {
       watch(isReadyFromGetData, (newValue, oldValue) => {
         if (newValue) {
+          getData()
+        }
+      })
+
+      watch(recordUuidTabParent, (newValue, oldValue) => {
+        if (newValue !== oldValue && !root.isEmptyValue(newValue)) {
           getData()
         }
       })

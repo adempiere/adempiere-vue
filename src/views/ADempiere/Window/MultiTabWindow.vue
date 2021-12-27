@@ -158,7 +158,7 @@ export default defineComponent({
         containerUuid,
         pageNumber = 0
       }) => {
-        root.$store.dispatch('dataManager/getEntities', {
+        root.$store.dispatch('getEntities', {
           parentUuid,
           containerUuid,
           pageNumber
