@@ -29,7 +29,7 @@
     @command="runAction"
     @click="runDefaultAction"
   >
-    {{ defaultActionName }}
+    {{ actionsManager.defaultActionName }}
 
     <el-dropdown-menu slot="dropdown">
       <el-dropdown-item
@@ -84,14 +84,13 @@
                       </b>
                     </span>
 
-                    <p
-                      v-if="!isEmptyValue(childs.description)"
-                      class="description"
-                    >
-                      {{ childs.description }}
-                    </p>
-                    <p v-else class="description">
-                      {{ $t('data.noDescription') }}
+                    <p class="description">
+                      <template v-if="isEmptyValue(childs.description)">
+                        {{ $t('data.noDescription') }}
+                      </template>
+                      <template v-else>
+                        {{ childs.description }}
+                      </template>
                     </p>
                   </el-dropdown-item>
                 </el-scrollbar>
@@ -104,8 +103,14 @@
                   {{ action.name }}
                 </b>
               </span>
+
               <p class="description">
-                {{ $t('data.noDescription') }}
+                <template v-if="isEmptyValue(action.description)">
+                  {{ $t('data.noDescription') }}
+                </template>
+                <template v-else>
+                  {{ action.description }}
+                </template>
               </p>
             </div>
           </div>
@@ -165,16 +170,6 @@ export default defineComponent({
       return false
     })
 
-    const defaultActionName = computed(() => {
-      if (!root.isEmptyValue(tableName)) {
-        if (isWithRecord.value) {
-          return root.$t('window.newRecord')
-        }
-        return root.$t('data.undo')
-      }
-      return root.$t('actionMenu.runProcessOrReport')
-    })
-
     const defaultActionToRun = computed(() => {
       if (isUndoAction.value) {
         return actionsList.value[2]
@@ -207,8 +202,6 @@ export default defineComponent({
 
     return {
       actionsList,
-      // computeds
-      defaultActionName,
       // methods
       runAction,
       runDefaultAction

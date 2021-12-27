@@ -169,6 +169,9 @@ export default defineComponent({
     const actionsManager = ref({
       parentUuid: props.windowMetadata.uuid,
       containerUuid: props.windowMetadata.currentTabUuid,
+
+      defaultActionName: root.$t('window.newRecord'),
+
       getActionList: () => [
         createNewRecord,
         refreshRecords,

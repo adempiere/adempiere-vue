@@ -19,6 +19,14 @@ import router from '@/router'
 // api request methods
 import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser.js'
 
+// constants
+import {
+  refreshBrowserSearh,
+  runProcessOrReport,
+  sharedLink,
+  zoomWindow
+} from '@/utils/ADempiere/constants/actionsMenuList'
+
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { generatePanelAndFields } from '@/utils/ADempiere/dictionary/panel.js'
@@ -44,6 +52,11 @@ export default {
           })
           commit('addBrowserToList', browserDefinition)
 
+          dispatch('setBrowserActionsMenu', {
+            containerUuid: browserDefinition.uuid
+          })
+
+          // set default values into fields
           dispatch('setBrowserDefaultValues', {
             containerUuid: browserDefinition.uuid,
             fieldsList: browserDefinition.fieldsList
@@ -55,9 +68,58 @@ export default {
   },
 
   /**
+   * Set actions menu to browser
+   * @param {string} containerUuid
+   */
+  setBrowserActionsMenu({ commit, getters }, {
+    containerUuid
+  }) {
+    const browserDefinition = getters.getStoredBrowser(containerUuid)
+
+    const actionsList = []
+
+    // process associated
+    if (!isEmptyValue(browserDefinition.process)) {
+      const { uuid, name, description } = browserDefinition.process
+      const actionProcess = {
+        ...runProcessOrReport,
+        uuid,
+        name,
+        description
+      }
+
+      actionsList.push(actionProcess)
+    }
+
+    // action refresh browser search
+    actionsList.push(refreshBrowserSearh)
+
+    // add action zoom window
+    if (!isEmptyValue(browserDefinition.window)) {
+      const { uuid, name, description } = browserDefinition.window
+      const zoomAction = {
+        ...zoomWindow,
+        uuid,
+        name: `${zoomWindow.name}: ${name}`,
+        description
+      }
+
+      actionsList.push(zoomAction)
+    }
+
+    // action shared link
+    actionsList.push(sharedLink)
+
+    commit('setActionMenu', {
+      containerUuid: browserDefinition.uuid,
+      actionsList
+    })
+  },
+
+  /**
    * Set default values to panel
-   * @param {string}  parentUuid
    * @param {string}  containerUuid
+   * @param {array} fieldsList
    */
   setBrowserDefaultValues({ dispatch, getters }, {
     containerUuid,
@@ -87,6 +149,9 @@ export default {
 
   /**
    * Used by components/fields/filterFields
+   * @param {string} containerUuid
+   * @param {array} fieldsShowed fields to displayed
+   * @param {array} fieldsList all fields list in container
    */
   changeBrowserFieldShowedFromUser({ commit, dispatch, getters, rootGetters }, {
     containerUuid,
