@@ -198,7 +198,7 @@ export default defineComponent({
 
     const fieldsListShowed = computed(() => {
       const { parentUuid, containerUuid } = props.metadata
-      const fieldsList = props.containerManager.getFieldsLit({
+      const fieldsList = props.containerManager.getFieldsList({
         parentUuid,
         containerUuid
       })

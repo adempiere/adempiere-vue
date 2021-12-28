@@ -195,6 +195,22 @@ export function generatePanelAndFields({
     })
   }
 
+  // TODO: Improve performance and reduce array cycles
+  // Get dependent fields
+  fieldsList.forEach((itemField, index, listFields) => {
+    if (!isEmptyValue(itemField.parentFieldsList) && itemField.isActive) {
+      itemField.parentFieldsList.forEach(parentColumnName => {
+        const parentField = listFields.find(parentFieldItem => {
+          return parentFieldItem.columnName === parentColumnName &&
+            parentColumnName !== itemField.columnName
+        })
+        if (parentField) {
+          parentField.dependentFieldsList.push(itemField.columnName)
+        }
+      })
+    }
+  })
+
   identifierColumns = sortFields({
     fieldsList: identifierColumns,
     orderBy: 'identifierSequence'

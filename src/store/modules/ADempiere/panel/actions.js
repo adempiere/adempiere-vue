@@ -355,6 +355,14 @@ const actions = {
         fieldsList = getters.getFieldsListFromPanel(containerUuid)
         field = fieldsList.find(fieldItem => fieldItem.columnName === columnName)
       }
+
+      if (containerManager.getFieldsList) {
+        fieldsList = containerManager.getFieldsList({
+          parentUuid: field.parentUuid,
+          containerUuid: field.containerUuid
+        })
+      }
+
       let value
       if (isEmptyValue(newValue)) {
         value = getters.getValueOfField({
@@ -386,6 +394,7 @@ const actions = {
               attributes: response.attributes
             })
           }
+
           // Change Dependents
           dispatch('changeDependentFieldsList', {
             field,

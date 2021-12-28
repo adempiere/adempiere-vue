@@ -105,6 +105,10 @@ export default defineComponent({
         return new Promise()
       },
 
+      getFieldsList: ({ parentUuid, containerUuid }) => {
+        return root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
+      },
+
       isDisplayedField,
       isDisplayedColumn,
 
@@ -225,11 +229,8 @@ export default defineComponent({
           containerUuid,
           fieldsShowed
         })
-      },
-
-      getFieldsLit({ parentUuid, containerUuid }) {
-        return root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
       }
+
     }
 
     if (!root.isEmptyValue(props.containerManager)) {
