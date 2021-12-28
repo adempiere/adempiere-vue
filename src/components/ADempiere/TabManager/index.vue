@@ -339,6 +339,12 @@ export default defineComponent({
       if (isReadyFromGetData.value) {
         getData()
       }
+      // if changed tab and not records in stored, get records from server
+      watch(tabUuid, (newValue, oldValue) => {
+        if (newValue !== oldValue && !root.isEmptyValue(recordUuidTabParent.value) && !tabData.value.isLoaded) {
+          getData()
+        }
+      })
     } else {
       watch(isReadyFromGetData, (newValue, oldValue) => {
         if (newValue) {
@@ -346,6 +352,7 @@ export default defineComponent({
         }
       })
 
+      // if changed record in parent tab, reload tab child
       watch(recordUuidTabParent, (newValue, oldValue) => {
         if (newValue !== oldValue && !root.isEmptyValue(newValue)) {
           getData()
