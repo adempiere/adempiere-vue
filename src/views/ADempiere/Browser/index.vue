@@ -222,7 +222,7 @@ export default defineComponent({
 
     const containerManager = {
       actionPerformed({ field, value, valueTo, containerUuid }) {
-        root.$store.dispatch('browserActionPerformed', {
+        return root.$store.dispatch('browserActionPerformed', {
           containerUuid,
           field,
           value,
@@ -255,7 +255,7 @@ export default defineComponent({
         })
       },
 
-      getFieldsLit({ containerUuid }) {
+      getFieldsList({ containerUuid }) {
         return root.$store.getters.getStoredFieldsFromBrowser(containerUuid)
       }
     }

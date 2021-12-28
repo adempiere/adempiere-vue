@@ -356,8 +356,8 @@ const actions = {
         field = fieldsList.find(fieldItem => fieldItem.columnName === columnName)
       }
 
-      if (containerManager.getFieldsLit) {
-        fieldsList = containerManager.getFieldsLit({
+      if (containerManager.getFieldsList) {
+        fieldsList = containerManager.getFieldsList({
           parentUuid: field.parentUuid,
           containerUuid: field.containerUuid
         })
