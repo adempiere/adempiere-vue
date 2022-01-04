@@ -87,21 +87,40 @@ export default defineComponent({
     })
 
     const storedPrivateAccess = computed(() => {
-      const { recordUuid } = getRecordKeys()
-
       return root.$store.getters.getStoredPrivateAccess({
         tableName,
-        recordUuid
+        recordUuid: recordUuid.value
       })
     })
 
-    const lockRecord = () => {
-      const { recordId, recordUuid } = getRecordKeys()
+    // TODO: Add client-side and server-side support for keys composed of more than 1 field
+    const recordId = computed(() => {
+      return root.$store.getters.getValueOfField({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        columnName: tableName + '_ID'
+      })
+    })
+    const recordUuid = computed(() => {
+      return root.$store.getters.getValueOfField({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        columnName: 'UUID'
+      })
+    })
 
+    const recordKeys = computed(() => {
+      return {
+        recordId: recordId.value,
+        recordUuid: recordUuid.value
+      }
+    })
+
+    const lockRecord = () => {
       root.$store.dispatch('lockRecordFromServer', {
         tableName,
-        recordId,
-        recordUuid
+        recordId: recordId.value,
+        recordUuid: recordUuid.value
       })
         .then(isLockedResponse => {
           isLocked.value = isLockedResponse
@@ -109,51 +128,20 @@ export default defineComponent({
     }
 
     const unLockRecord = () => {
-      const { recordId, recordUuid } = getRecordKeys()
-
       root.$store.dispatch('unlockRecordFromServer', {
         tableName,
-        recordId,
-        recordUuid
+        recordId: recordId.value,
+        recordUuid: recordUuid.value
       })
         .then(isUnLockedResponse => {
           isLocked.value = isUnLockedResponse
         })
     }
 
-    const record = computed(() => {
-      return root.$store.getters.getValuesView({
-        parentUuid: props.parentUuid,
-        containerUuid: props.containerUuid,
-        format: 'object'
-      })
-    })
-
-    const getRecordKeys = () => {
-      let recordId
-      let recordUuid
-      const recordRow = record.value
-      if (!root.isEmptyValue(recordRow)) {
-        recordId = recordRow[tableName + '_ID']
-        recordUuid = recordRow.UUID
-      } else {
-        if (isValidUuid(root.$route.query.action)) {
-          recordUuid = root.$route.query.action
-        }
-      }
-
-      return {
-        recordId,
-        recordUuid
-      }
-    }
-
     const isGettingRecordAccess = ref(false)
 
     const getPrivateAccess = () => {
-      const { recordId, recordUuid } = getRecordKeys()
-
-      if (root.isEmptyValue(recordId) && root.isEmptyValue(recordUuid)) {
+      if (root.isEmptyValue(recordId.value) && root.isEmptyValue(recordUuid.value)) {
         return
       }
 
@@ -168,8 +156,8 @@ export default defineComponent({
       // get from server
       root.$store.dispatch('getPrivateAccessFromServer', {
         tableName,
-        recordId,
-        recordUuid
+        recordId: recordId.value,
+        recordUuid: recordUuid.value
       })
         .then(privateAccessResponse => {
           isLocked.value = privateAccessResponse
@@ -182,8 +170,8 @@ export default defineComponent({
     // timer to execute the request between times
     const timeOut = ref(() => {})
 
-    watch(() => root.$route.query.action, (newValue, oldValue) => {
-      if (props.isActiveTab && isValidUuid(newValue) && !isGettingRecordAccess.value) {
+    watch(recordKeys, (newValue, oldValue) => {
+      if (props.isActiveTab && (isValidUuid(newValue.recordUuid) || !root.isEmptyValue(newValue.recordId)) && !isGettingRecordAccess.value) {
         clearTimeout(timeOut.value)
 
         timeOut.value = setTimeout(() => {

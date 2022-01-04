@@ -144,6 +144,8 @@ export function generatePanelAndFields({
 
   const fieldsRangeList = []
   const selectionColumns = []
+  const keyColumns = []
+  const parentColumns = []
   let identifierColumns = []
 
   let keyColumn
@@ -160,6 +162,7 @@ export function generatePanelAndFields({
     const { columnName, componentPath } = fieldDefinition
 
     if (fieldDefinition.isKey) {
+      keyColumns.push(columnName)
       keyColumn = columnName
     }
     if (fieldDefinition.isSelectionColumn) {
@@ -171,6 +174,9 @@ export function generatePanelAndFields({
         identifierSequence: fieldDefinition.identifierSequence,
         componentPath
       })
+    }
+    if (fieldDefinition.isParent) {
+      parentColumns.push(columnName)
     }
 
     // Add new field if is range number
@@ -256,6 +262,8 @@ export function generatePanelAndFields({
     fieldsList,
     // app attributes
     keyColumn,
+    keyColumns,
+    parentColumns,
     selectionColumns,
     identifierColumns,
     isLoadedFieldsList: true,
