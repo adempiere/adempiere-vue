@@ -327,13 +327,36 @@ export default {
       const attributes = this.$store.getters.getValuesView({
         containerUuid: this.containerUuid
       })
-      const attributesToServer = attributes.filter(attributeItem => {
-        const { columnName } = attributeItem
-        if (columnName.includes('DisplayColumn_') || columnName === 'C_Location_ID') {
-          return false
-        }
-        return true
+      const attributesToServer = attributes
+        .filter(attributeItem => {
+          const { columnName } = attributeItem
+          if (columnName.includes('DisplayColumn_') || columnName === 'C_Location_ID') {
+            return false
+          }
+          return true
+        })
+
+      const cityName = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'DisplayColumn_C_City_ID'
       })
+      if (!this.isEmptyValue(cityName)) {
+        attributesToServer.push({
+          columnName: 'City',
+          value: cityName
+        })
+      }
+
+      const regionName = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'DisplayColumn_C_Region_ID'
+      })
+      if (!this.isEmptyValue(cityName)) {
+        attributesToServer.push({
+          columnName: 'RegionName',
+          value: regionName
+        })
+      }
 
       const updateLocation = (responseLocation) => {
         // set form values

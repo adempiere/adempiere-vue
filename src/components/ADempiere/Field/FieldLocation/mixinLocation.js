@@ -111,9 +111,11 @@ export default {
         if (this.isEmptyValue(value)) {
           value = ''
         }
-        displayValue = displayValue
-          ? displayValue + ', ' + value
-          : value
+        if (!this.isEmptyValue(displayValue)) {
+          displayValue += ', ' + value
+        } else {
+          displayValue = value
+        }
       }
 
       // displayed value of Address column names
