@@ -6,7 +6,7 @@
 
     <span v-if="isMandatory" :style="'color: #f34b4b'"> * </span>
 
-    <i class="el-icon-info" :style="iconStyle" />
+    <i :class="cssClassName" />
   </div>
 </template>
 
@@ -41,26 +41,44 @@ export default defineComponent({
       return displayStyle + ' margin-left: 3px;'
     })
 
-    const iconStyle = computed(() => {
+    const cssClassName = computed(() => {
+      const iconClass = 'el-icon-info '
       if (isMobile.value) {
-        return 'margin-left: 5px; margin-top: 7px;'
+        return iconClass + 'icon-mobile'
       }
-      return 'margin-left: -5px; padding-bottom: 6px;'
+      return iconClass + 'icon-desktop'
     })
 
     return {
-      iconStyle,
+      cssClassName,
       labelStyle
     }
   }
 })
 </script>
 
+<style lang="scss">
+.el-popover {
+  .el-icon-info.icon-desktop {
+    margin-left: 0px !important;
+  }
+}
+</style>
 <style lang="scss" scoped>
 .label-field {
   .el-icon-info {
     font-size: 11px;
     color: #008fd3;
+
+    &.icon-mobile {
+      margin-left: 5px;
+      margin-top: 7px;
+    }
+
+    &.icon-desktop {
+      margin-left: -5px;
+      padding-bottom: 6px;
+    }
   }
 }
 </style>

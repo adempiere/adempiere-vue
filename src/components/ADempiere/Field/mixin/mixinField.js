@@ -230,7 +230,8 @@ export default {
           if (this.containerManager.getFieldsList) {
             fieldsList = this.containerManager.getFieldsList({
               parentUuid: this.metadata.parentUuid,
-              containerUuid: this.metadata.containerUuid
+              containerUuid: this.metadata.containerUuid,
+              root: this
             })
           }
           this.$store.dispatch('changeDependentFieldsList', {

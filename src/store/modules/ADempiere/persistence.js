@@ -78,7 +78,9 @@ const persistence = {
           containerUuid,
           formatReturn: false
         }).filter(itemField => {
-          return !LOG_COLUMNS_NAME_LIST.includes(itemField.columnName)
+          // omit send to server (to create or update) columns manage by backend
+          return itemField.isAlwaysUpdateable ||
+            !LOG_COLUMNS_NAME_LIST.includes(itemField.columnName)
         }).map(itemField => {
           return itemField.name
         })
@@ -116,7 +118,8 @@ const persistence = {
         let attributesList = getters.getPersistenceAttributes(containerUuid)
           .filter(itemField => {
             // omit send to server (to create or update) columns manage by backend
-            return !LOG_COLUMNS_NAME_LIST.includes(itemField.columnName)
+            return itemField.isAlwaysUpdateable ||
+              !LOG_COLUMNS_NAME_LIST.includes(itemField.columnName)
           })
 
         if (!isEmptyValue(attributesList)) {

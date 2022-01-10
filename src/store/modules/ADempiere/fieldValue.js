@@ -22,6 +22,7 @@ import {
 } from '@/utils/ADempiere/constants/systemColumns'
 
 // utils and helpers methods
+import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
 import { isEmptyValue, typeValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
@@ -88,6 +89,12 @@ const value = {
       attributes = [],
       isOverWriteParent = false
     }) {
+      if (typeValue(attributes) === 'OBJECT') {
+        attributes = convertObjectToKeyValue({
+          object: attributes
+        })
+      }
+
       attributes.forEach(attribute => {
         const { value, columnName } = attribute
 
