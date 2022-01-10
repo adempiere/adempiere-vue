@@ -13,15 +13,12 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import language from '@/lang'
+
+// import language from '@/lang'
 
 const fieldBase = {
   tableName: 'C_Location',
-  isFromDictionary: true,
-  overwriteDefinition: {
-    size: 24,
-    index: 0
-  }
+  isFromDictionary: true
 }
 
 export default [
@@ -42,6 +39,7 @@ export default [
     columnName: 'C_Country_ID',
     overwriteDefinition: {
       isCustomField: true,
+      isUpdateable: true,
       isActiveLogics: true, // enable logics
       defaultValue: '@#C_Country_ID@',
       size: 24,
@@ -56,10 +54,11 @@ export default [
     columnName: 'C_Region_ID',
     overwriteDefinition: {
       isCustomField: true,
+      isUpdateable: true,
       size: 24,
       sequenceFields: 'R',
       index: 3,
-      isMandatory: true
+      isMandatory: false
     }
   },
   {
@@ -68,6 +67,7 @@ export default [
     columnName: 'C_City_ID',
     overwriteDefinition: {
       isCustomField: true,
+      isUpdateable: true,
       size: 24,
       sequenceFields: 'C',
       index: 4,
@@ -80,6 +80,7 @@ export default [
     columnName: 'Address1',
     overwriteDefinition: {
       isCustomField: true,
+      isUpdateable: true,
       size: 24,
       sequenceFields: 'A1',
       index: 5
@@ -91,6 +92,7 @@ export default [
     columnName: 'Address2',
     overwriteDefinition: {
       isCustomField: true,
+      isUpdateable: true,
       size: 24,
       sequenceFields: 'A2',
       index: 6
@@ -102,6 +104,7 @@ export default [
     columnName: 'Address3',
     overwriteDefinition: {
       isCustomField: true,
+      isUpdateable: true,
       size: 24,
       sequenceFields: 'A3',
       index: 7
@@ -113,6 +116,7 @@ export default [
     columnName: 'Address4',
     overwriteDefinition: {
       isCustomField: true,
+      isUpdateable: true,
       size: 24,
       sequenceFields: 'A4',
       index: 8
@@ -124,21 +128,25 @@ export default [
     columnName: 'Postal',
     overwriteDefinition: {
       isCustomField: true,
+      isUpdateable: true,
       size: 24,
       sequenceFields: 'P',
       index: 9
     }
-  },
+  }
+  /*,
   {
     elementColumnName: 'Name',
     isFromDictionary: true,
     overwriteDefinition: {
       tabindex: 1,
       isCustomField: true,
+      isUpdateable: true,
       size: 24,
       name: language.t('components.contextMenuReferences'),
       sequence: 1,
       isMandatory: true
     }
   }
+  */
 ]

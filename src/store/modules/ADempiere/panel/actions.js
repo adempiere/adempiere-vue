@@ -30,6 +30,7 @@ const actions = {
       panelType,
       // isParentTab,
       // parentUuid,
+      isSetDefaultValues = true,
       uuid: containerUuid
     } = params
     let keyColumn = ''
@@ -115,7 +116,7 @@ const actions = {
 
     commit('addPanel', params)
 
-    if (!['table'].includes(panelType)) {
+    if (isSetDefaultValues) {
       dispatch('setDefaultValues', {
         parentUuid: params.parentUuid,
         containerUuid,

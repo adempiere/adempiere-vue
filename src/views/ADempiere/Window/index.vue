@@ -121,26 +121,29 @@ export default defineComponent({
         isProcessed,
         isWithRecord
       }) {
-        // evaluate client id context with record
-        const preferenceClientId = root.$store.getters.getPreferenceClientId
-        if (preferenceClientId !== clientId && isWithRecord) {
-          return true
+        if (isWithRecord) {
+          // evaluate client id context with record
+          const preferenceClientId = root.$store.getters.getPreferenceClientId
+          if (preferenceClientId !== clientId) {
+            return true
+          }
+
+          // not updateable and record saved
+          if (!field.isUpdateable) {
+            return true
+          }
+
+          // record is inactive isReadOnlyFromForm
+          if (!isActive && field.columnName !== 'IsActive') {
+            return true
+          }
+          if (isProcessing || isProcessed) {
+            return true
+          }
         }
 
-        // not updateable and record saved
-        if (!field.isUpdateable && isWithRecord) {
-          return true
-        }
-
-        // record is inactive isReadOnlyFromForm
-        if (!isActive && field.columnName !== 'IsActive') {
-          return true
-        }
         if (field.isAlwaysUpdateable) {
           return false
-        }
-        if (isWithRecord && (isProcessing || isProcessed)) {
-          return true
         }
 
         return isReadOnlyField(field) || field.isReadOnlyFromForm

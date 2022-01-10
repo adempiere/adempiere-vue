@@ -15,20 +15,34 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-popover
     v-if="!metadata.pos"
+    key="standard"
     ref="locationAddress"
     v-model="isShowedLocationForm"
+    class="popover-location"
     placement="left-end"
-    width="300"
+    width="350"
     trigger="manual"
   >
     <location-address-form
+      v-if="isShowedLocationForm"
+      class="location-form"
       :values="localValues"
       :parent-metadata="metadata"
+      :parent-uuid="parentUuid"
+      :container-uuid="containerUuid"
+      :container-manager="containerManager"
     />
-    <el-button slot="reference" type="text" style="width: -webkit-fill-available;" @click="setShowedLocationForm(true)">
+
+    <el-button
+      slot="reference"
+      class="button-location-show"
+      type="text"
+      @click="isShowedLocationForm = true"
+    >
       <el-input
         v-model="displayedValue"
         :class="cssClassStyle"
@@ -38,20 +52,26 @@
       </el-input>
     </el-button>
   </el-popover>
+
   <location-address-form
     v-else
+    key="point-of-sales"
+    class="location-form"
     :values="localValues"
     :parent-metadata="metadata"
+    :parent-uuid="parentUuid"
+    :container-uuid="containerUuid"
+    :container-manager="containerManager"
   />
 </template>
 
 <script>
 // mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import mixinLocation from './mixinLocation.js'
+import mixinLocation, { LOCATION_ADDRESS_FORM } from './mixinLocation.js'
 
 // components
-import LocationAddressForm from './locationAddressForm'
+import LocationAddressForm from './locationAddressForm.vue'
 
 export default {
   name: 'FieldLocation',
@@ -65,9 +85,14 @@ export default {
     mixinLocation
   ],
 
-  data() {
-    return {
-      localValues: {}
+  props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
+    containerUuid: {
+      type: String,
+      required: true
     }
   },
 
@@ -117,6 +142,19 @@ export default {
     }
   },
 
+  watch: {
+    value(newValue, oldValue) {
+      if (this.isEmptyValue(newValue)) {
+        this.displayedValue = undefined
+      } else {
+        if (newValue !== oldValue) {
+          this.displayedValue = undefined
+          this.getLocation()
+        }
+      }
+    }
+  },
+
   mounted() {
     if (!this.metadata.isAdvancedQuery) {
       this.getLocation()
@@ -124,7 +162,14 @@ export default {
   },
 
   methods: {
+    /**
+     * Request location entity
+     */
     getLocation() {
+      if (this.isGettingLocation) {
+        return
+      }
+
       if (!this.isEmptyValue(this.displayedValue)) {
         return
       }
@@ -134,21 +179,39 @@ export default {
         return
       }
 
+      this.isGettingLocation = true
       this.getLocationAddress({
         id: value
       })
         .then(responseLocation => {
-          const { values } = responseLocation
-
-          this.localValues = values
+          const { attributes } = responseLocation
+          this.localValues = attributes
 
           // TODO: Get Display_ColumnName from server request
-          this.displayedValue = this.getDisplayedValue(values) || value
+          this.displayedValue = this.getDisplayedValue(attributes) || value
+
+          this.$store.commit('updateValuesOfContainer', {
+            // parentUuid,
+            containerUuid: LOCATION_ADDRESS_FORM,
+            attributes
+          })
         })
         .catch(error => {
-          console.warn(`Get Location Address, Field Location - Error ${error.code}: ${error.message}.`)
+          console.warn(`Get Location Address Form, Field Location - Error ${error.code}: ${error.message}.`)
+        })
+        .finally(() => {
+          this.isGettingLocation = false
         })
     }
   }
 }
 </script>
+
+<style lang="scss">
+/**
+ * span tag as button and label text
+ */
+.button-location-show {
+  padding-top: 0px !important;
+}
+</style>
