@@ -305,29 +305,13 @@ export default {
         value: this.getDisplayedValue(values)
       })
     },
-    sendValuesToServer() {
-      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
-        containerUuid: this.containerUuid,
-        formatReturn: 'name'
-      })
 
-      if (!this.isEmptyValue(emptyMandatoryFields)) {
-        showNotification({
-          type: 'warning',
-          title: this.$t('notifications.emptyValues'),
-          name: '<b>' + emptyMandatoryFields + '.</b> ',
-          message: this.$t('notifications.fieldMandatory'),
-          isRedirect: false
-        })
-        return
-      }
-
-      const locationId = this.locationId
-
-      const attributes = this.$store.getters.getValuesView({
-        containerUuid: this.containerUuid
-      })
-      const attributesToServer = attributes
+    /**
+     * Get attributes list to server
+     * @returns {array} attributesToServer
+     */
+    getAttributesToServer(attributesList) {
+      const attributesToServer = attributesList
         .filter(attributeItem => {
           const { columnName } = attributeItem
           if (columnName.includes('DisplayColumn_') || columnName === 'C_Location_ID') {
@@ -358,6 +342,31 @@ export default {
         })
       }
 
+      return attributesToServer
+    },
+
+    sendValuesToServer() {
+      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
+        containerUuid: this.containerUuid,
+        formatReturn: 'name'
+      })
+
+      if (!this.isEmptyValue(emptyMandatoryFields)) {
+        showNotification({
+          type: 'warning',
+          title: this.$t('notifications.emptyValues'),
+          name: '<b>' + emptyMandatoryFields + '.</b> ',
+          message: this.$t('notifications.fieldMandatory'),
+          isRedirect: false
+        })
+        return
+      }
+
+      const attributes = this.$store.getters.getValuesView({
+        containerUuid: this.containerUuid
+      })
+      const attributesToServer = this.getAttributesToServer(attributes)
+
       const updateLocation = (responseLocation) => {
         // set form values
         this.setValues({
@@ -378,6 +387,7 @@ export default {
         return responseLocation.attributes
       }
 
+      const locationId = this.locationId
       if (this.isEmptyValue(locationId) || locationId === 0) {
         createLocationAddress({
           attributesList: attributesToServer
