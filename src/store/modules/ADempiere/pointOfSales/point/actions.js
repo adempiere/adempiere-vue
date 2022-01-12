@@ -67,19 +67,21 @@ export default {
    */
   listPointOfSalesFromServer({ commit, getters, dispatch }, posToSet = null) {
     const userUuid = getters['user/getUserUuid']
-    let pos, pontOfSalesList
+    let pos, pointOfSalesList
     listPointOfSales({
       userUuid
     })
       .then(response => {
-        pontOfSalesList = response.sellingPointsList
+        pointOfSalesList = response.sellingPointsList
         if (isEmptyValue(pos) && isEmptyValue(posToSet)) {
-          pos = pontOfSalesList.find(itemPOS => itemPOS.salesRepresentative.uuid === userUuid)
+          pos = pointOfSalesList.find(itemPOS => itemPOS.salesRepresentative.uuid === userUuid)
+        } else if (isEmptyValue(pos)) {
+          pos = pointOfSalesList[0]
         }
-        if (isEmptyValue(pos)) {
-          pos = pontOfSalesList[0]
+        if (!isEmptyValue(router.app._route.query.pos)) {
+          pos = response.sellingPointsList.find(point => point.id === parseInt(router.app._route.query.pos))
         }
-        commit('setPointOfSalesList', pontOfSalesList)
+        commit('setPointOfSalesList', pointOfSalesList)
         dispatch('setCurrentPOS', pos)
       })
       .catch(error => {
