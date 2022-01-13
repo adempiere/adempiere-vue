@@ -66,6 +66,8 @@
                       ...fieldsList[0],
                       labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
                     }"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
                 <el-col :span="8">
@@ -107,6 +109,8 @@
                 >
                   <field-definition
                     :metadata-field="field"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
               </el-row>
@@ -156,6 +160,8 @@
                     v-if="field.sequence < 3"
                     :key="field.columnName"
                     :metadata-field="field"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
               </el-row>
@@ -193,6 +199,8 @@
                       ...fieldsList[0],
                       labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
                     }"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
                 <el-col :span="8">
@@ -251,6 +259,8 @@
                 >
                   <field-definition
                     :metadata-field="field"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
               </el-row>
@@ -390,6 +400,18 @@ export default {
           containerUuid: 'OverdrawnInvoice'
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

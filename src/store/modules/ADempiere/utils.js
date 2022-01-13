@@ -40,6 +40,7 @@ const initStateUtils = {
   showCashWithdrawl: false,
   showCashSummaryMovements: false,
   showAssignSeller: false,
+  showPanelAddress: false,
   quickSearchOrder: {}
 }
 
@@ -163,6 +164,9 @@ export default {
     },
     setQuickSearchOrder(state, order) {
       state.quickSearchOrder = order
+    },
+    setShowPanelAddress(state, showPanelAddress) {
+      state.showPanelAddress = showPanelAddress
     }
   },
   actions: {
@@ -229,6 +233,9 @@ export default {
     changePopoverListBusinessPartner({ commit }, params) {
       commit('popoverListBusinessPartner', params)
     },
+    changeShowAddNewAddress({ commit }, params) {
+      commit('setShowAddNewAddress', params)
+    },
     changePopoverOverdrawnInvoice({ commit }, { attributePin, visible }) {
       const overdrawn = {
         attributePin,
@@ -247,6 +254,9 @@ export default {
     }
   },
   getters: {
+    getShowPanelAddress: (state) => {
+      return state.panelAddress
+    },
     getWidth: (state) => {
       return state.width
     },

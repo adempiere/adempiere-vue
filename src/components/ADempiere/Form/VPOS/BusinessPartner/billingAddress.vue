@@ -33,6 +33,8 @@
               size: { 'xs': fieldSize, 'sm': fieldSize, 'md': fieldSize, 'lg': fieldSize, 'xl': fieldSize },
               isReadOnly: disabled
             }"
+            :container-uuid="'Billing-Address'"
+            :container-manager="containerManager"
           />
         </template>
       </div>
@@ -74,6 +76,18 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

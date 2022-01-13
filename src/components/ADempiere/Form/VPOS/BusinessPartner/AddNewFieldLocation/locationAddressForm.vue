@@ -29,6 +29,8 @@
           <el-col v-for="(field) in fieldsListLocation" :key="field.columnName" :span="12">
             <field
               :metadata-field="field"
+              :container-uuid="'Add-Location-Address'"
+              :container-manager="containerManager"
             />
           </el-col>
         </template>
@@ -77,6 +79,18 @@ export default {
           containerUuid: 'Add-Location-Address'
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     },
     parentMetadata: {
       type: Object,

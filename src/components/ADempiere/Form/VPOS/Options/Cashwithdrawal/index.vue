@@ -33,6 +33,8 @@
               >
                 <field-definition
                   :metadata-field="fieldsList[0]"
+                  :container-uuid="'Cash-Withdrawal'"
+                  :container-manager="containerManager"
                 />
               </el-col>
               <el-col :span="8">
@@ -163,6 +165,8 @@
                     >
                       <field-definition
                         :metadata-field="fieldsList[1]"
+                        :container-uuid="'Cash-Withdrawal'"
+                        :container-manager="containerManager"
                       />
                     </el-col>
                     <el-col
@@ -170,6 +174,8 @@
                     >
                       <field-definition
                         :metadata-field="fieldsList[2]"
+                        :container-uuid="'Cash-Withdrawal'"
+                        :container-manager="containerManager"
                       />
                     </el-col>
                   </el-row>
@@ -232,6 +238,18 @@ export default {
           containerUuid: 'Cash-Withdrawal'
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

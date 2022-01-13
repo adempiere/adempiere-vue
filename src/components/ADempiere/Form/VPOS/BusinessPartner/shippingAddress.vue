@@ -30,6 +30,8 @@
             ...field,
             isReadOnly: disabled
           }"
+          :container-uuid="'Shipping-Address'"
+          :container-manager="containerManager"
         />
       </div>
     </el-card>
@@ -65,6 +67,18 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

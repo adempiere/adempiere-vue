@@ -92,7 +92,7 @@
  * This component is made to be the prototype of the Product Info search field
  */
 import ProductInfoList from './productList'
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+// import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 import {
   formatPrice,
   formatQuantity
@@ -103,13 +103,25 @@ export default {
   components: {
     ProductInfoList
   },
-  mixins: [
-    fieldMixin
-  ],
+  // mixins: [
+  //   fieldMixin
+  // ],
   props: {
     popoverName: {
       type: String,
       default: 'isShowPopoverField'
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {
@@ -216,7 +228,6 @@ export default {
 
           this.timeOut = setTimeout(() => {
             this.$store.dispatch('listProductPriceFromServer', {
-              containerUuid: 'Products-Price-List',
               pageNumber: 1,
               searchValue: stringToMatch
             })

@@ -41,6 +41,8 @@
                   :ref="field.columnName"
                   :key="field.columnName"
                   :metadata-field="field"
+                  :container-uuid="'Business-Partner-Create'"
+                  :container-manager="containerManager"
                 />
               </div>
             </el-card>
@@ -113,6 +115,18 @@ export default {
           fieldsList
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     },
     showField: {
       type: Boolean,

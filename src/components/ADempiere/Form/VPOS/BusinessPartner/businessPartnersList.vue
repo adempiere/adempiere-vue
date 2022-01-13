@@ -38,6 +38,8 @@
               v-for="(field) in metadataList"
               :key="field.columnName"
               :metadata-field="field"
+              :container-uuid="'Business-Partner-List'"
+              :container-manager="containerManager"
             />
           </el-row>
         </el-form>
@@ -149,6 +151,18 @@ export default {
     showField: {
       type: Boolean,
       default: true
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

@@ -37,6 +37,8 @@
             <field
               :key="field.columnName"
               :metadata-field="field"
+              :container-uuid="'Orders-List'"
+              :container-manager="containerManager"
             />
           </template>
         </el-form>

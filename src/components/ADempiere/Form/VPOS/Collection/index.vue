@@ -51,6 +51,8 @@
                         ...field,
                         labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
                       } : field"
+                      :container-uuid="'Collection'"
+                      :container-manager="containerManager"
                     />
                   </el-col>
                   <el-col :span="size">
@@ -93,6 +95,8 @@
                   >
                     <field-definition
                       :metadata-field="field"
+                      :container-uuid="'Collection'"
+                      :container-manager="containerManager"
                     />
                   </el-col>
                 </el-row>
@@ -191,7 +195,7 @@ import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeColl
 import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
-import overdrawnInvoice from '@/components/ADempiere/Form/VPOS/Collection/overdrawnInvoice'
+import overdrawnInvoice from './overdrawnInvoice'
 
 export default {
   name: 'Collection',
@@ -220,6 +224,18 @@ export default {
           containerUuid: 'Collection'
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

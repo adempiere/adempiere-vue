@@ -24,7 +24,7 @@
   >
     <el-container style="background: white; height: 100%!important;">
       <el-header
-        height="auto"
+        height="10%"
         :style="isShowedPOSKeyLayout ? 'padding-right: 20px; padding-left: 0px;' : 'padding-right: 0px; padding-left: 0px;'"
       >
         <el-form label-position="top" label-width="500px" @submit.native.prevent="notSubmitForm">

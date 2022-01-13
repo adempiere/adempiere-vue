@@ -43,6 +43,8 @@
                   ...field,
                   isReadOnly: validateCustomerTemplate
                 }"
+                :container-uuid="'Business-Partner-Update'"
+                :container-manager="containerManager"
               />
             </div>
           </el-card>
@@ -63,7 +65,7 @@
                   type="text"
                   @click="openEditAddress(address)"
                 >
-                  Editar
+                  Editar {{ showAddressUpdate }}
                 </el-button>
               </div>
               <el-scrollbar wrap-class="scroll-customer-description">
@@ -104,14 +106,18 @@
     </el-form>
     <el-dialog
       :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
-      :visible.sync="showAddressUpdate"
+      :visible.sync="showPanelAddress"
       :modal="false"
+      :append-to-body="true"
+      :close-on-press-escape="true"
       :show-close="true"
+      :close-on-click-modal="true"
+      @close="closePanelAddress"
     >
       <add-address
         :is-updated-address="showAddressUpdate"
         :address-to-update="addressUpdate"
-        :shows-popovers="showAddNewAddress"
+        :shows-popovers="showAddressUpdate"
       />
     </el-dialog>
   </el-main>
@@ -144,6 +150,18 @@ export default {
           fieldsList
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     },
     showsPopovers: {
       type: Boolean,
@@ -195,6 +213,15 @@ export default {
       },
       set(value) {
         this.$store.commit('setShowAddNewAddress', value)
+        return value
+      }
+    },
+    showPanelAddress: {
+      get() {
+        return this.$store.getters.getShowPanelAddress
+      },
+      set(value) {
+        this.$store.commit('setShowPanelAddress', value)
         return value
       }
     },
@@ -256,6 +283,9 @@ export default {
   },
   methods: {
     requestGetCountryDefinition,
+    closePanelAddress() {
+      this.showPanelAddress = false
+    },
     actionUpdate(commands) {
       if (commands.srcKey) {
         switch (commands.srcKey) {
@@ -514,6 +544,7 @@ export default {
       return ''
     },
     openEditAddress(address) {
+      this.showPanelAddress = true
       this.$store.commit('setShowAddressUpdate', true)
       this.addressUpdate = address
       this.loadAddresses(address, 'Add-Location-Address')

@@ -33,17 +33,23 @@
                 ...field,
                 labelCurrency: currencyPointOfSales,
               }"
+              :container-uuid="'line'"
+              :container-manager="containerManager"
             />
             <field
               v-if="field.columnName === 'QtyEntered'"
               :key="field.columnName"
               :metadata-field="field"
+              :container-uuid="'line'"
+              :container-manager="containerManager"
             />
             <field
               v-if="field.columnName === 'Discount'"
               :ref="field.columnName"
               :key="field.columnName"
               :metadata-field="field"
+              :container-uuid="'line'"
+              :container-manager="containerManager"
             />
           </el-form>
         </el-col>
@@ -87,6 +93,18 @@ export default {
     currentLine: {
       type: Object,
       default: () => {}
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

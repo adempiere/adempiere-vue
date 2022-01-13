@@ -29,6 +29,8 @@
             :ref="fieldsList[0].columnName"
             :metadata="fieldsList[0]"
             :value-model="fieldsList[0].value"
+            :container-uuid="'New-Address'"
+            :container-manager="containerManager"
           />
         </el-row>
       </div>
@@ -113,6 +115,18 @@ export default {
     showsPopovers: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

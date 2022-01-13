@@ -27,6 +27,18 @@ export default {
     metadata: {
       type: Object,
       default: () => {}
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return true },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

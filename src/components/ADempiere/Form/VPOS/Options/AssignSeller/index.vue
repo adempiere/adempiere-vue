@@ -28,6 +28,8 @@
           >
             <field-definition
               :metadata-field="fieldsList[0]"
+              :container-uuid="'Assign-Seller'"
+              :container-manager="containerManager"
             />
           </el-form>
         </el-col>
@@ -80,6 +82,18 @@ export default {
           containerUuid: 'Assign-Seller'
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {
