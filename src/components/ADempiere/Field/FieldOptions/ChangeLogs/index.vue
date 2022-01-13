@@ -42,16 +42,18 @@
               <!-- <el-collapse-transition> -->
               <div>
                 <span v-for="(list, index) in listLogs.changeLogsList" :key="index">
-                  <p v-if="list.columnName === 'DocStatus'">
+                  <p v-if="DOCUMENT_STATUS_COLUMNS_LIST.includes(list.columnName)">
                     <b> {{ list.displayColumnName }} :</b>
                     <strike>
-                      <el-tag :type="tagStatus(list.oldValue)">
-                        {{ list.oldDisplayValue }}
-                      </el-tag>
+                      <document-status-tag
+                        :value="list.oldValue"
+                        :displayed-value="list.oldDisplayValue"
+                      />
                     </strike>
-                    <el-tag :type="tagStatus(list.newValue)">
-                      {{ list.newDisplayValue }}
-                    </el-tag>
+                    <document-status-tag
+                      :value="list.newValue"
+                      :displayed-value="list.newDisplayValue"
+                    />
                   </p>
                   <p v-else>
                     <b> {{ list.displayColumnName }} :</b>
@@ -79,9 +81,18 @@
 </template>
 
 <script>
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+
+// constants
+import { DOCUMENT_STATUS_COLUMNS_LIST } from '@/utils/ADempiere/constants/systemColumns'
 
 export default {
   name: 'ChangeLogsField',
+
+  components: {
+    DocumentStatusTag
+  },
 
   props: {
     fieldAttributes: {
@@ -96,6 +107,7 @@ export default {
 
   data() {
     return {
+      DOCUMENT_STATUS_COLUMNS_LIST,
       isLoading: false,
       currentKey: 0,
       typeAction: 0

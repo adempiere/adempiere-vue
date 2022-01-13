@@ -14,56 +14,150 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
+// api request methods
 import { getLocationAddress } from '@/api/ADempiere/field/location.js'
+
+// constants
+export const LOCATION_ADDRESS_FORM = 'Location-Address-Form'
+import FieldsList from './fieldsList.js'
+
+// utils and helpers methods
+import { getSequenceAsList } from '@/utils/ADempiere/location'
 
 export default {
   name: 'MixinLocationField',
+
+  props: {
+    containerManager: {
+      type: Object,
+      required: true
+    }
+  },
+
+  data() {
+    return {
+      localValues: {},
+      isGettingLocation: false
+    }
+  },
+
   computed: {
+    countryId() {
+      return this.$store.getters.getValueOfField({
+        containerUuid: LOCATION_ADDRESS_FORM,
+        columnName: 'C_Country_ID'
+      })
+    },
     currentCountryDefinition() {
-      return this.$store.getters.getCountry
+      return this.$store.getters.getStoredCountryFromId({
+        id: this.countryId
+      })
     },
     isShowedLocationForm: {
       get() {
         return this.$store.getters.getIsShowedLocation
       },
-      set() {
-        // empty
+      set(value) {
+        this.$store.commit('setShowedLocation', Boolean(value))
       }
     }
   },
+
   methods: {
     getLocationAddress,
-    requestGetCountryDefinition,
     toggleShowedLocationForm() {
-      this.$store.commit('setShowedLocation', !this.isShowedLocationForm)
-    },
-    setShowedLocationForm(isShow) {
-      this.$store.commit('setShowedLocation', isShow)
+      this.isShowedLocationForm = !this.isShowedLocationForm
     },
     /**
-     * TODO: Add support with sequence to displayed
+     * Displayed sequence location
      * @param {object} entityValues
      */
     getDisplayedValue(entityValues) {
-      let value = ''
+      let displayValue = ''
 
-      if (!this.isEmptyValue(entityValues)) {
-        if (!this.isEmptyValue(entityValues.Address1)) {
-          value = entityValues.Address1
+      if (this.isEmptyValue(entityValues)) {
+        return displayValue
+      }
+
+      let displaySequence = this.$store.getters.getDisplaySequence
+      const country = this.currentCountryDefinition
+      if (!this.isEmptyValue(country)) {
+        displaySequence = country.displaySequence
+      }
+      const locationDisplayedSequence = getSequenceAsList(displaySequence)
+
+      const newFieldsList = FieldsList.map(item => {
+        const { sequenceFields } = item.overwriteDefinition
+        if (locationDisplayedSequence.includes(sequenceFields)) {
+          return {
+            ...item,
+            isDisplayed: true,
+            sequenceFields,
+            index: locationDisplayedSequence.indexOf(sequenceFields)
+          }
         }
-        if (!this.isEmptyValue(entityValues.City)) {
-          value += ', ' + entityValues.City
+        return {
+          ...item,
+          sequenceFields,
+          isDisplayed: false
         }
-        if (!this.isEmptyValue(entityValues.RegionName)) {
-          value += ', ' + entityValues.RegionName
+      }).filter(field => {
+        return field.isDisplayed
+      }).sort((itemA, itemB) => {
+        return itemA.index - itemB.index
+      })
+
+      const addDisplayValue = (value) => {
+        if (this.isEmptyValue(value)) {
+          value = ''
         }
-        if (!this.isEmptyValue(entityValues.Postal)) {
-          value += ', ' + entityValues.Postal
+        if (!this.isEmptyValue(displayValue)) {
+          displayValue += ', ' + value
+        } else {
+          displayValue = value
         }
       }
 
-      return value
+      // displayed value of Address column names
+      Object.keys(entityValues).forEach(columnName => {
+        if (columnName.includes('Address')) {
+          const currrentValue = entityValues[columnName]
+          addDisplayValue(currrentValue)
+        }
+      })
+
+      newFieldsList.forEach(field => {
+        const { columnName } = field
+        const displayColumnName = `DisplayColumn_${columnName}`
+
+        let currrentValue = ''
+        if (!this.isEmptyValue(entityValues[displayColumnName])) {
+          currrentValue = entityValues[displayColumnName]
+        }
+
+        if (this.isEmptyValue(currrentValue)) {
+          if (columnName === 'C_City_ID') {
+            currrentValue = entityValues['City']
+          }
+          if (columnName === 'C_Region_ID') {
+            currrentValue = entityValues['RegionName']
+          }
+
+          if (this.isEmptyValue(currrentValue)) {
+            currrentValue = this.$store.getters.getValueOfField({
+              containerUuid: LOCATION_ADDRESS_FORM,
+              columnName: displayColumnName
+            })
+          }
+        }
+        if (this.isEmptyValue(currrentValue)) {
+          currrentValue = entityValues[columnName]
+        }
+
+        addDisplayValue(currrentValue)
+      })
+
+      return displayValue
     }
   }
 }

@@ -157,7 +157,7 @@ const actions = {
               typeValue(valueGetDisplayColumn) === 'OBJECT' &&
               valueGetDisplayColumn.isSQL) {
               // get value from Query
-              valueGetDisplayColumn = await dispatch('getValueBySQL', {
+              valueGetDisplayColumn = await dispatch('getDefaultValue', {
                 parentUuid,
                 containerUuid,
                 query: itemField.defaultValue

@@ -147,6 +147,7 @@ export default {
     binaryTip: 'Only files with a size smaller than 500kb',
     imageError: 'The image exceeds 2MB and does not comply with the valid formats!',
     contextMenuActions: 'Actions',
+    contextMenuReferences: 'References',
     withOutReferences: 'Without references for record',
     ChangeParameters: 'Change Parameters',
     RunProcessAs: 'Run As',

@@ -81,7 +81,7 @@ export default defineComponent({
       ...props.windowManager,
 
       actionPerformed: ({ field, value }) => {
-        root.$store.dispatch('actionPerformed', {
+        return root.$store.dispatch('actionPerformed', {
           field,
           value
         })
@@ -110,19 +110,21 @@ export default defineComponent({
           })
           return
         }
-
-        root.$router.push({
-          name: root.$route.name,
-          query: {
-            ...root.$route.query,
-            action: row.UUID
-          },
-          params: {
-            ...root.$router.params,
-            tableName,
-            recordId: row[`${tableName}_ID`]
-          }
-        }, () => {})
+        const tab = root.$store.getters.getStoredTab(parentUuid, containerUuid)
+        if (tab.isParentTab) {
+          root.$router.push({
+            name: root.$route.name,
+            query: {
+              ...root.$route.query,
+              action: row.UUID
+            },
+            params: {
+              ...root.$router.params,
+              tableName,
+              recordId: row[`${tableName}_ID`]
+            }
+          }, () => {})
+        }
 
         const fieldsList = root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
         const defaultValues = root.$store.getters.getParsedDefaultValues({
@@ -143,6 +145,15 @@ export default defineComponent({
           attributes,
           isOverWriteParent: true
         })
+
+        // active logics with set records values
+        fieldsList.forEach(field => {
+          // change Dependents
+          root.$store.dispatch('changeDependentFieldsList', {
+            field,
+            fieldsList
+          })
+        })
       },
 
       seekTab: function(eventInfo) {
@@ -156,7 +167,7 @@ export default defineComponent({
         containerUuid,
         pageNumber = 0
       }) => {
-        root.$store.dispatch('dataManager/getEntities', {
+        root.$store.dispatch('getEntities', {
           parentUuid,
           containerUuid,
           pageNumber
@@ -167,6 +178,9 @@ export default defineComponent({
     const actionsManager = ref({
       parentUuid: props.windowMetadata.uuid,
       containerUuid: props.windowMetadata.currentTabUuid,
+
+      defaultActionName: root.$t('window.newRecord'),
+
       getActionList: () => [
         createNewRecord,
         refreshRecords,

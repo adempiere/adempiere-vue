@@ -16,7 +16,6 @@
 
 // api request methods
 import {
-  requestGetCountryDefinition,
   requestLanguagesList
 } from '@/api/ADempiere/system-core.js'
 
@@ -27,16 +26,12 @@ import { convertDateFormat } from '@/utils/ADempiere/formatValue/dateFormat.js'
 const system = {
   state: {
     systemDefinition: {},
-    country: {},
     languagesList: []
   },
 
   mutations: {
     setSystemDefinition(state, payload) {
       state.systemDefinition = payload
-    },
-    setCountry(state, payload) {
-      state.country = payload
     },
     setLanguagesList: (state, payload) => {
       const languagesList = payload.map(language => {
@@ -52,25 +47,6 @@ const system = {
   },
 
   actions: {
-    getCountryFormServer({ commit }, {
-      id,
-      uuid
-    }) {
-      return new Promise(resolve => {
-        requestGetCountryDefinition({
-          id,
-          uuid
-        })
-          .then(responseCountry => {
-            commit('setCountry', responseCountry)
-
-            resolve(responseCountry)
-          })
-          .catch(error => {
-            console.warn(`Error getting Country Definition: ${error.message}. Code: ${error.code}.`)
-          })
-      })
-    },
     getLanguagesFromServer({ commit, dispatch, rootGetters }) {
       return new Promise(resolve => {
         requestLanguagesList({
@@ -99,9 +75,6 @@ const system = {
   },
 
   getters: {
-    getCountry: (state) => {
-      return state.country
-    },
     getCurrency: (state) => {
       const { currencyIsoCode, standardPrecision } = state.systemDefinition
 
@@ -122,6 +95,9 @@ const system = {
     },
     getCountryLanguage: (state) => {
       return state.systemDefinition.language.replace('_', '-')
+    },
+    getDisplaySequence: (state) => {
+      return state.systemDefinition.displaySequence
     },
     getLanguagesList: (state) => {
       return state.languagesList

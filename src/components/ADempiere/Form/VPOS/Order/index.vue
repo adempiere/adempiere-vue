@@ -55,14 +55,13 @@
               />
             </el-col>
             <el-col :span="isShowKeyLayout ? 8 : 7" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2%;'">
-              <el-tag
+              <document-status-tag
                 v-if="!isEmptyValue(currentOrder.documentStatus.value)"
-                :type="tagStatus(currentOrder.documentStatus.value)"
-              >
-                <span v-if="!isEmptyValue(currentOrder.documentStatus.value)" style="font-size: 12px;">
-                  {{ currentOrder.documentStatus.name }}
-                </span>
-              </el-tag>
+                :value="currentOrder.documentStatus.value"
+                :displayed-value="currentOrder.documentStatus.name"
+                style="font-size: 12px;"
+              />
+
               <fast-ordes-list style="margin-right: 2%;margin-left: 2%;font-size: 12px;" />
             </el-col>
           </el-row>
@@ -464,6 +463,8 @@
 </template>
 
 <script>
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import orderLineMixin from './orderLineMixin.js'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
@@ -486,18 +487,22 @@ import { releaseOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'Order',
+
   components: {
     BusinessPartner,
+    DocumentStatusTag,
     ProductInfo,
     FastOrdesList,
     fieldLine,
     ImageProduct
   },
+
   mixins: [
     formMixin,
     orderLineMixin,
     posMixin
   ],
+
   data() {
     return {
       fieldsList: fieldsListOrder,

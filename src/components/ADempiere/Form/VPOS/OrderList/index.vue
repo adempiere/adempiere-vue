@@ -115,11 +115,10 @@
           </el-button-group>
         </template>
         <template slot-scope="scope">
-          <el-tag
-            :type="tagStatus(scope.row.documentStatus.value)"
-          >
-            {{ scope.row.documentStatus.name }}
-          </el-tag>
+          <document-status-tag
+            :value="scope.row.documentStatus.value"
+            :displayed-value="scope.row.documentStatus.name"
+          />
         </template>
       </el-table-column>
 
@@ -256,6 +255,8 @@
 </template>
 
 <script>
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 import CustomPagination from '@/components/ADempiere/Pagination'
 import fieldsListOrders from './fieldsListOrders.js'
 import {
@@ -271,13 +272,17 @@ import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 
 export default {
   name: 'OrdersList',
+
   components: {
     CustomPagination,
+    DocumentStatusTag,
     Field
   },
+
   mixins: [
     posMixin
   ],
+
   props: {
     metadata: {
       type: Object,

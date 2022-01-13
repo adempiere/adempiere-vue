@@ -93,7 +93,7 @@ export default {
   },
 
   async created() {
-    if (this.metadata.isSQLValue && (this.isEmptyValue(this.metadata.value) || this.metadata.value.isSQL)) {
+    if (this.metadata.isSQLValue && this.isEmptyValue(this.value)) {
       let value = this.$store.getters.getStoredDefaultValue({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
@@ -101,7 +101,7 @@ export default {
       })
 
       if (this.isEmptyValue(value)) {
-        value = await this.$store.dispatch('getValueBySQL', {
+        value = await this.$store.dispatch('getDefaultValue', {
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           columnName: this.metadata.columnName,
@@ -226,8 +226,17 @@ export default {
       // if is custom field, set custom handle change value
       if (this.metadata.isCustomField) {
         if (this.metadata.isActiveLogics) {
+          let fieldsList = []
+          if (this.containerManager.getFieldsList) {
+            fieldsList = this.containerManager.getFieldsList({
+              parentUuid: this.metadata.parentUuid,
+              containerUuid: this.metadata.containerUuid,
+              root: this
+            })
+          }
           this.$store.dispatch('changeDependentFieldsList', {
-            field: this.metadata
+            field: this.metadata,
+            fieldsList
           })
         }
         return

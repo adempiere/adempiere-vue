@@ -210,6 +210,13 @@ const actions = {
             root: true
           })
 
+          // get country definition of context session
+          dispatch('getCountryDefinition', {
+            id: sessionInfo.countryId
+          }, {
+            root: true
+          })
+
           dispatch('getRolesListFromServer', sessionUuid)
         })
         .catch(error => {

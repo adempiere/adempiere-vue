@@ -30,6 +30,7 @@ const actions = {
       panelType,
       // isParentTab,
       // parentUuid,
+      isSetDefaultValues = true,
       uuid: containerUuid
     } = params
     let keyColumn = ''
@@ -115,7 +116,7 @@ const actions = {
 
     commit('addPanel', params)
 
-    if (!['table'].includes(panelType)) {
+    if (isSetDefaultValues) {
       dispatch('setDefaultValues', {
         parentUuid: params.parentUuid,
         containerUuid,
@@ -355,6 +356,14 @@ const actions = {
         fieldsList = getters.getFieldsListFromPanel(containerUuid)
         field = fieldsList.find(fieldItem => fieldItem.columnName === columnName)
       }
+
+      if (containerManager.getFieldsList) {
+        fieldsList = containerManager.getFieldsList({
+          parentUuid: field.parentUuid,
+          containerUuid: field.containerUuid
+        })
+      }
+
       let value
       if (isEmptyValue(newValue)) {
         value = getters.getValueOfField({
@@ -386,6 +395,7 @@ const actions = {
               attributes: response.attributes
             })
           }
+
           // Change Dependents
           dispatch('changeDependentFieldsList', {
             field,
@@ -467,7 +477,7 @@ const actions = {
           value: fieldDependent.defaultValue
         }).query
         if (defaultValue !== fieldDependent.parsedDefaultValue) {
-          const newValue = await dispatch('getValueBySQL', {
+          const newValue = await dispatch('getDefaultValue', {
             parentUuid: field.parentUuid,
             containerUuid: field.containerUuid,
             query: defaultValue

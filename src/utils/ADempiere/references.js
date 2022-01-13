@@ -623,12 +623,12 @@ export const FIELDS_HIDDEN = [
 ]
 
 /**
- * Hidden field
+ * Hidden field or column by displayType
  * @param {number} displayType
  * @returns {boolean}
  */
 export function isHiddenField(displayType) {
-  FIELDS_HIDDEN.includes(displayType)
+  return FIELDS_HIDDEN.includes(displayType)
 }
 
 export const FIELDS_DECIMALS = [

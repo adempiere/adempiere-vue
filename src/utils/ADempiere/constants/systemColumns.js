@@ -77,6 +77,11 @@ export const DOCUMENT_STATUS_COLUMNS_LIST = [
   'O_DocStatus'
 ]
 
+export function isDocumentStatus({ columnName, elementColumnName }) {
+  return DOCUMENT_STATUS_COLUMNS_LIST.includes(columnName) ||
+    DOCUMENT_STATUS_COLUMNS_LIST.includes(elementColumnName)
+}
+
 export const COLUMN_IS_ACTIVE = {
   columnName: ACTIVE, // column name of field
   defaultValue: true, // default value when loading

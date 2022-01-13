@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-container>
     <el-header style="height: 2%;">
@@ -156,11 +157,10 @@
             </el-button-group>
           </template>
           <template slot-scope="scope">
-            <el-tag
-              :type="tagStatus(scope.row.documentStatus.value)"
-            >
-              {{ scope.row.documentStatus.name }}
-            </el-tag>
+            <document-status-tag
+              :value="scope.row.documentStatus.value"
+              :displayed-value="scope.row.documentStatus.name"
+            />
           </template>
         </el-table-column>
         <el-table-column

@@ -98,7 +98,7 @@ export const deleteRecord = {
   type: 'deleteEntity',
   actionName: 'deleteRecord',
   deleteRecord: ({ root, parentUuid, containerUuid, recordId, recordUuid }) => {
-    root.$store.dispatch('dataManager/deleteEntity', {
+    root.$store.dispatch('deleteEntity', {
       parentUuid,
       containerUuid,
       recordId,
@@ -131,6 +131,7 @@ export const zoomWindow = {
   icon: 'el-icon-zoom-in',
   type: 'zoom',
   actionName: 'zoomWindow',
+  uuid: null,
   zoomWindow: ({ uuid }) => {
     zoomIn({
       uuid
@@ -146,7 +147,7 @@ export const refreshRecords = {
   actionName: 'refreshRecords',
   refreshRecords: ({ root, parentUuid, containerUuid, tableName }) => {
     // used to window
-    root.$store.dispatch('dataManager/getEntities', {
+    root.$store.dispatch('getEntities', {
       parentUuid,
       containerUuid
     })
@@ -216,6 +217,7 @@ export const runProcessOrReport = {
   svg: false,
   icon: 'el-icon-setting',
   actionName: 'runProcessOrReport',
+  uuid: null,
   runProcessOrReport: ({ root, containerUuid }) => {
     root.$store.dispatch('startProcess', {
       containerUuid

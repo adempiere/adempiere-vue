@@ -119,12 +119,14 @@ const windowManager = {
         const token = getters.getPageToken({ containerUuid })
         pageToken = generatePageToken({ pageNumber, token })
       }
+
       const { contextColumnNames } = rootGetters.getStoredTab(parentUuid, containerUuid)
 
       const contextAttriburesList = []
       if (!isEmptyValue(contextColumnNames)) {
         contextColumnNames.forEach(columnName => {
           const value = getContext({
+            parentUuid,
             containerUuid,
             columnName
           })
@@ -139,7 +141,7 @@ const windowManager = {
         getEntities({
           windowUuid: parentUuid,
           tabUuid: containerUuid,
-          contextAttriburesList,
+          attributes: contextAttriburesList,
           pageToken
         })
           .then(dataResponse => {

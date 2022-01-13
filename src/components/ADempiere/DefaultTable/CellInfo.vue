@@ -67,7 +67,7 @@
       </el-popover>
     </p>
 
-    <p v-else key="only-value">
+    <p v-else key="only-value" :class="cellCssClass">
       {{ displayedValue }}
     </p>
   </span>
@@ -137,6 +137,21 @@ export default defineComponent({
         field: props.fieldAttributes,
         row: props.dataRow
       })
+    })
+
+    /**
+     * Css class style
+     */
+    const cellCssClass = computed(() => {
+      let classCss = ''
+      if (isReadOnly.value) {
+        classCss += ' cell-no-edit '
+      }
+      if (props.fieldAttributes.componentPath === 'FieldNumber') {
+        classCss += ' cell-align-right '
+      }
+      // return 'cell-edit'
+      return classCss
     })
 
     const formatNumber = ({ displayType, value }) => {
@@ -212,6 +227,7 @@ export default defineComponent({
 
     return {
       // computeds
+      cellCssClass,
       fieldValue,
       displayedValue,
       // methods
@@ -220,3 +236,15 @@ export default defineComponent({
   }
 })
 </script>
+
+<style lang="scss">
+// used in cell type number
+.cell-align-right {
+  text-align: right !important;
+}
+
+// style in cursor if cell is no edit
+.cell-no-edit {
+  cursor: not-allowed !important;
+}
+</style>

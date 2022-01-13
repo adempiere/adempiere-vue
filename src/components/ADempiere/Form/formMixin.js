@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Field from '@/components/ADempiere/Field'
+import FieldDefinition from '@/components/ADempiere/Field'
 import { createFieldFromDefinition, createFieldFromDictionary } from '@/utils/ADempiere/lookupFactory'
 
 export default {
   name: 'FormMixn',
   components: {
-    Field,
-    FieldDefinition: Field
+    Field: FieldDefinition, // TODO: deprecated component name, replace with FieldDefinition
+    FieldDefinition
   },
   props: {
     metadata: {
@@ -69,6 +69,11 @@ export default {
   created() {
     this.getPanel()
   },
+
+  beforeDestroy() {
+    this.unsubscribe()
+  },
+
   methods: {
     createFieldFromDefinition,
     createFieldFromDictionary,

@@ -147,6 +147,7 @@ export default {
     binaryTip: 'Solo archivos con un tamaño menor a 500kb',
     imageError: 'La imagen excede los 2MB y no cumple con los formato validos!',
     contextMenuActions: 'Acciones',
+    contextMenuReferences: 'Referencias',
     withOutReferences: 'Sin referencias para el registro',
     contextMenuDownload: 'Descargar',
     contextMennuExport: 'Exportar Smart Browser',

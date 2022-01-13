@@ -142,6 +142,8 @@ const lookupManager = {
             }
 
             commit('setLookupItem', {
+              parentUuid, // used by suscription filter
+              containerUuid, // used by suscription filter
               option,
               value, // isNaN(value) ? value : parseInt(value, 10),
               parsedDirectQuery: directQuery,
