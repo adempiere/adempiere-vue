@@ -308,6 +308,7 @@ export default {
       .header {
         text-overflow: ellipsis;
         overflow: hidden;
+        white-space: initial;
       }
 
       .upc {

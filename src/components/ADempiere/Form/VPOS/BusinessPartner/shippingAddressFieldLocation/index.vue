@@ -15,7 +15,6 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
-
 <template>
   <location-address-form
     :values="localValues"
@@ -24,7 +23,6 @@
 </template>
 
 <script>
-// components and mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 import mixinLocation from './mixinLocation.js'
 import LocationAddressForm from './locationAddressForm'

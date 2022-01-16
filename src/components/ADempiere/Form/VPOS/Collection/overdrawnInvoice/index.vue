@@ -35,7 +35,8 @@
             <el-radio v-model="option" :label="4"> {{ $t('form.pos.collect.overdrawnInvoice.adjustDocument') }}</el-radio>
           </el-form-item>
         </el-form>
-        <el-card v-if="option === 1" class="box-card">
+        <el-empty v-if="option === 1 && isEmptyValue(paymentTypeListRefund)" :description="$t('form.pos.optionsPoinSales.emptyAvailablePaymentMethods')" />
+        <el-card v-else-if="option === 1" class="box-card">
           <div slot="header" class="clearfix">
             <span v-if="isEmptyValue(currentFieldPaymentMethods)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <template v-else>
@@ -168,7 +169,8 @@
             </el-form>
           </div>
         </el-card>
-        <el-card v-if="option === 3" class="box-card">
+        <el-empty v-if="option === 3 && isEmptyValue(paymentTypeList)" :description="$t('form.pos.optionsPoinSales.emptyAvailablePaymentMethodsRefudn')" />
+        <el-card v-else-if="option === 3" class="box-card">
           <div slot="header" class="clearfix">
             <span v-if="isEmptyValue(currentFieldPaymentMethods)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <template v-else>
@@ -287,31 +289,6 @@
             :currency="pointOfSalesCurrency"
             :size="6"
           />
-          <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + $t('form.pos.collect.overdrawnInvoice.amountChange')" width="40%" :visible.sync="visiblePin" :append-to-body="true">
-            <el-input
-              id="pin"
-              ref="pinPostPayment"
-              v-model="pinPostPayment"
-              v-shortkey="visiblePin ? {close: ['esc'], enter: ['enter']} : {}"
-              autofocus
-              type="password"
-              :placeholder="$t('form.pos.tableProduct.pin')"
-              :focus="true"
-              @shortkey.native="theActionPin"
-            />
-            <span style="float: right;">
-              <el-button
-                type="danger"
-                icon="el-icon-close"
-                @click="closePinPayment()"
-              />
-              <el-button
-                type="primary"
-                icon="el-icon-check"
-                @click="openPinPayment(pin)"
-              />
-            </span>
-          </el-dialog>
         </el-card>
       </div>
       <div v-if="caseOrder === 2">
@@ -332,6 +309,31 @@
           </el-form>
         </el-card>
       </div>
+      <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + $t('form.pos.collect.overdrawnInvoice.amountLimitOrder')" width="40%" :visible.sync="visiblePin" :append-to-body="true">
+        <el-input
+          id="pin"
+          ref="pinPostPayment"
+          v-model="pinPostPayment"
+          v-shortkey="visiblePin ? {close: ['esc'], enter: ['enter']} : {}"
+          autofocus
+          type="password"
+          :placeholder="$t('form.pos.tableProduct.pin')"
+          :focus="true"
+          @shortkey.native="theActionPin"
+        />
+        <span style="float: right;">
+          <el-button
+            type="danger"
+            icon="el-icon-close"
+            @click="closePinPayment()"
+          />
+          <el-button
+            type="primary"
+            icon="el-icon-check"
+            @click="openPinPayment(pin)"
+          />
+        </span>
+      </el-dialog>
       <span slot="footer" class="dialog-footer">
         <el-button
           type="danger"
@@ -425,15 +427,16 @@ export default {
       currentPaymentType: '',
       visiblePin: false,
       pinPostPayment: '',
+      refundOptionVAlidate: {},
       currentBankAccount: ''
     }
   },
   computed: {
     validateOverdrawnInvoice() {
       if (this.option === 1) {
-        return this.isEmptyValue(this.listPaymentsRefund)
+        return this.isEmptyValue(this.listRefund)
       } else if (this.option === 3) {
-        return this.isEmptyValue(this.listRefundsReference)
+        return this.isEmptyValue(this.listRefund)
       }
       return false
     },
@@ -710,7 +713,7 @@ export default {
     searchRefundCurrency(value) {
       const clear = false
       this.clearAccountData(clear)
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       if (this.isEmptyValue(value) && this.showDialogo) {
         this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
       }
@@ -718,7 +721,7 @@ export default {
     option(value) {
       const clear = false
       this.clearAccountData(clear)
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       this.selectionTypeRefund = {}
       if (value === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
         this.selectPayment(this.paymentTypeListRefund[0])
@@ -729,9 +732,19 @@ export default {
       if (value === 3) {
         this.$store.dispatch('listCustomerBankAccounts', { customerUuid: this.currentOrder.businessPartner.uuid })
       }
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'OverdrawnInvoice',
+        columnName: 'PayAmt',
+        value: this.refundAmount / this.dayRate.divideRate
+      })
     },
     showDialogo(value) {
       if (value) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'OverdrawnInvoice',
+          columnName: 'PayAmt',
+          value: this.refundAmount / this.dayRate.divideRate
+        })
         if (this.option === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
           this.selectPayment(this.paymentTypeListRefund[0])
         }
@@ -770,7 +783,7 @@ export default {
   },
   mounted() {
     const containerUuid = 'OverdrawnInvoice'
-    this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+    this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
     this.selectionTypeRefund = this.paymentTypeListRefund[0]
     this.$store.commit('updateValueOfField', {
       containerUuid,
@@ -944,7 +957,7 @@ export default {
     openPinPayment(pin) {
       validatePin({
         posUuid: this.currentPointOfSales.uuid,
-        pin
+        pin: this.pinPostPayment
       })
         .then(response => {
           this.pinPostPayment = ''
@@ -954,7 +967,11 @@ export default {
             message: 'Acción a realizar',
             showClose: true
           })
-          this.addPostPayment()
+          if (!this.isEmptyValue(this.refundOptionVAlidate)) {
+            this.$store.dispatch('sendCreateCustomerAccount', this.refundOptionVAlidate)
+          } else {
+            this.addPostPayment()
+          }
         })
         .catch(error => {
           console.error(error.message)
@@ -968,10 +985,12 @@ export default {
         .finally(() => {
           this.visiblePin = false
           this.pinPostPayment = ''
+          this.refundOptionVAlidate = {}
         })
     },
     closePinPayment() {
       this.visiblePin = false
+      this.refundOptionVAlidate = {}
       this.pinPostPayment = ''
     },
     selectedBanckAccount(value) {
@@ -1138,7 +1157,7 @@ export default {
         ]
       })
       if (clear) {
-        this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+        this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       }
     },
     undoPatment() {
@@ -1150,7 +1169,7 @@ export default {
         orderUuid,
         paymentUuid
       })
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
     },
     empty(value, params) {
       if (this.isEmptyValue(value[params])) {
@@ -1194,12 +1213,22 @@ export default {
         return
       }
       if (this.maximumRefundAllowed < amount || (this.maximumRefundAllowed - allPayMaximunRefund) < amount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
-          duration: 1500,
-          showClose: true
-        })
+        this.visiblePin = true
+        setTimeout(() => {
+          this.$refs.pinPostPayment.focus()
+        }, 500)
+        this.refundOptionVAlidate = {
+          posUuid,
+          orderUuid,
+          bankUuid,
+          referenceNo,
+          amount: amount,
+          convertedAmount: amount * this.dayRate.divideRate,
+          paymentDate,
+          tenderTypeCode,
+          paymentMethodUuid,
+          currencyUuid
+        }
         return
       }
       this.$store.dispatch('sendCreateCustomerAccount', {
@@ -1214,7 +1243,7 @@ export default {
         paymentMethodUuid,
         currencyUuid
       })
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
     },
     actionOverdrawnInvoice(commands) {
       if (commands.srcKey === 'close') {
@@ -1304,7 +1333,7 @@ export default {
     },
     close() {
       this.selectionTypeRefund = {}
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       this.$store.commit('dialogoInvoce', { show: false })
     },
     changeCurrency(value) {

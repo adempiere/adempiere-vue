@@ -393,7 +393,8 @@ export default {
       releaseOrder: 'Liberar',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
-        emptyAvailablePaymentMethods: 'Este terminal no tiene configurado los metodos de pagos',
+        emptyAvailablePaymentMethods: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso',
+        emptyAvailablePaymentMethodsRefudn: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso Pendiente',
         emptyListCashSummary: 'No hay moviemineto en caja',
         salesOrder: {
           title: 'Orden de Venta',
@@ -531,6 +532,7 @@ export default {
           emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
           amountChange: 'Monto superior al cambio',
+          amountLimitOrder: 'Monto Superior al Límite de la Orden',
           incompleteChange: 'Cambio Incompleto',
           fieldList: {
             code: 'Cedula',
@@ -541,10 +543,10 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'No hay producto disponible Regresar al Principio'
+        noProducto: 'Producto no Disponible'
       },
       pinMessage: {
-        pin: 'Ingrese pin para ',
+        pin: 'Ingrese Pin para ',
         documentType: 'cambiar tipo de documento',
         warehouse: 'cambiar almacén',
         price: 'cambiar precio',

@@ -417,7 +417,8 @@ export default {
       releaseOrder: 'Release It',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
-        emptyAvailablePaymentMethods: 'This terminal has no payment methods configured',
+        emptyAvailablePaymentMethodsRefudn: 'This Terminal does not have a Payment Method configured to allow Pending Refund',
+        emptyAvailablePaymentMethods: 'This Terminal does not have a Payment Method configured to allow Refund',
         emptyListCashSummary: 'There is no cash movement',
         salesOrder: {
           title: 'Sale Order',
@@ -555,6 +556,7 @@ export default {
           emptyListPayment: 'You do not have any payment method associated with this option',
           addPayment: 'You must add a change type to complete the operation',
           amountChange: 'Amount greater than change',
+          amountLimitOrder: 'Amount greater than the limit of the Order',
           incompleteChange: 'Incomplete Change',
           fieldList: {
             code: 'Cedula',
@@ -565,10 +567,10 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'No product available. Back to top'
+        noProducto: 'Product not Avilable'
       },
       pinMessage: {
-        pin: 'Enter pin for ',
+        pin: 'Enter Pin for ',
         documentType: 'change document type',
         warehouse: 'change warehouse',
         price: 'change price',

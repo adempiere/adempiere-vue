@@ -15,7 +15,6 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
-
 <template>
   <div class="wrapper">
     <el-form
@@ -30,8 +29,6 @@
           <el-col v-for="(field) in fieldsListLocation" :key="field.columnName" :span="12">
             <field
               :metadata-field="field"
-              :container-uuid="'Add-Location-Address'"
-              :container-manager="containerManager"
             />
           </el-col>
         </template>
@@ -51,20 +48,13 @@
 </template>
 
 <script>
-// constants
-import fieldsList from '@/components/ADempiere/Field/FieldLocation/fieldsList.js'
-
-// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import mixinLocation from './mixinLocation.js'
-
-// api request methods
+import fieldsList from './fieldsList.js'
 import {
   createLocationAddress,
   updateLocationAddress
 } from '@/api/ADempiere/field/location.js'
-
-// methods and helpers
 import { showNotification } from '@/utils/ADempiere/notification.js'
 import { getSequenceAsList } from '@/utils/ADempiere/location'
 
@@ -83,22 +73,10 @@ export default {
       default: () => {
         return {
           // TODO: Add container uuid parent
-          uuid: 'Add-Location-Address',
-          containerUuid: 'Add-Location-Address'
+          uuid: 'Shipping-Address-Location-Address',
+          containerUuid: 'Shipping-Address-Location-Address'
         }
       }
-    },
-    containerManager: {
-      type: Object,
-      default: () => ({
-        actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
-        getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
-        setDefaultValues: () => {}
-      })
     },
     parentMetadata: {
       type: Object,
@@ -119,15 +97,14 @@ export default {
   },
   computed: {
     fieldsListLocation() {
-      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
-        return this.$store.getters.getFieldLocation
+      if (!this.isEmptyValue(this.$store.getters.getFieldsListLocationShipping)) {
+        return this.$store.getters.getFieldsListLocationShipping
       }
       return this.fieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({
-        parentUuid: this.parentMetadata.parentUuid,
-        containerUuid: this.parentMetadata.containerUuid,
+        containerUuid: 'Shipping-Address-Location-Address',
         columnName: this.parentMetadata.columnName
       })
     }
@@ -165,7 +142,7 @@ export default {
         const withOutColumnNames = ['C_Country_ID', 'DisplayColumn_C_Country_ID', 'C_Location_ID']
 
         if (mutation.type === 'updateValueOfField' &&
-          mutation.payload.containerUuid === 'Add-Location-Address') {
+          mutation.payload.containerUuid === 'Shipping-Address-Location-Address') {
           if (mutation.payload.columnName === 'C_Country_ID') {
             const values = []
             // Get country definition to sequence fields and displayed value
@@ -188,7 +165,7 @@ export default {
                       isDisplayed: false
                     }
                   })
-                  this.$store.dispatch('changeSequence', newFieldsList.sort(this.sortSequence))
+                  this.$store.dispatch('changeSequenceShipping', newFieldsList.sort(this.sortSequence))
                 })
                 .catch(error => {
                   this.$message({
@@ -312,7 +289,6 @@ export default {
         // set context values to parent continer
         if (this.parentMetadata.isSendParentValues) {
           this.$store.dispatch('updateValuesOfContainer', {
-            parentUuid: this.parentMetadata.parentUuid,
             containerUuid: this.parentMetadata.containerUuid,
             attributes
           })
@@ -348,7 +324,7 @@ export default {
           })
           console.warn(`Error update Location Address: ${error.message}. Code: ${error.code}.`)
         })
-      this.$store.dispatch('changeSequence', fieldsList)
+      this.$store.dispatch('changeSequenceShipping', fieldsList)
     },
     getLocation() {
       if (this.request > 0) {
