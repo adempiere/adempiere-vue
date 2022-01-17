@@ -75,7 +75,8 @@ export default {
         pointOfSalesList = response.sellingPointsList
         if (isEmptyValue(pos) && isEmptyValue(posToSet)) {
           pos = pointOfSalesList.find(itemPOS => itemPOS.salesRepresentative.uuid === userUuid)
-        } else if (isEmptyValue(pos)) {
+        }
+        if (isEmptyValue(pos)) {
           pos = pointOfSalesList[0]
         }
         if (!isEmptyValue(router.app._route.query.pos)) {
