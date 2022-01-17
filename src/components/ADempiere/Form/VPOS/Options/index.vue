@@ -458,6 +458,7 @@
     <el-dialog
       :title="$t('form.pos.optionsPoinSales.cashManagement.assignSeller')"
       :visible.sync="showAssignSeller"
+      :is-loaded-panel="showAssignSeller"
       width="60%"
       center
     >

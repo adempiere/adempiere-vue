@@ -1373,3 +1373,29 @@ export function holdOrder({
       return camelizeObjectKeys(response)
     })
 }
+
+/**
+ * GET List Available Sellers
+ *
+ * token - user token
+ * page_size - custom page size for batch
+ * page_token - specific page token
+ * pos_uuid - POS UUID reference
+ * is_only_allocated - Only allocated to current point of sales
+ */
+export function availableSellers({
+  posUuid,
+  isOnlyAllocated
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/available-sellers`,
+    method: 'get',
+    params: {
+      pos_uuid: posUuid,
+      is_only_allocated: isOnlyAllocated
+    }
+  })
+    .then(response => {
+      return camelizeObjectKeys(response)
+    })
+}

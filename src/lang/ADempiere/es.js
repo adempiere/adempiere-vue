@@ -570,6 +570,7 @@ export default {
       toDeliver: 'Por Entregar',
       toCollect: 'Por Cobrar',
       salesRepresentative: 'Agente Comercial',
+      onlyAllocated: 'Solo asignado al punto de venta actual',
       businessPartner: 'Socio de Negocio',
       copyShippingAddress: 'Copiar dirección para el envío',
       documentNo: 'Nro. Documento',

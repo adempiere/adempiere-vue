@@ -18,19 +18,31 @@
 <template>
   <el-container style="background: white; height: 100% !important;">
     <el-main style="background: white; padding: 0px; height: 100% !important; overflow: hidden">
-      <el-card class="box-card" style="padding-left: 0px; padding-right: 0px">
-        <el-col
-          :span="8"
-        >
-          <el-form
-            label-position="top"
-            label-width="10px"
-          >
-            <field-definition
-              :metadata-field="fieldsList[0]"
-            />
-          </el-form>
-        </el-col>
+      <el-card class="box-card" style="padding-left: 0px;padding-right: 0px;height: 100px;">
+        <el-form label-position="top">
+          <el-col :span="8">
+            <el-form-item :label="$t('form.byInvoice.salesRepresentative')" class="from-field">
+              <el-select
+                v-model="currentSeller"
+                style="display: block;"
+                :clearable="true"
+                @change="changeSeller"
+              >
+                <el-option
+                  v-for="item in listSeller"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.uuid"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('form.byInvoice.onlyAllocated')" class="from-field">
+              <el-switch v-model="isOnlyAllocated" @change="changeOnlyAllocated" />
+            </el-form-item>
+          </el-col>
+        </el-form>
       </el-card>
     </el-main>
     <el-footer style="height: auto; padding: 0px">
@@ -54,6 +66,7 @@
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import fieldsListAssignSeller from './fieldsList.js'
+import { availableSellers } from '@/api/ADempiere/form/point-of-sales'
 import {
   allocateSeller
 } from '@/api/ADempiere/form/point-of-sales.js'
@@ -95,16 +108,29 @@ export default {
       sendToServer: false,
       visible: false,
       infoClose: {},
+      currentSeller: '',
+      listSeller: [],
+      isOnlyAllocated: false,
+      salesRepresentative: '',
       value: ''
     }
   },
   computed: {
     validateSeller() {
-      const salesRep = this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
-        columnName: 'SalesRep_ID'
-      })
-      return this.isEmptyValue(salesRep)
+      return this.isEmptyValue(this.currentSeller)
+    },
+    showAssignSeller() {
+      return this.isEmptyValue(this.$store.getters.getShowAssignSeller) ? false : this.$store.getters.getShowAssignSeller
+    }
+  },
+  watch: {
+    showAssignSeller(value) {
+      if (value) {
+        this.listAvailableSellers()
+      }
+    },
+    fieldsList(value) {
+      this.listAvailableSellers()
     }
   },
   methods: {
@@ -116,14 +142,37 @@ export default {
       })
       this.$store.commit('setShowAssignSeller', false)
     },
-    assignSeller() {
-      const salesRepID = this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
-        columnName: 'SalesRep_ID_UUID'
+    listAvailableSellers(isOnlyAllocated) {
+      availableSellers({
+        posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
+        isOnlyAllocated
       })
+        .then(response => {
+          this.listSeller = response.records
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+        })
+    },
+    changeSeller(value) {
+      this.salesRepresentative = value
+    },
+    changeOnlyAllocated(value) {
+      if (value) {
+        this.listAvailableSellers(value)
+        return
+      }
+      this.listAvailableSellers()
+    },
+    assignSeller() {
       allocateSeller({
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
-        salesRepresentativeUuid: salesRepID
+        salesRepresentativeUuid: this.currentSeller
       })
         .then(response => {
           this.$message({
