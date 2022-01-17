@@ -179,7 +179,7 @@ export default defineComponent({
       parentUuid: props.windowMetadata.uuid,
       containerUuid: props.windowMetadata.currentTabUuid,
 
-      defaultActionName: root.$t('window.newRecord'),
+      defaultActionName: root.$t('actionMenu.createNewRecord'),
 
       getActionList: () => [
         createNewRecord,

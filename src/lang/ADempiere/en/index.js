@@ -153,7 +153,6 @@ export default {
     RunProcessAs: 'Run As',
     ExportTo: 'Export to',
     contextMenuDownload: 'Download',
-    contextMennuExport: 'Export Smart Browser',
     contextMenuPrintFormatSetup: 'Print Format Setup',
     dateStartPlaceholder: 'Start date',
     dateEndPlaceholder: 'End date',
@@ -407,7 +406,8 @@ export default {
       releaseOrder: 'Release It',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
-        emptyAvailablePaymentMethods: 'This terminal has no payment methods configured',
+        emptyAvailablePaymentMethodsRefudn: 'This Terminal does not have a Payment Method configured to allow Pending Refund',
+        emptyAvailablePaymentMethods: 'This Terminal does not have a Payment Method configured to allow Refund',
         emptyListCashSummary: 'There is no cash movement',
         salesOrder: {
           title: 'Sale Order',
@@ -545,6 +545,7 @@ export default {
           emptyListPayment: 'You do not have any payment method associated with this option',
           addPayment: 'You must add a change type to complete the operation',
           amountChange: 'Amount greater than change',
+          amountLimitOrder: 'Amount greater than the limit of the Order',
           incompleteChange: 'Incomplete Change',
           fieldList: {
             code: 'Cedula',
@@ -555,10 +556,10 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'No product available. Back to top'
+        noProducto: 'Product not Avilable'
       },
       pinMessage: {
-        pin: 'Enter pin for ',
+        pin: 'Enter Pin for ',
         documentType: 'change document type',
         warehouse: 'change warehouse',
         price: 'change price',
@@ -579,6 +580,8 @@ export default {
       title: 'Aisle Vendor Orders to be Invoiced',
       searchCompleteOrders: 'Search complete orders',
       label: 'To be invoiced',
+      toDeliver: 'To be delivered',
+      toCollect: 'Receivable',
       salesRepresentative: 'Sales Agent',
       businessPartner: 'Business Partner',
       copyShippingAddress: 'Copy shipping address',
