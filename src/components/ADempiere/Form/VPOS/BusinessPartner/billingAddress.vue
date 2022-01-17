@@ -15,29 +15,23 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-col :span="$store.getters.getCopyShippingAddress ? 24 : 12">
     <el-card class="box-card" shadow="never">
       <div slot="header" class="clearfix">
         <span>{{ $t('form.pos.order.BusinessPartnerCreate.billingAddress') }}</span>
       </div>
-      <div class="text item">
-        <template
-          v-for="(field) in fieldsList"
-        >
-          <field-definition
-            :key="field.columnName"
-            :ref="field.columnName"
-            :metadata-field="{
-              ...field,
-              size: { 'xs': fieldSize, 'sm': fieldSize, 'md': fieldSize, 'lg': fieldSize, 'xl': fieldSize },
-              isReadOnly: disabled
-            }"
-            :container-uuid="'Billing-Address'"
-            :container-manager="containerManager"
-          />
-        </template>
-      </div>
+      <field-location
+        :ref="fieldsList[0].columnName"
+        :metadata="{
+          ...fieldsList[0],
+          size: { 'xs': fieldSize, 'sm': fieldSize, 'md': fieldSize, 'lg': fieldSize, 'xl': fieldSize }
+        }"
+        :value-model="fieldsList[0].value"
+        :container-uuid="'Billing-Address'"
+        :container-manager="containerManager"
+      />
       <br>
       <br>
     </el-card>
@@ -45,11 +39,19 @@
 </template>
 
 <script>
+// constants
+import fieldsList from '@/components/ADempiere/Field/FieldLocation/fieldsList.js'
+
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldListBillingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
+import FieldLocation from './billingAddressFieldLocation'
+
 export default {
   name: 'BillingAddress',
+  components: {
+    FieldLocation
+  },
   mixins: [
     formMixin,
     BParterMixin

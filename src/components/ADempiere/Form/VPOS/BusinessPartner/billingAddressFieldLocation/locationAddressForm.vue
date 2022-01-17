@@ -30,8 +30,6 @@
           <el-col v-for="(field) in fieldsListLocation" :key="field.columnName" :span="12">
             <field
               :metadata-field="field"
-              :container-uuid="'Add-Location-Address'"
-              :container-manager="containerManager"
             />
           </el-col>
         </template>
@@ -83,22 +81,10 @@ export default {
       default: () => {
         return {
           // TODO: Add container uuid parent
-          uuid: 'Add-Location-Address',
-          containerUuid: 'Add-Location-Address'
+          uuid: 'Billing-Address-Location-Address',
+          containerUuid: 'Billing-Address-Location-Address'
         }
       }
-    },
-    containerManager: {
-      type: Object,
-      default: () => ({
-        actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
-        getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
-        setDefaultValues: () => {}
-      })
     },
     parentMetadata: {
       type: Object,
@@ -119,14 +105,13 @@ export default {
   },
   computed: {
     fieldsListLocation() {
-      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
-        return this.$store.getters.getFieldLocation
+      if (!this.isEmptyValue(this.$store.getters.getFieldsListLocationBilling)) {
+        return this.$store.getters.getFieldsListLocationBilling
       }
       return this.fieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({
-        parentUuid: this.parentMetadata.parentUuid,
         containerUuid: this.parentMetadata.containerUuid,
         columnName: this.parentMetadata.columnName
       })
@@ -165,7 +150,7 @@ export default {
         const withOutColumnNames = ['C_Country_ID', 'DisplayColumn_C_Country_ID', 'C_Location_ID']
 
         if (mutation.type === 'updateValueOfField' &&
-          mutation.payload.containerUuid === 'Add-Location-Address') {
+          mutation.payload.containerUuid === 'Billing-Address-Location-Address') {
           if (mutation.payload.columnName === 'C_Country_ID') {
             const values = []
             // Get country definition to sequence fields and displayed value
@@ -188,7 +173,7 @@ export default {
                       isDisplayed: false
                     }
                   })
-                  this.$store.dispatch('changeSequence', newFieldsList.sort(this.sortSequence))
+                  this.$store.dispatch('changeSequenceBilling', newFieldsList.sort(this.sortSequence))
                 })
                 .catch(error => {
                   this.$message({
@@ -312,7 +297,6 @@ export default {
         // set context values to parent continer
         if (this.parentMetadata.isSendParentValues) {
           this.$store.dispatch('updateValuesOfContainer', {
-            parentUuid: this.parentMetadata.parentUuid,
             containerUuid: this.parentMetadata.containerUuid,
             attributes
           })
@@ -348,7 +332,7 @@ export default {
           })
           console.warn(`Error update Location Address: ${error.message}. Code: ${error.code}.`)
         })
-      this.$store.dispatch('changeSequence', fieldsList)
+      this.$store.dispatch('changeSequenceBilling', fieldsList)
     },
     getLocation() {
       if (this.request > 0) {

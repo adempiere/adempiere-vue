@@ -107,7 +107,7 @@
             <el-button type="danger" icon="el-icon-close" @click="exit" />
             <el-button type="info" icon="el-icon-minus" :disabled="isDisabled" @click="undoPatment" />
             <el-button type="success" icon="el-icon-plus" :disabled="validPay || addPay || isDisabled" @click="addCollectToList(paymentBox)" />
-            <el-button type="primary" :disabled="validatePaymentBeforeProcessing" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
+            <el-button type="primary" :disabled="validatePaymentBeforeProcessing || porcessInvoce" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
           </samp>
         </el-header>
         <!-- Panel where they show the payments registered from the collection container -->
@@ -296,9 +296,9 @@ export default {
     },
     listPayments() {
       const listLocal = this.$store.getters.getPaymentBox
-      const listServer = this.currentOrder.listPayments
+      const listServer = this.$store.getters.getListRefund
       if (!this.sendToServer && !this.isEmptyValue(listServer)) {
-        return listServer.payments.filter(payment => !payment.isRefund)
+        return listServer.filter(payment => !payment.isRefund)
       }
       return listLocal.paymentBox
     },

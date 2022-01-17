@@ -25,7 +25,9 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 const initState = {
   countries: {},
   isShowedLocation: false,
-  fieldsListLocation: []
+  fieldsListLocation: [],
+  fieldsListLocationShipping: [],
+  fieldsListLocationBilling: []
 }
 
 const locationAddress = {
@@ -40,6 +42,12 @@ const locationAddress = {
     },
     setFieldsListLocation(state, fieldsListLocation) {
       state.fieldsListLocation = fieldsListLocation
+    },
+    setFieldsListLocationShipping(state, fieldsListLocation) {
+      state.fieldsListLocationShipping = fieldsListLocation
+    },
+    setFieldsListLocationBilling(state, fieldsListLocation) {
+      state.fieldsListLocationBilling = fieldsListLocation
     },
     resetStateLocation(state) {
       state = initState
@@ -73,6 +81,12 @@ const locationAddress = {
     },
     changeSequence({ commit }, params) {
       commit('setFieldsListLocation', params)
+    },
+    changeSequenceShipping({ commit }, params) {
+      commit('setFieldsListLocationShipping', params)
+    },
+    changeSequenceBilling({ commit }, params) {
+      commit('setFieldsListLocationBilling', params)
     }
   },
 
@@ -85,6 +99,12 @@ const locationAddress = {
     },
     getFieldLocation: (state) => {
       return state.fieldsListLocation
+    },
+    getFieldsListLocationShipping: (state) => {
+      return state.fieldsListLocationShipping
+    },
+    getFieldsListLocationBilling: (state) => {
+      return state.fieldsListLocationBilling
     }
   }
 }

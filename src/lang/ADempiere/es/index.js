@@ -150,7 +150,6 @@ export default {
     contextMenuReferences: 'Referencias',
     withOutReferences: 'Sin referencias para el registro',
     contextMenuDownload: 'Descargar',
-    contextMennuExport: 'Exportar Smart Browser',
     contextMenuPrintFormatSetup: 'Configurar Formato de Impresión',
     ChangeParameters: 'Cambiar Parametros',
     RunProcessAs: 'Ejecutar como',
@@ -238,31 +237,6 @@ export default {
       description: 'Descripción'
     }
   },
-  example: {
-    warning: 'La creación y edición de páginas no puede ser cacheada por keep-alive porque keep-alive include no soporta actualmente el cacheado basado en rutas, por lo que actualmente se cachea basado en el nombre del componente. Si quiere conseguir un efecto de caché similar, puede utilizar un esquema de caché del navegador como localStorage. O no utilizar keep-alive include para almacenar en caché todas las páginas directamente. Ver detalles'
-  },
-  errorLog: {
-    tips: 'Por favor, haga clic en el icono de error en la esquina superior derecha',
-    description: 'Ahora el sistema de gestión son básicamente la forma del balneario, mejora la experiencia del usuario, pero también aumenta la posibilidad de problemas de la página, una pequeña negligencia puede conducir a la página entera de punto muerto. Afortunadamente Vue proporciona una forma de captura de manejo de excepciones, donde se puede manejar los errores o informar de las excepciones.',
-    documentation: 'Introducción del documento'
-  },
-  excel: {
-    export: 'Exportar',
-    selectedExport: 'Exportar Elementos Seleccionados',
-    placeholder: 'Por favor, introduzca el nombre del archivo (por defecto lista-excel)'
-  },
-  zip: {
-    export: 'Exportar',
-    placeholder: 'Introduzca el nombre del archivo (archivo por defecto)'
-  },
-  pdf: {
-    tips: 'Aquí utilizamos window.print() para implementar la función de descarga de PDF.'
-  },
-  theme: {
-    change: 'Cambiar el tema',
-    documentation: 'Documentación del tema',
-    tips: 'Tips: Es diferente de la selección de temas en la barra de navegación es dos métodos diferentes de desollar, cada uno con diferentes escenarios de aplicación. Consulte la documentación para más detalles.'
-  },
   tagsView: {
     refresh: 'Actualizar',
     close: 'Cerrar',
@@ -340,7 +314,7 @@ export default {
     deleteRecordSuccessful: 'Registro eliminado exitosamente',
     deleteRecordError: 'Error al eliminar el regitro',
     exportRecord: 'Exportar Registro',
-    lockRecord: 'Bloquear Registro',
+    lockRecord: 'Registro Bloqueado',
     noDescription: 'Sin Descripción',
     addDescription: 'Agregue una Descripción',
     recordAccess: {
@@ -407,7 +381,8 @@ export default {
       releaseOrder: 'Liberar',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
-        emptyAvailablePaymentMethods: 'Este terminal no tiene configurado los metodos de pagos',
+        emptyAvailablePaymentMethods: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso',
+        emptyAvailablePaymentMethodsRefudn: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso Pendiente',
         emptyListCashSummary: 'No hay moviemineto en caja',
         salesOrder: {
           title: 'Orden de Venta',
@@ -545,6 +520,7 @@ export default {
           emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
           amountChange: 'Monto superior al cambio',
+          amountLimitOrder: 'Monto Superior al Límite de la Orden',
           incompleteChange: 'Cambio Incompleto',
           fieldList: {
             code: 'Cedula',
@@ -555,10 +531,10 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'No hay producto disponible Regresar al Principio'
+        noProducto: 'Producto no Disponible'
       },
       pinMessage: {
-        pin: 'Ingrese pin para ',
+        pin: 'Ingrese Pin para ',
         documentType: 'cambiar tipo de documento',
         warehouse: 'cambiar almacén',
         price: 'cambiar precio',
@@ -577,9 +553,10 @@ export default {
     },
     byInvoice: {
       title: 'Pedidos Vendedor de Pasillo por Facturar',
-      searchCompleteOrders: 'Solo Completas',
+      searchCompleteOrders: 'Sólo Completas',
       label: 'Por Facturar',
       toDeliver: 'Por Entregar',
+      toCollect: 'Por Cobrar',
       salesRepresentative: 'Agente Comercial',
       businessPartner: 'Socio de Negocio',
       copyShippingAddress: 'Copiar dirección para el envío',

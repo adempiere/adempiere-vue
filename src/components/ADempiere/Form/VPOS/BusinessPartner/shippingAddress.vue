@@ -22,12 +22,12 @@
         <span>{{ $t('form.pos.order.BusinessPartnerCreate.shippingAddress') }}</span>
       </div>
       <div class="text item">
-        <field-definition
-          v-for="(field) in fieldsListLocationShippingAddress"
-          :ref="field.columnName"
-          :key="field.columnName"
-          :metadata-field="{
-            ...field,
+        <field-location
+          :ref="fieldsList[0].columnName"
+          :value-model="fieldsList[0].value"
+
+          :metadata="{
+            ...fieldsList[0],
             isReadOnly: disabled
           }"
           :container-uuid="'Shipping-Address'"
@@ -39,12 +39,19 @@
 </template>
 
 <script>
+// constants
+import fieldsList from '@/components/ADempiere/Field/FieldLocation/fieldsList.js'
+
+// mixins and components
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldListShippingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
+import FieldLocation from './shippingAddressFieldLocation'
 
 export default {
   name: 'ShippingAddress',
+  components: {
+    FieldLocation
+  },
   mixins: [
     formMixin,
     BParterMixin
