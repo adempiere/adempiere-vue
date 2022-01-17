@@ -71,7 +71,8 @@ export default {
         this.loading = true
         requestForgotPassword(this.forgotForm.userName)
           .then(forgotPasswordResponse => {
-            if (forgotPasswordResponse.responseTypeStatus === 'OK') {
+            console.log(forgotPasswordResponse)
+            if (forgotPasswordResponse === 'Ok') {
               this.$message({
                 message: this.$t('login.passwordResetSendLink') + this.forgotForm.userName,
                 showClose: true,
