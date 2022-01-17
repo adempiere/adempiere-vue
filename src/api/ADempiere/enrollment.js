@@ -76,10 +76,7 @@ export function requestForgotPassword(eMailOrUserName) {
     }
   })
     .then(forgotResponse => {
-      return {
-        responseType: forgotResponse.response_type,
-        responseTypeStatus: forgotResponse.response_type_status
-      }
+      return forgotResponse
     })
 }
 
@@ -103,10 +100,7 @@ export function requestChangePassword({
     }
   })
     .then(changePasswordResponse => {
-      return {
-        responseType: changePasswordResponse.response_type,
-        responseTypeStatus: changePasswordResponse.response_type_status
-      }
+      return changePasswordResponse
     })
 }
 
