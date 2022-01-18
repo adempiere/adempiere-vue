@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div>
     <el-form-item @submit.native.prevent="notSubmitForm">
@@ -88,24 +89,32 @@
 </template>
 
 <script>
-/**
- * This component is made to be the prototype of the Product Info search field
- */
+// constants
 import ProductInfoList from './productList'
+
+// components and mixins
 // import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+
+// utils and helper methods
 import {
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 
+/**
+ * This component is made to be the prototype of the Product Info search field
+ */
 export default {
   name: 'FieldProductInfo',
+
   components: {
     ProductInfoList
   },
+
   // mixins: [
   //   fieldMixin
   // ],
+
   props: {
     popoverName: {
       type: String,
@@ -124,6 +133,7 @@ export default {
       })
     }
   },
+
   data() {
     return {
       visible: false,
@@ -131,6 +141,7 @@ export default {
       timeOut: null
     }
   },
+
   computed: {
     isShowProductsPriceList: {
       get() {
@@ -174,6 +185,7 @@ export default {
       })
     }
   },
+
   watch: {
     getProductValue(value) {
       this.sendProduct = value
@@ -186,13 +198,10 @@ export default {
       })
     }
   },
+
   methods: {
     formatPrice,
     formatQuantity,
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    },
     shortcutKeyMethod(event) {
       switch (event.srcKey) {
         case 'refreshList':

@@ -28,13 +28,14 @@
       <el-row :gutter="24">
         <template v-if="isLoaded">
           <el-col v-for="(field) in fieldsListLocation" :key="field.columnName" :span="12">
-            <field
+            <field-definition
               :metadata-field="field"
               :container-uuid="'Add-Location-Address'"
               :container-manager="containerManager"
             />
           </el-col>
         </template>
+
         <div
           v-else
           key="form-loading"
@@ -64,7 +65,7 @@ import {
   updateLocationAddress
 } from '@/api/ADempiere/field/location.js'
 
-// methods and helpers
+// utils and helper methods
 import { showNotification } from '@/utils/ADempiere/notification.js'
 import { getSequenceAsList } from '@/utils/ADempiere/location'
 
@@ -73,10 +74,12 @@ import { getSequenceAsList } from '@/utils/ADempiere/location'
  */
 export default {
   name: 'LocationAdressFrom',
+
   mixins: [
     formMixin,
     mixinLocation
   ],
+
   props: {
     metadata: {
       type: Object,
@@ -110,6 +113,7 @@ export default {
       default: () => {}
     }
   },
+
   data() {
     return {
       fieldsList,
@@ -117,6 +121,7 @@ export default {
       request: 0
     }
   },
+
   computed: {
     fieldsListLocation() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
@@ -132,14 +137,15 @@ export default {
       })
     }
   },
+
   created() {
     if (this.parentMetadata.pos) {
       this.fieldsList.forEach(element => {
         element.containerUuid = this.parentMetadata.containerUuid
       })
     }
-    this.unsubscribe = this.subscribeChanges()
   },
+
   mounted() {
     if (this.parentMetadata.pos) {
       this.fieldsList.forEach(element => {
@@ -148,9 +154,7 @@ export default {
     }
     this.getLocation()
   },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
+
   methods: {
     keyAction(event) {
       if (event.srcKey === 'closeForm') {

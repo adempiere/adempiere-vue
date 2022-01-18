@@ -15,9 +15,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-main
-    v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+    v-shortkey="popoverCreateBusinessParnet ? { close: ['esc'], enter: ['enter'] } : {}"
     style="height: -webkit-fill-available;overflow: hidden;"
     @shortkey.native="actionCreate"
   >
@@ -49,7 +50,7 @@
           </el-col>
         </el-row>
         <el-row v-show="isVisibleAddress" :gutter="24">
-          <el-scrollbar wrap-class="scroll-child">
+          <el-scrollbar v-if="isVisibleAddress" wrap-class="scroll-child">
             <billing-address />
             <shipping-address v-if="!copyShippingAddress" />
           </el-scrollbar>
@@ -88,23 +89,31 @@
 </template>
 
 <script>
-import { createCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
-import formMixin from '@/components/ADempiere/Form/formMixin.js'
+// constants
 import fieldsList from './fieldsListCreate.js'
+
+// components and mixins
+import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import BillingAddress from './billingAddress.vue'
 import ShippingAddress from './shippingAddress.vue'
 import BParterMixin from './mixinBusinessPartner.js'
 
+// api request methods
+import { createCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
+
 export default {
   name: 'BusinessPartnerCreate',
+
   components: {
     ShippingAddress,
     BillingAddress
   },
+
   mixins: [
     formMixin,
     BParterMixin
   ],
+
   props: {
     metadata: {
       type: Object,
@@ -133,6 +142,7 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       businessPartnerRecord: {},
@@ -141,10 +151,10 @@ export default {
       checked: true,
       isCustomForm: true,
       isVisibleAddress: false,
-      isExistingCustomer: false,
-      unsubscribe: () => {}
+      isExistingCustomer: false
     }
   },
+
   computed: {
     fieldsListLocation() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
@@ -194,6 +204,7 @@ export default {
       })
     }
   },
+
   watch: {
     showField(value) {
       if (value) {
@@ -216,12 +227,7 @@ export default {
       this.checked = value
     }
   },
-  created() {
-    this.unsubscribe = this.subscribeChanges()
-  },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
+
   methods: {
     actionCreate(commands) {
       if (commands.srcKey) {

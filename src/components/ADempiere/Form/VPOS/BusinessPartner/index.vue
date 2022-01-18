@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-form-item>
     <template slot="label">
@@ -108,6 +109,7 @@
               <el-row>
                 <el-col :span="24">
                   <add-address
+                    v-if="showAddNewAddress"
                     :shows-popovers="showAddNewAddress"
                     :address-to-update="selectCustomerValue"
                   />
@@ -150,6 +152,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </template>
+
     <el-autocomplete
       v-model="displayedValue"
       :placeholder="$t('quickAccess.searchWithEnter')"
@@ -187,23 +190,29 @@
 </template>
 
 <script>
-/**
- * This component is made to be the prototype of the Business Partner search field
- * TODO: Before creating you must make a search for all the filled fields.
- */
-import { requestGetBusinessPartner } from '@/api/ADempiere/system-core.js'
+// components and mixins
 import BusinessPartnerCreate from './businessPartnerCreate'
 import BusinessPartnerUpdate from './businessPartnerUpdate'
-import AddAddress from './addAddress'
+import AddAddress from './addAddress.vue'
 // import FieldListBusinessPartner from './fieldBusinessPartners/index'
 import BusinessPartnersList from './businessPartnersList'
 import BParterMixin from './mixinBusinessPartner.js'
+
+// api request methods
+import { requestGetBusinessPartner } from '@/api/ADempiere/system-core.js'
+
+// utils and helper methods
 const { setBusinessPartner } = BParterMixin.methods
 const { searchBPartnerList } = BusinessPartnersList.methods
 import { trimPercentage } from '@/utils/ADempiere/valueFormat.js'
 
+/**
+ * This component is made to be the prototype of the Business Partner search field
+ * TODO: Before creating you must make a search for all the filled fields.
+ */
 export default {
   name: 'FieldBusinessPartner',
+
   components: {
     BusinessPartnerCreate,
     BusinessPartnersList,
@@ -211,6 +220,7 @@ export default {
     AddAddress
     // FieldListBusinessPartner
   },
+
   props: {
     parentMetadata: {
       type: Object,
@@ -230,6 +240,7 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       controlDisplayed: this.displayedValue,
@@ -246,6 +257,7 @@ export default {
       selectCustomerValue: {}
     }
   },
+
   computed: {
     value: {
       get() {
@@ -370,6 +382,7 @@ export default {
       return this.$store.getters.getCopyShippingAddress
     }
   },
+
   watch: {
     popoverListBusinessParnet(value) {
       if (!value) {
@@ -406,6 +419,7 @@ export default {
       }
     }
   },
+
   methods: {
     setBusinessPartner,
     searchBPartnerList,

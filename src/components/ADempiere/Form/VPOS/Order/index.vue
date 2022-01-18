@@ -463,18 +463,22 @@
 </template>
 
 <script>
+// constants
+import fieldsListOrder from './fieldsListOrder.js'
+
 // components and mixins
 import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import orderLineMixin from './orderLineMixin.js'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
-import fieldsListOrder from './fieldsListOrder.js'
-import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner'
+import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner/index.vue'
 import fieldLine from '@/components/ADempiere/Form/VPOS/Order/line/index'
 import ImageProduct from '@/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
 // src/components/ADempiere/Form/VPOS/Order/ImageProduct/index.vue
 import ProductInfo from '@/components/ADempiere/Form/VPOS/ProductInfo'
 import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
+
+// utils and helper methods
 // Format of values ( Date, Price, Quantity )
 import {
   formatDate,
@@ -482,6 +486,8 @@ import {
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
+
+// api request methods
 import { requestLookupList } from '@/api/ADempiere/window.js'
 import { releaseOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
@@ -520,6 +526,7 @@ export default {
       listCampaign: []
     }
   },
+
   computed: {
     isValidToRelease() {
       if (!this.isEmptyValue(this.currentOrder) && this.currentOrder.documentStatus.value === 'DR') {
@@ -790,6 +797,7 @@ export default {
       return this.$t('form.pos.order.noCampaignSelected')
     }
   },
+
   watch: {
     showOverdrawnInvoice(value) {
       this.visible = value
@@ -826,6 +834,7 @@ export default {
       }
     }
   },
+
   mounted() {
     setTimeout(() => {
       if (!this.isEmptyValue(this.fieldCampaign.reference) && this.isEmptyValue(this.listCampaign)) {
@@ -851,6 +860,7 @@ export default {
     }
     this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
   },
+
   methods: {
     formatDate,
     formatDateToSend,

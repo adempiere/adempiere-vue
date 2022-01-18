@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-container style="background: white; height: 100% !important;">
     <el-main style="background: white; padding: 0px; height: 100% !important; overflow: hidden">
@@ -188,25 +189,35 @@
 </template>
 
 <script>
+// constants
+import fieldsListCollection from './fieldsListCollection.js'
+import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
+
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
-import fieldsListCollection from './fieldsListCollection.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
-import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
-import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
-import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
 import overdrawnInvoice from './overdrawnInvoice'
+
+// utils and helper methods
+import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
+
+// api request methods
+import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'Collection',
+
   components: {
     typeCollection,
     overdrawnInvoice
   },
+
   mixins: [
     formMixin,
     posMixin
   ],
+
   props: {
     isLoadedPanel: {
       type: Boolean,
@@ -238,6 +249,7 @@ export default {
       })
     }
   },
+
   data() {
     return {
       isCustomForm: true,
@@ -255,6 +267,7 @@ export default {
       currentFieldPaymentMethods: ''
     }
   },
+
   computed: {
     listCurrency() {
       return this.$store.getters.getCurrenciesList
@@ -654,6 +667,7 @@ export default {
       return 1
     }
   },
+
   watch: {
     dateConvertions(value) {
       if (!this.isEmptyValue(this.currentPointOfSales.conversionTypeUuid) && !this.isEmptyValue(this.currentPointOfSales.priceList.currency.uuid) && !this.isEmptyValue(this.selectCurrentFieldCurrency.uuid) && !this.isEmptyValue(value) && this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered) !== value) {
@@ -742,6 +756,7 @@ export default {
       return this.$store.getters.getCurrency.standardPrecision
     }
   },
+
   created() {
     this.currentFieldCurrency = this.pointOfSalesCurrency.iSOCode
     this.$store.dispatch('addRateConvertion', this.pointOfSalesCurrency)
@@ -759,6 +774,7 @@ export default {
     }, 1500)
     this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
   },
+
   methods: {
     formatDateToSend,
     showDayRate(rate) {
@@ -827,10 +843,6 @@ export default {
       }
       const rate = (currencyPay.divideRate > currencyPay.multiplyRate) ? currencyPay.divideRate : currencyPay.multiplyRate
       return rate
-    },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     },
     addCollectToList() {
       const containerUuid = this.containerUuid

@@ -34,7 +34,7 @@
           <template
             v-for="(field) in sortFieldsListOrder"
           >
-            <field
+            <field-definition
               :key="field.columnName"
               :metadata-field="field"
               :container-uuid="'Orders-List'"
@@ -255,10 +255,19 @@
 </template>
 
 <script>
+// constants
+import fieldsListOrders from './fieldsListOrders.js'
+
 // components and mixins
 import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 import CustomPagination from '@/components/ADempiere/Pagination'
-import fieldsListOrders from './fieldsListOrders.js'
+import FieldDefinition from '@/components/ADempiere/Field/index.vue'
+import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
+
+// api request methods
+import { holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
+
+// utils and helper methods
 import {
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
@@ -266,9 +275,6 @@ import {
   formatDate,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
-import Field from '@/components/ADempiere/Field'
-import { holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
-import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 
 export default {
   name: 'OrdersList',
@@ -276,7 +282,7 @@ export default {
   components: {
     CustomPagination,
     DocumentStatusTag,
-    Field
+    FieldDefinition
   },
 
   mixins: [
@@ -299,6 +305,7 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       defaultMaxPagination: 50,
@@ -311,6 +318,7 @@ export default {
       timeOut: null
     }
   },
+
   computed: {
     heightTable() {
       if (this.isEmptyValue(this.activeAccordion)) {
@@ -360,6 +368,7 @@ export default {
 
     }
   },
+
   watch: {
     showField(value) {
       if (value && this.isEmptyValue(this.metadataList)) {
@@ -370,15 +379,18 @@ export default {
       this.isLoadRecord = false
     }
   },
+
   created() {
     this.unsubscribe = this.subscribeChanges()
     if (this.isReadyFromGetData) {
       this.loadOrdersList()
     }
   },
+
   beforeDestroy() {
     this.unsubscribe()
   },
+
   methods: {
     formatDate,
     formatQuantity,
