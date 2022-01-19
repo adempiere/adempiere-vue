@@ -40,12 +40,12 @@
 
 <script>
 // constants
-import fieldsList from '@/components/ADempiere/Field/FieldLocation/fieldsList.js'
+import fieldsList from './shippingFieldLocation/fieldsList'
 
 // mixins and components
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import BParterMixin from './mixinBusinessPartner.js'
-import FieldLocation from './shippingAddressFieldLocation'
+import FieldLocation from './shippingFieldLocation'
 
 export default {
   name: 'ShippingAddress',

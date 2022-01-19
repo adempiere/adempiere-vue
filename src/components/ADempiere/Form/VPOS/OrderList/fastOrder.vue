@@ -17,92 +17,102 @@
 -->
 
 <template>
-  <span>
-    <el-button type="primary" plain @click="newOrder()">
-      {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
-    </el-button>
-    <el-dropdown size="mini" trigger="click" @command="handleCommand">
-      <el-button type="primary" size="small" style="padding: 10px;padding-left: 5px;">
-        <i class="el-icon-arrow-down el-icon--right" />
+  <el-form label-position="top" label-width="100px">
+    <el-form-item>
+      <template slot="label">
+        <span style="color: transparent;">
+          Option
+        </span>
+      </template>
+      <document-status-tag
+        v-if="!isEmptyValue(currentOrder.documentStatus.value)"
+        :value="currentOrder.documentStatus.value"
+        :displayed-value="currentOrder.documentStatus.name"
+        style="font-size: 12px;margin-right: 2%;"
+      />
+      <el-button type="primary" plain @click="newOrder()">
+        {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
       </el-button>
-      <el-dropdown-menu slot="dropdown">
-        <template v-for="(option, key) in quickOptions">
-          <el-dropdown-item v-show="option.isShow" :key="key" :command="option">
-            <el-popover
-              :key="key"
-              v-model="option.isVisible"
-              placement="right"
-              trigger="click"
-            >
-              <find-orders
-                :data="option"
-                :data-list="orderList"
-                :is-loading-table="isloading"
-                :params="option.params"
-                :show-field="showToDeliveOrders"
+      <el-dropdown size="mini" trigger="click" @command="handleCommand">
+        <el-button type="primary" size="small" style="padding: 10px;padding-left: 5px;">
+          <i class="el-icon-arrow-down el-icon--right" />
+        </el-button>
+        <el-dropdown-menu slot="dropdown">
+          <template v-for="(option, key) in quickOptions">
+            <el-dropdown-item v-show="option.isShow" :key="key" :command="option">
+              <el-popover
+                :key="key"
+                v-model="option.isVisible"
+                placement="right"
+                trigger="click"
+                width="900"
               >
-                <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
-                  <el-form-item label="No. del Documento">
-                    <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
-                  </el-form-item>
-                  <el-form-item
-                    v-for="(field) in metadataList"
-                    :key="field.columnName"
-                  >
-                    <field-definition
-                      v-if="field.columnName === 'DateOrderedFrom'"
-                      :metadata-field="{
-                        ...field,
-                        size: 6,
-                        name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
-                      }"
-                    />
-                    <field-definition
-                      v-else-if="field.columnName === 'C_BPartner_ID'"
-                      :metadata-field="{
-                        ...field,
-                        size: 6
-                      }"
-                    />
-                  </el-form-item>
-                </el-form>
-              </find-orders>
-              <el-row :gutter="24">
-                <el-col :span="24">
-                  <custom-pagination
-                    :total="total"
-                    :current-page="currentPage"
-                    :handle-change-page="handleChangePage"
-                    layout="total, prev, pager, next"
-                    style="float: right;"
-                  />
-                </el-col>
-                <el-col :span="24">
-                  <samp style="float: right; padding-right: 10px;">
-                    <el-button
-                      type="danger"
-                      class="custom-button-create-bp"
-                      icon="el-icon-close"
-                      @click="closeSearch(option)"
-                    />
-                    <el-button
-                      type="primary"
-                      class="custom-button-create-bp"
-                      icon="el-icon-check"
-                      @click="openOrder(option)"
-                    />
-                  </samp>
-                </el-col>
-              </el-row>
-              <el-button slot="reference" type="text" style="color: #333" @click="option.isVisible = true">
-                {{ option.title }}
-              </el-button>
-            </el-popover>
-          </el-dropdown-item>
-        </template>
-      </el-dropdown-menu>
-    </el-dropdown>
-  </span>
+                <find-orders
+                  :data="option"
+                  :data-list="orderList"
+                  :is-loading-table="isloading"
+                  :params="option.params"
+                  :show-field="showToDeliveOrders"
+                >
+                  <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
+                    <el-form-item label="No. del Documento">
+                      <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
+                    </el-form-item>
+                    <el-form-item
+                      v-for="(field) in metadataList"
+                      :key="field.columnName"
+                    >
+                      <field-definition
+                        :metadata-field="{
+                          ...field,
+                          size: 6,
+                          name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
+                        }"
+                        :container-uuid="'Cash-Withdrawal'"
+                        :container-manager="containerManager"
+                      />
+                    </el-form-item>
+                  </el-form>
+                </find-orders>
+                <custom-pagination
+                  :total="total"
+                  :current-page="currentPage"
+                  :handle-change-page="handleChangePage"
+                  layout="total, prev, pager, next"
+                  style="float: right;"
+                />
+                <el-button
+                  type="text"
+                  class="custom-button-create-bp"
+                />
+                <el-row :gutter="24">
+                  <el-col :span="24">
+                    <samp style="float: right; padding-right: 10px;">
+                      <el-button
+                        type="danger"
+                        class="custom-button-create-bp"
+                        icon="el-icon-close"
+                        @click="closeSearch(option)"
+                      />
+                      <el-button
+                        type="primary"
+                        class="custom-button-create-bp"
+                        icon="el-icon-check"
+                        @click="openOrder(option)"
+                      />
+                    </samp>
+                  </el-col>
+                </el-row>
+                <el-button slot="reference" type="text" style="color: #333" @click="option.isVisible = true">
+                  {{ option.title }}
+                </el-button>
+              </el-popover>
+            </el-dropdown-item>
+          </template>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
@@ -129,6 +139,7 @@ import {
   formatPrice
 } from '@/utils/ADempiere/valueFormat.js'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 export default {
   name: 'AisleVendorList',
@@ -136,6 +147,7 @@ export default {
   components: {
     CustomPagination,
     FindOrders,
+    DocumentStatusTag,
     FieldDefinition
   },
 
@@ -153,6 +165,18 @@ export default {
     showField: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
 
@@ -584,3 +608,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.el-form--label-top .el-form-item__label {
+  padding: 0px;
+}
+</style>

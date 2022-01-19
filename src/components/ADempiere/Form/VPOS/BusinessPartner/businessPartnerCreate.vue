@@ -17,17 +17,17 @@
 -->
 
 <template>
-  <el-main
-    v-shortkey="popoverCreateBusinessParnet ? { close: ['esc'], enter: ['enter'] } : {}"
-    style="height: -webkit-fill-available;overflow: hidden;"
-    @shortkey.native="actionCreate"
-  >
-    <el-form
-      label-position="top"
-      size="small"
-      class="create-bp"
+  <el-container style="max-height: 350px; border: 1px solid #eee; border: 0px">
+    <el-main
+      v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+      style="height: -webkit-fill-available;overflow: hidden;"
+      @shortkey.native="actionCreate"
     >
-      <el-scrollbar wrap-class="scroll-customer-create">
+      <el-form
+        label-position="top"
+        size="small"
+        class="create-bp"
+      >
         <el-row :gutter="24">
           <el-col :span="24">
             <el-card class="box-card" shadow="never" style="height: 230px;">
@@ -55,7 +55,7 @@
             <shipping-address v-if="!copyShippingAddress" />
           </el-scrollbar>
         </el-row>
-        <el-row :gutter="24">
+        <!-- <el-row :gutter="24">
           <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
             <samp style="float: right; padding-right: 10px;">
               <el-checkbox v-model="isVisibleAddress">
@@ -66,26 +66,30 @@
               </el-checkbox>
             </samp>
           </el-col>
-          <el-col :span="24">
-            <samp style="float: right; padding-right: 10px;">
-              <el-button
-                type="primary"
-                class="custom-button-create-bp"
-                icon="el-icon-check"
-                @click="createBusinessParter"
-              />
-              <el-button
-                type="danger"
-                class="custom-button-create-bp"
-                icon="el-icon-close"
-                @click="clearValues()"
-              />
-            </samp>
-          </el-col>
-        </el-row>
-      </el-scrollbar>
-    </el-form>
-  </el-main>
+        </el-row> -->
+      </el-form>
+    </el-main>
+    <!-- <el-footer>
+      <el-row :gutter="24">
+        <el-col :span="24">
+          <samp style="float: right; padding-right: 10px;">
+            <el-button
+              type="primary"
+              class="custom-button-create-bp"
+              icon="el-icon-check"
+              @click="createBusinessParter"
+            />
+            <el-button
+              type="danger"
+              class="custom-button-create-bp"
+              icon="el-icon-close"
+              @click="clearValues()"
+            />
+          </samp>
+        </el-col>
+      </el-row>
+    </el-footer> -->
+  </el-container>
 </template>
 
 <script>
@@ -140,6 +144,10 @@ export default {
     showField: {
       type: Boolean,
       default: false
+    },
+    isVisibleAddress: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -150,8 +158,8 @@ export default {
       fieldsList,
       checked: true,
       isCustomForm: true,
-      isVisibleAddress: false,
-      isExistingCustomer: false
+      isExistingCustomer: false,
+      unsubscribe: () => {}
     }
   },
 

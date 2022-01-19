@@ -47,23 +47,6 @@
           style="min-height: calc(50vh - 84px)"
           class="loading-panel"
         />
-        <!--<el-col v-show="!parentMetadata.pos" :span="24" style="padding-left: 12px;padding-right: 12px;padding-top: 3%;padding-bottom: 3%;">
-          <samp style="float: right; padding-right: 10px;">
-            <el-button
-              :disabled="!isLoaded"
-              type="primary"
-              class="custom-button-address-location"
-              icon="el-icon-check"
-              @click="sendValuesToServer"
-            />
-            <el-button
-              type="danger"
-              class="custom-button-address-location"
-              icon="el-icon-close"
-              @click="cancelChanges"
-            />
-          </samp>
-        </el-col>-->
       </el-row>
     </el-form>
   </div>
@@ -108,8 +91,8 @@ export default {
       default: () => {
         return {
           // TODO: Add container uuid parent
-          uuid: 'Add-Location-Address',
-          containerUuid: 'Add-Location-Address',
+          uuid: 'Billing-Address',
+          containerUuid: 'Billing-Address',
           isSetDefaultValues: false
         }
       }
@@ -143,8 +126,8 @@ export default {
       }
     },
     fieldsListLocation() {
-      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
-        return this.$store.getters.getFieldLocation
+      if (!this.isEmptyValue(this.$store.getters.getFieldsListLocationBilling)) {
+        return this.$store.getters.getFieldsListLocationBilling
       }
 
       // return this.fieldsList
@@ -265,7 +248,7 @@ export default {
             return itemA.index - itemB.index
           })
 
-          this.$store.dispatch('changeSequence', newFieldsList)
+          this.$store.dispatch('changeSequenceBilling', newFieldsList)
         })
         .catch(error => {
           this.$message({

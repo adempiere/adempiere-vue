@@ -166,6 +166,7 @@ export default {
       state.quickSearchOrder = order
     },
     setShowPanelAddress(state, showPanelAddress) {
+      console.log({ showPanelAddress })
       state.showPanelAddress = showPanelAddress
     }
   },
@@ -255,7 +256,7 @@ export default {
   },
   getters: {
     getShowPanelAddress: (state) => {
-      return state.panelAddress
+      return state.showPanelAddress
     },
     getWidth: (state) => {
       return state.width

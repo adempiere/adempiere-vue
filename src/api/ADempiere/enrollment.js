@@ -76,10 +76,7 @@ export function requestForgotPassword(eMailOrUserName) {
     }
   })
     .then(forgotResponse => {
-      return {
-        responseType: forgotResponse.response_type,
-        responseTypeStatus: forgotResponse.response_type_status
-      }
+      return forgotResponse
     })
 }
 

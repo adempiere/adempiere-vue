@@ -75,12 +75,6 @@ export default {
 
   created() {
     this.getPanel()
-
-    this.unsubscribe = this.subscribeChanges()
-  },
-
-  beforeDestroy() {
-    this.unsubscribe()
   },
 
   methods: {
@@ -90,9 +84,6 @@ export default {
      * Vuex suscription
      * @override
      */
-    subscribeChanges() {
-      // logic here
-    },
     async getPanel() {
       const panel = this.getterPanel
       if (!this.isEmptyValue(panel)) {

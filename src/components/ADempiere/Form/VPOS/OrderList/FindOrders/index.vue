@@ -202,10 +202,13 @@ import {
   formatPrice
 } from '@/utils/ADempiere/valueFormat.js'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 export default {
   name: 'FindOrders',
-
+  components: {
+    DocumentStatusTag
+  },
   props: {
     metadata: {
       type: Object,

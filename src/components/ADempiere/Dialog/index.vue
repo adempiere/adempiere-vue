@@ -17,6 +17,13 @@
 -->
 <template>
   <el-dialog
+    title="Tips"
+    :visible.sync="dialogVisible"
+    width="30%"
+  >
+    <span>This is a message</span>
+  </el-dialog>
+  <!-- <el-dialog
     v-if="!showRecordAccess"
     :title="modalMetadata.name"
     :visible="isVisibleDialog"
@@ -64,20 +71,20 @@
         @click="runAction(modalMetadata)"
       />
     </span>
-  </el-dialog>
+  </el-dialog>-->
 </template>
 
 <script>
-import MainPanel from '@/components/ADempiere/Panel'
-import SequenceOrder from '@/components/ADempiere/SequenceOrder'
-import { showNotification } from '@/utils/ADempiere/notification'
+// import MainPanel from '@/components/ADempiere/Panel'
+// import SequenceOrder from '@/components/ADempiere/SequenceOrder'
+// import { showNotification } from '@/utils/ADempiere/notification'
 
 export default {
   name: 'ModalProcess',
-  components: {
-    MainPanel,
-    SequenceOrder
-  },
+  // components: {
+  //   MainPanel,
+  //   SequenceOrder
+  // },
   props: {
     parentUuid: {
       type: String,
@@ -96,136 +103,146 @@ export default {
       default: ''
     }
   },
-  computed: {
-    isMobile() {
-      return this.$store.state.app.device === 'mobile'
-    },
-    width() {
-      if (this.isMobile) {
-        return 80
-      }
-      return 95
-    },
-    isVisibleDialog() {
-      return this.$store.state['process/index'].isVisibleDialog
-    },
-    modalMetadata() {
-      return this.$store.state['process/index'].metadata
-    },
-    windowRecordSelected() {
-      return this.$store.state['windowControl/index'].recordSelected
-    },
-    getterDataRecordsAndSelection() {
-      return this.$store.getters.getDataRecordAndSelection(this.containerUuid)
-    },
-    showRecordAccess() {
-      return this.$store.getters.getShowRecordAccess
-    }
-  },
-  watch: {
-    isVisibleDialog(value) {
-      if (value) {
-        if (this.modalMetadata.isSortTab) {
-          const data = this.$store.getters.getDataRecordAndSelection(this.modalMetadata.containerUuid)
-          if (!data.isLoaded && !data.record.length) {
-            this.$store.dispatch('getDataListTab', {
-              parentUuid: this.modalMetadata.parentUuid,
-              containerUuid: this.modalMetadata.containerUuid,
-              isAddRecord: true
-            })
-              .catch(error => {
-                console.warn(`Error getting data list tab. Message: ${error.message}, code ${error.code}.`)
-              })
-          }
-        }
-      }
-    }
-  },
-  methods: {
-    showNotification,
-    closeDialog() {
-      this.$store.dispatch('setShowDialog', {
-        type: this.modalMetadata.panelType,
-        action: undefined
-      })
-      this.$store.commit('setRecordAccess', false)
-    },
-    runAction(action) {
-      this.$store.commit('setRecordAccess', false)
-      if (action.isSortTab) {
-        this.$store.dispatch('updateSequence', {
-          parentUuid: this.modalMetadata.parentUuid,
-          containerUuid: this.modalMetadata.containerUuid
-        })
-        return
-      }
-      if (action === undefined && this.windowRecordSelected !== undefined) {
-        this.$router.push({
-          name: this.$route.name,
-          query: {
-            ...this.$route.query,
-            action: this.windowRecordSelected.UUID
-          }
-        }, () => {})
-        this.closeDialog()
-      } else if (!this.isEmptyValue(action)) {
-        const fieldNotReady = this.$store.getters.isNotReadyForSubmit(action.uuid)
-        if (this.panelType === 'From') {
-          this.$store.dispatch('processPos', {
-            action: action, // process metadata
-            parentUuid: this.parentUuid,
-            idProcess: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.id,
-            containerUuid: this.containerUuid,
-            panelType: this.panelType, // determinate if get table name and record id (window) or selection (browser)
-            parametersList: this.$store.getters.getPosParameters
-          })
-            .catch(error => {
-              console.warn(error)
-            })
-          this.closeDialog()
-        } else {
-          if (!fieldNotReady) {
-            this.closeDialog()
-            const porcesTabla = this.$store.getters.getProcessSelect.processTablaSelection
-            const selection = this.$store.getters.getProcessSelect
-            if (porcesTabla) {
-              // manage excecute process with records selection
-              this.$store.dispatch('selectionProcess', {
-                action: action, // process metadata
-                parentUuid: this.parentUuid,
-                containerUuid: this.containerUuid,
-                panelType: this.panelType, // determinate if get table name and record id (window) or selection (browser)
-                reportFormat: this.reportExportType,
-                recordUuidSelection: selection,
-                isProcessTableSelection: true,
-                routeToDelete: this.$route
-              })
-            } else {
-              this.$store.dispatch('startProcess', {
-                action: action, // process metadata
-                parentUuid: this.parentUuid,
-                isProcessTableSelection: false,
-                containerUuid: this.containerUuid,
-                panelType: this.panelType, // determinate if get table name and record id (window) or selection (browser)
-                reportFormat: this.reportExportType,
-                routeToDelete: this.$route
-              })
-                .catch(error => {
-                  console.warn(error)
-                })
-            }
-          } else {
-            this.showNotification({
-              type: 'warning',
-              title: this.$t('notifications.emptyValues'),
-              name: '<b>' + fieldNotReady.name + '.</b> ',
-              message: this.$t('notifications.fieldMandatory')
-            })
-          }
-        }
-      }
+  data() {
+    return {
+      lock: false,
+      dialogVisible: false
     }
   }
+  // computed: {
+  //   isMobile() {
+  //     return this.$store.state.app.device === 'mobile'
+  //   },
+  //   width() {
+  //     if (this.isMobile) {
+  //       return 80
+  //     }
+  //     return 95
+  //   },
+  //   isVisibleDialog() {
+  //     console.log(this.$store.state['process/index'])
+  //     if (this.isEmptyValue(this.$store.state['process/index'])) {
+  //       return false
+  //     }
+  //     return this.$store.state['process/index'].isVisibleDialog
+  //   },
+  //   modalMetadata() {
+  //     return this.$store.state['process/index'].metadata
+  //   },
+  //   windowRecordSelected() {
+  //     return this.$store.state['windowControl/index'].recordSelected
+  //   },
+  //   getterDataRecordsAndSelection() {
+  //     return this.$store.getters.getDataRecordAndSelection(this.containerUuid)
+  //   },
+  //   showRecordAccess() {
+  //     return this.$store.getters.getShowRecordAccess
+  //   }
+  // },
+  // watch: {
+  //   isVisibleDialog(value) {
+  //     if (value) {
+  //       if (this.modalMetadata.isSortTab) {
+  //         const data = this.$store.getters.getDataRecordAndSelection(this.modalMetadata.containerUuid)
+  //         if (!data.isLoaded && !data.record.length) {
+  //           this.$store.dispatch('getDataListTab', {
+  //             parentUuid: this.modalMetadata.parentUuid,
+  //             containerUuid: this.modalMetadata.containerUuid,
+  //             isAddRecord: true
+  //           })
+  //             .catch(error => {
+  //               console.warn(`Error getting data list tab. Message: ${error.message}, code ${error.code}.`)
+  //             })
+  //         }
+  //       }
+  //     }
+  //   }
+  // },
+  // methods: {
+  //   showNotification,
+  //   closeDialog() {
+  //     this.$store.dispatch('setShowDialog', {
+  //       type: this.modalMetadata.panelType,
+  //       action: undefined
+  //     })
+  //     this.$store.commit('setRecordAccess', false)
+  //   },
+  //   runAction(action) {
+  //     this.$store.commit('setRecordAccess', false)
+  //     if (action.isSortTab) {
+  //       this.$store.dispatch('updateSequence', {
+  //         parentUuid: this.modalMetadata.parentUuid,
+  //         containerUuid: this.modalMetadata.containerUuid
+  //       })
+  //       return
+  //     }
+  //     if (action === undefined && this.windowRecordSelected !== undefined) {
+  //       this.$router.push({
+  //         name: this.$route.name,
+  //         query: {
+  //           ...this.$route.query,
+  //           action: this.windowRecordSelected.UUID
+  //         }
+  //       }, () => {})
+  //       this.closeDialog()
+  //     } else if (!this.isEmptyValue(action)) {
+  //       const fieldNotReady = this.$store.getters.isNotReadyForSubmit(action.uuid)
+  //       if (this.panelType === 'From') {
+  //         this.$store.dispatch('processPos', {
+  //           action: action, // process metadata
+  //           parentUuid: this.parentUuid,
+  //           idProcess: this.$store.getters.posAttributes.currentPointOfSales.currentOrder.id,
+  //           containerUuid: this.containerUuid,
+  //           panelType: this.panelType, // determinate if get table name and record id (window) or selection (browser)
+  //           parametersList: this.$store.getters.getPosParameters
+  //         })
+  //           .catch(error => {
+  //             console.warn(error)
+  //           })
+  //         this.closeDialog()
+  //       } else {
+  //         if (!fieldNotReady) {
+  //           this.closeDialog()
+  //           const porcesTabla = this.$store.getters.getProcessSelect.processTablaSelection
+  //           const selection = this.$store.getters.getProcessSelect
+  //           if (porcesTabla) {
+  //             // manage excecute process with records selection
+  //             this.$store.dispatch('selectionProcess', {
+  //               action: action, // process metadata
+  //               parentUuid: this.parentUuid,
+  //               containerUuid: this.containerUuid,
+  //               panelType: this.panelType, // determinate if get table name and record id (window) or selection (browser)
+  //               reportFormat: this.reportExportType,
+  //               recordUuidSelection: selection,
+  //               isProcessTableSelection: true,
+  //               routeToDelete: this.$route
+  //             })
+  //           } else {
+  //             this.$store.dispatch('startProcess', {
+  //               action: action, // process metadata
+  //               parentUuid: this.parentUuid,
+  //               isProcessTableSelection: false,
+  //               containerUuid: this.containerUuid,
+  //               panelType: this.panelType, // determinate if get table name and record id (window) or selection (browser)
+  //               reportFormat: this.reportExportType,
+  //               routeToDelete: this.$route
+  //             })
+  //               .catch(error => {
+  //                 console.warn(error)
+  //               })
+  //           }
+  //         } else {
+  //           this.showNotification({
+  //             type: 'warning',
+  //             title: this.$t('notifications.emptyValues'),
+  //             name: '<b>' + fieldNotReady.name + '.</b> ',
+  //             message: this.$t('notifications.fieldMandatory')
+  //           })
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }
 </script>
 

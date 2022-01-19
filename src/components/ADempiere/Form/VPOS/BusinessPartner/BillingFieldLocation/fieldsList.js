@@ -28,17 +28,6 @@ const fieldBase = {
 export default [
   {
     ...fieldBase,
-    elementColumnName: 'C_Location_ID',
-    columnName: 'C_Location_ID',
-    overwriteDefinition: {
-      isCustomField: true,
-      size: 24,
-      isDisplayed: false,
-      index: 1
-    }
-  },
-  {
-    ...fieldBase,
     elementColumnName: 'C_Country_ID',
     columnName: 'C_Country_ID',
     overwriteDefinition: {

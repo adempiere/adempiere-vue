@@ -31,11 +31,44 @@
               placement="left-start"
               width="900"
               trigger="click"
+              style="padding: 0px"
             >
-              <business-partner-create
-                :parent-metadata="parentMetadata"
-                :show-field="popoverCreateBusinessParnet"
-              />
+              <el-scrollbar wrap-class="scroll-child">
+                <business-partner-create
+                  :parent-metadata="parentMetadata"
+                  :show-field="popoverCreateBusinessParnet"
+                  :is-visible-address="isVisibleAddress"
+                />
+              </el-scrollbar>
+              <br>
+              <el-row :gutter="24">
+                <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
+                  <samp style="float: right; padding-right: 10px;">
+                    <el-checkbox v-model="isVisibleAddress">
+                      {{ $t('form.pos.order.BusinessPartnerCreate.addBillingAddress') }}
+                    </el-checkbox>
+                    <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
+                      {{ $t('form.byInvoice.copyShippingAddress') }}
+                    </el-checkbox>
+                  </samp>
+                </el-col>
+                <el-col :span="24">
+                  <samp style="float: right; padding-right: 10px;">
+                    <el-button
+                      type="primary"
+                      class="custom-button-create-bp"
+                      icon="el-icon-check"
+                      @click="createBusinessParter"
+                    />
+                    <el-button
+                      type="danger"
+                      class="custom-button-create-bp"
+                      icon="el-icon-close"
+                      @click="clearValues()"
+                    />
+                  </samp>
+                </el-col>
+              </el-row>
               <el-button
                 slot="reference"
                 type="text"
@@ -79,8 +112,9 @@
               v-if="!isEmptyValue(currentOrder)"
               v-model="showUpdate"
               placement="left-start"
-              width="900"
+              width="950"
               trigger="click"
+              style="padding: 0px; margin: 0px"
             >
               <business-partner-update
                 :shows-popovers="showUpdate"
@@ -95,7 +129,7 @@
                   class="el-icon-edit"
                   style="font-size: 22px"
                 />
-                Actualizar Socio de Negocio {{ selectAddress.first_name }}
+                Actualizar Socio de Negocio
               </el-button>
             </el-popover>
           </el-dropdown-item>
@@ -191,16 +225,20 @@
 </template>
 
 <script>
-// components and mixins
-import BusinessPartnerCreate from './businessPartnerCreate'
+/**
+ * This component is made to be the prototype of the Business Partner search field
+ * TODO: Before creating you must make a search for all the filled fields.
+ */
+import { requestGetBusinessPartner } from '@/api/ADempiere/system-core.js'
+import BusinessPartnerCreate from './businessPartnerCreate.vue'
 import BusinessPartnerUpdate from './businessPartnerUpdate'
-import AddAddress from './addAddress.vue'
+import { createCustomer } from '@/api/ADempiere/form/point-of-sales.js'
+import AddAddress from './addAddress'
 // import FieldListBusinessPartner from './fieldBusinessPartners/index'
 import BusinessPartnersList from './businessPartnersList'
 import BParterMixin from './mixinBusinessPartner.js'
 
 // api request methods
-import { requestGetBusinessPartner } from '@/api/ADempiere/system-core.js'
 
 // utils and helper methods
 const { setBusinessPartner } = BParterMixin.methods
@@ -221,7 +259,9 @@ export default {
     AddAddress
     // FieldListBusinessPartner
   },
-
+  mixins: [
+    BParterMixin
+  ],
   props: {
     parentMetadata: {
       type: Object,
@@ -256,11 +296,20 @@ export default {
       customerValue: '',
       oldValueCustomer: '',
       visibleSelectAddress: false,
-      selectCustomerValue: {}
+      selectCustomerValue: {},
+      isVisibleAddress: false
     }
   },
 
   computed: {
+    copyShippingAddress: {
+      get() {
+        return this.$store.getters.getCopyShippingAddress
+      },
+      set(value) {
+        this.$store.dispatch('changeCopyShippingAddress', value)
+      }
+    },
     value: {
       get() {
         return this.$store.getters.getValueOfField({
@@ -400,10 +449,10 @@ export default {
     },
     updatedCustomerValue() {
       return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner.value
-    },
-    copyShippingAddress() {
-      return this.$store.getters.getCopyShippingAddress
     }
+    // copyShippingAddress() {
+    //   return this.$store.getters.getCopyShippingAddress
+    // }
   },
 
   watch: {
@@ -451,6 +500,127 @@ export default {
         return ' - ' + address
       }
       return ''
+    },
+    changeShipping(value) {
+      this.$store.dispatch('changeCopyShippingAddress', value)
+    },
+    clearValues() {
+      this.$store.dispatch('changePopover', false)
+
+      this.$store.dispatch('setDefaultValues', {
+        containerUuid: this.containerUuid,
+        panelType: this.panelType
+      })
+      this.clearAddresses('Location-Address-Create')
+      this.clearAddresses('Shipping-Address')
+      this.clearDataCustomer(this.containerUuid)
+    },
+    createBusinessParter() {
+      const values = this.datesForm(this.$store.getters.getValuesView({
+        containerUuid: 'Business-Partner-Create',
+        format: 'object'
+      }))
+      const billingAddress = this.billingAddress
+      if (this.isEmptyValue(billingAddress.first_name)) {
+        const region = this.$store.getters.getValueOfField({
+          containerUuid: 'Billing-Address',
+          columnName: 'DisplayColumn_C_Region_ID'
+        })
+        const city = this.$store.getters.getValueOfField({
+          containerUuid: 'Billing-Address',
+          columnName: 'DisplayColumn_C_City_ID'
+        })
+        billingAddress.first_name = region + '/' + city
+      }
+      const validateValueCustomer = this.$store.getters.getValueOfField({
+        containerUuid: 'Business-Partner-Create',
+        columnName: 'Value'
+      })
+      this.billingAddress.email = values.email
+      this.billingAddress.phone = values.phone
+      this.shippingAddress.phone = values.phone
+      this.shippingAddress.email = values.email
+      if (this.isEmptyValue(validateValueCustomer)) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Business-Partner-Create',
+          columnName: 'Value',
+          value: values.taxId
+        })
+        values.value = values.taxId
+      }
+      values.addresses = [this.billingAddress, this.shippingAddress]
+      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
+        containerUuid: this.containerUuid,
+        formatReturn: 'name'
+      })
+      if (this.isEmptyValue(emptyMandatoryFields)) {
+        this.isLoadingRecord = true
+        createCustomer(
+          values
+        )
+          .then(responseBPartner => {
+            // TODO: Add new record into vuex store.
+            this.setBusinessPartner(responseBPartner)
+            this.clearValues()
+            this.$message({
+              type: 'success',
+              message: this.$t('form.pos.order.BusinessPartnerCreate.businessPartner'),
+              duration: 1500,
+              showClose: true
+            })
+          })
+          .catch(error => {
+            this.showsPopovers.isShowCreate = true
+            this.$message({
+              type: 'warning',
+              message: error.message + 'Name',
+              duration: 1500,
+              showClose: true
+            })
+            console.warn(`Error create Business Partner. Message: ${error.message}, code ${error.code}.`)
+          })
+          .finally(() => {
+            this.isLoadingRecord = false
+          })
+      } else {
+        this.$message({
+          type: 'warn',
+          message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
+          duration: 1500,
+          showClose: true
+        })
+      }
+    },
+    datesForm(values) {
+      const valuesToSend = {}
+      Object.keys(values).forEach(key => {
+        const value = values[key]
+        if (this.isEmptyValue(value)) {
+          return
+        }
+        switch (key) {
+          case 'Value':
+            valuesToSend['value'] = value
+            break
+          case 'Name':
+            valuesToSend['name'] = value
+            break
+          case 'Name2':
+            valuesToSend['lastName'] = value
+            break
+          case 'TaxID':
+            valuesToSend['taxId'] = value
+            break
+          case 'Phone':
+            valuesToSend['phone'] = value
+            break
+          case 'EMail':
+            valuesToSend['email'] = value
+            break
+        }
+      })
+      valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
+      return valuesToSend
     },
     handleCommandAddress(address) {
       this.selectAddress = address

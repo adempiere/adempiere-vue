@@ -24,8 +24,8 @@
   >
     <el-container style="background: white; height: 100%!important;">
       <el-header
-        height="10%"
-        :style="isShowedPOSKeyLayout ? 'padding-right: 20px; padding-left: 0px;' : 'padding-right: 0px; padding-left: 0px;'"
+        height="15%"
+        :style="isShowedPOSKeyLayout ? 'padding-right: 1%; padding-left: 1%;' : 'padding-right: 1%; padding-left: 1%;'"
       >
         <el-form label-position="top" label-width="500px" @submit.native.prevent="notSubmitForm">
           <el-row :gutter="24" style="display: flex;">
@@ -54,14 +54,7 @@
                 :is-disabled="isDisabled"
               />
             </el-col>
-            <el-col :span="isShowKeyLayout ? 8 : 7" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2%;'">
-              <document-status-tag
-                v-if="!isEmptyValue(currentOrder.documentStatus.value)"
-                :value="currentOrder.documentStatus.value"
-                :displayed-value="currentOrder.documentStatus.name"
-                style="font-size: 12px;"
-              />
-
+            <el-col :span="6" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px;'">
               <fast-ordes-list style="margin-right: 2%;margin-left: 2%;font-size: 12px;" />
             </el-col>
           </el-row>
@@ -467,7 +460,7 @@
 import fieldsListOrder from './fieldsListOrder.js'
 
 // components and mixins
-import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+// import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import orderLineMixin from './orderLineMixin.js'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
@@ -496,7 +489,7 @@ export default {
 
   components: {
     BusinessPartner,
-    DocumentStatusTag,
+    // DocumentStatusTag,
     ProductInfo,
     FastOrdesList,
     fieldLine,

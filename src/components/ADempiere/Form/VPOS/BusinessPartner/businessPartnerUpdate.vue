@@ -65,8 +65,30 @@
                   type="text"
                   @click="openEditAddress(address)"
                 >
-                  Editar {{ showAddressUpdate }}
+                  Editar
                 </el-button>
+                <!--<el-popover
+                  v-model="showPanelAddress"
+                  placement="left-start"
+                  :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
+                  width="600"
+                  trigger="click"
+                >
+                  {{ address.first_name }}
+                  <add-address
+                    :is-updated-address="showAddressUpdate"
+                    :address-to-update="addressUpdate"
+                    :shows-popovers="showAddressUpdate"
+                  />
+                  <el-button
+                    slot="reference"
+                    style="float: right; padding: 3px 0"
+                    type="text"
+                    @click="openEditAddress(address)"
+                  >
+                    Editar
+                  </el-button>
+                </el-popover>-->
               </div>
               <el-scrollbar wrap-class="scroll-customer-description">
                 <el-descriptions class="margin-top" :title="$t('form.pos.order.BusinessPartnerCreate.address.managementDescription')" :column="1">
@@ -106,13 +128,11 @@
     </el-form>
     <el-dialog
       :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
-      :visible.sync="showPanelAddress"
-      :modal="false"
-      :append-to-body="true"
-      :close-on-press-escape="true"
+      :visible.sync="epale"
       :show-close="true"
-      :close-on-click-modal="true"
-      @close="closePanelAddress"
+      :append-to-body="true"
+      :modal-append-to-body="true"
+      :modal="false"
     >
       <add-address
         :is-updated-address="showAddressUpdate"
@@ -262,6 +282,9 @@ export default {
     showCustomer() {
       return this.$store.getters.getShowUpdateCustomer
     },
+    showUpdate() {
+      return this.$store.getters.getShowUpdateCustomer
+    },
     copyShippingAddress() {
       return this.$store.getters.getCopyShippingAddress
     },
@@ -284,6 +307,7 @@ export default {
   methods: {
     requestGetCountryDefinition,
     closePanelAddress() {
+      this.epale = false
       this.showPanelAddress = false
     },
     actionUpdate(commands) {
@@ -546,6 +570,7 @@ export default {
     openEditAddress(address) {
       this.showPanelAddress = true
       this.$store.commit('setShowAddressUpdate', true)
+      this.$store.commit('setShowPanelAddress', true)
       this.addressUpdate = address
       this.loadAddresses(address, 'Add-Location-Address')
       this.$store.commit('updateValueOfField', {

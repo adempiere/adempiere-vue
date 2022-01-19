@@ -140,6 +140,15 @@ export default {
       return 'field-standard'
     },
     sizeField() {
+      if (this.isEmptyValue(this.field.size)) {
+        return {
+          xs: 24,
+          sm: 24,
+          md: 24,
+          lg: 24,
+          xl: 24
+        }
+      }
       return {
         xs: this.field.size.xs,
         sm: this.field.size.sm,

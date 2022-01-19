@@ -47,23 +47,6 @@
           style="min-height: calc(50vh - 84px)"
           class="loading-panel"
         />
-        <!--<el-col v-show="!parentMetadata.pos" :span="24" style="padding-left: 12px;padding-right: 12px;padding-top: 3%;padding-bottom: 3%;">
-          <samp style="float: right; padding-right: 10px;">
-            <el-button
-              :disabled="!isLoaded"
-              type="primary"
-              class="custom-button-address-location"
-              icon="el-icon-check"
-              @click="sendValuesToServer"
-            />
-            <el-button
-              type="danger"
-              class="custom-button-address-location"
-              icon="el-icon-close"
-              @click="cancelChanges"
-            />
-          </samp>
-        </el-col>-->
       </el-row>
     </el-form>
   </div>
@@ -108,8 +91,8 @@ export default {
       default: () => {
         return {
           // TODO: Add container uuid parent
-          uuid: 'Add-Location-Address',
-          containerUuid: 'Add-Location-Address',
+          uuid: 'Shipping-Address',
+          containerUuid: 'Shipping-Address',
           isSetDefaultValues: false
         }
       }
@@ -143,13 +126,10 @@ export default {
       }
     },
     fieldsListLocation() {
-      if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
-        return this.$store.getters.getFieldLocation
+      if (!this.isEmptyValue(this.$store.getters.getFieldsListLocationShipping)) {
+        return this.$store.getters.getFieldsListLocationShipping
       }
-
-      // return this.fieldsList
-
-      return this.getterPanel.fieldsList
+      return this.fieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({
@@ -265,7 +245,7 @@ export default {
             return itemA.index - itemB.index
           })
 
-          this.$store.dispatch('changeSequence', newFieldsList)
+          this.$store.dispatch('changeSequenceShipping', newFieldsList)
         })
         .catch(error => {
           this.$message({

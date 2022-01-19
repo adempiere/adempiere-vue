@@ -46,7 +46,7 @@ export default {
         getFieldsLit: () => {},
         isDisplayedField: () => { return true },
         isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return true },
+        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
