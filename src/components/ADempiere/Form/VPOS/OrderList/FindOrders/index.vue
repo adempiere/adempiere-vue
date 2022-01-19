@@ -196,6 +196,7 @@
 </template>
 
 <script>
+// utils and helper methods
 import {
   formatDate,
   formatPrice
@@ -204,6 +205,7 @@ import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
   name: 'FindOrders',
+
   props: {
     metadata: {
       type: Object,
@@ -244,6 +246,7 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       metadataList: {},
@@ -261,6 +264,7 @@ export default {
       openPopover: false
     }
   },
+
   computed: {
     highlightRow() {
       if (!this.isEmptyValue(this.selectOrder)) {
@@ -289,6 +293,7 @@ export default {
       })
     }
   },
+
   methods: {
     formatDate,
     formatPrice,
@@ -324,10 +329,6 @@ export default {
         }
         return 0
       })
-    },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     },
     handleChangePage(newPage) {
       this.tokenPage = this.tokenPage + '-' + newPage

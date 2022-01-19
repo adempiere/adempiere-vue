@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div class="wrapper">
     <el-row
@@ -25,7 +26,7 @@
       >
         <el-col :key="index" :span="8">
           <el-form label-position="top" label-width="10px" @submit.native.prevent="notSubmitForm">
-            <field
+            <field-definition
               v-if="field.columnName === 'PriceEntered'"
               :key="field.columnName"
               :ref="field.columnName"
@@ -36,14 +37,14 @@
               :container-uuid="'line'"
               :container-manager="containerManager"
             />
-            <field
+            <field-definition
               v-if="field.columnName === 'QtyEntered'"
               :key="field.columnName"
               :metadata-field="field"
               :container-uuid="'line'"
               :container-manager="containerManager"
             />
-            <field
+            <field-definition
               v-if="field.columnName === 'Discount'"
               :ref="field.columnName"
               :key="field.columnName"
@@ -68,19 +69,27 @@
 </template>
 
 <script>
+// constants
+import fieldsListLine from './fieldsListLine.js'
 
+// components and mixins
+import FieldDefinition from '@/components/ADempiere/Field/index.vue'
+
+// api request methods
+import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
+
+// utils and helper methods
 import {
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
-import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
-import fieldsListLine from './fieldsListLine.js'
-import Field from '@/components/ADempiere/Field'
 
 export default {
   name: 'FieldLine',
+
   components: {
-    Field
+    FieldDefinition
   },
+
   props: {
     dataLine: {
       type: Object,
@@ -107,6 +116,7 @@ export default {
       })
     }
   },
+
   data() {
     return {
       metadataList: [],
@@ -118,6 +128,7 @@ export default {
       fieldsList: []
     }
   },
+
   computed: {
     isModifyPrice() {
       const pos = this.$store.getters.posAttributes.currentPointOfSales
@@ -183,12 +194,15 @@ export default {
       }
     }
   },
+
   beforeMount() {
     this.unsubscribe = this.subscribeChanges()
   },
+
   beforeDestroy() {
     this.unsubscribe()
   },
+
   methods: {
     createFieldFromDictionary,
     setFieldsList() {

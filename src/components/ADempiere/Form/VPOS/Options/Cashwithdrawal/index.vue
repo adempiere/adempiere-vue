@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-empty v-if="isEmptyValue(listCurrency) && isEmptyValue(availablePaymentMethods)" :description="$t('form.pos.optionsPoinSales.emptyAvailablePaymentMethods')" />
   <el-container v-else style="background: white; height: 100% !important;">
@@ -205,22 +206,31 @@
 </template>
 
 <script>
+// constants
+import fieldsListCashOpen from './fieldsList.js'
+
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
-import fieldsListCashOpen from './fieldsList.js'
-import { formatPrice, formatDate, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
+
+// api request methods
 import {
   createPayment,
   cashWithdrawal,
   deletePayment
 } from '@/api/ADempiere/form/point-of-sales.js'
 
+// utils and helper methods
+import { formatPrice, formatDate, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
+
 export default {
   name: 'Cashwithdrawal',
+
   mixins: [
     formMixin,
     posMixin
   ],
+
   props: {
     isLoadedPanel: {
       type: Boolean,
@@ -252,6 +262,7 @@ export default {
       })
     }
   },
+
   data() {
     return {
       isCustomForm: true,
@@ -269,6 +280,7 @@ export default {
       currentFieldPaymentMethods: ''
     }
   },
+
   computed: {
     listCurrency() {
       return this.$store.getters.getCurrenciesList
@@ -557,6 +569,7 @@ export default {
       return false
     }
   },
+
   watch: {
     pending(value) {
       this.$store.commit('updateValueOfField', {
@@ -620,16 +633,18 @@ export default {
       return this.$store.getters.getCurrency.standardPrecision
     }
   },
+
   created() {
     this.currentFieldCurrency = this.pointOfSalesCurrency.iSOCode
     this.$store.dispatch('addRateConvertion', this.pointOfSalesCurrency)
-    this.unsubscribe = this.subscribeChanges()
     this.defaultValueCurrency()
     this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
   },
+
   mounted() {
     this.listPaymentOpen()
   },
+
   methods: {
     formatDateToSend,
     formatDate,
@@ -667,10 +682,6 @@ export default {
       }
       const rate = (currencyPay.divideRate > currencyPay.multiplyRate) ? currencyPay.divideRate : currencyPay.multiplyRate
       return rate
-    },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     },
     updateServer(listPaymentsLocal) {
       const posUuid = this.currentPointOfSales.uuid

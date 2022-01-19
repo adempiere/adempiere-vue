@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div>
     <div style="text-align: center">
@@ -467,9 +468,18 @@
 </template>
 
 <script>
+// components and methods
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
 import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
 import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
+import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
+import CashOpening from './CashOpening'
+import CashSummaryMovements from './CashSummaryMovements'
+import CashWithdrawal from './Cashwithdrawal'
+import AssignSeller from './AssignSeller'
+import ModalDialog from '@/components/ADempiere/Dialog'
+
+// api request methods
 import {
   generateImmediateInvoice,
   withdrawal,
@@ -480,16 +490,11 @@ import {
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
 import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
-import ModalDialog from '@/components/ADempiere/Dialog'
 // import posProcess from '@/utils/ADempiere/constants/posProcess'
-import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
-import CashOpening from './CashOpening'
-import CashSummaryMovements from './CashSummaryMovements'
-import CashWithdrawal from './Cashwithdrawal'
-import AssignSeller from './AssignSeller'
 
 export default {
-  name: 'Options',
+  name: 'PointOfSalesOptions',
+
   components: {
     ListProductPrice,
     OrdersList,
@@ -500,15 +505,18 @@ export default {
     AssignSeller,
     ConfirmDelivery
   },
+
   mixins: [
     orderLineMixin
   ],
+
   props: {
     metadata: {
       type: Object,
       default: () => {}
     }
   },
+
   data() {
     return {
       activeName: '',
@@ -524,6 +532,7 @@ export default {
       showConfirmDelivery: false
     }
   },
+
   computed: {
     isAllowsCashOpening() {
       return this.currentPointOfSales.isAllowsCashOpening
@@ -689,6 +698,7 @@ export default {
       return false
     }
   },
+
   watch: {
     // popoverConfirmDelivery(value) {
     //   this.showConfirmDelivery = value
@@ -701,6 +711,7 @@ export default {
       }
     }
   },
+
   methods: {
     openDelivery() {
       if (!this.isProcessed) {
@@ -798,10 +809,6 @@ export default {
           this.pin = ''
           this.visible = false
         })
-    },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     },
     validateOption(name) {
       this.visible = true

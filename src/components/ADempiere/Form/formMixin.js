@@ -14,15 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// components and mixins
 import FieldDefinition from '@/components/ADempiere/Field'
+
+// utils and helper methods
 import { createFieldFromDefinition, createFieldFromDictionary } from '@/utils/ADempiere/lookupFactory'
 
 export default {
   name: 'FormMixn',
+
   components: {
-    Field: FieldDefinition, // TODO: deprecated component name, replace with FieldDefinition
     FieldDefinition
   },
+
   props: {
     metadata: {
       type: Object,
@@ -41,6 +45,7 @@ export default {
       })
     }
   },
+
   data() {
     let containerUuid = this.$route.meta.uuid
     if (!this.isEmptyValue(this.metadata)) {
@@ -61,13 +66,17 @@ export default {
       panelType: 'form'
     }
   },
+
   computed: {
     getterPanel() {
       return this.$store.getters.getPanel(this.containerUuid)
     }
   },
+
   created() {
     this.getPanel()
+
+    this.unsubscribe = this.subscribeChanges()
   },
 
   beforeDestroy() {
@@ -77,6 +86,13 @@ export default {
   methods: {
     createFieldFromDefinition,
     createFieldFromDictionary,
+    /**
+     * Vuex suscription
+     * @override
+     */
+    subscribeChanges() {
+      // logic here
+    },
     async getPanel() {
       const panel = this.getterPanel
       if (!this.isEmptyValue(panel)) {

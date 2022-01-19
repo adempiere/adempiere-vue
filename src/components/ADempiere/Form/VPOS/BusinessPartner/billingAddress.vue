@@ -49,13 +49,16 @@ import FieldLocation from './billingAddressFieldLocation'
 
 export default {
   name: 'BillingAddress',
+
   components: {
     FieldLocation
   },
+
   mixins: [
     formMixin,
     BParterMixin
   ],
+
   props: {
     metadata: {
       type: Object,
@@ -66,10 +69,6 @@ export default {
           fieldsList
         }
       }
-    },
-    epale: {
-      type: Object,
-      default: () => {}
     },
     showField: {
       type: Boolean,
@@ -92,6 +91,7 @@ export default {
       })
     }
   },
+
   data() {
     return {
       input: '',
@@ -99,10 +99,10 @@ export default {
       isLoadingRecord: false,
       fieldsList,
       checked: true,
-      isCustomForm: true,
-      unsubscribe: () => {}
+      isCustomForm: true
     }
   },
+
   computed: {
     fieldSize() {
       return !this.$store.getters.getCopyShippingAddress ? 24 : 12
@@ -144,15 +144,6 @@ export default {
     },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
-    }
-  },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
-  methods: {
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     }
   }
 }

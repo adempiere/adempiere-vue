@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <span>
     <el-button type="primary" plain @click="newOrder()">
@@ -48,7 +49,7 @@
                     v-for="(field) in metadataList"
                     :key="field.columnName"
                   >
-                    <field
+                    <field-definition
                       v-if="field.columnName === 'DateOrderedFrom'"
                       :metadata-field="{
                         ...field,
@@ -56,7 +57,7 @@
                         name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
                       }"
                     />
-                    <field
+                    <field-definition
                       v-else-if="field.columnName === 'C_BPartner_ID'"
                       :metadata-field="{
                         ...field,
@@ -105,8 +106,21 @@
 </template>
 
 <script>
+// constants
 import fieldsListOrders from './fieldsListOrders.js'
+
+// components and mixins
+import FindOrders from './FindOrders'
+import FieldDefinition from '@/components/ADempiere/Field'
 import CustomPagination from '@/components/ADempiere/Pagination'
+
+// api request methods
+import { createShipment, shipments, holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
+import {
+  listOrders
+} from '@/api/ADempiere/form/point-of-sales.js'
+
+// ultils and helper methods
 import {
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
@@ -114,21 +128,17 @@ import {
   formatDate,
   formatPrice
 } from '@/utils/ADempiere/valueFormat.js'
-import {
-  listOrders
-} from '@/api/ADempiere/form/point-of-sales.js'
-import { createShipment, shipments, holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
-import FindOrders from './FindOrders'
-import Field from '@/components/ADempiere/Field'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
   name: 'AisleVendorList',
+
   components: {
     CustomPagination,
     FindOrders,
-    Field
+    FieldDefinition
   },
+
   props: {
     metadata: {
       type: Object,
@@ -145,6 +155,7 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       fieldsList: fieldsListOrders,
@@ -169,6 +180,7 @@ export default {
       isStatus: ''
     }
   },
+
   computed: {
     allowsConfirmShipment() {
       return this.currentPointOfSales.isAllowsConfirmShipment
@@ -274,12 +286,15 @@ export default {
       return this.$store.getters.getQuickSearchOrder
     }
   },
+
   created() {
     this.unsubscribe = this.subscribeChanges()
   },
+
   beforeDestroy() {
     this.unsubscribe()
   },
+
   methods: {
     formatDate,
     formatPrice,
@@ -381,10 +396,6 @@ export default {
             showClose: true
           })
         })
-    },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     },
     handleChangePage(newPage) {
       this.tokenPage = this.tokenPage + '-' + newPage
