@@ -100,10 +100,7 @@ export function requestChangePassword({
     }
   })
     .then(changePasswordResponse => {
-      return {
-        responseType: changePasswordResponse.response_type,
-        responseTypeStatus: changePasswordResponse.response_type_status
-      }
+      return changePasswordResponse
     })
 }
 

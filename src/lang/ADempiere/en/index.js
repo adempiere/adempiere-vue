@@ -583,6 +583,7 @@ export default {
       toDeliver: 'To be delivered',
       toCollect: 'Receivable',
       salesRepresentative: 'Sales Agent',
+      onlyAllocated: 'Only allocated to current point of sales',
       businessPartner: 'Business Partner',
       copyShippingAddress: 'Copy shipping address',
       documentNo: 'Document No.',
