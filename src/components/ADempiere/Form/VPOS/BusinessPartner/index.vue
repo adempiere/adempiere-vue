@@ -154,6 +154,7 @@
     </template>
 
     <el-autocomplete
+      ref="displayBPartner"
       v-model="displayedValue"
       :placeholder="$t('quickAccess.searchWithEnter')"
       :fetch-suggestions="localSearch"
@@ -253,6 +254,7 @@ export default {
       labelAddress: '',
       visibleAddress: false,
       customerValue: '',
+      oldValueCustomer: '',
       visibleSelectAddress: false,
       selectCustomerValue: {}
     }
@@ -275,17 +277,14 @@ export default {
       }
     },
     listAddress() {
-      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
-      const orderCustomer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
-      if (!this.isEmptyValue(templateCustomer) && templateCustomer.uuid !== orderCustomer.uud) {
-        return orderCustomer.addresses
+      if (!this.isEmptyValue(this.templateCustomer) && this.templateCustomer.uuid !== this.orderCustomer.uud) {
+        return this.orderCustomer.addresses
       }
       return []
     },
     listAddressCustomer() {
-      const orderCustomer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
-      if (!this.isEmptyValue(orderCustomer.addresses)) {
-        return orderCustomer.addresses
+      if (!this.isEmptyValue(this.orderCustomer.addresses)) {
+        return this.orderCustomer.addresses
       }
       return []
     },
@@ -293,16 +292,25 @@ export default {
       get() {
         const display = this.$store.getters.getValueOfField({
           containerUuid: this.parentMetadata.containerUuid,
-          // DisplayColumn_'ColumnName'
           columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.displayColumnName
         })
-        if (display === undefined && !this.visibleSelectAddress) {
-          return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer.name
+        if (this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid)) {
+          if (!this.isEmptyValue(this.oldValueCustomer) && !this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
+            return this.oldValueCustomerData + this.displayAddress(this.selectAddress.first_name)
+          }
+          if (!this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
+            return this.templateCustomerData + this.displayAddress(this.selectAddress.first_name)
+          }
+          return display
+        } else {
+          if (!this.isEmptyValue(this.oldValueCustomer) && !this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
+            return this.oldValueCustomerData + this.displayAddress(this.selectAddress.first_name)
+          }
+          if (!this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
+            return this.orderCustomerData + this.displayAddress(this.selectAddress.first_name)
+          }
+          return display
         }
-        if (!this.isEmptyValue(this.selectAddress) && this.visibleSelectAddress) {
-          return this.customerValue + display + ' - ' + this.selectAddress.first_name
-        }
-        return this.customerValue + display
       },
       set(value) {
         this.$store.commit('updateValueOfField', {
@@ -311,6 +319,21 @@ export default {
           value
         })
       }
+    },
+    templateCustomer() {
+      return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
+    },
+    templateCustomerData() {
+      return this.templateCustomer.value + ' - ' + this.templateCustomer.name
+    },
+    orderCustomer() {
+      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
+    },
+    orderCustomerData() {
+      return this.orderCustomer.value + ' - ' + this.orderCustomer.name
+    },
+    oldValueCustomerData() {
+      return this.oldValueCustomer.value + ' - ' + this.oldValueCustomer.name
     },
     recordsBusinessPartners() {
       return this.$store.getters.getBusinessPartnersList
@@ -423,6 +446,12 @@ export default {
   methods: {
     setBusinessPartner,
     searchBPartnerList,
+    displayAddress(address) {
+      if (!this.isEmptyValue(address)) {
+        return ' - ' + address
+      }
+      return ''
+    },
     handleCommandAddress(address) {
       this.selectAddress = address
     },
@@ -442,7 +471,7 @@ export default {
     },
     setOldDisplayedValue() {
       this.visibleSelectAddress = true
-      this.customerValue = this.updatedCustomerValue + ' - '
+      this.customerValue = this.isEmptyValue(this.updatedCustomerValue) ? this.updatedCustomerValue : this.updatedCustomerValue + ' - '
       if (this.controlDisplayed !== this.displayedValue) {
         this.displayedValue = this.controlDisplayed
       }
@@ -517,6 +546,7 @@ export default {
       })
     },
     handleSelect(selectedValue) {
+      this.oldValueCustomer = selectedValue
       let businessPartner = selectedValue
       if (this.isEmptyValue(businessPartner)) {
         businessPartner = this.blankBPartner

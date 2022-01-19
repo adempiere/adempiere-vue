@@ -181,7 +181,7 @@ export default {
         password: password
       })
         .then(createPasswordResponse => {
-          if (createPasswordResponse.responseTypeStatus === 'OK') {
+          if (createPasswordResponse === 'Ok') {
             this.$message({
               message: this.$t('login.createPasswordSuccessful'),
               showClose: true,
