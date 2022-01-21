@@ -123,6 +123,7 @@ import fieldsListOrders from './fieldsListOrders.js'
 import FindOrders from './FindOrders'
 import FieldDefinition from '@/components/ADempiere/Field'
 import CustomPagination from '@/components/ADempiere/Pagination'
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 // api request methods
 import { createShipment, shipments, holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
@@ -134,12 +135,8 @@ import {
 import {
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
-import {
-  formatDate,
-  formatPrice
-} from '@/utils/ADempiere/valueFormat.js'
+import { clientDateTime } from '@/utils/ADempiere/formatValue/dateFormat.js'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
-import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 export default {
   name: 'AisleVendorList',
@@ -190,13 +187,11 @@ export default {
       input: '',
       valueVisible: false,
       isCustomForm: true,
-      businessPartner: '',
       timeOut: null,
       changeOrder: {},
       isloading: true,
       ordersInvoiced: [],
       ordersComplete: [],
-      dateOrdered: '',
       searchCriteria: {},
       currentOptions: {},
       orderList: [],
@@ -278,7 +273,7 @@ export default {
     sortFieldsListOrder() {
       return this.fieldsList.find(field => field.columnName === 'C_BPartner_ID')
     },
-    dateOrderedFrom() {
+    dateOrderedFromField() {
       return this.fieldsList.find(field => {
         if (field.columnName === 'DateOrdered') {
           return field
@@ -306,6 +301,38 @@ export default {
         this.$store.commit('setShowsearchToDeliveOrders', value)
       }
     },
+    businessPartnerUuid: {
+      get() {
+        // main panel values
+        return this.$store.getters.getValueOfField({
+          containerUuid: 'Aisle-Vendor-List',
+          columnName: 'C_BPartner_ID_UUID'
+        })
+      },
+      set(value) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Aisle-Vendor-List',
+          columnName: 'C_BPartner_ID_UUID',
+          value
+        })
+      }
+    },
+    dateOrderedFrom: {
+      get() {
+        // main panel values
+        return this.$store.getters.getValueOfField({
+          containerUuid: 'Aisle-Vendor-List',
+          columnName: 'DateOrderedFrom'
+        })
+      },
+      set(value) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Aisle-Vendor-List',
+          columnName: 'DateOrderedFrom',
+          value
+        })
+      }
+    },
     getSearchOrder() {
       return this.$store.getters.getQuickSearchOrder
     }
@@ -320,8 +347,6 @@ export default {
   },
 
   methods: {
-    formatDate,
-    formatPrice,
     extractPagingToken,
     createFieldFromDictionary,
     handleCommand(command) {
@@ -348,11 +373,9 @@ export default {
         columnName: 'DisplayColumn_C_BPartner_ID',
         value: undefined
       })
-      this.$store.commit('updateValueOfField', {
-        containerUuid: 'Aisle-Vendor-List',
-        columnName: 'C_BPartner_ID_UUID',
-        value: undefined
-      })
+
+      this.businessPartnerUuid = undefined
+      this.dateOrderedFrom = undefined
     },
     openOrder(command) {
       const posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
@@ -453,20 +476,20 @@ export default {
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
-        if (mutation.type === 'updateValueOfField' && mutation.payload.columnName === 'C_BPartner_ID_UUID' && mutation.payload.containerUuid === 'Aisle-Vendor-List' && mutation.payload.value !== this.businessPartner) {
-          this.businessPartner = mutation.payload.value
-        }
-        if (mutation.type === 'updateValueOfField' && mutation.payload.columnName === 'DateOrderedFrom' && mutation.payload.containerUuid === 'Aisle-Vendor-List' && mutation.payload.value !== this.dateOrdered) {
-          this.dateOrdered = mutation.payload.value
-        }
-        if (mutation.type === 'updateValueOfField' &&
-          !mutation.payload.columnName.includes('DisplayColumn') &&
-          !mutation.payload.columnName.includes('_UUID') &&
-          mutation.payload.containerUuid === this.metadata.containerUuid) {
-          clearTimeout(this.timeOut)
-          this.timeOut = setTimeout(() => {
-            this.listOrdersInvoiced(this.currentOptions)
-          }, 2000)
+        const { type } = mutation
+        if (type === 'updateValueOfField') {
+          const { payload } = mutation
+          if (payload.containerUuid === this.metadata.containerUuid) {
+            const { columnName } = payload
+
+            if (!columnName.includes('DisplayColumn') &&
+              !columnName.includes('_UUID')) {
+              clearTimeout(this.timeOut)
+              this.timeOut = setTimeout(() => {
+                this.listOrdersInvoiced(this.currentOptions)
+              }, 2000)
+            }
+          }
         }
       })
     },
@@ -484,7 +507,7 @@ export default {
           containerUuid: 'Aisle-Vendor-List'
         },
         {
-          ...this.dateOrderedFrom,
+          ...this.dateOrderedFromField,
           containerUuid: 'Aisle-Vendor-List'
         }
       ]
@@ -518,13 +541,25 @@ export default {
     },
     listOrdersInvoiced(option) {
       this.isloading = true
+
+      /*
+      // send multiple request with close list orders
+      if (this.isEmptyValue(this.dateOrdered) || this.isEmptyValue(this.businessPartnerUuid)) {
+        // with mandatory empty values
+        this.isLoading = false
+        return
+      }
+      */
+
+      const dateOrderedTo = clientDateTime(this.dateOrderedFrom, 'd')
+
       const values = {
         ...this.currentOptions.params,
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
         pageToken: this.tokenPage,
-        dateOrderedTo: this.dateOrdered,
-        businessPartnerUuid: this.businessPartner,
+        dateOrderedTo,
+        businessPartnerUuid: this.businessPartnerUuid,
         salesRepresentativeUuid: this.$store.getters['user/getUserUuid']
       }
       listOrders(

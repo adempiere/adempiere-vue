@@ -89,7 +89,7 @@ export function convertHasMapToObject({ map }) {
   // return result
 }
 
-// TODO: Remove and change path
+// TODO: Duplicated exported method, removed this
 export { formatDate } from '@/utils/ADempiere/formatValue/dateFormat'
 
 //  Get Formatted Price
@@ -119,6 +119,7 @@ export function formatQuantity(number) {
   //  Get formatted number
 }
 
+// TODO: Duplicated exported method, removed this
 // Format percentage based on Intl library
 export { formatPercent } from '@/utils/ADempiere/formatValue/numberFormat.js'
 
