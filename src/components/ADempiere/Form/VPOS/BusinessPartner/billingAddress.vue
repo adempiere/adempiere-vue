@@ -15,11 +15,12 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-col :span="$store.getters.getCopyShippingAddress ? 24 : 12">
     <el-card class="box-card" shadow="never">
       <div slot="header" class="clearfix">
-        <span>{{ $t('form.pos.order.BusinessPartnerCreate.billingAddress') }}</span>
+        <span>{{ $t('form.pos.order.BusinessPartnerCreate.billingAddress') }} </span>
       </div>
       <field-location
         :ref="fieldsList[0].columnName"
@@ -28,6 +29,8 @@
           size: { 'xs': fieldSize, 'sm': fieldSize, 'md': fieldSize, 'lg': fieldSize, 'xl': fieldSize }
         }"
         :value-model="fieldsList[0].value"
+        :container-uuid="'Billing-Address'"
+        :container-manager="containerManager"
       />
       <br>
       <br>
@@ -36,19 +39,26 @@
 </template>
 
 <script>
+// constants
+import fieldsList from './BillingFieldLocation/fieldsList.js'
+
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldListBillingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
-import FieldLocation from './billingAddressFieldLocation'
+import FieldLocation from './BillingFieldLocation'
+
 export default {
   name: 'BillingAddress',
+
   components: {
     FieldLocation
   },
+
   mixins: [
     formMixin,
     BParterMixin
   ],
+
   props: {
     metadata: {
       type: Object,
@@ -60,10 +70,6 @@ export default {
         }
       }
     },
-    epale: {
-      type: Object,
-      default: () => {}
-    },
     showField: {
       type: Boolean,
       default: false
@@ -71,8 +77,21 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
+
   data() {
     return {
       input: '',
@@ -80,10 +99,10 @@ export default {
       isLoadingRecord: false,
       fieldsList,
       checked: true,
-      isCustomForm: true,
-      unsubscribe: () => {}
+      isCustomForm: true
     }
   },
+
   computed: {
     fieldSize() {
       return !this.$store.getters.getCopyShippingAddress ? 24 : 12
@@ -125,15 +144,6 @@ export default {
     },
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
-    }
-  },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
-  methods: {
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     }
   }
 }

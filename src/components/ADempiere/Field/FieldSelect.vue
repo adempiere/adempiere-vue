@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-select
     :ref="metadata.columnName"
@@ -22,7 +23,7 @@
     :filterable="!isMobile"
     :placeholder="metadata.placeholder"
     :loading="isLoading"
-    value-key="id"
+    value-key="value"
     :class="cssClassStyle"
     clearable
     :multiple="isSelectMultiple"
@@ -36,15 +37,19 @@
     <el-option
       v-for="(option, key) in optionsList"
       :key="key"
-      :value="option.id"
+      :value="option.value"
       :label="option.label"
     />
   </el-select>
 </template>
 
 <script>
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import { convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+
+// utils and helper methods
+import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
  * This component is a lookup type field, use as a replacement for fields:
@@ -52,29 +57,37 @@ import { convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
  * - Table List
  * - Table Direct
  *
+ * TODO: String values add single quotation marks 'value'
+ * TODO: Add support to valuesList filter on proxy-api
+ * TODO: No blanck option enabled if is mandatory field
  * TODO: ALL: Although in the future these will have different components, and
  * are currently not supported is also displayed as a substitute for fields:
  * - Search Field
  */
 export default {
   name: 'FieldSelect',
-  mixins: [fieldMixin],
+
+  mixins: [
+    FieldMixin
+  ],
+
   data() {
     // label with '' value is assumed to be undefined non-existent
     const label = ' '
     const blankOption = {
       label,
-      id: undefined,
+      value: undefined,
       uuid: undefined
     }
 
     return {
       isLoading: false,
       optionsList: [blankOption],
-      blankValues: [null, undefined, -1],
+      blankValues: [null, undefined, -1, '-1'],
       blankOption
     }
   },
+
   computed: {
     isPanelWindow() {
       return this.metadata.panelType === 'window'
@@ -87,81 +100,69 @@ export default {
       if (this.isSelectMultiple) {
         styleClass += ' custom-field-select-multiple '
       }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass += this.metadata.cssClassName
       }
+
       return styleClass
     },
-    getterLookupList() {
+    getLookupList() {
       if (this.isEmptyValue(this.metadata.reference.query) ||
         !this.metadata.displayed) {
         return [this.blankOption]
       }
-      return this.$store.getters.getLookupList({
+      return this.$store.getters.getStoredLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        tableName: this.metadata.reference.tableName,
         query: this.metadata.reference.query,
-        tableName: this.metadata.reference.tableName
+        validationCode: this.metadata.reference.validationCode
       })
     },
-    getterLookupAll() {
-      const allOptions = this.$store.getters.getLookupAll({
+    getLookupAll() {
+      const allOptions = this.$store.getters.getStoredLookupAll({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
-        query: this.metadata.reference.query,
-        directQuery: this.metadata.reference.directQuery,
         tableName: this.metadata.reference.tableName,
+        query: this.metadata.reference.query,
+        validationCode: this.metadata.reference.validationCode,
+        directQuery: this.metadata.reference.directQuery,
         value: this.value
       })
 
       // sets the value to blank when the lookupList or lookupItem have no
       // values, or if only lookupItem does have a value
       if (this.isEmptyValue(allOptions) || (allOptions.length &&
-        (!this.blankValues.includes(allOptions[0].id)))) {
+        (!this.blankValues.includes(allOptions[0].value)))) {
         allOptions.unshift(this.blankOption)
       }
       return allOptions
     },
     value: {
       get() {
-        const { columnName, containerUuid } = this.metadata
-        let value
+        const { columnName, containerUuid, inTable } = this.metadata
         // table records values
-        if (this.metadata.inTable) {
-          const row = this.$store.getters.getRowData({
-            containerUuid,
-            index: this.metadata.tableIndex
-          })
-          value = row[columnName]
-        } else {
-          value = this.$store.getters.getValueOfField({
-            parentUuid: this.metadata.parentUuid,
-            containerUuid,
-            columnName
-          })
+        if (inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.getCell) {
+            return this.containerManager.getCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName
+            })
+          }
         }
 
-        if (this.isEmptyValue(value)) {
-          /* eslint-disable */
-          this.displayedValue = undefined
-          this.uuidValue = undefined
-          /* eslint-disable */
-          return value
-        }
-
-        const option = this.findOption(value)
-        if (!option.label) {
-          const label = this.displayedValue
-          /* eslint-disable */
-          this.optionsList.push({
-            // TODO: Add uuid
-            id: value,
-            label
-          })
-          /* eslint-disable */
-        }
-
-        return value
+        return this.$store.getters.getValueOfField({
+          parentUuid: this.metadata.parentUuid,
+          containerUuid,
+          columnName
+        })
       },
       set(value) {
         const option = this.findOption(value)
@@ -185,7 +186,7 @@ export default {
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           // 'ColumnName'_UUID
-          columnName: this.metadata.columnName + '_UUID',
+          columnName: this.metadata.columnName + '_UUID'
         })
       },
       set(value) {
@@ -203,20 +204,23 @@ export default {
     },
     displayedValue: {
       get() {
-        const { displayColumnName: columnName, containerUuid } = this.metadata
+        // DisplayColumn_'ColumnName'
+        const { displayColumnName: columnName, containerUuid, inTable } = this.metadata
         // table records values
-        if (this.metadata.inTable) {
-          const row = this.$store.getters.getRowData({
-            containerUuid,
-            index: this.metadata.tableIndex
-          })
-          // DisplayColumn_'ColumnName'
-          return row[columnName]
+        if (inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.getCell) {
+            return this.containerManager.getCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName
+            })
+          }
         }
+
         return this.$store.getters.getValueOfField({
           parentUuid: this.metadata.parentUuid,
           containerUuid,
-          // DisplayColumn_'ColumnName'
           columnName
         })
       },
@@ -231,6 +235,7 @@ export default {
       }
     }
   },
+
   watch: {
     isSelectMultiple(isMultiple) {
       let value = this.value
@@ -246,7 +251,7 @@ export default {
             // set first value
             value = value[0]
           } else {
-            value = this.blankOption.id
+            value = this.blankOption.value
           }
         }
       }
@@ -255,16 +260,40 @@ export default {
     'metadata.displayed'(value) {
       if (value) {
         // if is field showed, search into store all options to list
-        this.optionsList = this.getterLookupAll
+        this.optionsList = this.getLookupAll
+      }
+    },
+    value(newValue) {
+      if (isEmptyValue(newValue)) {
+        this.displayedValue = undefined
+        this.uuidValue = undefined
+        return
+      }
+
+      const option = this.findOption(newValue)
+      if (!option.label) {
+        const label = this.displayedValue
+        if (!isEmptyValue(label)) {
+          this.optionsList.push({
+            value: newValue,
+            uuid: option.uuid,
+            label
+          })
+        } else {
+          // request lookup
+          this.getDataLookupItem()
+        }
       }
     }
   },
+
   created() {
     this.changeBlankOption()
   },
+
   beforeMount() {
     if (this.metadata.displayed) {
-      this.optionsList = this.getterLookupAll
+      this.optionsList = this.getLookupAll
       const value = this.value
       if (!this.isEmptyValue(value) && !this.metadata.isAdvancedQuery) {
         const option = this.findOption(value)
@@ -272,18 +301,18 @@ export default {
           this.displayedValue = option.label
           this.uuidValue = option.uuid
         } else {
-          // TODO: Property displayColumn is @deprecated
-          if (!this.isEmptyValue(this.metadata.displayColumn)) {
+          if (!this.isEmptyValue(this.displayedValue)) {
             // verify if exists to add
             this.optionsList.push({
-              id: value,
-              // TODO: Add uuid
-              label: this.metadata.displayColumn
+              value,
+              uuid: option.uuid,
+              label: this.displayedValue
             })
           } else {
             if (!this.isPanelWindow || (this.isPanelWindow &&
               !this.isEmptyValue(this.$route.query) &&
               this.$route.query.action === 'create-new')) {
+              // request lookup
               this.getDataLookupItem()
             }
           }
@@ -291,6 +320,7 @@ export default {
       }
     }
   },
+
   methods: {
     parseValue(value) {
       if (typeof value === 'boolean') {
@@ -301,7 +331,7 @@ export default {
     },
     changeBlankOption() {
       if (Number(this.metadata.defaultValue) === -1) {
-        this.blankOption.id = this.metadata.defaultValue
+        this.blankOption.value = this.metadata.defaultValue
       }
     },
     preHandleChange(value) {
@@ -313,7 +343,7 @@ export default {
       })
     },
     findOption(value) {
-      const option = this.optionsList.find(item => item.id === value)
+      const option = this.optionsList.find(item => item.value === value)
       if (option && option.label) {
         return option
       }
@@ -342,7 +372,7 @@ export default {
             this.displayedValue = responseLookupItem.label
             this.uuidValue = responseLookupItem.uuid
             this.$nextTick(() => {
-              this.optionsList = this.getterLookupAll
+              this.optionsList = this.getLookupAll
             })
           }
         })
@@ -355,10 +385,9 @@ export default {
      */
     getDataLookupList(isShowList) {
       if (isShowList) {
-        // TODO: Evaluate if length = 1 and this element id = blankOption
-        const list = this.getterLookupList
-        this.optionsList =  this.getterLookupList
-        if (this.isEmptyValue(list) || (list.length === 1 && this.blankValues.includes(list[0]))) {
+        const list = this.getLookupList
+        if (this.isEmptyValue(list) || (list.length === 1 &&
+          this.blankValues.includes(list[0].value))) {
           this.remoteMethod()
         }
       }
@@ -371,16 +400,16 @@ export default {
         columnName: this.metadata.columnName,
         tableName: this.metadata.reference.tableName,
         query: this.metadata.reference.query,
-        whereClause: this.metadata.validationCode,
+        validationCode: this.metadata.reference.validationCode,
         // valuesList: this.value
         isAddBlankValue: true,
-        blankValue: this.blankOption.id
+        blankValue: this.blankOption.value
       })
         .then(responseLookupList => {
           if (!this.isEmptyValue(responseLookupList)) {
             this.optionsList = responseLookupList
           } else {
-            this.optionsList = this.getterLookupAll
+            this.optionsList = this.getLookupAll
           }
         })
         .finally(() => {
@@ -388,24 +417,27 @@ export default {
         })
     },
     clearLookup() {
-      // set empty list and empty option
-      this.optionsList = [
-        this.blankOption
-      ]
-
       this.$store.dispatch('deleteLookupList', {
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
         tableName: this.metadata.reference.tableName,
         query: this.metadata.reference.query,
         directQuery: this.metadata.reference.directQuery,
+        validationCode: this.metadata.reference.validationCode,
         value: this.value
       })
+        .then(() => {
+          // set empty list and empty option
+          this.optionsList = [
+            this.blankOption
+          ]
 
-      // set empty value
-      this.value = this.blankOption.id
+          // set empty value
+          this.value = this.blankOption.value
+        })
     }
   }
+
 }
 </script>
 

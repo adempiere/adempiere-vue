@@ -15,18 +15,19 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
-  <el-main
-    v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
-    style="height: -webkit-fill-available;overflow: hidden;"
-    @shortkey.native="actionCreate"
-  >
-    <el-form
-      label-position="top"
-      size="small"
-      class="create-bp"
+  <el-container style="max-height: 350px; border: 1px solid #eee; border: 0px">
+    <el-main
+      v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
+      style="height: -webkit-fill-available;overflow: hidden;"
+      @shortkey.native="actionCreate"
     >
-      <el-scrollbar wrap-class="scroll-customer-create">
+      <el-form
+        label-position="top"
+        size="small"
+        class="create-bp"
+      >
         <el-row :gutter="24">
           <el-col :span="24">
             <el-card class="box-card" shadow="never" style="height: 230px;">
@@ -41,18 +42,20 @@
                   :ref="field.columnName"
                   :key="field.columnName"
                   :metadata-field="field"
+                  :container-uuid="'Business-Partner-Create'"
+                  :container-manager="containerManager"
                 />
               </div>
             </el-card>
           </el-col>
         </el-row>
         <el-row v-show="isVisibleAddress" :gutter="24">
-          <el-scrollbar wrap-class="scroll-child">
+          <el-scrollbar v-if="isVisibleAddress" wrap-class="scroll-child">
             <billing-address />
             <shipping-address v-if="!copyShippingAddress" />
           </el-scrollbar>
         </el-row>
-        <el-row :gutter="24">
+        <!-- <el-row :gutter="24">
           <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
             <samp style="float: right; padding-right: 10px;">
               <el-checkbox v-model="isVisibleAddress">
@@ -63,46 +66,58 @@
               </el-checkbox>
             </samp>
           </el-col>
-          <el-col :span="24">
-            <samp style="float: right; padding-right: 10px;">
-              <el-button
-                type="primary"
-                class="custom-button-create-bp"
-                icon="el-icon-check"
-                @click="createBusinessParter"
-              />
-              <el-button
-                type="danger"
-                class="custom-button-create-bp"
-                icon="el-icon-close"
-                @click="clearValues()"
-              />
-            </samp>
-          </el-col>
-        </el-row>
-      </el-scrollbar>
-    </el-form>
-  </el-main>
+        </el-row> -->
+      </el-form>
+    </el-main>
+    <!-- <el-footer>
+      <el-row :gutter="24">
+        <el-col :span="24">
+          <samp style="float: right; padding-right: 10px;">
+            <el-button
+              type="primary"
+              class="custom-button-create-bp"
+              icon="el-icon-check"
+              @click="createBusinessParter"
+            />
+            <el-button
+              type="danger"
+              class="custom-button-create-bp"
+              icon="el-icon-close"
+              @click="clearValues()"
+            />
+          </samp>
+        </el-col>
+      </el-row>
+    </el-footer> -->
+  </el-container>
 </template>
 
 <script>
-import { createCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
-import formMixin from '@/components/ADempiere/Form/formMixin.js'
+// constants
 import fieldsList from './fieldsListCreate.js'
+
+// components and mixins
+import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import BillingAddress from './billingAddress.vue'
 import ShippingAddress from './shippingAddress.vue'
 import BParterMixin from './mixinBusinessPartner.js'
 
+// api request methods
+import { createCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
+
 export default {
   name: 'BusinessPartnerCreate',
+
   components: {
     ShippingAddress,
     BillingAddress
   },
+
   mixins: [
     formMixin,
     BParterMixin
   ],
+
   props: {
     metadata: {
       type: Object,
@@ -114,11 +129,28 @@ export default {
         }
       }
     },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
+    },
     showField: {
+      type: Boolean,
+      default: false
+    },
+    isVisibleAddress: {
       type: Boolean,
       default: false
     }
   },
+
   data() {
     return {
       businessPartnerRecord: {},
@@ -126,11 +158,11 @@ export default {
       fieldsList,
       checked: true,
       isCustomForm: true,
-      isVisibleAddress: false,
       isExistingCustomer: false,
       unsubscribe: () => {}
     }
   },
+
   computed: {
     fieldsListLocation() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
@@ -180,6 +212,7 @@ export default {
       })
     }
   },
+
   watch: {
     showField(value) {
       if (value) {
@@ -202,12 +235,7 @@ export default {
       this.checked = value
     }
   },
-  created() {
-    this.unsubscribe = this.subscribeChanges()
-  },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
+
   methods: {
     actionCreate(commands) {
       if (commands.srcKey) {

@@ -37,6 +37,10 @@
 </template>
 
 <script>
+/**
+ * @deprecated
+ * TODO: Use DefaultTable/CustomPagination
+ */
 export default {
   name: 'CustomPagination',
   props: {

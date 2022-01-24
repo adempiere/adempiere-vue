@@ -1,16 +1,40 @@
-import {
-  requestCreateEntity,
-  requestUpdateEntity
-} from '@/api/ADempiere/common/persistence.js'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/dataUtils.js'
+// ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
+// Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
+// Contributor(s): Yamel Senih ysenih@erpya.com www.erpya.com
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import router from '@/router'
 import language from '@/lang'
+
+// constants
+import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/constants/systemColumns'
+
+// api request methods
+import {
+  createEntity,
+  updateEntity
+} from '@/api/ADempiere/common/persistence.js'
+
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 
 const persistence = {
   state: {
     persistence: {}
   },
+
   mutations: {
     resetStatepersistence(state) {
       state = {
@@ -34,8 +58,58 @@ const persistence = {
       })
     }
   },
+
   actions: {
-    flushPersistenceQueue({ getters, dispatch }, {
+    actionPerformed({ commit, getters, dispatch }, {
+      field,
+      recordUuid,
+      value
+    }) {
+      return new Promise((resolve, reject) => {
+        const { parentUuid, containerUuid } = field
+        commit('addChangeToPersistenceQueue', {
+          containerUuid,
+          columnName: field.columnName,
+          value
+        })
+
+        const emptyFields = getters.getTabFieldsEmptyMandatory({
+          parentUuid,
+          containerUuid,
+          formatReturn: false
+        }).filter(itemField => {
+          // omit send to server (to create or update) columns manage by backend
+          return itemField.isAlwaysUpdateable ||
+            !LOG_COLUMNS_NAME_LIST.includes(itemField.columnName)
+        }).map(itemField => {
+          return itemField.name
+        })
+
+        if (!isEmptyValue(emptyFields)) {
+          showMessage({
+            message: language.t('notifications.mandatoryFieldMissing') + emptyFields,
+            type: 'info'
+          })
+          return
+        }
+        const route = router.app._route
+        recordUuid = route.query.action === 'create-new'
+          ? getters.getUuidOfContainer(field.containerUuid)
+          : route.query.action
+
+        dispatch('flushPersistenceQueue', {
+          containerUuid,
+          tableName: field.tabTableName,
+          recordUuid
+        })
+          .then(response => {
+            resolve(response)
+          })
+          .catch(error => reject(error))
+      })
+    },
+
+    flushPersistenceQueue({ getters }, {
       containerUuid,
       tableName,
       recordUuid
@@ -44,22 +118,23 @@ const persistence = {
         let attributesList = getters.getPersistenceAttributes(containerUuid)
           .filter(itemField => {
             // omit send to server (to create or update) columns manage by backend
-            return !LOG_COLUMNS_NAME_LIST.includes(itemField.columnName)
+            return itemField.isAlwaysUpdateable ||
+              !LOG_COLUMNS_NAME_LIST.includes(itemField.columnName)
           })
 
-        if (attributesList) {
-          if (recordUuid) {
+        if (!isEmptyValue(attributesList)) {
+          if (!isEmptyValue(recordUuid)) {
             // Update existing entity
-            requestUpdateEntity({
+            updateEntity({
               tableName,
               recordUuid,
               attributesList
             })
               .then(response => {
-                dispatch('listRecordLogs', {
-                  tableName: response.tableName,
-                  recordId: response.id,
-                  recordUuid: response.uuid
+                // TODO: Get list record log
+                showMessage({
+                  message: language.t('recordManager.updatedRecord'),
+                  type: 'success'
                 })
                 resolve(response)
               })
@@ -68,7 +143,7 @@ const persistence = {
             attributesList = attributesList.filter(itemAttribute => !isEmptyValue(itemAttribute.value))
 
             // Create new entity
-            requestCreateEntity({
+            createEntity({
               tableName,
               attributesList
             })
@@ -77,7 +152,7 @@ const persistence = {
                   message: language.t('data.createRecordSuccessful'),
                   type: 'success'
                 })
-
+                response.type = 'createEntity'
                 resolve(response)
               })
               .catch(error => reject(error))
@@ -86,6 +161,7 @@ const persistence = {
       })
     }
   },
+
   getters: {
     getPersistenceMap: (state) => (tableName) => {
       return state.persistence[tableName]

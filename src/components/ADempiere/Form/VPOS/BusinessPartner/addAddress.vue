@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-col :span="24">
     <el-card class="box-card" shadow="never" style="height: 350px;">
@@ -29,6 +30,8 @@
             :ref="fieldsList[0].columnName"
             :metadata="fieldsList[0]"
             :value-model="fieldsList[0].value"
+            :container-uuid="'New-Address'"
+            :container-manager="containerManager"
           />
         </el-row>
       </div>
@@ -69,11 +72,17 @@
 </template>
 
 <script>
+// constants
+import fieldsList from '@/components/ADempiere/Field/FieldLocation/fieldsList.js'
+
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldListBillingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
 import FieldLocation from './AddNewFieldLocation'
+
+// api request methods
 import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
+
 export default {
   name: 'AddAddress',
   components: {
@@ -113,6 +122,18 @@ export default {
     showsPopovers: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

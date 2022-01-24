@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div>
     <div style="text-align: center">
@@ -468,30 +469,33 @@
 </template>
 
 <script>
+// components and methods
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
 import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
 import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
-import {
-  generateImmediateInvoice,
-  withdrawal,
-  createNewReturnOrder,
-  deleteOrder,
-  createOrder,
-  reverseSales,
-  processOrder
-} from '@/api/ADempiere/form/point-of-sales.js'
-import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
-import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
-import ModalDialog from '@/components/ADempiere/Dialog'
-import posProcess from '@/utils/ADempiere/constants/posProcess'
 import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
 import CashOpening from './CashOpening'
 import CashSummaryMovements from './CashSummaryMovements'
 import CashWithdrawal from './Cashwithdrawal'
 import AssignSeller from './AssignSeller'
+import ModalDialog from '@/components/ADempiere/Dialog'
+
+// api request methods
+import {
+  generateImmediateInvoice,
+  withdrawal,
+  createNewReturnOrder,
+  deleteOrder,
+  reverseSales,
+  processOrder
+} from '@/api/ADempiere/form/point-of-sales.js'
+import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
+import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
+// import posProcess from '@/utils/ADempiere/constants/posProcess'
 
 export default {
-  name: 'Options',
+  name: 'PointOfSalesOptions',
+
   components: {
     ListProductPrice,
     OrdersList,
@@ -502,15 +506,18 @@ export default {
     AssignSeller,
     ConfirmDelivery
   },
+
   mixins: [
     orderLineMixin
   ],
+
   props: {
     metadata: {
       type: Object,
       default: () => {}
     }
   },
+
   data() {
     return {
       activeName: '',
@@ -523,10 +530,10 @@ export default {
       isLoadingReverse: false,
       showFieldListOrder: false,
       messageReverseSales: '',
-      showConfirmDelivery: false,
-      posProcess
+      showConfirmDelivery: false
     }
   },
+
   computed: {
     isAllowsCashOpening() {
       return this.currentPointOfSales.isAllowsCashOpening
@@ -692,6 +699,7 @@ export default {
       return false
     }
   },
+
   watch: {
     // popoverConfirmDelivery(value) {
     //   this.showConfirmDelivery = value
@@ -704,9 +712,7 @@ export default {
       }
     }
   },
-  created() {
-    this.findProcess(this.posProcess)
-  },
+
   methods: {
     openDelivery() {
       if (!this.isProcessed) {
@@ -858,10 +864,6 @@ export default {
           break
       }
     },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    },
     printTicket() {
       const orderUuid = this.currentOrder.uuid
       const posUuid = this.currentPointOfSales.uuid
@@ -904,6 +906,7 @@ export default {
             message: this.$t('notifications.completed'),
             showClose: true
           })
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
         })
         .catch(error => {
           this.$message({
@@ -980,51 +983,6 @@ export default {
       if (this.isEmptyValue(this.currentOrder.uuid)) {
         return ''
       }
-      this.processPos = posProcess[1].uuid
-      const posUuid = this.currentPointOfSales.uuid
-      const parametersList = [{
-        columnName: 'C_Order_ID',
-        value: this.currentOrder.id
-      }]
-      this.$store.commit('setShowPOSCollection', false)
-      this.$store.dispatch('addParametersProcessPos', parametersList)
-      createOrder({
-        posUuid,
-        customerUuid: this.currentOrder.businessPartner.uuid,
-        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
-        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid,
-        campaignUuid: this.currentPointOfSales.defaultCampaignUuid
-      })
-        .then(order => {
-          this.$store.dispatch('currentOrder', order)
-
-          this.$router.push({
-            params: {
-              ...this.$route.params
-            },
-            query: {
-              ...this.$route.query,
-              action: order.uuid
-            }
-          }).then(() => {
-          }).catch(() => {})
-
-          this.$store.commit('setIsReloadListOrders')
-        })
-        .catch(error => {
-          console.error(error.message)
-          this.$message({
-            type: 'error',
-            message: error.message,
-            showClose: true
-          })
-        })
-        .finally(() => {
-          const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
-          this.showModal(process)
-          // close panel lef
-          this.$store.commit('setShowPOSOptions', false)
-        })
     },
     copyLineOrder() {
       const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
@@ -1059,14 +1017,6 @@ export default {
     seeOrderList() {
       if (this.ordersList.recordCount <= 0) {
         this.$store.dispatch('listOrdersFromServer', {})
-      }
-    },
-    findProcess() {
-      const findServer = this.$store.getters.getProcess('a42ad0c6-fb40-11e8-a479-7a0060f0aa01')
-      if (this.isEmptyValue(findServer)) {
-        posProcess.forEach(item => {
-          this.$store.dispatch('getProcessFromServer', { containerUuid: item.uuid, processId: item.id })
-        })
       }
     },
     changePos(posElement) {

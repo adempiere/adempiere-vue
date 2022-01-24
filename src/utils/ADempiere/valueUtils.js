@@ -14,8 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { convertStringToBoolean, convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
+import language from '@/lang'
+
+// constants
 import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
+
+// utils and helper methods
+import { convertBooleanToString, convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+import { OPERATION_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
 
 /**
  * Checks if value is empty. Deep-checks arrays and objects
@@ -37,7 +43,7 @@ export const isEmptyValue = function(value) {
 
   switch (typeOfValue) {
     case 'UNDEFINED':
-    case 'ERRORR':
+    case 'ERROR':
     case 'NULL':
       isEmpty = true
       break
@@ -101,19 +107,75 @@ export function typeValue(value) {
 }
 
 /**
+ * Cast value wiht type of value
+ * @param {string} value
+ * @param {string} type
+ * @returns {mixed} castValue
+ */
+export function castValueWithType({
+  value,
+  type
+}) {
+  let castValue
+  if (isEmptyValue(value)) {
+    return castValue
+  }
+
+  switch (type) {
+    case 'UNDEFINED':
+    case 'ERROR':
+    case 'NULL':
+      // emtpy value
+      break
+    case 'BOOLEAN':
+      castValue = Boolean(value)
+      break
+    case 'DATE':
+      castValue = new Date(value)
+      break
+    case 'STRING':
+      castValue = String(value)
+      break
+    case 'MATH':
+    case 'NUMBER':
+      castValue = Number(value)
+      break
+  }
+
+  return castValue
+}
+
+/**
  * Return token of pagination.
  * @author EdwinBetanc0urt <EdwinBetanc0urt@oulook.com>
  * @param {string} token
  * @returns {string}
  */
 export function extractPagingToken(token) {
+  if (isEmptyValue(token)) {
+    return ''
+  }
+
   let onlyToken = token.slice(0, -2)
   if (onlyToken.substr(-1, 1) === '-') {
+    // removes end hyphen
     onlyToken = onlyToken.slice(0, -1)
   }
   return onlyToken
 }
 
+export function generatePageToken({ pageNumber = 1, token }) {
+  if (pageNumber < 1) {
+    pageNumber = 1
+  }
+
+  const onlyToken = extractPagingToken(token)
+  if (isEmptyValue(onlyToken)) {
+    return ''
+  }
+
+  return onlyToken + '-' + pageNumber
+}
 /**
  * @param {number} number
  */
@@ -136,45 +198,27 @@ export function zeroPad(number, pad = 2) {
   return Array(+(zero > 0 && zero)).join('0') + number
 }
 
-/**
- * Get date and time from client in a object value
- * @param {string} type Type value of return
- * @returns {object|string}
- */
-export function clientDateTime(date = null, type = '') {
-  if (date == null || date === undefined || (typeof date === 'string' && date.trim() === '')) {
-    // instance the objet Data with current date from client
-    date = new Date()
-  } else {
-    // instance the objet Data with date or time send
-    date = new Date(date)
-  }
+// /**
+//  * Get date and time from client in a object value
+//  * @param {string} type Type value of return
+//  * @returns {object|string}
+//  */
+// export function clientDateTime(date = null, type = '') {
+//   if (date == null || date === undefined || (typeof date === 'string' && date.trim() === '')) {
+//     // instance the objet Data with current date from client
+//     date = new Date()
+//   } else {
+//     // instance the objet Data with date or time send
+//     date = new Date(date)
+//   }
 
-  const currentDate = date.getFullYear() +
-    '-' + zeroPad(date.getMonth() + 1) +
-    '-' + zeroPad(date.getDate())
+//   const onlyToken = extractPagingToken(token)
+//   if (isEmptyValue(onlyToken)) {
+//     return ''
+//   }
 
-  const currentTime = date.getHours() +
-    ':' + date.getMinutes() +
-    ':' + date.getSeconds()
-
-  const currentDateTime = {
-    date: currentDate,
-    time: currentTime
-  }
-
-  if (type.toLowerCase() === 't') {
-    // time format HH:II:SS
-    return currentDateTime.time
-  } else if (type.toLowerCase() === 'd') {
-    // date format YYYY-MM-DD
-    return currentDateTime.date
-  } else if (type.toLocaleLowerCase() === 'o') {
-    // object format
-    return currentDateTime
-  }
-  return currentDateTime.date + ' ' + currentDateTime.time
-}
+//   return onlyToken + '-' + pageNumber
+// }
 
 export function convertFieldsListToShareLink(fieldsList) {
   let attributesListLink = ''
@@ -294,9 +338,6 @@ export function parsedValueComponent({
   const isEmpty = isEmptyValue(value)
   if (isEmpty && !isMandatory) {
     if (componentPath === 'FieldYesNo') {
-      if (columnName === 'IsActive') {
-        return true
-      }
       // Processing, Processed, and any other columnName, return false by default
       return Boolean(value)
     }
@@ -384,64 +425,14 @@ export function parsedValueComponent({
 }
 
 /**
- * add a tab depending on the status of the document
+ * Payment method icon element-ui supported
  * @author Elsio Sanchez <elsiosanches@gmail.com>
- * @param {string} tag, document status key
+ * @param {string} paymentMethod, value the payment
  */
-export function tagStatus(tag) {
-  let type
-  switch (tag) {
-    case 'VO':
-      type = 'danger'
-      break
-    case 'AP':
-      type = 'success'
-      break
-    case 'DR':
-      type = 'info'
-      break
-    case 'CL':
-      type = 'primary'
-      break
-    case 'CO':
-      type = 'success'
-      break
-    case '??':
-      type = 'info'
-      break
-    case 'IP':
-      type = 'warning'
-      break
-    case 'WC':
-      type = 'warning'
-      break
-    case 'WP':
-      type = 'warning'
-      break
-    case 'NA':
-      type = 'danger'
-      break
-    case 'IN':
-      type = 'danger'
-      break
-    case 'RE':
-      type = 'danger'
-      break
-  }
-  return type
-}
-
-/**
- * add a tab depending on the status of the document
- * @author Elsio Sanchez <elsiosanches@gmail.com>
- * @param {string} iconElment, icon the Elment
- */
-export function iconStatus(iconElment) {
+export function paymentIcon(paymentMethod) {
   let icon
-  switch (iconElment) {
+  switch (paymentMethod) {
     case 'A':
-      icon = 'el-icon-wallet'
-      break
     case 'M':
       icon = 'el-icon-wallet'
       break
@@ -454,15 +445,11 @@ export function iconStatus(iconElment) {
     case 'Z':
       icon = 'el-icon-coin'
       break
-    case 'T':
-      icon = 'el-icon-bank-card'
-      break
     case 'P':
       icon = 'el-icon-mobile'
       break
+    case 'T':
     case 'C':
-      icon = 'el-icon-bank-card'
-      break
     case 'D':
       icon = 'el-icon-bank-card'
       break
@@ -470,44 +457,25 @@ export function iconStatus(iconElment) {
   return icon
 }
 
-let partialValue = ''
-export function calculationValue(value, event) {
-  const isZero = Number(value) === 0
-  const VALIDATE_EXPRESSION = /[\d\/.()%\*\+\-]/gim
-  const isValidKey = VALIDATE_EXPRESSION.test(event.key)
-  if (event.type === 'keydown' && isValidKey) {
-    partialValue += event.key
-    const operation = isEmptyValue(value) || isZero ? partialValue : String(value) + partialValue
-    if (!isEmptyValue(operation)) {
-      try {
-        // eslint-disable-next-line no-eval
-        return eval(operation) + ''
-      } catch (error) {
-        return null
-      }
-    }
-  } else if (event.type === 'click') {
-    if (!isEmptyValue(value)) {
-      try {
-        // eslint-disable-next-line no-eval
-        return eval(value) + ''
-      } catch (error) {
-        return null
-      }
-    }
-  } else {
-    if ((event.key === 'Backspace' || event.key === 'Delete') && !isEmptyValue(value)) {
-      try {
-        // eslint-disable-next-line no-eval
-        return eval(value) + ''
-      } catch (error) {
-        return null
-      }
-    } else {
-      return null
-    }
+/**
+ * Insert char in positions text
+ * @author Edwin Betancourt <EdwinBetanc0urt@oulook.com>
+ * @param {number|string} value
+ * @param {number|string} char
+ * @param {number} selectionStart
+ * @param {number} selectionEnd
+ */
+export function charInText({ value, char, selectionStart, selectionEnd }) {
+  if (OPERATION_PATTERN.test(char)) {
+    // separate positions
+    const firstText = String(value).slice(0, selectionStart)
+    const secondText = String(value).slice(selectionEnd)
+    const text = firstText.concat(char).concat(secondText) // insert char clicked
+    return text
   }
+  return null
 }
+
 export function convertValuesToSendListOrders(values) {
   const valuesToSend = {}
 
@@ -555,6 +523,66 @@ export function convertValuesToSendListOrders(values) {
   })
   return valuesToSend
 }
+
+export function tableColumnDataType(column, currentOption) {
+  if (currentOption === language.t('table.dataTable.showAllColumns')) {
+    return true
+  }
+  if (currentOption === language.t('table.dataTable.showOnlyMandatoryColumns') && (column.isMandatory || column.isMandatoryFromLogic)) {
+    return true
+  }
+  if (currentOption === language.t('table.dataTable.showTableColumnsOnly') && column.isDisplayedGrid) {
+    return true
+  }
+  return false
+}
+// export function convertValuesToSendListOrders(values) {
+//   const valuesToSend = {}
+
+//   values.forEach(element => {
+//     const { value, columnName } = element
+//     if (isEmptyValue(value) || (typeof value === 'boolean' && !value)) {
+//       return
+//     }
+
+//     switch (columnName) {
+//       case 'DocumentNo':
+//         valuesToSend['documentNo'] = value
+//         break
+//       case 'C_BPartner_ID_UUID':
+//         valuesToSend['businessPartnerUuid'] = value
+//         break
+//       case 'GrandTotal':
+//         valuesToSend['grandTotal'] = value
+//         break
+//       case 'OpenAmt':
+//         valuesToSend['openAmount'] = value
+//         break
+//       case 'IsPaid':
+//         valuesToSend['isPaid'] = value
+//         break
+//       case 'Processed':
+//         valuesToSend['isProcessed'] = value
+//         break
+//       case 'IsAisleSeller':
+//         valuesToSend['isAisleSeller'] = value
+//         break
+//       case 'IsInvoiced':
+//         valuesToSend['isInvoiced'] = value
+//         break
+//       case 'DateOrderedFrom':
+//         valuesToSend['dateOrderedFrom'] = value
+//         break
+//       case 'DateOrderedTo':
+//         valuesToSend['dateOrderedTo'] = value
+//         break
+//       case 'SalesRep_ID_UUID':
+//         valuesToSend['salesRepresentativeUuid'] = value
+//         break
+//     }
+//   })
+//   return valuesToSend
+// }
 /**
  * Search in the currency lists for the current currency
  * @author Elsio Sanchez <elsiosanches@gmail.com>
@@ -579,13 +607,13 @@ export function currencyFind({
   }
   return defaultCurrency.iSOCode
 }
+
 /**
  * Search the Payment List for the Current Payment
  * @author Elsio Sanchez <elsiosanches@gmail.com>
  * @param {string} currentPayment Current Payment
  * @param {array} listTypePayment Payment Type Listings
  */
-
 export function tenderTypeFind({
   currentPayment,
   listTypePayment
@@ -600,9 +628,7 @@ export function tenderTypeFind({
   }
   return currentPayment
 }
-export function clearVariables() {
-  partialValue = ''
-}
+
 export function formatConversionCurrenty(params) {
   let exponential, expre
   const number = params.toString()
@@ -615,11 +641,11 @@ export function formatConversionCurrenty(params) {
   }
   return params
 }
+
 /**
  * convert Values To Send
  * @param {string, number, boolean, date} values
  */
-
 export function convertValuesToSend(values) {
   const valuesToSend = {}
 

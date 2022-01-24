@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-date-picker
     :ref="metadata.columnName"
@@ -40,12 +41,23 @@
 </template>
 
 <script>
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import { DATE_PLUS_TIME } from '@/utils/ADempiere/references'
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
+// constants
+import { DATE_PLUS_TIME } from '@/utils/ADempiere/references'
+import { OPERATORS_MULTIPLE_VALUES } from '@/utils/ADempiere/dataUtils'
+
+/**
+ * TODO: Improves set values into store and set in vales in component
+ */
 export default {
   name: 'FieldDate',
-  mixins: [fieldMixin],
+
+  mixins: [
+    FieldMixin
+  ],
+
   data() {
     return {
       pickerOptionsDate: {
@@ -112,10 +124,11 @@ export default {
       }
     }
   },
+
   computed: {
     typePicker() {
       let picker = 'date'
-      if (['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery) {
+      if (this.isMultipleValues) {
         picker += 's'
         return picker
       }
@@ -133,7 +146,16 @@ export default {
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass += this.metadata.cssClassName
       }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       return styleClass
+    },
+    isMultipleValues() {
+      return this.metadata.isAdvancedQuery &&
+        OPERATORS_MULTIPLE_VALUES.includes(this.metadata.operator)
     },
     /**
      * Parse the date format to be compatible with element-ui
@@ -170,15 +192,18 @@ export default {
     },
     value: {
       get() {
-        const { columnName, containerUuid } = this.metadata
+        const { columnName, containerUuid, inTable } = this.metadata
 
         // table records values
-        if (this.metadata.inTable) {
-          const row = this.$store.getters.getRowData({
-            containerUuid,
-            index: this.metadata.tableIndex
-          })
-          return row[columnName]
+        if (inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.getCell) {
+            return this.containerManager.getCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName
+            })
+          }
         }
 
         // main panel values
@@ -201,22 +226,34 @@ export default {
         return value
       },
       set(value) {
-        let startValue = value
-        if (Array.isArray(value)) {
+        let startValue, endValue
+        startValue = value
+
+        if (this.metadata.isRange && !this.metadata.inTable && Array.isArray(value)) {
           startValue = value[0]
+          endValue = value[1]
         }
+
+        if (startValue === null) {
+          startValue = undefined
+          endValue = undefined
+        }
+
+        if (typeof startValue !== 'object' && startValue !== undefined) {
+          startValue = new Date(startValue)
+          endValue = new Date(endValue)
+        }
+
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           columnName: this.metadata.columnName,
           value: startValue
         })
+
         if (!this.metadata.isRange) {
           return
         }
-
-        const endValue = value[1]
-
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
@@ -226,17 +263,18 @@ export default {
       }
     }
   },
+
   methods: {
     parseValue(value) {
       // not return undefined to v-model
       if (this.isEmptyValue(value)) {
-        if (['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery) {
+        if (this.isMultipleValues) {
           return []
         }
         return null
       }
 
-      if (['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery) {
+      if (this.isMultipleValues) {
         if (Array.isArray(value)) {
           value = value.map(itemValue => {
             if (typeof itemValue === 'object') {
@@ -261,7 +299,7 @@ export default {
 
       // generate range value
       if (this.metadata.isRange && !this.metadata.inTable) {
-        let valueTo // = this.metadata.valueTo
+        let valueTo
         if (Array.isArray(value)) {
           valueTo = value[1]
           value = value[0]
@@ -317,7 +355,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
   .custom-field-date {
     width: 100% !important;
   }

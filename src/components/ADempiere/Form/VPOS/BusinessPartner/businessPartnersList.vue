@@ -15,9 +15,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-main
-    v-shortkey="popoverListBusinessParnet ? {close: ['esc']} : {}"
+    v-shortkey="popoverListBusinessParnet ? { close: ['esc'] } : {}"
     @shortkey.native="actionList"
   >
     <el-collapse v-model="activeAccordion" accordion>
@@ -34,10 +35,12 @@
           size="small"
         >
           <el-row>
-            <field
+            <field-definition
               v-for="(field) in metadataList"
               :key="field.columnName"
               :metadata-field="field"
+              :container-uuid="'Business-Partner-List'"
+              :container-manager="containerManager"
             />
           </el-row>
         </el-form>
@@ -99,30 +102,37 @@
         </samp>
       </el-col>
     </el-row>
-    <!-- -->
   </el-main>
 </template>
 
 <script>
+// constants
+import fieldsList from './fieldsListSearch.js'
+
+// components and mixins
 import CustomPagination from '@/components/ADempiere/Pagination'
+import BParterMixin from './mixinBusinessPartner.js'
+import FieldDefinition from '@/components/ADempiere/Field'
+
+// utils and helper methods
 import {
   // createFieldFromDefinition,
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
-import fieldsList from './fieldsListSearch.js'
-import BParterMixin from './mixinBusinessPartner.js'
-import Field from '@/components/ADempiere/Field'
 
 export default {
   name: 'BusinessPartnersList',
+
   components: {
     CustomPagination,
-    Field
+    FieldDefinition
   },
+
   mixins: [
     // formMixin,
     BParterMixin
   ],
+
   props: {
     metadata: {
       type: Object,
@@ -149,8 +159,21 @@ export default {
     showField: {
       type: Boolean,
       default: true
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
+
   data() {
     return {
       isLoadedRecords: false,
@@ -162,6 +185,7 @@ export default {
       unsubscribe: () => {}
     }
   },
+
   computed: {
     businessParners() {
       return this.$store.getters.getBusinessPartner
@@ -177,6 +201,7 @@ export default {
       return this.$store.getters.getPopoverListBusinessParnet
     }
   },
+
   watch: {
     isReadyFromGetData(isToLoad) {
       if (isToLoad) {
@@ -189,6 +214,7 @@ export default {
       }
     }
   },
+
   created() {
     this.unsubscribe = this.subscribeChanges()
 
@@ -196,9 +222,11 @@ export default {
       this.searchBPartnerList({})
     }
   },
+
   beforeDestroy() {
     this.unsubscribe()
   },
+
   methods: {
     createFieldFromDictionary,
     actionList(event) {
@@ -275,6 +303,7 @@ export default {
   }
 }
 </script>
+
 <style>
 .el-table__empty-text {
   line-height: 60px;

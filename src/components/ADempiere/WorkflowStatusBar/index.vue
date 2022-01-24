@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-steps :active="getActive" finish-status="success" simple :style="styleSteps">
     <el-step
@@ -44,20 +45,18 @@
             />
           </el-select>
 
-          <el-tag
+          <document-status-tag
             v-if="!isEmptyValue(value)"
-            index="tag-with-value"
-            :type="tagStatus(value)"
-          >
-            {{ displayedValue }}
-          </el-tag>
-          <el-tag
+            key="tag-with-value"
+            :value="value"
+            :displayed-value="displayedValue"
+          />
+          <document-status-tag
             v-else
-            index="tag-without-value"
-            :type="tagStatus(value)"
-          >
-            {{ infoDocumentAction.name }}
-          </el-tag>
+            key="tag-without-value"
+            :value="value"
+            :displayed-value="infoDocumentAction.name"
+          />
 
           <p v-if="!isEmptyValue(infoDocumentAction.description)" index="with-description">
             {{ infoDocumentAction.description }}
@@ -79,8 +78,16 @@
 </template>
 
 <script>
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+
 export default {
   name: 'WorkflowStatusBar',
+
+  components: {
+    DocumentStatusTag
+  },
+
   props: {
     styleSteps: {
       type: Object,
@@ -99,6 +106,7 @@ export default {
       default: 'window'
     }
   },
+
   data() {
     // TODO: See 'DocAction'
     const columnName = 'DocStatus'

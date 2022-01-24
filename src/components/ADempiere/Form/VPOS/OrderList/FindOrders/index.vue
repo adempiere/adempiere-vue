@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-container>
     <el-header style="height: 2%;">
@@ -156,11 +157,10 @@
             </el-button-group>
           </template>
           <template slot-scope="scope">
-            <el-tag
-              :type="tagStatus(scope.row.documentStatus.value)"
-            >
-              {{ scope.row.documentStatus.name }}
-            </el-tag>
+            <document-status-tag
+              :value="scope.row.documentStatus.value"
+              :displayed-value="scope.row.documentStatus.name"
+            />
           </template>
         </el-table-column>
         <el-table-column
@@ -196,14 +196,19 @@
 </template>
 
 <script>
+// utils and helper methods
 import {
   formatDate,
   formatPrice
 } from '@/utils/ADempiere/valueFormat.js'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 export default {
   name: 'FindOrders',
+  components: {
+    DocumentStatusTag
+  },
   props: {
     metadata: {
       type: Object,
@@ -244,6 +249,7 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       metadataList: {},
@@ -261,6 +267,7 @@ export default {
       openPopover: false
     }
   },
+
   computed: {
     highlightRow() {
       if (!this.isEmptyValue(this.selectOrder)) {
@@ -289,6 +296,7 @@ export default {
       })
     }
   },
+
   methods: {
     formatDate,
     formatPrice,
@@ -324,10 +332,6 @@ export default {
         }
         return 0
       })
-    },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     },
     handleChangePage(newPage) {
       this.tokenPage = this.tokenPage + '-' + newPage

@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div>
+  <div class="field-options">
     <el-dropdown
       v-if="isMobile"
       key="options-mobile"
@@ -28,7 +28,8 @@
       @command="handleCommand"
       @click="false"
     >
-      <label-field :is-mandatory="metadata.required && isEmptyValue(valueField)" :label="metadata.name" :is-mobile="true" />
+      <label-field :is-mandatory="metadata.required" :label="metadata.name" :is-mobile="true" />
+
       <el-dropdown-menu slot="dropdown">
         <template
           v-for="(option, key) in optionsList"
@@ -45,10 +46,10 @@
       </el-dropdown-menu>
     </el-dropdown>
 
+    <!-- Desktop menu -->
     <el-menu
       v-else-if="!isMobile && metadata.panelType !== 'form'"
       key="options-desktop"
-      class="el-menu-demo"
       mode="horizontal"
       unique-opened
       style="z-index: 0"
@@ -59,8 +60,9 @@
     >
       <el-submenu index="menu">
         <template slot="title">
-          <label-field :is-mandatory="metadata.required && isEmptyValue(valueField)" :label="metadata.name" />
+          <label-field :is-mandatory="metadata.required" :label="metadata.name" />
         </template>
+
         <el-menu-item
           v-for="(option, key) in optionsList"
           :key="key"
@@ -69,15 +71,21 @@
           <el-popover
             placement="top"
             trigger="click"
-            style="padding: 0px; max-width: 400px"
+            class="popover-field-options"
+            style="padding: 0px !important; max-width: 400px"
             @hide="closePopover"
           >
             <component
               :is="option.componentRender"
-              v-if="visibleForDesktop && showPanelFieldOption"
-              :field-attributes="fieldAttributes"
+              v-if="visibleForDesktop
+                && showPanelFieldOption
+                && option.name === currentFieldOption.name"
+              :field-attributes="metadata"
               :field-value="valueField"
+              :record-uuid="recordUuid"
+              :container-manager="containerManager"
             />
+
             <el-button slot="reference" type="text" style="color: #606266;">
               <label-popover-option :option="option" />
             </el-button>
@@ -88,21 +96,28 @@
 
     <span v-else key="options-form">
       <!-- label or name of field in form -->
-      <span :style="metadata.required && isEmptyValue(valueField) ? 'color: #f34b4b' : ''"> {{ metadata.name }}</span>
+      <label-field :is-mandatory="metadata.required" :label="metadata.name" />
     </span>
   </div>
 </template>
 
 <script>
 import { defineComponent, computed, ref, watch } from '@vue/composition-api'
+
+// components and mixins
+import LabelField from './LabelField.vue'
+import LabelPopoverOption from './LabelPopoverOption.vue'
+
+// utils and helper methods
 import {
   optionsListStandad, optionsListAdvancedQuery,
   documentStatusOptionItem, translateOptionItem,
-  zoomInOptionItem, calculatorOptionItem
+  zoomInOptionItem, calculatorOptionItem,
+  hideThisField
 } from '@/components/ADempiere/Field/FieldOptions/fieldOptionsList.js'
-import LabelField from './LabelField.vue'
-import LabelPopoverOption from './LabelPopoverOption.vue'
-import { recursiveTreeSearch } from '@/utils/ADempiere/valueUtils.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
+import { isLookup, LIST } from '@/utils/ADempiere/references.js'
+import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 
 export default defineComponent({
   name: 'FieldOptions',
@@ -114,6 +129,14 @@ export default defineComponent({
   props: {
     metadata: {
       type: Object
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({})
+    },
+    recordUuid: {
+      type: String,
+      default: undefined
     }
   },
 
@@ -125,6 +148,11 @@ export default defineComponent({
 
     const isMobile = computed(() => {
       return root.$store.state.app.device === 'mobile'
+    })
+
+    // current option field selected
+    const currentFieldOption = computed(() => {
+      return root.$store.getters.getFieldContextMenu
     })
 
     const valueField = computed(() => {
@@ -149,10 +177,12 @@ export default defineComponent({
       }
     }, 2000)
 
+    // TODO: Manage with panel
     const panelContextMenu = computed(() => {
       return root.$store.state.contextMenu.isShowRightPanel
     })
 
+    // TODO: Manage with field
     const showPanelFieldOption = computed(() => {
       return root.$store.state.contextMenu.isShowOptionField
     })
@@ -166,112 +196,105 @@ export default defineComponent({
       return '110'
     })
 
-    const permissionRoutes = computed(() => {
-      return root.$store.getters.permission_routes
+    const fieldsListShowed = computed(() => {
+      const { parentUuid, containerUuid } = props.metadata
+      const fieldsList = props.containerManager.getFieldsList({
+        parentUuid,
+        containerUuid
+      })
+
+      return root.$store.getters.getFieldsListNotMandatory({
+        containerUuid: props.containerUuid,
+        fieldsList,
+        showedMethod: props.containerManager.isDisplayedField,
+        isTable: props.inTable
+      })
+        .filter(itemField => {
+          return itemField.isShowedFromUser &&
+            itemField.columnName !== props.metadata.columnName
+        }).map(itemField => {
+          return itemField.columnName
+        })
     })
 
-    const redirect = ({ window }) => {
-      const viewSearch = recursiveTreeSearch({
-        treeData: permissionRoutes.value,
-        attributeValue: window.uuid,
-        attributeName: 'meta',
-        secondAttribute: 'uuid',
-        attributeChilds: 'children'
-      })
-
-      if (viewSearch) {
-        root.$router.push({
-          name: viewSearch.name,
-          query: {
-            action: 'advancedQuery',
-            tabParent: 0,
-            [props.metadata.columnName]: valueField
-          }
-        }, () => {})
-      } else {
-        root.$message({
-          type: 'error',
-          showClose: true,
-          message: root.$t('notifications.noRoleAccess')
-        })
+    function redirect() {
+      let window = props.metadata.reference.zoomWindows
+      if (typeValue(window) === 'ARRAY') {
+        window = window[0]
       }
-    }
 
-    const handleCommand = (command) => {
-      root.$store.commit('setRecordAccess', false)
-      if (command.name === root.$t('table.ProcessActivity.zoomIn')) {
-        if (!root.isEmptyValue(props.metadata.reference.zoomWindows)) {
-          redirect({
-            window: props.metadata.reference.zoomWindows[0]
-          })
+      let value = valueField.value
+      let columnName = props.metadata.columnName
+      // TODO: Evaluate reference.keyColumnName
+      if (props.metadata.displayType === LIST.id) {
+        columnName = 'AD_Reference_ID'
+        const valueQuery = props.metadata.reference.directQuery
+          .match(/AD_Reference_ID=\d+/i)
+          .toString()
+        value = Number(valueQuery.replace(/[^\d]/g, ''))
+      }
+
+      zoomIn({
+        uuid: window.uuid,
+        query: {
+          tabParent: 0,
+          action: 'zoomIn',
+          columnName,
+          value
         }
-        return
-      }
-      if (isMobile.value) {
-        root.$store.commit('changeShowRigthPanel', true)
-      } else {
-        visibleForDesktop.value = true
-      }
-
-      root.$store.commit('changeShowPopoverField', true)
-      root.$store.dispatch('setOptionField', {
-        ...command,
-        fieldAttributes: props.metadata
       })
     }
 
-    const isContextInfo = computed(() => {
-      const field = props.metadata
-      if (!field.isPanelWindow) {
+    const isDocuemntStatus = computed(() => {
+      if (!props.metadata.isColumnDocumentStatus) {
         return false
       }
 
-      return Boolean(field.contextInfo &&
-        field.contextInfo.isActive) ||
-        Boolean(field.reference &&
-        !root.isEmptyValue(field.reference.zoomWindows))
-    })
+      // if (!root.isEmptyValue(root.$store.getters.getOrders)) {
+      //   reutrn false
+      // }
 
-    const isDocuemntStatus = computed(() => {
-      if (props.metadata.isPanelWindow && !props.metadata.isAdvancedQuery) {
-        const { parentUuid, containerUuid, columnName } = props.metadata
-        if (columnName === 'DocStatus') {
-          const statusValue = root.$store.getters.getValueOfField({
-            parentUuid,
-            containerUuid,
-            columnName
-          })
-          // if (!root.isEmptyValue(root.$store.getters.getOrders)) {
-          if (!root.isEmptyValue(statusValue)) {
-            return true
-          }
-        }
+      const { parentUuid, containerUuid, columnName } = props.metadata
+      const statusValue = root.$store.getters.getValueOfField({
+        parentUuid,
+        containerUuid,
+        columnName
+      })
+      if (!root.isEmptyValue(statusValue)) {
+        return true
       }
+
       return false
     })
+
     const optionsList = computed(() => {
+      const field = props.metadata
       const menuOptions = []
-      if (props.metadata.isNumericField) {
+      if (field.isNumericField) {
         menuOptions.push(calculatorOptionItem)
       }
+      if (!field.required) {
+        menuOptions.push(hideThisField)
+      }
       // infoOption, operatorOption
-      if (props.metadata.isAdvancedQuery) {
+      if (field.isAdvancedQuery) {
         return menuOptions.concat(optionsListAdvancedQuery)
       }
 
-      if (isContextInfo.value) {
-        menuOptions.push(zoomInOptionItem)
+      if (field.isTranslatedField) {
+        menuOptions.push(translateOptionItem)
       }
-      if (props.metadata.isPanelWindow) {
-        if (props.metadata.isTranslatedField) {
-          menuOptions.push(translateOptionItem)
-        }
-        if (isDocuemntStatus.value) {
-          menuOptions.push(documentStatusOptionItem)
-        }
+      if (isDocuemntStatus.value) {
+        menuOptions.push(documentStatusOptionItem)
       }
 
-      return menuOptions.concat(optionsListStandad)
+      if (field.reference &&
+        !root.isEmptyValue(field.reference.zoomWindows) &&
+        isLookup(field.displayType)) {
+        menuOptions.push(zoomInOptionItem)
+      }
+
+      return optionsListStandad.concat(menuOptions)
     })
 
     const openOptionField = computed({
@@ -287,6 +310,7 @@ export default defineComponent({
       set(value) {
         if (!value) {
           showPopoverPath.value = false
+          /*
           root.$router.push({
             name: root.$route.name,
             query: {
@@ -295,11 +319,16 @@ export default defineComponent({
               fieldColumnName: ''
             }
           }, () => {})
+          */
         }
       }
     })
 
     const closePopover = () => {
+      visibleForDesktop.value = false
+      // root.$store.commit('changeShowRigthPanel', false)
+      // root.$store.commit('changeShowPopoverField', true)
+      /*
       root.$router.push({
         name: root.$route.name,
         query: {
@@ -308,44 +337,81 @@ export default defineComponent({
           fieldColumnName: ''
         }
       }, () => {})
+      */
     }
+
     const handleOpen = (key, keyPath) => {
       triggerMenu.value = 'hover'
     }
     const handleClose = (key, keyPath) => {
       triggerMenu.value = 'click'
     }
+
+    /**
+     * Used by mobile menu
+     */
+    const handleCommand = (command) => {
+      root.$store.commit('setRecordAccess', false)
+
+      handleOptionSelected(command.name)
+    }
+
+    /**
+     * Used by desktop menu
+     */
     const handleSelect = (key, keyPath) => {
-      if (key === root.$t('table.ProcessActivity.zoomIn')) {
-        redirect({
-          window: props.metadata.reference.zoomWindows[0]
-        })
+      handleOptionSelected(key)
+
+      triggerMenu.value = 'hover'
+    }
+
+    const handleOptionSelected = (optionName) => {
+      if (optionName === root.$t('table.ProcessActivity.zoomIn')) {
+        redirect()
         return
       }
+      if (optionName === root.$t('fieldOptions.hideThisField')) {
+        hideOnlyThisfield()
+        return
+      }
+
       if (isMobile.value) {
         root.$store.commit('changeShowRigthPanel', true)
       } else {
         root.$store.commit('changeShowOptionField', true)
         visibleForDesktop.value = true
-        root.$router.push({
-          name: root.$route.name,
-          query: {
-            ...root.$route.query,
-            typeAction: key,
-            fieldColumnName: props.metadata.columnName
-          }
-        }, () => {})
+        // root.$router.push({
+        //   name: root.$route.name,
+        //   query: {
+        //     ...root.$route.query,
+        //     typeAction: key,
+        //     fieldColumnName: props.metadata.columnName
+        //   }
+        // }, () => {})
       }
-      root.$store.commit('changeShowPopoverField', true)
+
       const option = optionsList.value.find(option => {
-        return option.name === key
+        return option.name === optionName
       })
+
+      root.$store.commit('changeShowPopoverField', true)
       root.$store.dispatch('setOptionField', {
         ...option,
         valueField: valueField.value,
         fieldAttributes: props.metadata
       })
-      triggerMenu.value = 'hover'
+    }
+
+    /**
+     * Hide only this field
+     */
+    const hideOnlyThisfield = () => {
+      const { parentUuid, containerUuid } = props.metadata
+      props.containerManager.changeFieldShowedFromUser({
+        parentUuid,
+        containerUuid,
+        fieldsShowed: fieldsListShowed.value
+      })
     }
 
     watch(panelContextMenu, (newValue, oldValue) => {
@@ -358,107 +424,63 @@ export default defineComponent({
       }
     })
 
-    const fieldAttributes = ref(props.metadata)
     return {
+      // computed
+      currentFieldOption,
       isMobile,
       labelStyle,
-      fieldAttributes,
-      optionsList,
-      closePopover,
-      openOptionField,
-      handleCommand,
-      handleOpen,
-      handleClose,
-      handleSelect,
       isDocuemntStatus,
+      optionsList,
+      openOptionField,
       visibleForDesktop,
       valueField,
       triggerMenu,
-      showPanelFieldOption
+      showPanelFieldOption,
+      // methods
+      closePopover,
+      handleClose,
+      handleCommand,
+      handleOpen,
+      handleSelect
     }
   }
 })
 </script>
 
-<style>
-.el-popover {
-  position: fixed;
-  padding: 0px;
-}
-.el-textarea {
-  position: relative;
-  width: 100%;
-  vertical-align: bottom;
-  font-size: 14px;
-  display: flex;
-}
-.el-menu--horizontal > .el-submenu .el-submenu__title {
-  height: 60px;
-  line-height: 60px;
-  border-bottom: 2px solid transparent;
-  color: #535457e3;
-}
-</style>
-<style scoped>
-.el-form--label-top .el-form-item__label {
-  padding-bottom: 0px !important;
-  display: block;
-}
-.el-menu.el-menu--horizontal {
-  border-bottom: solid 0px #E6E6E6;
-}
-.svg-icon {
-  width: 1em;
-  height: 1.5em;
-  vertical-align: -0.15em;
-  fill: currentColor;
-  overflow: hidden;
-}
-.el-dropdown .el-button-group {
-  display: flex;
-}
-.el-dropdown-menu {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  padding: 0px;
-  margin: 0px;
-  background-color: #FFFFFF;
-  border: 1px solid #e6ebf5;
-  border-radius: 4px;
-  -webkit-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  max-height: 250px;
-  max-width: 220px;
-  overflow: auto;
-}
-.el-dropdown-menu--mini .el-dropdown-menu__item {
-  line-height: 14px;
-  padding: 0px 15px;
-  padding-top: 1%;
-  padding-right: 15px;
-  padding-bottom: 1%;
-  padding-left: 15px;
-  font-size: 10px;
-}
-.el-dropdown-menu__item--divided {
-  position: relative;
-  /* margin-top: 6px; */
-  border-top: 1px solid #e6ebf5;
-}
-.label {
-  font-size: 14px;
-  margin-top: 0% !important;
-  margin-left: 0px;
-  text-align: initial;
-}
-.description {
-  margin: 0px;
-  font-size: 12px;
-  text-align: initial;
-}
-.contents {
-  display: inline-flex;
+<style lang="scss">
+.field-options {
+  &.el-menu--horizontal,
+  .el-menu--horizontal {
+    // transparent background color of the field label
+    &.el-menu {
+      background: #FFF0;
+    }
+    &.el-menu:hover {
+      background: #FFF0;
+    }
+
+    // height of the field label
+    .el-submenu .el-submenu__title {
+      height: 30px;
+      line-height: 30px;
+    }
+    .el-submenu__title {
+      height: 30px;
+      line-height: 30px;
+      // left spacing of field name
+      padding: 0px;
+    }
+  }
+
+  // hidde arrow icon
+  .el-submenu .el-submenu__icon-arrow  {
+    visibility: hidden;
+  }
+
+  // hide bottom line in label
+  .el-menu.el-menu--horizontal,
+  .el-submenu__title {
+    border-bottom: solid 0px transparent !important;
+  }
 }
 </style>

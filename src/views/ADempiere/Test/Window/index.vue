@@ -21,27 +21,68 @@
     :is="WindowView"
     :uuid="uuid"
     :metadata="metadata"
+    :container-manager="containerManager"
   />
 </template>
 
 <script>
 import { defineComponent } from '@vue/composition-api'
 
-import WindowView from '@/views/ADempiere/WindowView'
+import WindowView from '@/views/ADempiere/Window'
 import standardMetadata from './standardWindow.json'
+import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
 
 export default defineComponent({
-  name: 'TestWindowView',
+  name: 'TestWindow',
 
-  setup() {
+  setup(props, { root }) {
     // Product Group
     const uuid = 'a521b2f6-fb40-11e8-a479-7a0060f0aa01'
     const metadata = standardMetadata.result
 
+    const containerManager = {
+      actionPerformed: ({ field, value }) => {
+        root.$store.dispatch('actionPerformed', {
+          field,
+          value
+        })
+      },
+
+      seekRecord: ({ row, tableName, parentUuid, containerUuid }) => {
+        root.$router.push({
+          name: root.$route.name,
+          query: {
+            ...root.$route.query,
+            action: row.UUID
+          },
+          params: {
+            ...root.$router.params,
+            tableName,
+            recordId: row[`${tableName}_ID`]
+          }
+        }, () => {})
+
+        const attributes = convertObjectToKeyValue({
+          object: row
+        })
+        root.$store.dispatch('updateValuesOfContainer', {
+          parentUuid,
+          containerUuid,
+          attributes
+        })
+      },
+
+      seekTab: function(eventInfo) {
+        console.log('seekTab: ', eventInfo)
+        return new Promise()
+      }
+    }
+
     return {
-      WindowView,
       metadata,
-      uuid
+      uuid,
+      WindowView,
+      containerManager
     }
   }
 })

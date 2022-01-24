@@ -104,7 +104,7 @@
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import CustomPagination from '@/components/ADempiere/Pagination'
-import fieldsListProductPrice from './fieldsList.js'
+// import fieldsListProductPrice from './fieldsList.js'
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
 
 export default {
@@ -137,7 +137,7 @@ export default {
   data() {
     return {
       defaultMaxPagination: 50,
-      fieldsList: fieldsListProductPrice,
+      // fieldsList: fieldsListProductPrice,
       isLoadedServer: false,
       isCustomForm: true,
       currentProduct: {},

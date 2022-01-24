@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { requestAttachment } from '@/api/ADempiere/user-interface.js'
+import { getAttachment } from '@/api/ADempiere/user-interface/resources.js'
 import { getImagePath } from '@/utils/ADempiere/resource.js'
 
 export default {
@@ -107,7 +107,7 @@ export default {
   },
   methods: {
     getListImageProduct(line) {
-      requestAttachment({
+      getAttachment({
         tableName: 'M_Product',
         recordId: line.product.id,
         recordUuid: line.product.uuid

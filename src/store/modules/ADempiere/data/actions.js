@@ -1,72 +1,40 @@
+// ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
+// Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import language from '@/lang'
+
+// constants
+import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references'
+
+// api request methods
 import {
-  requestGetEntity,
-  requestListEntities
-} from '@/api/ADempiere/common/persistence.js'
-import {
-  requestDefaultValue,
   requestGetContextInfoValue
 } from '@/api/ADempiere/window'
-import {
-  getPrivateAccess,
-  lockPrivateAccess,
-  unlockPrivateAccess
-} from '@/api/ADempiere/actions/private-access'
-import {
-  extractPagingToken,
-  isEmptyValue
-} from '@/utils/ADempiere/valueUtils.js'
+
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertArrayKeyValueToObject } from '@/utils/ADempiere/valueFormat.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 import {
-  parseContext,
   getPreference
 } from '@/utils/ADempiere/contextUtils'
 import { showMessage } from '@/utils/ADempiere/notification'
-import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references'
-import language from '@/lang'
 
 const actions = {
-  /**
-   * Set page number of pagination list
-   * @param {string}  parameters.parentUuid
-   * @param {string}  parameters.containerUuid
-   * @param {integer} parameters.panelType
-   * @param {string}  parameters.pageNumber
-   */
-  setPageNumber({ commit, state, dispatch, rootGetters }, parameters) {
-    const {
-      parentUuid, containerUuid, panelType = 'window', pageNumber,
-      isAddRecord = false, isShowNotification = true
-    } = parameters
-    const data = state.recordSelection.find(recordItem => {
-      return recordItem.containerUuid === containerUuid
-    })
-    commit('setPageNumber', {
-      data: data,
-      pageNumber: pageNumber
-    })
 
-    // refresh list table with data from server
-    if (panelType === 'window') {
-      dispatch('getDataListTab', {
-        parentUuid,
-        containerUuid,
-        isAddRecord,
-        isShowNotification
-      })
-        .catch(error => {
-          console.warn(`Error getting data list tab. Message: ${error.message}, code ${error.code}.`)
-        })
-    } else if (panelType === 'browser') {
-      if (!rootGetters.isNotReadyForSubmit(containerUuid)) {
-        dispatch('getBrowserSearch', {
-          containerUuid,
-          isClearSelection: true
-        })
-      }
-    }
-  },
   /**
    * Insert new row bottom list table, used only from window
    * @param {string}  parentUuid
@@ -189,7 +157,7 @@ const actions = {
               typeValue(valueGetDisplayColumn) === 'OBJECT' &&
               valueGetDisplayColumn.isSQL) {
               // get value from Query
-              valueGetDisplayColumn = await dispatch('getValueBySQL', {
+              valueGetDisplayColumn = await dispatch('getDefaultValue', {
                 parentUuid,
                 containerUuid,
                 query: itemField.defaultValue
@@ -259,87 +227,7 @@ const actions = {
       data: dataStore
     })
   },
-  /**
-   * Is load context in true when panel is set context
-   * @param {string}  containerUuid
-   */
-  setIsloadContext({ commit, state }, { containerUuid }) {
-    const dataStore = state.recordSelection.find(recordItem => {
-      return recordItem.containerUuid === containerUuid
-    })
-    if (dataStore) {
-      commit('setIsloadContext', {
-        data: dataStore,
-        isLoadedContext: true
-      })
-    }
-  },
-  /**
-   * Set record, selection, page number, token, and record count, with container uuid
-   * @param {string}  parameters.containerUuid
-   * @param {array}   parameters.record
-   * @param {array}   parameters.selection
-   * @param {integer} parameters.pageNumber
-   * @param {integer} parameters.recordCount
-   * @param {string}  parameters.nextPageToken
-   * @param {string}  parameters.panelType
-   */
-  setRecordSelection({ state, commit }, parameters) {
-    const {
-      parentUuid, containerUuid, panelType = 'window', record = [],
-      query, whereClause, orderByClause,
-      selection = [], pageNumber = 1, recordCount = 0, nextPageToken,
-      originalNextPageToken, isAddRecord = false, isLoaded = true
-    } = parameters
 
-    const dataStore = state.recordSelection.find(recordItem => {
-      return recordItem.containerUuid === containerUuid
-    })
-
-    const newDataStore = {
-      parentUuid,
-      containerUuid,
-      record,
-      selection,
-      pageNumber,
-      recordCount,
-      nextPageToken,
-      originalNextPageToken,
-      panelType,
-      isLoaded,
-      isLoadedContext: false,
-      query,
-      whereClause,
-      orderByClause
-    }
-
-    if (dataStore) {
-      if (isAddRecord) {
-        newDataStore.record = dataStore.record.concat(newDataStore.record)
-      }
-      commit('setRecordSelection', {
-        dataStore,
-        newDataStore
-      })
-    } else {
-      commit('addRecordSelection', newDataStore)
-    }
-  },
-  /**
-   * Set selection in data list associated in container
-   * @param {string} containerUuid
-   * @param {array} selection
-   */
-  setSelection({ commit, getters }, {
-    containerUuid,
-    selection = []
-  }) {
-    const recordSelection = getters.getDataRecordAndSelection(containerUuid)
-    commit('setSelection', {
-      newSelection: selection,
-      data: recordSelection
-    })
-  },
   /**
    * Delete record result in container
    * @param {string}  viewUuid // As parentUuid in window
@@ -379,203 +267,7 @@ const actions = {
       })
     }
   },
-  /**
-   * @param {string} tableName
-   * @param {string} recordUuid
-   * @param {number} recordId
-   */
-  getEntity({ commit }, {
-    tableName,
-    recordUuid,
-    recordId
-  }) {
-    return new Promise(resolve => {
-      requestGetEntity({
-        tableName,
-        recordUuid,
-        recordId
-      })
-        .then(responseGetEntity => {
-          resolve(responseGetEntity.attributes)
-        })
-        .catch(error => {
-          console.warn(`Error Get Entity ${error.message}. Code: ${error.code}.`)
-        })
-    })
-  },
-  /**
-   * Request list to view in table
-   * TODO: Join with getDataListTab action
-   * @param {string} parentUuid, uuid from window
-   * @param {string} containerUuid, uuid from tab
-   * @param {string} tableName, table name to search record data
-   * @param {string} query, criteria to search record data
-   * @param {string} whereClause, criteria to search record data
-   * @param {string} orderByClause, criteria to search record data
-   * @param {array}  conditionsList, conditions list to criteria
-   * @param {boolean} isShowNotification, show searching and response records
-   * @param {boolean} isParentTab, conditions list to criteria
-   * @param {boolean} isAddRecord, join store records with server records (used with sequence tab)
-   * @param {boolean} isAddDefaultValues, add default fields values
-   */
-  getObjectListFromCriteria({ dispatch, getters, rootGetters }, {
-    parentUuid, containerUuid,
-    tableName, query, whereClause, orderByClause, conditionsList = [],
-    isShowNotification = true, isParentTab = true, isAddRecord = false,
-    isAddDefaultValues = true
-  }) {
-    if (isShowNotification) {
-      showMessage({
-        title: language.t('notifications.loading'),
-        message: language.t('notifications.searching'),
-        type: 'info'
-      })
-    }
 
-    const replaceTable = (value) => {
-      return value.replace('table_', '')
-    }
-    parentUuid = replaceTable(parentUuid)
-    containerUuid = replaceTable(containerUuid)
-
-    const dataStore = getters.getDataRecordAndSelection(containerUuid)
-
-    let nextPageToken
-    if (!isEmptyValue(dataStore.nextPageToken)) {
-      nextPageToken = dataStore.nextPageToken + '-' + dataStore.pageNumber
-    }
-
-    let inEdited = []
-    if (!isParentTab) {
-      // TODO: Evaluate peformance to evaluate records to edit
-      inEdited = dataStore.record.filter(itemRecord => {
-        return itemRecord.isEdit && !itemRecord.isNew
-      })
-    }
-
-    // gets the default value of the fields (including whether it is empty or undefined)
-    let defaultValues = {}
-    if (isAddDefaultValues) {
-      defaultValues = rootGetters.getParsedDefaultValues({
-        parentUuid,
-        containerUuid,
-        formatToReturn: 'object',
-        isGetServer: false
-      })
-    }
-    return requestListEntities({
-      tableName,
-      query,
-      whereClause,
-      conditionsList,
-      orderByClause,
-      pageToken: nextPageToken
-    })
-      .then(dataResponse => {
-        const recordsList = dataResponse.recordsList.map(record => {
-          const values = record.attributes
-          let isEdit = false
-          if (isAddDefaultValues) {
-            if (inEdited.find(itemEdit => itemEdit.UUID === values.UUID)) {
-              isEdit = true
-            }
-          }
-
-          // overwrite default values and sets the values obtained from the
-          // server (empty fields are not brought from the server)
-          return {
-            ...defaultValues,
-            ...values,
-            // datatables attributes
-            isNew: false,
-            isEdit,
-            isReadOnlyFromRow: false
-          }
-        })
-
-        const originalNextPageToken = dataResponse.nextPageToken
-        let token = originalNextPageToken
-        if (isEmptyValue(token)) {
-          token = dataStore.nextPageToken
-        } else {
-          token = extractPagingToken(token)
-        }
-        if (isShowNotification) {
-          let searchMessage = 'searchWithOutRecords'
-          if (recordsList.length) {
-            searchMessage = 'succcessSearch'
-          }
-          showMessage({
-            title: language.t('notifications.succesful'),
-            message: language.t(`notifications.${searchMessage}`),
-            type: 'success'
-          })
-        }
-        dispatch('setRecordSelection', {
-          parentUuid,
-          containerUuid,
-          record: recordsList,
-          selection: dataStore.selection,
-          recordCount: dataResponse.recordCount,
-          nextPageToken: token,
-          originalNextPageToken,
-          isAddRecord,
-          pageNumber: dataStore.pageNumber,
-          tableName,
-          query,
-          whereClause
-        })
-
-        return recordsList
-      })
-      .catch(error => {
-        // Set default registry values so that the table does not say loading,
-        // there was already a response from the server
-        dispatch('setRecordSelection', {
-          parentUuid,
-          containerUuid
-        })
-
-        if (isShowNotification) {
-          showMessage({
-            title: language.t('notifications.error'),
-            message: error.message,
-            type: 'error'
-          })
-        }
-        console.warn(`Error Get Object List ${error.message}. Code: ${error.code}.`)
-      })
-  },
-  /**
-   * @param {string} parentUuid
-   * @param {string} containerUuid
-   * @param {string} query
-   */
-  getValueBySQL({ commit }, {
-    parentUuid,
-    containerUuid,
-    query
-  }) {
-    // TODO: Change to promise all
-    return new Promise(resolve => {
-      if (query.includes('@')) {
-        query = parseContext({
-          parentUuid,
-          containerUuid,
-          isSQL: true,
-          value: query
-        }).query
-      }
-
-      requestDefaultValue(query)
-        .then(defaultValueResponse => {
-          resolve(defaultValueResponse)
-        })
-        .catch(error => {
-          console.warn(`Error getting default value from server. Error code ${error.code}: ${error.message}.`)
-        })
-    })
-  },
   /**
    * TODO: Add support to tab children
    * @param {string} parentUuid
@@ -636,7 +328,7 @@ const actions = {
     isSendToServer = true,
     isSendCallout = true,
     newValue,
-    displayColumn,
+    displayColumnName,
     withOutColumnNames = []
   }) {
     // dispatch('setPreferenceContext', {
@@ -665,7 +357,7 @@ const actions = {
       row,
       value: newValue,
       columnName,
-      displayColumn
+      displayColumnName
     })
 
     if (panelType === 'browser') {
@@ -676,7 +368,7 @@ const actions = {
         row: rowSelection,
         value: newValue,
         columnName,
-        displayColumn
+        displayColumnName
       })
     } else if (panelType === 'window') {
       // request callouts
@@ -752,93 +444,7 @@ const actions = {
         console.warn(`Error ${error.code} getting context info value for field ${error.message}.`)
       })
   },
-  getPrivateAccessFromServer({ rootGetters }, {
-    tableName,
-    recordId,
-    recordUuid
-  }) {
-    return getPrivateAccess({
-      tableName,
-      recordId,
-      recordUuid
-    })
-      .then(privateAccessResponse => {
-        return {
-          ...privateAccessResponse
-        }
-      })
-      .catch(error => {
-        console.warn(`Error get private access: ${error.message}. Code: ${error.code}.`)
-      })
-  },
-  lockRecord({ rootGetters }, {
-    tableName,
-    recordId,
-    recordUuid
-  }) {
-    return lockPrivateAccess({
-      tableName,
-      recordId,
-      recordUuid
-    })
-      .then(privateAccessResponse => {
-        if (!isEmptyValue(privateAccessResponse.recordId)) {
-          const recordLocked = {
-            isPrivateAccess: true,
-            isLocked: true,
-            ...privateAccessResponse
-          }
-          showMessage({
-            title: language.t('notifications.succesful'),
-            message: language.t('notifications.recordLocked'),
-            type: 'success'
-          })
-          return recordLocked
-        }
-      })
-      .catch(error => {
-        showMessage({
-          title: language.t('notifications.error'),
-          message: language.t('login.unexpectedError') + error.message,
-          type: 'error'
-        })
-        console.warn(`Error lock private access: ${error.message}. Code: ${error.code}.`)
-      })
-  },
-  unlockRecord({ rootGetters }, {
-    tableName,
-    recordId,
-    recordUuid
-  }) {
-    return unlockPrivateAccess({
-      tableName,
-      recordId,
-      recordUuid
-    })
-      .then(privateAccessResponse => {
-        if (!isEmptyValue(privateAccessResponse.recordId)) {
-          const recordUnlocked = {
-            isPrivateAccess: true,
-            isLocked: false,
-            ...privateAccessResponse
-          }
-          showMessage({
-            title: language.t('notifications.succesful'),
-            message: language.t('notifications.recordUnlocked'),
-            type: 'success'
-          })
-          return recordUnlocked
-        }
-      })
-      .catch(error => {
-        showMessage({
-          title: language.t('notifications.error'),
-          message: language.t('login.unexpectedError') + error.message,
-          type: 'error'
-        })
-        console.warn(`Error unlock private access: ${error.message}. Code: ${error.code}.`)
-      })
-  },
+
   resetStateBusinessData({ commit }) {
     commit('resetStateContainerInfo')
     commit('setInitialContext', {})

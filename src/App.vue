@@ -9,7 +9,9 @@
 </template>
 
 <script>
+// components and mixins
 import ModalIdle from './components/ADempiere/ModalIdle'
+
 export default {
   name: 'App',
   components: { ModalIdle },

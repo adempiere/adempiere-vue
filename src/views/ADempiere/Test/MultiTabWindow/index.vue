@@ -21,27 +21,109 @@
     :is="WindowView"
     :uuid="uuid"
     :metadata="metadata"
+    :container-manager="containerManager"
   />
 </template>
 
 <script>
 import { defineComponent } from '@vue/composition-api'
 
-import WindowView from '@/views/ADempiere/WindowView'
+import WindowView from '@/views/ADempiere/Window'
 import multiTabMetadata from './multiTabWindow.json'
+import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
+import { createNewRecord, deleteRecord, sharedLink, refreshRecords } from '@/utils/ADempiere/constants/actionsMenuList'
 
 export default defineComponent({
-  name: 'TestWindowView',
+  name: 'TestWindow',
 
-  setup() {
+  setup(props, { root }) {
     // Business Partner
     const uuid = 'a520de12-fb40-11e8-a479-7a0060f0aa01'
     const metadata = multiTabMetadata.result
 
+    const containerManager = {
+      actionPerformed: ({ field, value }) => {
+        root.$store.dispatch('actionPerformed', {
+          field,
+          value
+        })
+      },
+
+      seekRecord: ({ row, tableName, parentUuid, containerUuid }) => {
+        root.$router.push({
+          name: root.$route.name,
+          query: {
+            ...root.$route.query,
+            action: row.UUID
+          },
+          params: {
+            ...root.$router.params,
+            tableName,
+            recordId: row[`${tableName}_ID`]
+          }
+        }, () => {})
+
+        const attributes = convertObjectToKeyValue({
+          object: row
+        })
+        root.$store.dispatch('notifyPanelChange', {
+          parentUuid,
+          containerUuid,
+          attributes
+        })
+      },
+
+      seekTab: function(eventInfo) {
+        console.log('seekTab: ', eventInfo)
+        return new Promise()
+      },
+
+      // To Default Table
+      setSelection: ({ containerUuid, recordsSelected }) => {
+        console.info('setSelection callback', containerUuid, recordsSelected)
+      },
+      setSelectionAll: ({ containerUuid, recordsSelected }) => {
+        console.info('setSelectionAll callback', containerUuid, recordsSelected)
+      },
+
+      // action menu
+      relationsManager: {
+        menuParentUuid: root.$route.meta.parentUuid
+      },
+
+      referencesManager: (tableName) => {
+        return tableName
+      },
+
+      // current tab properties
+      actionsManager: {
+        actionsList: ({ tableName, uuid }) => {
+          const actionsList = [
+            createNewRecord,
+            {
+              ...refreshRecords,
+              callBack: () => {
+                root.$store.dispatch('getEntities', {
+                  parentUuid: props.parentUuid,
+                  containerUuid: uuid,
+                  tableName
+                })
+              }
+            },
+            deleteRecord,
+            sharedLink
+          ]
+
+          return actionsList
+        }
+      }
+    }
+
     return {
       WindowView,
       metadata,
-      uuid
+      uuid,
+      containerManager
     }
   }
 })

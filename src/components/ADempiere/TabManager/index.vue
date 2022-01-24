@@ -17,112 +17,198 @@
 -->
 
 <template>
-  <el-tabs
-    v-model="currentTab"
-    type="border-card"
-    @tab-click="handleClick"
-  >
-    <template v-for="(tabAttributes, key) in tabsList">
+  <div style="height: 100% !important;">
+    <auxiliary-panel
+      v-if="isParentTabs && isShowedTableRecords"
+      :parent-uuid="parentUuid"
+      :container-uuid="tabUuid"
+      :label="tabsList[currentTab].name"
+    >
+      <record-navigation
+        :parent-uuid="parentUuid"
+        :container-uuid="tabUuid"
+        :container-manager="containerManager"
+        :current-tab="tabsList[currentTab]"
+      />
+    </auxiliary-panel>
+
+    <el-tabs
+      v-model="currentTab"
+      type="border-card"
+      @tab-click="handleClick"
+    >
       <el-tab-pane
+        v-for="(tabAttributes, key) in tabsList"
         :key="key"
         :label="tabAttributes.name"
-        :windowuuid="windowUuid"
-        :tabuuid="tabAttributes.uuid"
         :name="String(key)"
+        :tabuuid="tabAttributes.uuid"
         :tabindex="String(key)"
         lazy
         :disabled="isDisabledTab(key)"
         :style="tabStyle"
       >
-        <lock-record
+        <tab-label
           slot="label"
-          :tab-position="key"
-          :tab-uuid="tabAttributes.uuid"
-          :table-name="tabAttributes.tableName"
-          :tab-name="tabAttributes.name"
+          :is-active-tab="tabAttributes.uuid === tabUuid"
+          :parent-uuid="parentUuid"
+          :container-uuid="tabAttributes.uuid"
         />
 
-        <panel-definition
-          :parent-uuid="windowUuid"
-          :container-uuid="tabAttributes.uuid"
-          :panel-metadata="tabAttributes"
-          :group-tab="tabAttributes.tabGroup"
-        />
+        <div v-if="isShowedTabs">
+          <!-- records in table to multi records -->
+          <default-table
+            v-if="!isParentTabs"
+            v-show="!isParentTabs && isShowedTableRecords"
+            key="default-table"
+            :parent-uuid="parentUuid"
+            :container-uuid="tabAttributes.uuid"
+            :container-manager="containerManager"
+            :header="tableHeaders"
+            :data-table="recordsList"
+            :panel-metadata="tabAttributes"
+          />
+          <!-- Close table when clicking on group of fields -->
+          <div @click="close()">
+            <!-- fields in panel to single record -->
+            <panel-definition
+              v-show="isParentTabs || (!isParentTabs && !isShowedTableRecords)"
+              key="panel-definition"
+              :parent-uuid="parentUuid"
+              :container-uuid="tabAttributes.uuid"
+              :container-manager="containerManager"
+              :panel-metadata="tabAttributes"
+              :group-tab="tabAttributes.tabGroup"
+            />
+          </div>
+        </div>
       </el-tab-pane>
-    </template>
-  </el-tabs>
+    </el-tabs>
+  </div>
 </template>
 
 <script>
-import { defineComponent, computed, ref } from '@vue/composition-api'
+import { defineComponent, computed, watch, ref } from '@vue/composition-api'
 
-import PanelDefinition from '@/components/ADempiere/PanelDefinition'
-import LockRecord from '@/components/ADempiere/ContainerOptions/LockRecord'
+// components and mixins
+import AuxiliaryPanel from '@/components/ADempiere/AuxiliaryPanel/index.vue'
+import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
+import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
+import RecordNavigation from '@/components/ADempiere/RecordNavigation/index.vue'
+import TabLabel from '@/components/ADempiere/TabManager/TabLabel.vue'
 
 export default defineComponent({
   name: 'TabManager',
 
   components: {
+    AuxiliaryPanel,
+    DefaultTable,
     PanelDefinition,
-    LockRecord
+    RecordNavigation,
+    TabLabel
   },
 
   props: {
-    windowUuid: {
+    parentUuid: {
       type: String,
-      default: ''
+      required: true
     },
-    windowMetadata: {
+    containerManager: {
       type: Object,
-      default: () => {}
+      required: true
     },
     tabsList: {
       type: Array,
       default: () => []
+    },
+    isParentTabs: {
+      type: Boolean,
+      default: true
     }
   },
 
   setup(props, { root }) {
+    let queryProperty = 'tab'
+    if (!props.isParentTabs) {
+      queryProperty = 'tabChild'
+    }
+
     // if tabParent is present in path set this
-    const tabNo = root.$route.query.tab || '0'
+    const tabNo = root.$route.query[queryProperty] || '0'
     const currentTab = ref(tabNo)
 
-    const tabUuid = ref(props.tabsList[0].uuid)
+    const tabUuid = ref(props.tabsList[tabNo].uuid)
 
     const tabStyle = computed(() => {
+      let height = '68vh'
+      if (!isShowedTabs.value) {
+        height = '0vh'
+      }
+      // height tab content
       return {
-        height: '75vh',
+        // height: '75vh',
+        height,
         overflow: 'auto'
       }
+    })
+
+    // use getter to reactive properties
+    const currentTabMetadata = computed(() => {
+      return root.$store.getters.getStoredTab(props.parentUuid, tabUuid.value)
+    })
+
+    const isShowedTabs = computed(() => {
+      if (props.isParentTabs) {
+        return root.$store.getters.getStoredWindow(props.parentUuid).isShowedTabsParent
+      }
+      return root.$store.getters.getStoredWindow(props.parentUuid).isShowedTabsChildren
+    })
+
+    const isShowedTableRecords = computed(() => {
+      return currentTabMetadata.value.isShowedTableRecords
     })
 
     const isCreateNew = computed(() => {
       return Boolean(root.$route.query.action === 'create-new')
     })
 
-    const isDisabledTab = (key) => {
-      return key > 0 && isCreateNew.value
+    function isDisabledTab(key) {
+      return (key > 0 || !props.isParentTabs) &&
+        (isCreateNew.value || root.isEmptyValue(recordUuidTabParent.value))
     }
 
-    const setCurrentTab = () => {
-      root.$store.dispatch('setCurrentTab', {
-        parentUuid: props.windowUuid,
-        containerUuid: tabUuid.value,
-        window: props.windowMetadata
+    function setCurrentTab() {
+      let tabMutation = 'setCurrentTab'
+      if (!props.isParentTabs) {
+        tabMutation = 'setCurrentTabChild'
+      }
+      root.$store.commit(tabMutation, {
+        parentUuid: props.parentUuid,
+        tab: props.tabsList[currentTab.value]
       })
     }
+
+    // create the table header
+    const tableHeaders = computed(() => {
+      const panel = props.tabsList[tabNo]
+      if (panel && panel.fieldsList) {
+        return panel.fieldsList
+      }
+      return []
+    })
 
     /**
      * @param {object} tabHTML DOM HTML the tab clicked
      */
     const handleClick = (tabHTML) => {
       const { tabuuid, tabindex } = tabHTML.$attrs
+
+      setTabNumber(tabindex)
+
+      // set metadata tab
       if (tabUuid.value !== tabuuid) {
         tabUuid.value = tabuuid
         setCurrentTab()
-      }
-      if (currentTab.value !== tabindex) {
-        setTabNumber(tabindex)
       }
     }
 
@@ -137,39 +223,157 @@ export default defineComponent({
       root.$router.push({
         query: {
           ...root.$route.query,
-          tab: currentTab.value
+          [queryProperty]: currentTab.value
         },
         params: {
           ...root.$route.params
         }
       }, () => {})
 
-      // TODO: Delete this to production
-      console.log('Click tab number ', tabNumber)
       return tabNumber
     }
 
-    const getData = () => {
-      root.$store.dispatch('getDataListTab', {
-        parentUuid: props.windowUuid,
-        containerUuid: tabUuid.value
+    const tabData = computed(() => {
+      return root.$store.getters.getTabData({
+        containerUuid: currentTabMetadata.value.uuid
       })
-        .catch(error => {
-          console.warn(`Error getting data list tab. Message: ${error.message}, code ${error.code}.`)
-        })
+    })
+
+    // get records list
+    const recordsList = computed(() => {
+      if (!props.isParentTabs && root.isEmptyValue(recordUuidTabParent.value)) {
+        return []
+      }
+      return tabData.value.recordsList
+    })
+
+    const isLoadedParentRecords = computed(() => {
+      return root.$store.getters.getTabData({
+        containerUuid: currentTabMetadata.value.firstTabUuid
+      }).isLoaded
+    })
+
+    const isReadyFromGetData = computed(() => {
+      if (props.isParentTabs) {
+        return !tabData.value.isLoaded
+      }
+      // TODO: add is loaded context columns
+      return isLoadedParentRecords.value && !tabData.value.isLoaded
+    })
+
+    const recordUuidTabParent = computed(() => {
+      return root.$store.getters.getValueOfField({
+        parentUuid: props.parentUuid,
+        containerUuid: currentTabMetadata.value.firstTabUuid,
+        columnName: 'UUID'
+      })
+    })
+
+    const getData = () => {
+      root.$store.dispatch('getEntities', {
+        parentUuid: props.parentUuid,
+        containerUuid: tabUuid.value
+      }).then(responseData => {
+        const tab = root.$store.getters.getStoredTab(props.parentUuid, tabUuid.value)
+        if (!isCreateNew.value && !root.isEmptyValue(responseData)) {
+          let row
+          const { action } = root.$route.query
+          // uuid into action query
+          if (!root.isEmptyValue(action)) {
+            if (action === 'zoomIn') {
+              const { columnName, value } = root.$route.query
+              row = responseData.find(rowData => {
+                return rowData[columnName] === value
+              })
+            } else {
+              row = responseData.find(rowData => {
+                return rowData.UUID === action
+              })
+
+              // search link value
+              if (root.isEmptyValue(row) && !tab.isParentTab) {
+                const { linkColumnName } = tab
+                const value = root.$store.getters.getValueOfField({
+                  parentUuid: props.parentUuid,
+                  columnName: linkColumnName
+                })
+                if (linkColumnName && !root.isEmptyValue(value)) {
+                  row = responseData.find(rowData => {
+                    return rowData[linkColumnName] === value
+                  })
+                }
+              }
+            }
+          }
+
+          // set first record
+          if (root.isEmptyValue(row)) {
+            row = responseData[0]
+          }
+
+          const { tableName } = tab
+          // set values in panel
+          props.containerManager.seekRecord({
+            parentUuid: props.parentUuid,
+            containerUuid: tabUuid.value,
+            row,
+            tableName
+          })
+        }
+      })
     }
 
-    getData()
+    /**
+     * Close table when clicking on group of fields
+     */
+    const close = () => {
+      root.$store.dispatch('changeTabAttribute', {
+        parentUuid: props.parentUuid,
+        containerUuid: tabUuid.value,
+        attributeName: 'isShowedTableRecords',
+        attributeValue: false
+      })
+    }
+
+    if (props.isParentTabs) {
+      if (isReadyFromGetData.value) {
+        getData()
+      }
+      // if changed tab and not records in stored, get records from server
+      watch(tabUuid, (newValue, oldValue) => {
+        if (newValue !== oldValue && !root.isEmptyValue(recordUuidTabParent.value) && !tabData.value.isLoaded) {
+          getData()
+        }
+      })
+    } else {
+      watch(isReadyFromGetData, (newValue, oldValue) => {
+        if (newValue) {
+          getData()
+        }
+      })
+
+      // if changed record in parent tab, reload tab child
+      watch(recordUuidTabParent, (newValue, oldValue) => {
+        if (newValue !== oldValue && !root.isEmptyValue(newValue)) {
+          getData()
+        }
+      })
+    }
 
     setTabNumber(currentTab.value)
 
     return {
-      currentTab,
       tabUuid,
+      currentTab,
+      tableHeaders,
+      recordsList,
       // computed
+      isShowedTabs,
+      isShowedTableRecords,
       tabStyle,
-      // meyhods
+      // methods
       handleClick,
+      close,
       isDisabledTab
     }
   }

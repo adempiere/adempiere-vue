@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-container>
     <el-header style="height: 2%;">
@@ -27,7 +28,7 @@
           v-for="(field) in metadataList"
           :key="field.columnName"
         >
-          <field
+          <field-definition
             :metadata-field="{
               ...field,
               size: 6,
@@ -82,11 +83,10 @@
           width="100"
         >
           <template slot-scope="scope">
-            <el-tag
-              :type="tagStatus(scope.row.documentStatus.value)"
-            >
-              {{ scope.row.documentStatus.name }}
-            </el-tag>
+            <document-status-tag
+              :value="scope.row.documentStatus.value"
+              :displayed-value="scope.row.documentStatus.name"
+            />
           </template>
         </el-table-column>
 
@@ -132,8 +132,20 @@
 </template>
 
 <script>
-import CustomPagination from '@/components/ADempiere/Pagination'
+// constants
 import fieldsListOrders from './fieldsListOrders.js'
+
+// components and mixins
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import FieldDefinition from '@/components/ADempiere/Field'
+import CustomPagination from '@/components/ADempiere/Pagination'
+
+// api request methods
+import {
+  listOrders
+} from '@/api/ADempiere/form/point-of-sales.js'
+
+// utils and helpers methods
 import {
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
@@ -141,18 +153,17 @@ import {
   formatDate,
   formatPrice
 } from '@/utils/ADempiere/valueFormat.js'
-import {
-  listOrders
-} from '@/api/ADempiere/form/point-of-sales.js'
-import Field from '@/components/ADempiere/Field'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
   name: 'SearchCompleteOrders',
+
   components: {
     CustomPagination,
-    Field
+    DocumentStatusTag,
+    FieldDefinition
   },
+
   props: {
     metadata: {
       type: Object,
@@ -169,6 +180,7 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       fieldsList: fieldsListOrders,
@@ -187,6 +199,7 @@ export default {
       openPopover: false
     }
   },
+
   computed: {
     highlightRow() {
       if (!this.isEmptyValue(this.selectOrder)) {
@@ -215,6 +228,7 @@ export default {
       })
     }
   },
+
   watch: {
     showField(value) {
       const date = new Date()
@@ -232,21 +246,20 @@ export default {
       }
     }
   },
+
   created() {
     this.unsubscribe = this.subscribeChanges()
   },
+
   beforeDestroy() {
     this.unsubscribe()
   },
+
   methods: {
     formatDate,
     formatPrice,
     extractPagingToken,
     createFieldFromDictionary,
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    },
     handleChangePage(newPage) {
       this.tokenPage = this.tokenPage + '-' + newPage
       this.listOrdersInvoiced()

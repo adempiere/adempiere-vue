@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const OPERATOR_EQUAL = {
+export const OPERATOR_EQUAL = {
   operator: 'EQUAL',
   symbol: '='
 }
@@ -208,41 +208,12 @@ export const FIELD_OPERATORS_LIST = [
   OPERATORS_FIELD_YES_NO
 ]
 
-/**
- * Log columns list into table
- * Manages with user session
- */
-export const LOG_COLUMNS_NAME_LIST = [
-  'Created',
-  'CreatedBy',
-  'Updated',
-  'UpdatedBy'
+export const OPERATORS_MULTIPLE_VALUES = [
+  OPERATOR_IN.operator,
+  OPERATOR_NOT_IN.operator
 ]
 
-/**
- * Columns list into standard table
- */
-export const STANDARD_COLUMNS_NAME_LIST = [
-  ...LOG_COLUMNS_NAME_LIST,
-  // Table Name '_ID'
-  'AD_Client_ID',
-  'AD_Org_ID',
-  'IsActive',
-  'UUID'
-]
-
-/**
- * Columns list into document table
- */
-export const DOCUMENT_COLUMNS_NAME_LIST = [
-  ...STANDARD_COLUMNS_NAME_LIST,
-  'C_DocType_ID',
-  'DateDoc',
-  'Description',
-  'DocAction',
-  'DocStatus',
-  'DocumentNo',
-  'IsApproved',
-  'Processed',
-  'Processing'
+export const OPERATORS_IGNORE_VALUE = [
+  OPERATOR_NULL.operator,
+  OPERATOR_NOT_NULL.operator
 ]

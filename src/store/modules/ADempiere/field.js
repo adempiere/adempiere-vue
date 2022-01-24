@@ -1,13 +1,26 @@
+// ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
+// Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+// api request methods
 import { requestFieldMetadata } from '@/api/ADempiere/dictionary/window'
 
 const initStateLookup = {
   referenceList: [],
   fieldsList: [],
-  validationRuleList: [],
-  fieldsListLocation: [],
-  fieldsListLocationShipping: [],
-  fieldsListLocationBilling: [],
-  isShowedLocation: false
+  validationRuleList: []
 }
 
 const field = {
@@ -24,18 +37,6 @@ const field = {
     },
     resetStateLookup(state) {
       state = initStateLookup
-    },
-    setShowedLocation(state, isShowed) {
-      state.isShowedLocation = isShowed
-    },
-    setFieldsListLocation(state, fieldsListLocation) {
-      state.fieldsListLocation = fieldsListLocation
-    },
-    setFieldsListLocationShipping(state, fieldsListLocation) {
-      state.fieldsListLocationShipping = fieldsListLocation
-    },
-    setFieldsListLocationBilling(state, fieldsListLocation) {
-      state.fieldsListLocationBilling = fieldsListLocation
     }
   },
   actions: {
@@ -76,21 +77,9 @@ const field = {
         .catch(error => {
           console.warn(`Get Field - Error ${error.code}: ${error.message}.`)
         })
-    },
-    changeSequence({ commit }, params) {
-      commit('setFieldsListLocation', params)
-    },
-    changeSequenceShipping({ commit }, params) {
-      commit('setFieldsListLocationShipping', params)
-    },
-    changeSequenceBilling({ commit }, params) {
-      commit('setFieldsListLocationBilling', params)
     }
   },
   getters: {
-    getIsShowedLocation: (state) => {
-      return state.isShowedLocation
-    },
     getFieldFromUuid: (state) => (uuid) => {
       return state.fieldsList.find(fieldItem => {
         return fieldItem.uuid === uuid
@@ -118,15 +107,6 @@ const field = {
       return state.fieldsList.find(fieldItem => {
         return fieldItem.tableName === tableName && fieldItem.columnName === columnName
       })
-    },
-    getFieldLocation: (state) => {
-      return state.fieldsListLocation
-    },
-    getFieldsListLocationShipping: (state) => {
-      return state.fieldsListLocationShipping
-    },
-    getFieldsListLocationBilling: (state) => {
-      return state.fieldsListLocationBilling
     }
   }
 }

@@ -582,63 +582,54 @@ const REFERENCES = [
 export default REFERENCES
 
 export const FIELDS_RANGE = [
-  AMOUNT,
-  COSTS_PLUS_PRICES,
-  DATE,
-  DATE_PLUS_TIME,
-  INTEGER,
-  NUMBER,
-  QUANTITY,
-  TIME
+  AMOUNT.id,
+  COSTS_PLUS_PRICES.id,
+  DATE.id,
+  DATE_PLUS_TIME.id,
+  INTEGER.id,
+  NUMBER.id,
+  QUANTITY.id,
+  TIME.id
 ]
+
+/**
+ * Is range field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isRangeField(displayType) {
+  return FIELDS_RANGE.includes(displayType)
+}
+
+/**
+ * Is manage range to in other field
+ * @param {boolean} isRange
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isAddRangeField({ isRange, displayType }) {
+  if (!isRange) {
+    return false
+  }
+
+  return isNumberField(displayType)
+}
 
 /**
  * Fields not showed in panel's
  */
 export const FIELDS_HIDDEN = [
-  BUTTON
-]
-
-export const COLUMN_IS_ACTIVE = {
-  columnName: 'IsActive', // column name of field
-  defaultValue: true, // default value when loading
-  valueIsReadOnlyForm: false, // value that activates read-only form
-  isChangedAllForm: false // change the entire form to read only including this field
-}
-
-export const COLUMN_PROCESSED = {
-  columnName: 'Processed',
-  defaultValue: false,
-  valueIsReadOnlyForm: true,
-  isChangedAllForm: true
-}
-
-export const COLUMN_PROCESSING = {
-  columnName: 'Processing',
-  defaultValue: true,
-  valueIsReadOnlyForm: false,
-  isChangedAllForm: true
-}
-
-export const COLUMNS_NAME_READ_ONLY = [
-  COLUMN_IS_ACTIVE.columnName,
-  COLUMN_PROCESSED.columnName,
-  COLUMN_PROCESSING.columnName
-]
-
-export const COLUMNS_NAME_DOCUMENT_STATUS = [
-  'DocStatus',
-  'O_DocStatus'
+  BUTTON.id
 ]
 
 /**
- * Fields with this column name, changed all fields is read only
+ * Hidden field or column by displayType
+ * @param {number} displayType
+ * @returns {boolean}
  */
-export const COLUMNS_READ_ONLY_FORM = [
-  COLUMN_IS_ACTIVE,
-  COLUMN_PROCESSED,
-  COLUMN_PROCESSING
-]
+export function isHiddenField(displayType) {
+  return FIELDS_HIDDEN.includes(displayType)
+}
 
 export const FIELDS_DECIMALS = [
   AMOUNT.id,
@@ -662,3 +653,44 @@ export const FIELDS_CURRENCY = [
   AMOUNT.id,
   COSTS_PLUS_PRICES.id
 ]
+
+/**
+ * Is currency field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isCurrencyField(displayType) {
+  return FIELDS_CURRENCY.includes(displayType)
+}
+
+/**
+ * Is number field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isNumberField(displayType) {
+  return FIELDS_QUANTITY.includes(displayType)
+}
+
+export const FIELDS_INTEGER = [
+  INTEGER.id,
+  ID.id
+]
+
+/**
+ * Is intenger number field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isIntegerField(displayType) {
+  return FIELDS_INTEGER.includes(displayType)
+}
+
+/**
+ * Is decimal number field
+ * @param {number} displayType
+ * @returns {boolean}
+ */
+export function isDecimalField(displayType) {
+  return FIELDS_DECIMALS.includes(displayType)
+}

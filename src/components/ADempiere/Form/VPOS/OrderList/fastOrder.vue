@@ -15,120 +15,139 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
-  <span>
-    <el-button type="primary" plain @click="newOrder()">
-      {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
-    </el-button>
-    <el-dropdown size="mini" trigger="click" @command="handleCommand">
-      <el-button type="primary" size="small" style="padding: 10px;padding-left: 5px;">
-        <i class="el-icon-arrow-down el-icon--right" />
+  <el-form label-position="top" label-width="100px">
+    <el-form-item>
+      <template slot="label">
+        <span style="color: transparent;">
+          Option
+        </span>
+      </template>
+      <document-status-tag
+        v-if="!isEmptyValue(currentOrder.documentStatus.value)"
+        :value="currentOrder.documentStatus.value"
+        :displayed-value="currentOrder.documentStatus.name"
+        style="font-size: 12px;margin-right: 2%;"
+      />
+      <el-button type="primary" plain @click="newOrder()">
+        {{ $t('form.pos.optionsPoinSales.salesOrder.newOrder') }}
       </el-button>
-      <el-dropdown-menu slot="dropdown">
-        <template v-for="(option, key) in quickOptions">
-          <el-dropdown-item v-show="option.isShow" :key="key" :command="option">
-            <el-popover
-              :key="key"
-              v-model="option.isVisible"
-              placement="right"
-              trigger="click"
-            >
-              <find-orders
-                :data="option"
-                :data-list="orderList"
-                :is-loading-table="isloading"
-                :params="option.params"
-                :show-field="showToDeliveOrders"
+      <el-dropdown size="mini" trigger="click" @command="handleCommand">
+        <el-button type="primary" size="small" style="padding: 10px;padding-left: 5px;">
+          <i class="el-icon-arrow-down el-icon--right" />
+        </el-button>
+        <el-dropdown-menu slot="dropdown">
+          <template v-for="(option, key) in quickOptions">
+            <el-dropdown-item v-show="option.isShow" :key="key" :command="option">
+              <el-popover
+                :key="key"
+                v-model="option.isVisible"
+                placement="right"
+                trigger="click"
+                width="900"
               >
-                <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
-                  <el-form-item label="No. del Documento">
-                    <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
-                  </el-form-item>
-                  <el-form-item
-                    v-for="(field) in metadataList"
-                    :key="field.columnName"
-                  >
-                    <field
-                      v-if="field.columnName === 'DateOrderedFrom'"
-                      :metadata-field="{
-                        ...field,
-                        size: 6,
-                        name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
-                      }"
-                    />
-                    <field
-                      v-else-if="field.columnName === 'C_BPartner_ID'"
-                      :metadata-field="{
-                        ...field,
-                        size: 6
-                      }"
-                    />
-                  </el-form-item>
-                </el-form>
-              </find-orders>
-              <el-row :gutter="24">
-                <el-col :span="24">
-                  <custom-pagination
-                    :total="total"
-                    :current-page="currentPage"
-                    :handle-change-page="handleChangePage"
-                    layout="total, prev, pager, next"
-                    style="float: right;"
-                  />
-                </el-col>
-                <el-col :span="24">
-                  <samp style="float: right; padding-right: 10px;">
-                    <el-button
-                      type="danger"
-                      class="custom-button-create-bp"
-                      icon="el-icon-close"
-                      @click="closeSearch(option)"
-                    />
-                    <el-button
-                      type="primary"
-                      class="custom-button-create-bp"
-                      icon="el-icon-check"
-                      @click="openOrder(option)"
-                    />
-                  </samp>
-                </el-col>
-              </el-row>
-              <el-button slot="reference" type="text" style="color: #333" @click="option.isVisible = true">
-                {{ option.title }}
-              </el-button>
-            </el-popover>
-          </el-dropdown-item>
-        </template>
-      </el-dropdown-menu>
-    </el-dropdown>
-  </span>
+                <find-orders
+                  :data="option"
+                  :data-list="orderList"
+                  :is-loading-table="isloading"
+                  :params="option.params"
+                  :show-field="showToDeliveOrders"
+                >
+                  <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
+                    <el-form-item label="No. del Documento">
+                      <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
+                    </el-form-item>
+                    <el-form-item
+                      v-for="(field) in metadataList"
+                      :key="field.columnName"
+                    >
+                      <field-definition
+                        :metadata-field="{
+                          ...field,
+                          size: 6,
+                          name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
+                        }"
+                        :container-uuid="'Cash-Withdrawal'"
+                        :container-manager="containerManager"
+                      />
+                    </el-form-item>
+                  </el-form>
+                </find-orders>
+                <custom-pagination
+                  :total="total"
+                  :current-page="currentPage"
+                  :handle-change-page="handleChangePage"
+                  layout="total, prev, pager, next"
+                  style="float: right;"
+                />
+                <el-button
+                  type="text"
+                  class="custom-button-create-bp"
+                />
+                <el-row :gutter="24">
+                  <el-col :span="24">
+                    <samp style="float: right; padding-right: 10px;">
+                      <el-button
+                        type="danger"
+                        class="custom-button-create-bp"
+                        icon="el-icon-close"
+                        @click="closeSearch(option)"
+                      />
+                      <el-button
+                        type="primary"
+                        class="custom-button-create-bp"
+                        icon="el-icon-check"
+                        @click="openOrder(option)"
+                      />
+                    </samp>
+                  </el-col>
+                </el-row>
+                <el-button slot="reference" type="text" style="color: #333" @click="option.isVisible = true">
+                  {{ option.title }}
+                </el-button>
+              </el-popover>
+            </el-dropdown-item>
+          </template>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
+// constants
 import fieldsListOrders from './fieldsListOrders.js'
+
+// components and mixins
+import FindOrders from './FindOrders'
+import FieldDefinition from '@/components/ADempiere/Field'
 import CustomPagination from '@/components/ADempiere/Pagination'
-import {
-  createFieldFromDictionary
-} from '@/utils/ADempiere/lookupFactory'
-import {
-  formatDate,
-  formatPrice
-} from '@/utils/ADempiere/valueFormat.js'
+import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+
+// api request methods
+import { createShipment, shipments, holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import {
   listOrders
 } from '@/api/ADempiere/form/point-of-sales.js'
-import { createShipment, shipments, holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
-import FindOrders from './FindOrders'
-import Field from '@/components/ADempiere/Field'
+
+// ultils and helper methods
+import {
+  createFieldFromDictionary
+} from '@/utils/ADempiere/lookupFactory'
+import { clientDateTime } from '@/utils/ADempiere/formatValue/dateFormat.js'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
   name: 'AisleVendorList',
+
   components: {
     CustomPagination,
     FindOrders,
-    Field
+    DocumentStatusTag,
+    FieldDefinition
   },
+
   props: {
     metadata: {
       type: Object,
@@ -143,8 +162,21 @@ export default {
     showField: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
+
   data() {
     return {
       fieldsList: fieldsListOrders,
@@ -155,13 +187,11 @@ export default {
       input: '',
       valueVisible: false,
       isCustomForm: true,
-      businessPartner: '',
       timeOut: null,
       changeOrder: {},
       isloading: true,
       ordersInvoiced: [],
       ordersComplete: [],
-      dateOrdered: '',
       searchCriteria: {},
       currentOptions: {},
       orderList: [],
@@ -169,6 +199,7 @@ export default {
       isStatus: ''
     }
   },
+
   computed: {
     allowsConfirmShipment() {
       return this.currentPointOfSales.isAllowsConfirmShipment
@@ -242,7 +273,7 @@ export default {
     sortFieldsListOrder() {
       return this.fieldsList.find(field => field.columnName === 'C_BPartner_ID')
     },
-    dateOrderedFrom() {
+    dateOrderedFromField() {
       return this.fieldsList.find(field => {
         if (field.columnName === 'DateOrdered') {
           return field
@@ -270,19 +301,52 @@ export default {
         this.$store.commit('setShowsearchToDeliveOrders', value)
       }
     },
+    businessPartnerUuid: {
+      get() {
+        // main panel values
+        return this.$store.getters.getValueOfField({
+          containerUuid: 'Aisle-Vendor-List',
+          columnName: 'C_BPartner_ID_UUID'
+        })
+      },
+      set(value) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Aisle-Vendor-List',
+          columnName: 'C_BPartner_ID_UUID',
+          value
+        })
+      }
+    },
+    dateOrderedFrom: {
+      get() {
+        // main panel values
+        return this.$store.getters.getValueOfField({
+          containerUuid: 'Aisle-Vendor-List',
+          columnName: 'DateOrderedFrom'
+        })
+      },
+      set(value) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Aisle-Vendor-List',
+          columnName: 'DateOrderedFrom',
+          value
+        })
+      }
+    },
     getSearchOrder() {
       return this.$store.getters.getQuickSearchOrder
     }
   },
+
   created() {
     this.unsubscribe = this.subscribeChanges()
   },
+
   beforeDestroy() {
     this.unsubscribe()
   },
+
   methods: {
-    formatDate,
-    formatPrice,
     extractPagingToken,
     createFieldFromDictionary,
     handleCommand(command) {
@@ -309,11 +373,9 @@ export default {
         columnName: 'DisplayColumn_C_BPartner_ID',
         value: undefined
       })
-      this.$store.commit('updateValueOfField', {
-        containerUuid: 'Aisle-Vendor-List',
-        columnName: 'C_BPartner_ID_UUID',
-        value: undefined
-      })
+
+      this.businessPartnerUuid = undefined
+      this.dateOrderedFrom = undefined
     },
     openOrder(command) {
       const posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
@@ -382,10 +444,6 @@ export default {
           })
         })
     },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    },
     handleChangePage(newPage) {
       this.tokenPage = this.tokenPage + '-' + newPage
       this.listOrdersInvoiced(this.currentOptions)
@@ -418,20 +476,20 @@ export default {
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
-        if (mutation.type === 'updateValueOfField' && mutation.payload.columnName === 'C_BPartner_ID_UUID' && mutation.payload.containerUuid === 'Aisle-Vendor-List' && mutation.payload.value !== this.businessPartner) {
-          this.businessPartner = mutation.payload.value
-        }
-        if (mutation.type === 'updateValueOfField' && mutation.payload.columnName === 'DateOrderedFrom' && mutation.payload.containerUuid === 'Aisle-Vendor-List' && mutation.payload.value !== this.dateOrdered) {
-          this.dateOrdered = mutation.payload.value
-        }
-        if (mutation.type === 'updateValueOfField' &&
-          !mutation.payload.columnName.includes('DisplayColumn') &&
-          !mutation.payload.columnName.includes('_UUID') &&
-          mutation.payload.containerUuid === this.metadata.containerUuid) {
-          clearTimeout(this.timeOut)
-          this.timeOut = setTimeout(() => {
-            this.listOrdersInvoiced(this.currentOptions)
-          }, 2000)
+        const { type } = mutation
+        if (type === 'updateValueOfField') {
+          const { payload } = mutation
+          if (payload.containerUuid === this.metadata.containerUuid) {
+            const { columnName } = payload
+
+            if (!columnName.includes('DisplayColumn') &&
+              !columnName.includes('_UUID')) {
+              clearTimeout(this.timeOut)
+              this.timeOut = setTimeout(() => {
+                this.listOrdersInvoiced(this.currentOptions)
+              }, 2000)
+            }
+          }
         }
       })
     },
@@ -449,7 +507,7 @@ export default {
           containerUuid: 'Aisle-Vendor-List'
         },
         {
-          ...this.dateOrderedFrom,
+          ...this.dateOrderedFromField,
           containerUuid: 'Aisle-Vendor-List'
         }
       ]
@@ -483,13 +541,25 @@ export default {
     },
     listOrdersInvoiced(option) {
       this.isloading = true
+
+      /*
+      // send multiple request with close list orders
+      if (this.isEmptyValue(this.dateOrdered) || this.isEmptyValue(this.businessPartnerUuid)) {
+        // with mandatory empty values
+        this.isLoading = false
+        return
+      }
+      */
+
+      const dateOrderedTo = clientDateTime(this.dateOrderedFrom, 'd')
+
       const values = {
         ...this.currentOptions.params,
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         documentNo: this.input,
         pageToken: this.tokenPage,
-        dateOrderedTo: this.dateOrdered,
-        businessPartnerUuid: this.businessPartner,
+        dateOrderedTo,
+        businessPartnerUuid: this.businessPartnerUuid,
         salesRepresentativeUuid: this.$store.getters['user/getUserUuid']
       }
       listOrders(
@@ -573,3 +643,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.el-form--label-top .el-form-item__label {
+  padding: 0px;
+}
+</style>

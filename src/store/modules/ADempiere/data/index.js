@@ -4,8 +4,7 @@ import mutations from './mutations.js'
 
 const initStateBusinessData = {
   recordSelection: [], // record data and selection
-  contextInfoField: [],
-  recordPrivateAccess: {}
+  contextInfoField: []
 }
 
 const data = {

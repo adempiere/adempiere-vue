@@ -17,32 +17,26 @@
 -->
 
 <template>
-  <span v-if="isFirstTab" key="withTooltip">
-    <el-tooltip
-      v-if="isFirstTab"
-      :content="tooltipText"
-      placement="top"
-    >
-      <el-button type="text" @click="lockRecord()">
-        <i
-          :class="{ 'el-icon-lock': isLocked, 'el-icon-unlock': !isLocked }"
-          style="font-size: 15px; color: black;"
-        />
-      </el-button>
-    </el-tooltip>
-
-    <slot name="prefix" />
-
+  <span v-if="isActiveTab" key="withTooltip" class="lock-record">
     <span :class="{ 'locked-record': isLocked }">
       {{ tabName }}
     </span>
 
-    <slot name="sufix" />
+    <el-tooltip
+      :content="tooltipText"
+      placement="top"
+    >
+      <el-button v-if="isLocked" type="text" @click="unLockRecord()">
+        <i class="el-icon-unlock icon-font" />
+      </el-button>
+
+      <el-button v-else type="text" @click="lockRecord()">
+        <i class="el-icon-lock icon-font" />
+      </el-button>
+    </el-tooltip>
   </span>
 
-  <span v-else key="onlyName">
-    <slot name="prefix" />
-
+  <span v-else key="onlyName" :class="{ 'locked-record': isLocked }">
     {{ tabName }}
 
     <slot name="sufix" />
@@ -56,13 +50,13 @@ export default defineComponent({
   name: 'LockRecord',
 
   props: {
-    tabUuid: {
+    parentUuid: {
       type: String,
       required: true
     },
-    tabPosition: {
-      type: Number,
-      default: 0
+    containerUuid: {
+      type: String,
+      required: true
     },
     tabName: {
       type: String,
@@ -71,16 +65,15 @@ export default defineComponent({
     tableName: {
       type: String,
       required: true
+    },
+    isActiveTab: {
+      type: Boolean,
+      required: true
     }
   },
 
   setup(props, { root }) {
-    const containerUuid = props.tabUuid
     const tableName = props.tableName
-
-    const isFirstTab = computed(() => {
-      return props.tabPosition === 0
-    })
 
     const isLocked = ref(false)
 
@@ -95,49 +88,50 @@ export default defineComponent({
       return root.$t('data.lockRecord')
     })
 
-    const lockRecord = () => {
-      const action = isLocked.value ? 'unlockRecord' : 'lockRecord'
-      const { recordId, recordUuid } = getRecordId()
+    const storedPrivateAccess = computed(() => {
+      const { recordUuid } = getRecordKeys()
 
-      root.$store.dispatch(action, {
+      return root.$store.getters.getStoredPrivateAccess({
+        tableName,
+        recordUuid
+      })
+    })
+
+    const lockRecord = () => {
+      const { recordId, recordUuid } = getRecordKeys()
+
+      root.$store.dispatch('lockRecordFromServer', {
         tableName,
         recordId,
         recordUuid
       })
-        .then(() => {
-          root.$message({
-            type: 'success',
-            message: root.$t('data.notification.' + action),
-            showClose: true
-          })
+        .then(isLockedResponse => {
+          isLocked.value = isLockedResponse
         })
-        .catch(() => {
-          root.$message({
-            type: 'error',
-            message: root.$t('data.isError') + root.$t('data.' + action),
-            showClose: true
-          })
-        })
-        .finally(() => {
-          getPrivateAccess()
+    }
+
+    const unLockRecord = () => {
+      const { recordId, recordUuid } = getRecordKeys()
+
+      root.$store.dispatch('unlockRecordFromServer', {
+        tableName,
+        recordId,
+        recordUuid
+      })
+        .then(isUnLockedResponse => {
+          isLocked.value = isUnLockedResponse
         })
     }
 
     const record = computed(() => {
-      if (isFirstTab) {
-        const recordUuid = root.$route.query.action
-        if (isValidUuid(recordUuid)) {
-          return root.$store.getters.getRowData({
-            containerUuid,
-            recordUuid
-          })
-        }
-      }
-
-      return undefined
+      return root.$store.getters.getValuesView({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        format: 'object'
+      })
     })
 
-    const getRecordId = () => {
+    const getRecordKeys = () => {
       let recordId
       let recordUuid
       const recordRow = record.value
@@ -156,43 +150,72 @@ export default defineComponent({
       }
     }
 
-    const getPrivateAccess = () => {
-      const { recordId, recordUuid } = getRecordId()
+    const isGettingRecordAccess = ref(false)
 
+    const getPrivateAccess = () => {
+      const { recordId, recordUuid } = getRecordKeys()
+
+      if (root.isEmptyValue(recordId) && root.isEmptyValue(recordUuid)) {
+        return
+      }
+
+      // get from vuex stored
+      if (!root.isEmptyValue(storedPrivateAccess.value)) {
+        isLocked.value = storedPrivateAccess.value.isLocked
+        return
+      }
+
+      isGettingRecordAccess.value = true
+
+      // get from server
       root.$store.dispatch('getPrivateAccessFromServer', {
         tableName,
         recordId,
         recordUuid
       })
         .then(privateAccessResponse => {
-          if (!root.isEmptyValue(privateAccessResponse)) {
-            isLocked.value = privateAccessResponse.isLocked
-          } else {
-            isLocked.value = false
-          }
+          isLocked.value = privateAccessResponse
+        })
+        .finally(() => {
+          isGettingRecordAccess.value = false
         })
     }
 
-    watch(() => root.$route.query.action, (newValue) => {
-      if (isValidUuid(newValue)) {
-        getPrivateAccess()
+    // timer to execute the request between times
+    const timeOut = ref(() => {})
+
+    watch(() => root.$route.query.action, (newValue, oldValue) => {
+      if (props.isActiveTab && isValidUuid(newValue) && !isGettingRecordAccess.value) {
+        clearTimeout(timeOut.value)
+
+        timeOut.value = setTimeout(() => {
+          // get records
+          getPrivateAccess()
+        }, 1000)
       }
     })
 
     return {
       isLocked,
       // computed
-      isFirstTab,
       tooltipText,
       // methods
-      lockRecord
+      lockRecord,
+      unLockRecord
     }
   }
 })
 </script>
 
 <style lang="scss">
-.locked-record {
-  color: red !important;
+.lock-record {
+  .locked-record {
+    color: red !important;
+  }
+
+  .icon-font {
+    font-size: 15px;
+    color: black;
+  }
 }
 </style>

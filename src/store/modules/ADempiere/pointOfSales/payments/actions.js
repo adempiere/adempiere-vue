@@ -587,6 +587,7 @@ export default {
           message: error.message,
           showClose: true
         })
+        return { type: 'error' }
       })
   },
   addDeliveryList({ commit, state, getters }, product) {
@@ -655,4 +656,5 @@ export default {
         console.warn(`Error: ${error.message}. Code: ${error.code}.`)
       })
   }
+
 }

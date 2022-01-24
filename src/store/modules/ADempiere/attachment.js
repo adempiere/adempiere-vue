@@ -1,4 +1,4 @@
-import { requestAttachment } from '@/api/ADempiere/user-interface.js'
+import { getAttachment } from '@/api/ADempiere/user-interface/resources.js'
 
 const initStateAttachment = {
   listAttachment: []
@@ -6,18 +6,20 @@ const initStateAttachment = {
 
 const attachment = {
   state: initStateAttachment,
+
   mutations: {
     setListAttachment(state, payload) {
       state.listAttachment = payload
     }
   },
+
   actions: {
     attachments({ commit }, {
       tableName,
       recordId,
       recordUuid
     }) {
-      requestAttachment({
+      getAttachment({
         tableName,
         recordId,
         recordUuid
@@ -37,6 +39,7 @@ const attachment = {
         })
     }
   },
+
   getters: {
     getListAttachment: (state) => {
       return state.listAttachment

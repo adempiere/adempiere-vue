@@ -31,6 +31,8 @@
         v-for="(field) in fieldsList"
         :key="field.columnName"
         :metadata-field="field"
+        :container-uuid="'Products-Price-List-ProductInfo'"
+        :container-manager="containerManager"
       />
     </el-form>
     <el-table
@@ -180,6 +182,18 @@ export default {
       default() {
         return []
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

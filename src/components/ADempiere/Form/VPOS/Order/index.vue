@@ -24,8 +24,8 @@
   >
     <el-container style="background: white; height: 100%!important;">
       <el-header
-        height="auto"
-        :style="isShowedPOSKeyLayout ? 'padding-right: 20px; padding-left: 0px;' : 'padding-right: 0px; padding-left: 0px;'"
+        height="15%"
+        :style="isShowedPOSKeyLayout ? 'padding-right: 1%; padding-left: 1%;' : 'padding-right: 1%; padding-left: 1%;'"
       >
         <el-form label-position="top" label-width="500px" @submit.native.prevent="notSubmitForm">
           <el-row :gutter="24" style="display: flex;">
@@ -54,15 +54,7 @@
                 :is-disabled="isDisabled"
               />
             </el-col>
-            <el-col :span="isShowKeyLayout ? 8 : 7" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px; margin-top: 2%;'">
-              <el-tag
-                v-if="!isEmptyValue(currentOrder.documentStatus.value)"
-                :type="tagStatus(currentOrder.documentStatus.value)"
-              >
-                <span v-if="!isEmptyValue(currentOrder.documentStatus.value)" style="font-size: 12px;">
-                  {{ currentOrder.documentStatus.name }}
-                </span>
-              </el-tag>
+            <el-col :span="6" :style="isShowedPOSKeyLayout ? 'padding: 0px; margin-top: 3.%;' : 'padding: 0px;'">
               <fast-ordes-list style="margin-right: 2%;margin-left: 2%;font-size: 12px;" />
             </el-col>
           </el-row>
@@ -464,16 +456,22 @@
 </template>
 
 <script>
+// constants
+import fieldsListOrder from './fieldsListOrder.js'
+
+// components and mixins
+// import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import orderLineMixin from './orderLineMixin.js'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
-import fieldsListOrder from './fieldsListOrder.js'
-import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner'
+import BusinessPartner from '@/components/ADempiere/Form/VPOS/BusinessPartner/index.vue'
 import fieldLine from '@/components/ADempiere/Form/VPOS/Order/line/index'
 import ImageProduct from '@/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
 // src/components/ADempiere/Form/VPOS/Order/ImageProduct/index.vue
 import ProductInfo from '@/components/ADempiere/Form/VPOS/ProductInfo'
 import FastOrdesList from '@/components/ADempiere/Form/VPOS/OrderList/fastOrder'
+
+// utils and helper methods
 // Format of values ( Date, Price, Quantity )
 import {
   formatDate,
@@ -481,23 +479,29 @@ import {
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
+
+// api request methods
 import { requestLookupList } from '@/api/ADempiere/window.js'
 import { releaseOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'Order',
+
   components: {
     BusinessPartner,
+    // DocumentStatusTag,
     ProductInfo,
     FastOrdesList,
     fieldLine,
     ImageProduct
   },
+
   mixins: [
     formMixin,
     orderLineMixin,
     posMixin
   ],
+
   data() {
     return {
       fieldsList: fieldsListOrder,
@@ -515,6 +519,7 @@ export default {
       listCampaign: []
     }
   },
+
   computed: {
     isValidToRelease() {
       if (!this.isEmptyValue(this.currentOrder) && this.currentOrder.documentStatus.value === 'DR') {
@@ -785,6 +790,7 @@ export default {
       return this.$t('form.pos.order.noCampaignSelected')
     }
   },
+
   watch: {
     showOverdrawnInvoice(value) {
       this.visible = value
@@ -821,6 +827,7 @@ export default {
       }
     }
   },
+
   mounted() {
     setTimeout(() => {
       if (!this.isEmptyValue(this.fieldCampaign.reference) && this.isEmptyValue(this.listCampaign)) {
@@ -846,6 +853,7 @@ export default {
     }
     this.$store.dispatch('changePopoverOverdrawnInvoice', { visible: false })
   },
+
   methods: {
     formatDate,
     formatDateToSend,

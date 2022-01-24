@@ -29,6 +29,7 @@ import {
 import { resetRouter } from '@/router'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
 import language from '@/lang'
 
 const state = {
@@ -43,12 +44,12 @@ const state = {
   userInfo: {},
   organizationsList: [],
   organization: {},
+  currentOrganizationId: 0,
   warehousesList: [],
   warehouse: {},
   isSession: false,
   sessionInfo: {},
-  corporateBrandingImage: '',
-  currentOrganizationId: 0
+  corporateBrandingImage: ''
 }
 
 const mutations = {
@@ -152,6 +153,7 @@ const actions = {
             name: sessionInfo.name,
             processed: sessionInfo.processed
           })
+
           const { userInfo } = sessionInfo
           commit('SET_NAME', sessionInfo.name)
           commit('SET_INTRODUCTION', userInfo.description)
@@ -176,12 +178,12 @@ const actions = {
           const { role } = sessionInfo
           commit('SET_ROLE', role)
           setCurrentRole(role.uuid)
-          const organizationIdOfSession = sessionInfo.defaultContext.find(context => {
-            if (context.key === '#AD_Org_ID') {
+          const currentOrganizationSession = sessionInfo.defaultContext.find(context => {
+            if (context.key === '#' + ORGANIZATION) {
               return context
             }
           })
-          commit('SET_CURRENT_ORGANIZATION_ID', organizationIdOfSession.value)
+          commit('SET_CURRENT_ORGANIZATION_ID', currentOrganizationSession.value)
 
           // wait to establish the client and organization to generate the menu
           await dispatch('getOrganizationsListFromServer', role.uuid)
@@ -199,6 +201,13 @@ const actions = {
             displaySequence: sessionInfo.displaySequence,
             language: sessionInfo.language,
             standardPrecision: sessionInfo.standardPrecision
+          }, {
+            root: true
+          })
+
+          // get country definition of context session
+          dispatch('getCountryDefinition', {
+            id: sessionInfo.countryId
           }, {
             root: true
           })
@@ -263,12 +272,6 @@ const actions = {
       removeToken()
 
       commit('setIsSession', false)
-      dispatch('resetStateBusinessData', null, {
-        root: true
-      })
-      dispatch('dictionaryResetCache', null, {
-        root: true
-      })
 
       // reset visited views and cached views
       // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
@@ -353,31 +356,29 @@ const actions = {
       roleUuid = getCurrentRole()
     }
 
-    const currentOrganizationId = getters.getCurrentOrgId
-    const currentOrganizationUuid = getCurrentOrganization()
-
     return requestOrganizationsList({ roleUuid })
       .then(response => {
         commit('SET_ORGANIZATIONS_LIST', response.organizationsList)
 
-        let organization
-        // set with uuid
-        if (!isEmptyValue(currentOrganizationUuid)) {
+        // TODO: Change id from session context server
+        const currentOrganizationId = getters.getCurrentOrgId
+        // set organization with AD_Org_ID context
+        let organization = response.organizationsList.find(item => {
+          if (item.id === currentOrganizationId) {
+            return item
+          }
+        })
+
+        // set organization with cookie uuid
+        if (!isEmptyValue(organization)) {
           organization = response.organizationsList.find(item => {
-            if (item.uuid === currentOrganizationUuid) {
+            if (item.uuid === getCurrentOrganization()) {
               return item
             }
           })
         }
-        // set with id
-        if (isEmptyValue(organization) && !isEmptyValue(currentOrganizationId)) {
-          organization = response.organizationsList.find(item => {
-            if (item.id === currentOrganizationId) {
-              return item
-            }
-          })
-        }
-        // set first of list
+
+        // set first organization of list
         if (isEmptyValue(organization)) {
           organization = response.organizationsList[0]
         }
@@ -386,7 +387,7 @@ const actions = {
         commit('SET_ORGANIZATION', organization)
         commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
         commit('setPreferenceContext', {
-          columnName: '#AD_Org_ID',
+          columnName: `#${ORGANIZATION}`,
           value: organization.id
         }, {
           root: true
@@ -428,7 +429,7 @@ const actions = {
         commit('SET_ORGANIZATION', organization)
         commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
         commit('setPreferenceContext', {
-          columnName: '#AD_Org_ID',
+          columnName: '#' + ORGANIZATION,
           value: organization.id
         }, {
           root: true
@@ -436,13 +437,6 @@ const actions = {
 
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
-
-        dispatch('resetStateBusinessData', null, {
-          root: true
-        })
-        dispatch('dictionaryResetCache', null, {
-          root: true
-        })
 
         dispatch('getWarehousesList', organizationUuid)
 
@@ -548,13 +542,6 @@ const actions = {
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
 
-        dispatch('resetStateBusinessData', null, {
-          root: true
-        })
-        dispatch('dictionaryResetCache', null, {
-          root: true
-        })
-
         showMessage({
           message: language.t('notifications.successChangeRole'),
           type: 'success',
@@ -588,15 +575,18 @@ const getters = {
   getOrganizations: (state) => {
     return state.organizationsList
   },
+  getOrganization: (state) => {
+    return state.organization
+  },
+  getCurrentOrgId: (state) => {
+    return state.currentOrganizationId
+  },
   getWarehouses: (state) => {
     return state.warehousesList
   },
   // current role info
   getRole: (state) => {
     return state.role
-  },
-  getOrganization: (state) => {
-    return state.organization
   },
   getWarehouse: (state) => {
     return state.warehouse
@@ -612,9 +602,6 @@ const getters = {
   },
   getIsPersonalLock: (state) => {
     return state.role.isPersonalLock
-  },
-  getCurrentOrgId: (state) => {
-    return state.currentOrganizationId
   }
 }
 

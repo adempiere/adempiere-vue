@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { convertStringToBoolean } from '@/utils/ADempiere/valueFormat.js'
+import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**

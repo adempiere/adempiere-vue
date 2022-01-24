@@ -1,7 +1,7 @@
 <!--
  ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
  Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
- Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+ Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div
     :id="id"
@@ -29,16 +30,21 @@ import 'tui-editor/dist/tui-editor-contents.css' // editor content
 import 'codemirror/lib/codemirror.css' // codemirror
 import Editor from 'tui-editor'
 
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+import FieldMixinText from '@/components/ADempiere/Field/mixin/mixinFieldText.js'
+
+// utils and helper methods
 import { getLanguage } from '@/lang'
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import fieldMixinText from '@/components/ADempiere/Field/mixin/mixinFieldText.js'
 
 export default {
   name: 'FieldTextLong',
+
   mixins: [
-    fieldMixin,
-    fieldMixinText
+    FieldMixin,
+    FieldMixinText
   ],
+
   props: {
     id: {
       type: String,
@@ -48,6 +54,7 @@ export default {
       }
     }
   },
+
   data() {
     return {
       mode: 'markdown', // 'markdown' or 'wysiwyg'
@@ -55,12 +62,18 @@ export default {
       editor: null
     }
   },
+
   computed: {
     cssClassStyle() {
       let styleClass = ' custom-field-text-long '
       if (this.isDisabled) {
         styleClass += ' custom-field-text-long-disable '
       }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass += this.metadata.cssClassName
       }
@@ -74,18 +87,18 @@ export default {
       return getLanguage()
     },
     editorOptions() {
-      const options = {
+      return {
         previewStyle: 'vertical',
         useCommandShortcut: true,
         usageStatistics: false, // send hostname to google analytics
-        hideModeSwitch: this.isDisabled
+        hideModeSwitch: this.isDisabled,
+        initialEditType: this.mode,
+        height: this.height,
+        language: this.language
       }
-      options.initialEditType = this.mode
-      options.height = this.height
-      options.language = this.language
-      return options
     }
   },
+
   watch: {
     value(newValue, oldValue) {
       if (this.isDisabled) {
@@ -109,12 +122,15 @@ export default {
       this.initEditor()
     }
   },
+
   mounted() {
     this.initEditor()
   },
+
   destroyed() {
     this.destroyEditor()
   },
+
   methods: {
     initEditor() {
       this.editor = new Editor({

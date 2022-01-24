@@ -22,7 +22,7 @@ import { request } from '@/utils/ADempiere/request'
  * @param {string}  tableName
  * @param {array}   attributesList
  */
-export function requestCreateEntity({
+export function createEntity({
   tableName,
   attributesList
 }) {
@@ -55,7 +55,7 @@ export function requestCreateEntity({
  * @param {string}  recordUuid
  * @param {array}   attributesList
  */
-export function requestUpdateEntity({
+export function updateEntity({
   tableName,
   recordId,
   recordUuid,
@@ -91,7 +91,7 @@ export function requestUpdateEntity({
  * @param {number}  recordId
  * @param {string}  recordUuid
  */
-export function requestDeleteEntity({
+export function deleteEntity({
   tableName,
   recordId,
   recordUuid
@@ -138,8 +138,10 @@ export function rollbackEntity({
     })
 }
 
-// Get entity from table name and record id or record uuid
-export function requestGetEntity({
+/**
+ * Get entity from table name and record id or record uuid
+ */
+export function getEntity({
   tableName,
   recordId,
   recordUuid
@@ -157,62 +159,5 @@ export function requestGetEntity({
       const { convertEntity } = require('@/utils/ADempiere/apiConverts/persistence.js')
 
       return convertEntity(entityResponse)
-    })
-}
-
-/**
- * Object List from window
- * @param {string} tableName
- * @param {string} query
- * @param {string} whereClause
- * @param {array}  conditionsList
- * @param {array}  columnsList // TODO: Add support on adempiere-vue
- * @param {string} orderByClause
- * @param {string} pageToken
- */
-export function requestListEntities({
-  tableName,
-  query,
-  whereClause,
-  conditionsList = [],
-  columnsList = [],
-  orderByClause,
-  limit,
-  pageToken,
-  pageSize
-}) {
-  const filters = conditionsList.map(condition => {
-    const { value, operator, columnName, valueTo, values } = condition
-    return {
-      column_name: columnName,
-      value,
-      operator,
-      value_to: valueTo,
-      values
-    }
-  })
-
-  return request({
-    url: '/common/api/entites',
-    method: 'get',
-    params: {
-      table_name: tableName,
-      // DSL Query
-      filters,
-      columns: columnsList,
-      // Custom Query
-      query,
-      where_clause: whereClause,
-      order_by_clause: orderByClause,
-      limit,
-      // Page Data
-      pageToken,
-      pageSize
-    }
-  })
-    .then(entitiesListResponse => {
-      const { convertEntityList } = require('@/utils/ADempiere/apiConverts/persistence.js')
-
-      return convertEntityList(entitiesListResponse)
     })
 }

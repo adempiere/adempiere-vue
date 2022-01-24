@@ -18,12 +18,14 @@ import {
   isEmptyValue,
   parsedValueComponent
 } from '@/utils/ADempiere/valueUtils.js'
-import { specialColumns } from '@/utils/ADempiere/contextUtils.js'
+import {
+  ACCOUNTING_COLUMNS,
+  LOG_COLUMNS_NAME_LIST
+} from '@/utils/ADempiere/constants/systemColumns'
 import {
   fieldIsDisplayed,
   getDefaultValue
 } from '@/utils/ADempiere/dictionaryUtils.js'
-import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/dataUtils.js'
 
 const getters = {
   getPanel: (state) => (containerUuid) => {
@@ -91,15 +93,21 @@ const getters = {
    * Obtain empty obligatory fields
    * @param {string} containerUuid
    * @param {array} fieldsList
+   * @param {function} showedMethod
    * @param {string} formatReturn
    */
   getFieldsListEmptyMandatory: (state, getters) => ({
     containerUuid,
     fieldsList,
+    showedMethod,
     formatReturn = 'name'
   }) => {
     if (isEmptyValue(fieldsList)) {
       fieldsList = getters.getFieldsListFromPanel(containerUuid)
+    }
+    // TODO: Remove conditional with complete support
+    if (!showedMethod) {
+      showedMethod = fieldIsDisplayed
     }
 
     // all mandatory and empty fields value
@@ -112,7 +120,7 @@ const getters = {
 
       if (isEmptyValue(value)) {
         const isMandatory = fieldItem.isMandatory || fieldItem.isMandatoryFromLogic
-        if (fieldIsDisplayed(fieldItem) && isMandatory) {
+        if (showedMethod(fieldItem) && isMandatory) {
           return true
         }
       }
@@ -132,23 +140,43 @@ const getters = {
    * Show all available fields not mandatory and not button
    * to show, used in components FilterFields
    * @param {string} containerUuid
+   * @param {array} fieldsList
+   * @param {function} showedMethod
    * @param {boolean} isEvaluateShowed
+   * @param {boolean} isEvaluateDefaultValue
    */
-  getFieldsListNotMandatory: (state, getters) => ({
+  getFieldsListNotMandatory: (state, getters, rootState, rootGetters) => ({
     containerUuid,
     isTable = false,
+    fieldsList = [],
+    showedMethod,
+    isEvaluateDefaultValue = false,
     isEvaluateShowed = true
   }) => {
+    if (isEmptyValue(fieldsList)) {
+      fieldsList = getters.getFieldsListFromPanel(containerUuid)
+    }
+
     // all optionals (not mandatory) fields
-    return getters.getFieldsListFromPanel(containerUuid)
+    return fieldsList
       .filter(fieldItem => {
         const isMandatory = fieldItem.isMandatory || fieldItem.isMandatoryFromLogic
         if (isMandatory && !isTable) {
           return false
         }
 
+        const { defaultValue } = fieldItem
+        if (isEvaluateDefaultValue && isEvaluateShowed) {
+          return showedMethod(fieldItem) &&
+            !isEmptyValue(defaultValue)
+        }
+
+        if (isEvaluateDefaultValue) {
+          return !isEmptyValue(defaultValue)
+        }
+
         if (isEvaluateShowed) {
-          return fieldIsDisplayed(fieldItem, isTable)
+          return showedMethod(fieldItem)
         }
 
         return true
@@ -209,12 +237,12 @@ const getters = {
         attributesObject[fieldItem.columnName] = valueToReturn
 
         // Add display columns if field has value
-        if (fieldItem[propertyName] && fieldItem.displayColumn) {
-          // TODO: Verify displayColumn attribute, or get dispay column to fieldValue store
-          attributesObject[fieldItem.displayColumnName] = fieldItem.displayColumn
+        if (fieldItem[propertyName] && fieldItem.displayColumnName) {
+          // TODO: Verify displayColumnName attribute, or get dispay column to fieldValue store
+          attributesObject[fieldItem.displayColumnName] = fieldItem.displayColumnName
           displayColumnsList.push({
             columnName: fieldItem.displayColumnName,
-            value: fieldItem.displayColumn
+            value: fieldItem.displayColumnName
           })
         }
 
@@ -245,7 +273,7 @@ const getters = {
     return attributesList
   },
 
-  getParsedDefaultValues: (state, getters) => ({
+  getParsedDefaultValues: (state, getters, rootState, rootGetters) => ({
     parentUuid,
     containerUuid,
     isGetServer = true,
@@ -257,13 +285,14 @@ const getters = {
       fieldsList = getters.getFieldsListFromPanel(containerUuid)
     }
     const attributesRangue = []
+    const attributesDisplayColumn = []
     const attributesObject = {}
     let attributesList = fieldsList
       .map(fieldItem => {
         const { columnName, defaultValue } = fieldItem
         let isSQL = false
         let parsedDefaultValue = fieldItem.parsedDefaultValue
-        const isSpeciaColumn = specialColumns.includes(columnName) || specialColumns.includes(fieldItem.elementName)
+        const isSpeciaColumn = ACCOUNTING_COLUMNS.includes(columnName) || ACCOUNTING_COLUMNS.includes(fieldItem.elementName)
 
         if (String(defaultValue).includes('@') || isSpeciaColumn) {
           parsedDefaultValue = getDefaultValue({
@@ -305,9 +334,33 @@ const getters = {
         }
 
         // add display column to default
-        if (fieldItem.componentPath === 'FieldSelect' && fieldItem.value === parsedDefaultValue) {
-          // TODO: Verify displayColumn attribute, or get dispay column to fieldValue store
-          attributesObject[fieldItem.displayColumnName] = fieldItem.displayColumn
+        if (fieldItem.componentPath === 'FieldSelect') {
+          const { displayColumnName } = fieldItem
+          let displayedValue
+          if (!isEmptyValue(parsedDefaultValue)) {
+            const { tableName, directQuery, query } = fieldItem.reference
+            const optionsList = rootGetters.getStoredLookupAll({
+              parentUuid,
+              containerUuid,
+              directQuery,
+              tableName,
+              query,
+              value: parsedDefaultValue
+            })
+            if (!isEmptyValue(optionsList)) {
+              const option = optionsList.find(item => item.id === parsedDefaultValue)
+              if (!isEmptyValue(option)) {
+                displayedValue = option.label
+              }
+            }
+          }
+
+          attributesObject[displayColumnName] = displayedValue
+          attributesDisplayColumn.push({
+            columnName: displayColumnName,
+            value: displayedValue,
+            isSQL
+          })
         }
 
         return {
@@ -318,7 +371,7 @@ const getters = {
         }
       })
     if (formatToReturn === 'array') {
-      attributesList = attributesList.concat(attributesRangue)
+      attributesList = attributesList.concat(attributesRangue, attributesDisplayColumn)
       return attributesList
     }
     return attributesObject

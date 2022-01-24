@@ -24,8 +24,14 @@
       <div class="text item">
         <field-location
           :ref="fieldsList[0].columnName"
-          :metadata="fieldsList[0]"
           :value-model="fieldsList[0].value"
+
+          :metadata="{
+            ...fieldsList[0],
+            isReadOnly: disabled
+          }"
+          :container-uuid="'Shipping-Address'"
+          :container-manager="containerManager"
         />
       </div>
     </el-card>
@@ -33,10 +39,14 @@
 </template>
 
 <script>
+// constants
+import fieldsList from './shippingFieldLocation/fieldsList'
+
+// mixins and components
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldListShippingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
-import FieldLocation from './shippingAddressFieldLocation'
+import FieldLocation from './shippingFieldLocation'
+
 export default {
   name: 'ShippingAddress',
   components: {
@@ -64,6 +74,18 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-tooltip
     v-model="isShowed"
@@ -37,13 +38,16 @@
       :controls="isShowControls"
       :controls-position="controlsPosition"
       :class="cssClassStyle"
+      style="text-align-last: end !important"
       autofocus
       @change="preHandleChange"
       @focus="focusGained"
+      @blur="customFocusLost"
       @keydown.native="keyPressed"
       @keyup.native="keyReleased"
       @keyup.native.enter="select"
     />
+
     <el-input
       v-else
       key="number-displayed-blur"
@@ -60,27 +64,41 @@
 </template>
 
 <script>
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import { FIELDS_CURRENCY, FIELDS_DECIMALS } from '@/utils/ADempiere/references'
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+
+// utils and helper methods
+import { isDecimalField } from '@/utils/ADempiere/references.js'
+import { calculationValue, formatNumber, INPUT_NUMBER_PATTERN } from '@/utils/ADempiere/formatValue/numberFormat.js'
+
 export default {
   name: 'FieldNumber',
-  mixins: [fieldMixin],
+
+  mixins: [
+    FieldMixin
+  ],
+
   data() {
     return {
       showControls: true,
       isFocus: false,
       operation: '',
-      expression: /[\d\/.()%\*\+\-]/gim,
       valueToDisplay: '',
       isShowed: false
     }
   },
+
   computed: {
     cssClassStyle() {
       let styleClass = ' custom-field-number '
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass += this.metadata.cssClassName
       }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       return styleClass
     },
     maxValue() {
@@ -96,9 +114,9 @@ export default {
       return Number(this.metadata.valueMin)
     },
     precision() {
-      // Amount, Costs+Prices, Number
-      if (this.isDecimal) {
-        return this.currencyDefinition.standardPrecision
+      // Amount, Costs+Prices, Number, Quantity
+      if (isDecimalField(this.metadata.displayType)) {
+        return this.$store.getters.getStandardPrecision
       }
       return undefined
     },
@@ -120,55 +138,24 @@ export default {
       // show right controls
       return 'right'
     },
-    isDecimal() {
-      return FIELDS_DECIMALS.includes(this.metadata.displayType)
-    },
-    isCurrency() {
-      return FIELDS_CURRENCY.includes(this.metadata.displayType)
-    },
     displayedValue() {
-      let value = this.value
-      if (this.isEmptyValue(value)) {
-        value = 0
-      }
-      if (!this.isDecimal) {
-        return value
-      }
-      let options = {
-        useGrouping: true,
-        minimumIntegerDigits: 1,
-        minimumFractionDigits: this.precision,
-        maximumFractionDigits: this.precision
-      }
-      let lang
-      if (this.isCurrency) {
-        lang = this.countryLanguage
-        options = {
-          ...options,
-          style: 'currency',
-          currency: this.currencyCode
-        }
-      }
-      // TODO: Check the grouping of thousands
-      const formatterInstance = new Intl.NumberFormat(lang, options)
-      return formatterInstance.format(value)
-    },
-    countryLanguage() {
-      return this.$store.getters.getCountryLanguage
+      return formatNumber({
+        value: this.value,
+        displayType: this.metadata.displayType,
+        currency: this.currencyCode
+      })
     },
     currencyCode() {
+      const currencyIsoCode = this.$store.getters.getCurrencyCode
       if (!this.isEmptyValue(this.metadata.labelCurrency)) {
-        if (this.metadata.labelCurrency.iSOCode === this.currencyDefinition.iSOCode) {
-          return this.currencyDefinition.iSOCode
+        if (this.metadata.labelCurrency.iSOCode !== currencyIsoCode) {
+          return this.metadata.labelCurrency.iSOCode
         }
-        return this.metadata.labelCurrency.iSOCode
       }
-      return this.currencyDefinition.iSOCode
-    },
-    currencyDefinition() {
-      return this.$store.getters.getCurrency
+      return currencyIsoCode
     }
   },
+
   methods: {
     parseValue(value) {
       if (this.isEmptyValue(value)) {
@@ -177,6 +164,10 @@ export default {
       return Number(value)
     },
     customFocusGained(event) {
+      if (this.metadata.readonly) {
+        this.isFocus = false
+        return
+      }
       this.isFocus = true
       // this.focusGained(event)
       this.$nextTick(() => {
@@ -192,10 +183,10 @@ export default {
       this.isFocus = false
       // this.focusLost(event)
     },
-    calculateValue(event) {
-      const isAllowed = event.key.match(this.expression)
+    calculateDisplayedValue(event) {
+      const isAllowed = event.key.match(INPUT_NUMBER_PATTERN)
       if (isAllowed) {
-        const result = this.calculationValue(this.value, event)
+        const result = calculationValue(this.value, event)
         if (!this.isEmptyValue(result)) {
           this.valueToDisplay = result
           this.isShowed = true
@@ -207,7 +198,7 @@ export default {
         if (String(this.value).slice(0, -1) > 0) {
           event.preventDefault()
           const newValue = String(this.value).slice(0, -1)
-          const result = this.calculationValue(newValue, event)
+          const result = calculationValue(newValue, event)
           if (!this.isEmptyValue(result)) {
             this.value = this.parseValue(result)
             this.valueToDisplay = result
@@ -221,7 +212,7 @@ export default {
         if (String(this.value).slice(-1) > 0) {
           event.preventDefault()
           const newValue = String(this.value).slice(-1)
-          const result = this.calculationValue(newValue, event)
+          const result = calculationValue(newValue, event)
           if (!this.isEmptyValue(result)) {
             this.value = this.parseValue(result)
             this.valueToDisplay = result
@@ -235,12 +226,71 @@ export default {
         event.preventDefault()
       }
     },
+    calculateValue(event) {
+      const result = calculationValue(this.value, event)
+      if (!this.isEmptyValue(result)) {
+        this.valueToDisplay = result
+      } else {
+        this.valueToDisplay = '...'
+      }
+      this.isShowed = true
+
+      /**
+      const isAllowed = event.key.match(oeprationPattern)
+      if (isAllowed) {
+        const result = this.calculationValue(this.value, event)
+        if (!this.isEmptyValue(result)) {
+          this.valueToDisplay = result
+        } else {
+          this.valueToDisplay = '...'
+        }
+        this.isShowed = true
+      } else {
+        const { selectionStart, selectionEnd } = event.target
+        if (event.key === 'Backspace') {
+          const newValue = this.deleteChar({ value: this.value, selectionStart, selectionEnd })
+          if (newValue > 0) {
+            event.preventDefault()
+            const result = this.calculationValue(newValue, event)
+            if (!this.isEmptyValue(result)) {
+              this.value = this.validateValue(result)
+              this.valueToDisplay = result
+            } else {
+              this.valueToDisplay = '...'
+            }
+            this.isShowed = true
+          }
+        } else if (event.key === 'Delete') {
+          const newValue = this.deleteChar({ value: this.value, selectionStart, selectionEnd, isReverse: false })
+          if (String(this.value).slice(-1) > 0) {
+            event.preventDefault()
+            const newValue = String(this.value).slice(-1)
+            const result = this.calculationValue(newValue, event)
+            if (!this.isEmptyValue(result)) {
+              this.value = this.validateValue(result)
+              this.valueToDisplay = result
+            } else {
+              this.valueToDisplay = '...'
+            }
+            this.isShowed = true
+          }
+        } else {
+          event.preventDefault()
+        }
+      }
+      */
+    },
+    validateInput(event) {
+      const value = String(event.target.value)
+        .replace(INPUT_NUMBER_PATTERN, '')
+      this.value = value
+    },
     changeValue() {
       if (!this.isEmptyValue(this.valueToDisplay) && this.valueToDisplay !== '...') {
         const result = this.parseValue(this.valueToDisplay)
         this.preHandleChange(result)
       }
-      this.clearVariables()
+
       this.isShowed = false
     }
   }

@@ -38,11 +38,16 @@
 </template>
 
 <script>
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 export default {
   name: 'FieldTime',
-  mixins: [fieldMixin],
+
+  mixins: [
+    FieldMixin
+  ],
+
   computed: {
     isPickerRange() {
       if (this.metadata.isRange && !this.metadata.inTable) {
@@ -67,9 +72,15 @@ export default {
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass += this.metadata.cssClassName
       }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       return styleClass
     }
   },
+
   methods: {
     parseValue(value) {
       if (typeof value === 'number') {

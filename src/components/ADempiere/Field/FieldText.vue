@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-input
     :ref="metadata.columnName"
@@ -30,6 +31,7 @@
     :show-password="Boolean(metadata.isEncrypted)"
     :autofocus="metadata.inTable"
     :size="inputSize"
+    show-word-limit
     @change="preHandleChange"
     @blur="focusLost"
     @focus="focusGained"
@@ -41,16 +43,21 @@
 </template>
 
 <script>
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import fieldMixinText from '@/components/ADempiere/Field/mixin/mixinFieldText.js'
+// components and mixins
+import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+import FieldMixinText from '@/components/ADempiere/Field/mixin/mixinFieldText.js'
+
+// constants
 import { TEXT } from '@/utils/ADempiere/references'
 
 export default {
   name: 'FieldText',
+
   mixins: [
-    fieldMixin,
-    fieldMixinText
+    FieldMixin,
+    FieldMixinText
   ],
+
   props: {
     inTable: {
       type: Boolean,
@@ -61,17 +68,34 @@ export default {
       default: undefined
     }
   },
+
   data() {
     return {
       patternFileName: '[A-Za-zñÑ0-9-_]{1,}',
       patternFilePath: '[A-Za-zñÑ0-9-_/.]{1,}'
     }
   },
+
   computed: {
     cssClassStyle() {
-      let styleClass = ' custom-field-text '
-      if (!this.isEmptyValue(this.metadata.cssClassName)) {
-        styleClass += this.metadata.cssClassName
+      const { cssClassName, displayType, inTable } = this.metadata
+      let styleClass = ''
+      if (!this.isEmptyValue(cssClassName)) {
+        styleClass += cssClassName
+      }
+
+      if (displayType === TEXT.id) {
+        styleClass += ' custom-field-textarea '
+      } else {
+        styleClass += ' custom-field-text '
+      }
+
+      if (inTable) {
+        styleClass += ' field-in-table '
+      }
+
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
       }
       return styleClass
     },
@@ -110,11 +134,15 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
   .custom-field-text {
-    max-height: 34px;
+    max-height: 36px;
   }
+
+  // indicates if the textarea is adjustable
   .el-textarea__inner {
-    resize: none !important;
+    &.field-in-table {
+      resize: none !important;
+    }
   }
 </style>
