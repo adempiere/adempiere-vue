@@ -24,6 +24,8 @@ export const PROCESSING = 'Processing'
 
 export const PROCESSED = 'Processed'
 
+export const WAREHOUSE = 'M_Warehouse_ID'
+
 /**
  * Log columns list into table
  * Manages with user session

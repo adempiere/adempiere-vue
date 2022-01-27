@@ -29,7 +29,7 @@ import {
 import { resetRouter } from '@/router'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
-import { ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
+import { ORGANIZATION, WAREHOUSE } from '@/utils/ADempiere/constants/systemColumns'
 import language from '@/lang'
 
 const state = {
@@ -74,8 +74,8 @@ const mutations = {
   SET_ORGANIZATIONS_LIST: (state, payload) => {
     state.organizationsList = payload
   },
-  SET_CURRENT_ORGANIZATION_ID: (state, payload) => {
-    state.currentOrganizationId = payload
+  SET_CURRENT_ORGANIZATION_ID: (state, organizationId) => {
+    state.currentOrganizationId = organizationId
   },
   SET_ORGANIZATION: (state, organization) => {
     state.organization = organization
@@ -179,7 +179,7 @@ const actions = {
           commit('SET_ROLE', role)
           setCurrentRole(role.uuid)
           const currentOrganizationSession = sessionInfo.defaultContext.find(context => {
-            if (context.key === '#' + ORGANIZATION) {
+            if (context.key === `#${ORGANIZATION}`) {
               return context
             }
           })
@@ -429,7 +429,7 @@ const actions = {
         commit('SET_ORGANIZATION', organization)
         commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
         commit('setPreferenceContext', {
-          columnName: '#' + ORGANIZATION,
+          columnName: `#${ORGANIZATION}`,
           value: organization.id
         }, {
           root: true
@@ -483,7 +483,7 @@ const actions = {
           setCurrentWarehouse(warehouse.uuid)
           commit('SET_WAREHOUSE', warehouse)
           commit('setPreferenceContext', {
-            columnName: '#M_Warehouse_ID',
+            columnName: `#${WAREHOUSE}`,
             value: warehouse.id
           }, {
             root: true
@@ -504,7 +504,7 @@ const actions = {
     commit('SET_WAREHOUSE', currentWarehouse)
 
     commit('setPreferenceContext', {
-      columnName: '#M_Warehouse_ID',
+      columnName: `#${WAREHOUSE}`,
       value: currentWarehouse.id
     }, {
       root: true
@@ -569,8 +569,8 @@ const actions = {
 }
 
 const getters = {
-  getRoles: (state) => {
-    return state.rolesList
+  getIsSession: (state) => {
+    return state.isSession
   },
   getOrganizations: (state) => {
     return state.organizationsList
@@ -581,18 +581,19 @@ const getters = {
   getCurrentOrgId: (state) => {
     return state.currentOrganizationId
   },
-  getWarehouses: (state) => {
-    return state.warehousesList
+  getRoles: (state) => {
+    return state.rolesList
   },
   // current role info
   getRole: (state) => {
     return state.role
   },
+  getWarehouses: (state) => {
+    return state.warehousesList
+  },
+  // TODO: Manage with vuex module to warehouse
   getWarehouse: (state) => {
     return state.warehouse
-  },
-  getIsSession: (state) => {
-    return state.isSession
   },
   getUserUuid: (state) => {
     return state.userUuid
@@ -600,6 +601,7 @@ const getters = {
   userInfo: (state) => {
     return state.userInfo
   },
+  // TODO: Manage with vuex module to personal lock
   getIsPersonalLock: (state) => {
     return state.role.isPersonalLock
   }
