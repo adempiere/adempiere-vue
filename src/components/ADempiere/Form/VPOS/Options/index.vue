@@ -312,101 +312,10 @@
       </el-collapse-item>
 
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.generalOptions.title')" name="generalOptions">
-        <el-row :gutter="24" style="padding-right: 10px;">
-          <el-col :span="size">
-            <el-card shadow="hover" style="height: 100px">
-              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="adviserPin ? validateOption($t('form.pos.optionsPoinSales.generalOptions.changePos')) : changePos()">
-                <p
-                  style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
-                >
-                  <i class="el-icon-mobile-phone" />
-                  <br>
-                  {{ $t('form.pos.optionsPoinSales.generalOptions.changePos') }}
-                </p>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-for="item in listPointOfSales"
-                    :key="item.uuid"
-                    :command="item"
-                  >
-                    {{ item.name }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-card>
-          </el-col>
-          <!-- Product List Price -->
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
-              <el-popover
-                placement="right"
-                trigger="click"
-                width="800"
-              >
-                <list-product-price
-                  :is-selectable="false"
-                  popover-name="isShowPopoverMenu"
-                />
-                <div
-                  slot="reference"
-                  :style="blockOption"
-                  @click="isShowProductsPriceList = !isShowProductsPriceList"
-                >
-                  <svg-icon icon-class="shopping" />
-                  <br>
-                  {{ $t('form.pos.optionsPoinSales.generalOptions.listProducts') }}
-                </div>
-              </el-popover>
-            </el-card>
-          </el-col>
-          <!-- List Warehouse -->
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
-              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
-                <p
-                  style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
-                >
-                  <svg-icon icon-class="tree-table" />
-                  <br>
-                  {{ $t('form.pos.optionsPoinSales.generalOptions.changeWarehouseList') }}
-                </p>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-for="item in warehousesListPointOfSales"
-                    :key="item.id"
-                    :command="item"
-                  >
-                    {{ item.name }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-card>
-          </el-col>
-          <!-- List Price -->
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
-              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
-                <p
-                  style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
-                >
-                  <svg-icon icon-class="list" />
-                  <br>
-                  {{ $t('form.pos.optionsPoinSales.generalOptions.changePriceList') }} </p>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-for="item in priceListPointOfSales"
-                    :key="item.uuid"
-                    :command="item"
-                  >
-                    {{ item.name }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-card>
-          </el-col>
-        </el-row>
+        <general-options :metadata="metadata" />
       </el-collapse-item>
     </el-collapse>
+
     <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + attributePin.label" width="40%" :visible.sync="visible">
       <el-input
         id="pin"
@@ -469,9 +378,8 @@
 </template>
 
 <script>
-// components and methods
+// components and mixins
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
-import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
 import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
 import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
 import CashOpening from './CashOpening'
@@ -479,6 +387,7 @@ import CashSummaryMovements from './CashSummaryMovements'
 import CashWithdrawal from './Cashwithdrawal'
 import AssignSeller from './AssignSeller'
 import ModalDialog from '@/components/ADempiere/Dialog'
+import GeneralOptions from '@/components/ADempiere/Form/VPOS/Options/generalOptions.vue'
 
 // api request methods
 import {
@@ -497,14 +406,14 @@ export default {
   name: 'PointOfSalesOptions',
 
   components: {
-    ListProductPrice,
-    OrdersList,
-    ModalDialog,
+    AssignSeller,
     CashOpening,
     CashSummaryMovements,
     CashWithdrawal,
-    AssignSeller,
-    ConfirmDelivery
+    ConfirmDelivery,
+    GeneralOptions,
+    ModalDialog,
+    OrdersList
   },
 
   mixins: [
@@ -561,19 +470,6 @@ export default {
     },
     allowsCreateOrder() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
-    },
-    isShowProductsPriceList: {
-      get() {
-        return this.$store.state['pointOfSales/point/index'].productPrice.isShowPopoverMenu
-      },
-      set(isShowed) {
-        if (!this.isEmptyValue(this.$route.query.pos)) {
-          this.$store.commit('showListProductPrice', {
-            attribute: 'isShowPopoverMenu',
-            isShowed
-          })
-        }
-      }
     },
     isShowOrdersList: {
       get() {
@@ -632,23 +528,6 @@ export default {
     },
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
-    },
-    listPointOfSales() {
-      return this.$store.getters.posAttributes.pointOfSalesList
-    },
-    priceListPointOfSales() {
-      const list = this.$store.getters.posAttributes.currentPointOfSales.pricesList
-      if (this.isEmptyValue(list)) {
-        return []
-      }
-      return list
-    },
-    warehousesListPointOfSales() {
-      const list = this.$store.getters.posAttributes.currentPointOfSales.warehousesList
-      if (this.isEmptyValue(list)) {
-        return []
-      }
-      return list
     },
     ordersList() {
       if (this.isEmptyValue(this.currentPointOfSales)) {
@@ -1020,6 +899,11 @@ export default {
       }
     },
     changePos(posElement) {
+      if (this.adviserPin) {
+        this.validateOption(this.$t('form.pos.optionsPoinSales.generalOptions.changePos'))
+        return
+      }
+
       this.$store.dispatch('setCurrentPOS', posElement)
       this.clearOrder()
     },
