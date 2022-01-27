@@ -98,10 +98,18 @@
                       {{ labelDirecction(address) }}
                     </el-tag>
                   </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.region')"> {{ labelAddress(address.region) }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.city')"> {{ labelAddress(address.city) }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.address')"> {{ address.address_1 }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.postCode')"> {{ address.postal_code }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.region')">
+                    {{ labelAddress(address.region) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.city')">
+                    {{ labelAddress(address.city) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.address')">
+                    {{ address.address_1 }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.postCode')">
+                    {{ address.postal_code }}
+                  </el-descriptions-item>
                 </el-descriptions>
               </el-scrollbar>
             </el-card>
