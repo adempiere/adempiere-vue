@@ -513,7 +513,7 @@ export default {
         })
         .finally(() => {
           this.$store.commit('updateValuesOfContainer', {
-            containerUuid: this.metadata.containerUuid,
+            containerUuid: this.$route.meta.uuid,
             attributes: [{
               columnName: 'ProductValue',
               value: undefined
