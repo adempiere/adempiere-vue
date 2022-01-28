@@ -170,7 +170,7 @@ export default {
         changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
         isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
+        isMandatoryField: () => { return false },
         isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
