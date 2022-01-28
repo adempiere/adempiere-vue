@@ -50,7 +50,7 @@
                     <field-definition
                       :metadata-field="field.columnName === 'PayAmt' ? {
                         ...field,
-                        labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
+                        labelCurrency: currentFieldCurrency
                       } : field"
                       :container-uuid="'Collection'"
                       :container-manager="containerManager"

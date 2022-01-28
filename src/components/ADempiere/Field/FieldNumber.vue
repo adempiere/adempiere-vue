@@ -148,8 +148,8 @@ export default {
     currencyCode() {
       const currencyIsoCode = this.$store.getters.getCurrencyCode
       if (!this.isEmptyValue(this.metadata.labelCurrency)) {
-        if (this.metadata.labelCurrency.iSOCode !== currencyIsoCode) {
-          return this.metadata.labelCurrency.iSOCode
+        if (this.metadata.labelCurrency !== currencyIsoCode) {
+          return this.metadata.labelCurrency
         }
       }
       return currencyIsoCode

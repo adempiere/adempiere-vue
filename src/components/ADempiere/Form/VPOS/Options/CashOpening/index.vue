@@ -33,7 +33,10 @@
                 :span="8"
               >
                 <field-definition
-                  :metadata-field="fieldsList[0]"
+                  :metadata-field="{
+                    ...fieldsList[0],
+                    labelCurrency: currentFieldCurrency
+                  } "
                   :container-uuid="'Cash-Opening'"
                   :container-manager="containerManager"
                 />
