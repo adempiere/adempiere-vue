@@ -195,7 +195,7 @@ function hidenStactiRoutes({ staticRoutes, permiseRole }) {
       return {
         ...route,
         // is hidden by default, change to be visible
-        hidden: !isAllowInfoProduct
+        hidden: false
       }
     }
     return {

@@ -114,7 +114,7 @@
           {{ formatPrice(getTaxAmount(scope.row.priceStandard, scope.row.taxRate.rate) + scope.row.priceStandard, scope.row.currency.iSOCode) }}
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         label=""
         width="100"
       >
@@ -124,6 +124,7 @@
               {{ $t('form.pos.tableProduct.options') }}
               <i class="el-icon-arrow-down el-icon--right" />
             </span>
+            {{ scope.row.product.name }}
             <el-dropdown-menu slot="dropdown" style="padding-bottom: 0px;">
               <span v-show="!isEmptyValue(process)">
                 <el-dropdown-item v-for="(report, key) in process" :key="key" icon="el-icon-document">
@@ -135,7 +136,7 @@
             </el-dropdown-menu>
           </el-dropdown>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <custom-pagination
       :total="productPrice.recordCount"
@@ -244,23 +245,23 @@ export default {
       }
       return 0
     },
-    process() {
-      if (!this.isEmptyValue(this.reportAsociated)) {
-        const process = this.reportAsociated.map(element => {
-          const findProcess = this.$store.getters.getProcess(element.uuid)
-          if (!this.isEmptyValue(findProcess)) {
-            return {
-              ...element,
-              name: findProcess.name,
-              id: findProcess.id
-            }
-          }
-          return []
-        })
-        return process
-      }
-      return []
-    },
+    // process() {
+    //   if (!this.isEmptyValue(this.reportAsociated)) {
+    //     const process = this.reportAsociated.map(element => {
+    //       const findProcess = this.$store.getters.getProcess(element.uuid)
+    //       if (!this.isEmptyValue(findProcess)) {
+    //         return {
+    //           ...element,
+    //           name: findProcess.name,
+    //           id: findProcess.id
+    //         }
+    //       }
+    //       return []
+    //     })
+    //     return process
+    //   }
+    //   return []
+    // },
     isMobile() {
       return this.$store.state.app.device === 'mobile'
     }

@@ -19,6 +19,7 @@
   <div>
     <product-info-list
       :report-asociated="process"
+      :container-manager="containerManager"
     />
   </div>
 </template>
@@ -28,7 +29,6 @@
  * This component is made to be the prototype of the Product Info search field
  */
 import ProductInfoList from './productList'
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 import staticReportRoutes from '@/utils/ADempiere/constants/zoomReport'
 import {
   formatPrice,
@@ -40,9 +40,20 @@ export default {
   components: {
     ProductInfoList
   },
-  mixins: [
-    fieldMixin
-  ],
+  props: {
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
+    }
+  },
   data() {
     return {
       timeOut: null,
@@ -88,7 +99,7 @@ export default {
   created() {
     // if (this.isEmptyValue(this.currentPos)) {
     this.$store.dispatch('listPointOfSalesFromServer')
-    this.findProcess(this.process)
+    // this.findProcess(this.process)
     // }
   },
   methods: {
