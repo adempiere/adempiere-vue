@@ -19,7 +19,6 @@ import {
   parsedValueComponent
 } from '@/utils/ADempiere/valueUtils.js'
 import {
-  ACCOUNTING_COLUMNS,
   LOG_COLUMNS_NAME_LIST
 } from '@/utils/ADempiere/constants/systemColumns'
 import {
@@ -290,39 +289,26 @@ const getters = {
     let attributesList = fieldsList
       .map(fieldItem => {
         const { columnName, defaultValue } = fieldItem
-        let isSQL = false
-        let parsedDefaultValue = fieldItem.parsedDefaultValue
-        const isSpeciaColumn = ACCOUNTING_COLUMNS.includes(columnName) || ACCOUNTING_COLUMNS.includes(fieldItem.elementName)
+        const isSQL = String(defaultValue).includes('@SQL=') && isGetServer
 
-        if (String(defaultValue).includes('@') || isSpeciaColumn) {
-          parsedDefaultValue = getDefaultValue({
-            ...fieldItem,
-            parentUuid,
-            isSOTrxMenu
-          })
-          if (String(defaultValue).includes('@SQL=') && isGetServer) {
-            isSQL = true
-          }
-        }
+        const parsedDefaultValue = getDefaultValue({
+          ...fieldItem,
+          parentUuid,
+          isSOTrxMenu
+        })
         attributesObject[columnName] = parsedDefaultValue
 
         if (fieldItem.isRange && fieldItem.componentPath !== 'FieldNumber') {
           const { columnNameTo, elementNameTo, defaultValueTo } = fieldItem
-          let parsedDefaultValueTo = fieldItem.parsedDefaultValueTo
-          let isSQLTo = false
-          if (String(defaultValueTo).includes('@') || isSpeciaColumn) {
-            if (String(defaultValueTo).includes('@SQL=') && isGetServer) {
-              isSQLTo = true
-            }
+          const isSQLTo = String(defaultValueTo).includes('@SQL=') && isGetServer
 
-            parsedDefaultValueTo = getDefaultValue({
-              ...fieldItem,
-              parentUuid,
-              isSOTrxMenu,
-              columnName: columnNameTo,
-              elementName: elementNameTo
-            })
-          }
+          const parsedDefaultValueTo = getDefaultValue({
+            ...fieldItem,
+            parentUuid,
+            isSOTrxMenu,
+            columnName: columnNameTo,
+            elementName: elementNameTo
+          })
 
           attributesObject[columnNameTo] = parsedDefaultValueTo
           attributesRangue.push({

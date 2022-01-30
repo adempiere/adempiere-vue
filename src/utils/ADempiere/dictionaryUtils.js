@@ -15,11 +15,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import evaluator from '@/utils/ADempiere/evaluator'
-import { isEmptyValue, parsedValueComponent } from '@/utils/ADempiere/valueUtils'
+import { arrayMatches, isEmptyValue, parsedValueComponent } from '@/utils/ADempiere/valueUtils'
 import { getContext, getParentFields, getPreference, parseContext } from '@/utils/ADempiere/contextUtils'
 import REFERENCES, { BUTTON, YES_NO, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
 import { FIELD_OPERATORS_LIST } from '@/utils/ADempiere/dataUtils'
 import {
+  ACCOUNTING_COLUMNS,
   isDocumentStatus,
   READ_ONLY_FORM_COLUMNS,
   readOnlyColumn
@@ -307,7 +308,10 @@ export function getDefaultValue({
 }) {
   let parsedDefaultValue = defaultValue
 
-  if (String(parsedDefaultValue).includes('@') &&
+  const isContextValue = String(parsedDefaultValue).includes('@')
+  const isSpeciaColumn = !isEmptyValue(arrayMatches(ACCOUNTING_COLUMNS, [columnName, elementName]))
+  // search value with context
+  if ((isSpeciaColumn || isContextValue) &&
     String(parsedDefaultValue).trim() !== '-1') {
     parsedDefaultValue = parseContext({
       parentUuid,
@@ -318,6 +322,7 @@ export function getDefaultValue({
     }).value
   }
 
+  // search value preference with column name
   if (isEmptyValue(parsedDefaultValue) && !isKey &&
     String(parsedDefaultValue).trim() !== '-1') {
     parsedDefaultValue = getPreference({
@@ -326,7 +331,7 @@ export function getDefaultValue({
       columnName
     })
 
-    // search value preference with elementName
+    // search value preference with element name
     if (!isEmptyValue(elementName) &&
       isEmptyValue(parsedDefaultValue)) {
       parsedDefaultValue = getPreference({
@@ -337,6 +342,7 @@ export function getDefaultValue({
     }
   }
 
+  // search value with form read only
   if (isColumnReadOnlyForm && isEmptyValue(parsedDefaultValue)) {
     const { defaultValue: defaultValueColumn } = READ_ONLY_FORM_COLUMNS.find(columnItem => {
       return columnItem.columnName === columnName
@@ -344,6 +350,12 @@ export function getDefaultValue({
     parsedDefaultValue = defaultValueColumn
   }
 
+  // set default value
+  if (isEmptyValue(parsedDefaultValue) && !isContextValue) {
+    parsedDefaultValue = defaultValue
+  }
+
+  // convert to element-ui compatible value
   parsedDefaultValue = parsedValueComponent({
     columnName,
     componentPath,

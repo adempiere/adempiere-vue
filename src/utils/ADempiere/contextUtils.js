@@ -26,7 +26,14 @@ import evaluator from '@/utils/ADempiere/evaluator'
 
 export default evaluator
 
-// get context state from vuex store
+/**
+ * Get context state from vuex store
+ * @param {string} parentUuid UUID Window
+ * @param {string} containerUuid  UUID Tab, Process, SmartBrowser, Report and Form
+ * @param {boolean} isBooleanToString if convert true to 'Y'
+ * @param {string} columnName (context)  Entity to search
+ * @returns
+ */
 export const getContext = ({
   parentUuid,
   containerUuid,
@@ -37,14 +44,16 @@ export const getContext = ({
   const isPreferenceValue = columnName.startsWith('$') ||
     columnName.startsWith('#') ||
     columnName.startsWith(`P|`)
+
+  // get value to session context
   if (isPreferenceValue) {
     value = store.getters.getPreference({
       parentUuid,
       containerUuid,
       columnName
     })
-  }
-  if (!isPreferenceValue && isEmptyValue(value)) {
+  } else {
+    // get value to container view
     value = store.getters.getValueOfField({
       parentUuid,
       containerUuid,
@@ -88,8 +97,8 @@ export function getPreference({
   // View Preferences
   if (parentUuid) {
     value = getContext({
-      parentUuid: 'P' + parentUuid,
-      containerUuid,
+      parentUuid: 'P|' + parentUuid,
+      containerUuid: 'P|' + containerUuid,
       columnName
     })
     if (!isEmptyValue(value)) {

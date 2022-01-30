@@ -425,6 +425,27 @@ export function parsedValueComponent({
 }
 
 /**
+ * Returns matching elements of arrays
+ * @param {array} arrayA
+ * @param {array} arrayB
+ * @returns {array}
+ */
+export function arrayMatches(arrayA = [], arrayB = []) {
+  const matches = []
+
+  if (isEmptyValue(arrayA) || isEmptyValue(arrayB)) {
+    return matches
+  }
+  arrayA.forEach(elementA => {
+    if (arrayB.includes(elementA)) {
+      matches.push(elementA)
+    }
+  })
+
+  return matches
+}
+
+/**
  * Payment method icon element-ui supported
  * @author Elsio Sanchez <elsiosanches@gmail.com>
  * @param {string} paymentMethod, value the payment
