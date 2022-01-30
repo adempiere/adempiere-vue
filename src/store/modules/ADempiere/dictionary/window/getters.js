@@ -70,7 +70,7 @@ export default {
 
   getStoredFieldFromTab: (state, getters) => ({ windowUuid, tabUuid, columnName, fieldUuid }) => {
     return getters.getStoredFieldsFromTab(windowUuid, tabUuid)
-      .map(field => {
+      .find(field => {
         return field.columnName === columnName || field.uuid === fieldUuid
       })
   },
