@@ -45,9 +45,9 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-// components
+// components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
-import TabManager from '@/components/ADempiere/TabManager'
+import TabManager from '@/components/ADempiere/TabManager/index.vue'
 
 // utils and helpers methods
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
@@ -99,6 +99,17 @@ export default defineComponent({
                 }
               }, () => {})
             }
+
+            const { parentUuid, containerUuid } = field
+            const tab = root.$store.getters.getStoredTab(parentUuid, containerUuid)
+
+            // set response values
+            root.$store.dispatch('updateValuesOfContainer', {
+              parentUuid,
+              containerUuid,
+              isOverWriteParent: tab.isParentTab,
+              attributes: response.attributes
+            })
           })
       },
 
