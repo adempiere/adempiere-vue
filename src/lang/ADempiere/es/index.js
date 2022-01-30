@@ -3,6 +3,7 @@ import actionMenu from './actionMenu'
 import fieldDisplayOptions from './fieldDisplayOptions'
 import fieldOptions from './fieldOptions'
 import recordManager from './recordManager'
+import window from './window'
 
 export default {
   actionMenu,
@@ -271,29 +272,7 @@ export default {
     changeLanguage: 'Cambiar idioma',
     changeLanguagePlaceholder: 'Elija un idioma'
   },
-  window: {
-    newRecord: 'Nuevo Registro',
-    deleteRecord: 'Eliminar Registro',
-    undoNew: 'Descartar Nuevo Registro',
-    containerInfo: {
-      attachment: 'Anexo',
-      notes: 'Listado de Notas',
-      changeLog: 'Actividad',
-      workflowLog: 'Histórico de Flujo de Trabajo',
-      changeDetail: 'Detalle del cambio',
-      logWorkflow: {
-        message: 'Mensaje',
-        responsible: 'Responsable',
-        workflowName: 'Nombre de estado del flujo de trabajo',
-        timeElapsed: 'Tiempo transcurrido',
-        addNote: 'Agregar Nota'
-      }
-    },
-    documentStatus: 'Estatus del Documento',
-    callout: {
-      error: 'Error En Callout'
-    }
-  },
+  window,
   field: {
     field: 'Campo',
     info: 'Información',
@@ -314,7 +293,6 @@ export default {
     deleteRecordSuccessful: 'Registro eliminado exitosamente',
     deleteRecordError: 'Error al eliminar el regitro',
     exportRecord: 'Exportar Registro',
-    lockRecord: 'Registro Bloqueado',
     noDescription: 'Sin Descripción',
     addDescription: 'Agregue una Descripción',
     recordAccess: {
@@ -341,8 +319,7 @@ export default {
     },
     addNote: 'Agregar Nota',
     emptyNote: 'Este registro no posee ninguna nota',
-    descriptionNote: 'Agregar Nota o Comentario al Registro',
-    unlockRecord: 'Desbloquear Registro'
+    descriptionNote: 'Agregar Nota o Comentario al Registro'
   },
   sequence: {
     available: 'Disponibles',

@@ -14,12 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const recordManager = {
-  deleteRecordSuccessful: 'Record deleted successfully',
-  deleteRecordError: 'Error deleting record',
-  lockRecord: 'Lock Record',
-  updatedRecord: 'Record Updated',
-  unlockRecord: 'Unlock Record'
+const window = {
+  newRecord: 'New Record',
+  deleteRecord: 'Delete Record',
+  undoNew: 'Undo New Record',
+  containerInfo: {
+    attachment: 'Attachment',
+    notes: 'Notes List',
+    changeLog: 'ACtivity',
+    workflowLog: 'Workflow Log',
+    changeDetail: 'Change detail',
+    logWorkflow: {
+      message: 'Message',
+      responsible: 'Responsible',
+      workflowName: 'Name of Workflow Status',
+      timeElapsed: 'Time Elapsed',
+      addNote: 'Add Note'
+    }
+  },
+  documentStatus: 'Document Status',
+  callout: {
+    error: 'Error In Callout'
+  },
+  gridToggle: 'Toggle single/multi record',
+  toggleTabContentVisibility: 'Toggle tab content visibility'
 }
 
-export default recordManager
+export default window

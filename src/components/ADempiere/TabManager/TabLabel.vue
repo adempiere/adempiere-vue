@@ -27,24 +27,34 @@
       :tab-name="tabMetadata.name"
     />
 
-    <el-button
-      v-if="isActiveTab"
-      type="text"
-      style="margin-left: 0px;"
-      :disabled="isDisbaledTable"
-      @click="changeShowedRecords "
+    <el-tooltip
+      :content="$t('window.gridToggle')"
+      placement="top"
     >
-      <i class="el-icon-s-fold" style="font-size: 15px; color: black;" />
-    </el-button>
+      <el-button
+        v-if="isActiveTab"
+        type="text"
+        style="margin-left: 0px;"
+        :disabled="isDisbaledTable"
+        @click="changeShowedRecords "
+      >
+        <i class="el-icon-s-fold" style="font-size: 15px; color: black;" />
+      </el-button>
+    </el-tooltip>
 
-    <el-button
-      v-if="isActiveTab"
-      type="text"
-      style="margin-left: 0px;"
-      @click="changeShowedTab"
+    <el-tooltip
+      :content="$t('window.toggleTabContentVisibility')"
+      placement="top"
     >
-      <svg-icon icon-class="eye-open" style="font-size: 15px; color: black;" />
-    </el-button>
+      <el-button
+        v-if="isActiveTab"
+        type="text"
+        style="margin-left: 0px;"
+        @click="changeShowedTab"
+      >
+        <svg-icon icon-class="eye-open" style="font-size: 15px; color: black;" />
+      </el-button>
+    </el-tooltip>
   </span>
 </template>
 

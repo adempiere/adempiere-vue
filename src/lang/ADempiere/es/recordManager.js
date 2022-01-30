@@ -17,7 +17,9 @@
 const recordManager = {
   deleteRecordSuccessful: 'Registro eliminado exitosamente',
   deleteRecordError: 'Error al eliminar el regitro',
-  updatedRecord: 'Registro Actualizado'
+  lockRecord: 'Bloquear Registro',
+  updatedRecord: 'Registro Actualizado',
+  unlockRecord: 'Desbloquear Registro'
 }
 
 export default recordManager

@@ -3,6 +3,7 @@ import actionMenu from './actionMenu'
 import fieldDisplayOptions from './fieldDisplayOptions'
 import fieldOptions from './fieldOptions'
 import recordManager from './recordManager'
+import window from './window'
 
 export default {
   actionMenu,
@@ -296,29 +297,7 @@ export default {
     changeLanguage: 'Change language',
     changeLanguagePlaceholder: 'Choose a language'
   },
-  window: {
-    newRecord: 'New Record',
-    deleteRecord: 'Delete Record',
-    undoNew: 'Undo New Record',
-    containerInfo: {
-      attachment: 'Attachment',
-      notes: 'Notes List',
-      changeLog: 'ACtivity',
-      workflowLog: 'Workflow Log',
-      changeDetail: 'Change detail',
-      logWorkflow: {
-        message: 'Message',
-        responsible: 'Responsible',
-        workflowName: 'Name of Workflow Status',
-        timeElapsed: 'Time Elapsed',
-        addNote: 'Add Note'
-      }
-    },
-    documentStatus: 'Document Status',
-    callout: {
-      error: 'Error In Callout'
-    }
-  },
+  window,
   field: {
     field: 'Field',
     info: 'Information',
@@ -339,7 +318,6 @@ export default {
     deleteRecordSuccessful: 'Record deleted successfully',
     deleteRecordError: 'Error deleting record',
     exportRecord: 'Export Record',
-    lockRecord: 'Lock Record',
     noDescription: 'No Description',
     addDescription: 'Add Description',
     recordAccess: {
@@ -366,8 +344,7 @@ export default {
     },
     addNote: 'Add Note',
     emptyNote: 'Este registro no posee ninguna nota',
-    descriptionNote: 'Add Note or Comment to Record',
-    unlockRecord: 'Unlock Record'
+    descriptionNote: 'Add Note or Comment to Record'
   },
   sequence: {
     available: 'Available',
