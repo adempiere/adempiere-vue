@@ -15,7 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // List of fields to send for create new
-import language from '@/lang'
 
 export default [
   {
@@ -96,7 +95,6 @@ export default [
     tableName: 'AD_user',
     isFromDictionary: true,
     overwriteDefinition: {
-      name: language.t('form.pos.order.BusinessPartnerCreate.phone'),
       isCustomField: true,
       isMandatory: true,
       size: 8

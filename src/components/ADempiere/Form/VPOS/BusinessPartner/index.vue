@@ -370,7 +370,14 @@ export default {
       }
     },
     templateCustomer() {
-      return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
+      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
+      if (this.isEmptyValue(templateCustomer)) {
+        return {
+          value: '',
+          name: ''
+        }
+      }
+      return templateCustomer
     },
     templateCustomerData() {
       return this.templateCustomer.value + ' - ' + this.templateCustomer.name
