@@ -22,7 +22,6 @@ import {
   getEntities
 } from '@/api/ADempiere/user-interface/persistence.js'
 import {
-  createEntity,
   deleteEntity
 } from '@/api/ADempiere/common/persistence.js'
 
@@ -79,24 +78,6 @@ const windowManager = {
   },
 
   actions: {
-    createEntity({
-      rootGetters
-    }, {
-      parentUuid,
-      containerUuid
-    }) {
-      return new Promise(resolve => {
-        const tab = rootGetters.getStoredTab(parentUuid, containerUuid)
-
-        createEntity({
-          tableName: tab.tableName
-        })
-          .then(createResponse => {
-            resolve(createResponse)
-          })
-      })
-    },
-
     /**
      * Get list entities
      * @param {string} parentUuid

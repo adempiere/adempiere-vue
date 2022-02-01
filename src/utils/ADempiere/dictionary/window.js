@@ -41,8 +41,14 @@ export function isMandatoryField({ isMandatory, isMandatoryFromLogic }) {
   return isMandatory || isMandatoryFromLogic
 }
 
-export function isReadOnlyField({ isQueryCriteria, isReadOnlyFromLogic }) {
-  return isQueryCriteria && isReadOnlyFromLogic
+/**
+ * Is read only field in panel single record
+ * @param {boolean} isReadOnly
+ * @param {boolean} isReadOnlyFromLogic
+ * @returns {boolean}
+ */
+export function isReadOnlyField({ isReadOnly, isReadOnlyFromLogic }) {
+  return isReadOnly || isReadOnlyFromLogic
 }
 
 /**

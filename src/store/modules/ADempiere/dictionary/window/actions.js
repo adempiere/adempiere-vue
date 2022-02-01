@@ -179,6 +179,19 @@ export default {
         }, {
           root: true
         })
+
+        if (!attribute.columnName.includes('DisplayColumn')) {
+          const field = rootGetters.getStoredFieldFromTab({
+            windowUuid: parentUuid,
+            tabUuid: containerUuid,
+            columnName: attribute.columnName
+          })
+          // activate logics
+          dispatch('changeDependentFieldsList', {
+            field,
+            fieldsList: tab.fieldsList
+          })
+        }
       })
 
       dispatch('updateValuesOfContainer', {

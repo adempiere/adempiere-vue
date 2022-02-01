@@ -83,9 +83,9 @@ export default defineComponent({
 
     const tooltipText = computed(() => {
       if (isLocked.value) {
-        return root.$t('data.unlockRecord')
+        return root.$t('recordManager.unlockRecord')
       }
-      return root.$t('data.lockRecord')
+      return root.$t('recordManager.lockRecord')
     })
 
     const storedPrivateAccess = computed(() => {

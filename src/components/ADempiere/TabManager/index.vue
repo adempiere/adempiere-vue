@@ -69,7 +69,7 @@
             :panel-metadata="tabAttributes"
           />
           <!-- Close table when clicking on group of fields -->
-          <div @click="close()">
+          <div @click="closeRecordNavigation()">
             <!-- fields in panel to single record -->
             <panel-definition
               v-show="isParentTabs || (!isParentTabs && !isShowedTableRecords)"
@@ -326,7 +326,7 @@ export default defineComponent({
     /**
      * Close table when clicking on group of fields
      */
-    const close = () => {
+    const closeRecordNavigation = () => {
       root.$store.dispatch('changeTabAttribute', {
         parentUuid: props.parentUuid,
         containerUuid: tabUuid.value,
@@ -373,7 +373,7 @@ export default defineComponent({
       tabStyle,
       // methods
       handleClick,
-      close,
+      closeRecordNavigation,
       isDisabledTab
     }
   }

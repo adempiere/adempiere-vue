@@ -43,6 +43,9 @@ export default {
           })
         })
         .finally(() => {
+          if (isEmptyValue(rootGetters.getNotificationProcess)) {
+            return
+          }
           const notification = rootGetters.getNotificationProcess.find(notification => {
             if (!isEmptyValue(notification) && notification.typeActivity && notification.quantityActivities === state.listActivity.length) {
               return notification

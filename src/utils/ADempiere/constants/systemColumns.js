@@ -24,7 +24,7 @@ export const PROCESSING = 'Processing'
 
 export const PROCESSED = 'Processed'
 
-export const WAREHOUSE = 'M_Warehouse_ID'
+export const UUID = 'UUID'
 
 /**
  * Log columns list into table
@@ -46,7 +46,7 @@ export const STANDARD_COLUMNS_NAME_LIST = [
   CLIENT,
   ORGANIZATION,
   ACTIVE,
-  'UUID'
+  UUID
 ]
 
 /**

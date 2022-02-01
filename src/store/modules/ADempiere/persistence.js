@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import router from '@/router'
 import language from '@/lang'
 
 // constants
@@ -92,10 +91,10 @@ const persistence = {
           })
           return
         }
-        const route = router.app._route
-        recordUuid = route.query.action === 'create-new'
-          ? getters.getUuidOfContainer(field.containerUuid)
-          : route.query.action
+
+        if (isEmptyValue(recordUuid) || recordUuid === 'create-new') {
+          recordUuid = getters.getUuidOfContainer(field.containerUuid)
+        }
 
         dispatch('flushPersistenceQueue', {
           containerUuid,
