@@ -18,15 +18,13 @@ import Vue from 'vue'
 
 // constants
 import {
-  ACTIVE, PROCESSING, PROCESSED
+  ACTIVE, PROCESSING, PROCESSED, UUID
 } from '@/utils/ADempiere/constants/systemColumns'
 
 // utils and helpers methods
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
 import { isEmptyValue, typeValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
-
-const UUID_KEY = 'UUID'
 
 const value = {
   state: {
@@ -257,8 +255,9 @@ const value = {
     },
 
     getUuidOfContainer: (state) => (containerUuid) => {
-      return state.field[containerUuid + '_' + UUID_KEY]
+      return state.field[`${containerUuid}_${UUID}`]
     },
+
     // Using to read only in data tables in Window
     getContainerIsActive: (state) => (parentUuid) => {
       const valueIsActive = state.field[`${parentUuid}_${ACTIVE}`]

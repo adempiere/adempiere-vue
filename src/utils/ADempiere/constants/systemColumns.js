@@ -24,6 +24,8 @@ export const PROCESSING = 'Processing'
 
 export const PROCESSED = 'Processed'
 
+export const UUID = 'UUID'
+
 /**
  * Log columns list into table
  * Manages with user session
@@ -44,7 +46,7 @@ export const STANDARD_COLUMNS_NAME_LIST = [
   CLIENT,
   ORGANIZATION,
   ACTIVE,
-  'UUID'
+  UUID
 ]
 
 /**
