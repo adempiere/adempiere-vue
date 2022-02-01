@@ -371,6 +371,7 @@
       :is-loaded-panel="showAssignSeller"
       width="60%"
       center
+      class="dialogo-seller"
     >
       <assign-seller />
     </el-dialog>
@@ -1039,6 +1040,9 @@ export default {
     padding-right: 10px;
     background-color:white;
     background:white;
+  }
+  .dialogo-seller {
+    overflow: hidden;
   }
 </style>
 <style>

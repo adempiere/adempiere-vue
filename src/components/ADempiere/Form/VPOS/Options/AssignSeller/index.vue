@@ -16,36 +16,41 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <el-container style="background: white; height: 100% !important;">
-    <el-main style="background: white; padding: 0px; height: 100% !important; overflow: hidden">
-      <el-card class="box-card" style="padding-left: 0px;padding-right: 0px;height: 100px;">
-        <el-form label-position="top">
-          <el-col :span="8">
-            <el-form-item :label="$t('form.byInvoice.salesRepresentative')" class="from-field">
-              <el-select
-                v-model="currentSeller"
-                style="display: block;"
-                :clearable="true"
-                @change="changeSeller"
-              >
-                <el-option
-                  v-for="item in listSeller"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.uuid"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('form.byInvoice.onlyAllocated')" class="from-field">
-              <el-switch v-model="isOnlyAllocated" @change="changeOnlyAllocated" />
-            </el-form-item>
-          </el-col>
-        </el-form>
+  <el-container style="height: -webkit-fill-available;overflow: hidden;">
+    <el-main style="background: white;padding: 0px;overflow: hidden;height: -webkit-fill-available;">
+      <el-card class="box-card" style="padding-left: 0px;padding-right: 0px;">
+        <el-scrollbar wrap-class="scroll-seller">
+          <el-row style="padding: 2px">
+            <template v-for="(seller, key) in listSeller">
+              <el-col :key="key" :span="8">
+                <el-card
+                  :shadow="seller.uuid === salesRepresentative.uuid ? 'always' : 'never'"
+                  :class="seller.uuid === salesRepresentative.uuid ? 'custom-card-select' : 'custom-card'"
+                  :body-style="{ padding: '10px' }"
+                >
+                  <div @click="changeSeller(seller)">
+                    <div class="image-profile">
+                      <el-avatar
+                        shape="circle"
+                        :size="100"
+                        fit="fill"
+                        :src="avatarResize(seller.image)"
+                      />
+                    </div>
+                    <div class="footer-product">
+                      <p class="label">
+                        <b> {{ seller.name }} </b>
+                      </p>
+                    </div>
+                  </div>
+                </el-card>
+              </el-col>
+            </template>
+          </el-row>
+        </el-scrollbar>
       </el-card>
     </el-main>
-    <el-footer style="height: auto; padding: 0px">
+    <el-footer>
       <el-button
         style="float: right;margin-left: 10px;"
         type="primary"
@@ -70,6 +75,7 @@ import { availableSellers } from '@/api/ADempiere/form/point-of-sales'
 import {
   allocateSeller
 } from '@/api/ADempiere/form/point-of-sales.js'
+import { getImagePath } from '@/utils/ADempiere/resource.js'
 
 export default {
   name: 'AssignSeller',
@@ -123,13 +129,15 @@ export default {
       currentSeller: '',
       listSeller: [],
       isOnlyAllocated: false,
-      salesRepresentative: '',
+      salesRepresentative: {
+        uuid: ''
+      },
       value: ''
     }
   },
   computed: {
     validateSeller() {
-      return this.isEmptyValue(this.currentSeller)
+      return this.isEmptyValue(this.salesRepresentative)
     },
     showAssignSeller() {
       return this.isEmptyValue(this.$store.getters.getShowAssignSeller) ? false : this.$store.getters.getShowAssignSeller
@@ -146,6 +154,19 @@ export default {
     }
   },
   methods: {
+    avatarResize(image) {
+      if (this.isEmptyValue(image)) {
+        return require('@/image/ADempiere/avatar/no-avatar.png')
+      }
+
+      const { uri } = getImagePath({
+        file: image,
+        width: 40,
+        height: 40
+      })
+
+      return uri
+    },
     close() {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
@@ -153,6 +174,7 @@ export default {
         value: undefined
       })
       this.$store.commit('setShowAssignSeller', false)
+      this.salesRepresentative = ''
     },
     listAvailableSellers(isOnlyAllocated) {
       availableSellers({
@@ -160,6 +182,7 @@ export default {
         isOnlyAllocated
       })
         .then(response => {
+          console.log(response.records)
           this.listSeller = response.records
         })
         .catch(error => {
@@ -172,6 +195,7 @@ export default {
         })
     },
     changeSeller(value) {
+      console.log({ value })
       this.salesRepresentative = value
     },
     changeOnlyAllocated(value) {
@@ -184,7 +208,7 @@ export default {
     assignSeller() {
       allocateSeller({
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
-        salesRepresentativeUuid: this.currentSeller
+        salesRepresentativeUuid: this.salesRepresentative.uuid
       })
         .then(response => {
           this.$message({
@@ -262,7 +286,43 @@ export default {
     margin-top: 13px;
     line-height: 12px;
   }
-
+  .custom-card-select {
+    margin: 1px;
+    cursor: pointer;
+    border: 1px solid #bfe3ff;
+    background: hsl(206, 100%, 87%);
+  }
+  .custom-card {
+    margin: 1px;
+    cursor: pointer;
+  }
+  .custom-card:hover {
+    background-color: #eaf5fe;
+    border: 1px solid #36a3f7;
+  }
+  .footer-product {
+    display: flex;
+    width: 100%;
+  }
+  .key-layout {
+    width: 100%;
+    height: 200px;
+    display: block;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+  }
+  .label {
+    text-align: center;
+    width: 100%;
+    padding: 0px !important;
+    margin: 0px;
+  }
+  .image-profile {
+    width: 100%;
+    text-align: center;
+  }
   .button {
     padding: 0;
     float: right;
@@ -289,5 +349,8 @@ export default {
   .total {
     margin-top: 10px;
     margin-bottom: 10px;
+  }
+  .scroll-seller {
+    max-height: 250px;
   }
 </style>
