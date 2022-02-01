@@ -97,7 +97,7 @@ const windowManager = {
       let pageToken
       if (!isEmptyValue(pageNumber)) {
         pageNumber-- // TODO: Remove with fix in backend
-        const token = getters.getPageToken({ containerUuid })
+        const token = getters.getTabPageToken({ containerUuid })
         pageToken = generatePageToken({ pageNumber, token })
       }
 

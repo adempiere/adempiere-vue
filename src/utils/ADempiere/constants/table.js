@@ -20,7 +20,7 @@
 export const ROW_ATTRIBUTES = {
   isNewRow: false,
   isEditRow: false,
-  indexRow: 0,
+  rowIndex: 0,
   isReadOnlyFromRow: false
 }
 
