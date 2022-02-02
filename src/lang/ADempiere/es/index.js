@@ -440,6 +440,7 @@ export default {
           addBillingAddress: 'Agregar Dirección de Facturación',
           billingAddress: 'Dirección de Facturación',
           shippingAddress: 'Dirección de Envío',
+          withoutSetting: 'Sin Establecer',
           taxId: 'Identificación Fiscal',
           address: {
             edit: 'Editar',

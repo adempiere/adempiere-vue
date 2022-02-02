@@ -72,7 +72,7 @@
               <el-scrollbar wrap-class="scroll-customer-description">
                 <el-descriptions class="margin-top" :title="$t('form.pos.order.BusinessPartnerCreate.address.managementDescription')" :column="1">
                   <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.addressType')">
-                    <el-tag size="small" :type="address.is_default_billing ? 'success' : ''">
+                    <el-tag size="small" :type="typeTag(address)">
                       {{ labelDirecction(address) }}
                     </el-tag>
                   </el-descriptions-item>
@@ -548,6 +548,14 @@ export default {
         return this.$t('form.pos.order.BusinessPartnerCreate.shippingAddress')
       }
       return this.$t('form.pos.order.BusinessPartnerCreate.withoutSetting')
+    },
+    typeTag(value) {
+      if (value.is_default_billing) {
+        return 'success'
+      } else if (value.is_default_shipping) {
+        return ''
+      }
+      return 'warning'
     },
     labelAddress(address) {
       if (!this.isEmptyValue(address) && !this.isEmptyValue(address.name)) {

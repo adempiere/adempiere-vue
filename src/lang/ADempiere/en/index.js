@@ -465,6 +465,7 @@ export default {
           addBillingAddress: 'Add Billing Address',
           billingAddress: 'Billing Address',
           shippingAddress: 'Shipping Address',
+          withoutSetting: 'Sin Establecer',
           taxId: 'Tax Identification',
           address: {
             edit: 'Edit',
