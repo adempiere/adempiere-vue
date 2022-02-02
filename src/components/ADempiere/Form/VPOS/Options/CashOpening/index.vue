@@ -835,6 +835,14 @@ export default {
         containerUuid: 'Cash-Opening',
         format: 'object'
       })
+      if (this.isEmptyValue(this.listCurrency)) {
+        this.$message({
+          type: 'error',
+          showClose: true,
+          message: this.$t('form.pos.collect.emptyRate')
+        })
+        return
+      }
       const selectCurrency = this.listCurrency.find(payemnt => payemnt.iso_code === this.currentFieldCurrency)
       const paymentMethodsPos = this.availablePaymentMethods.find(payemnt => payemnt.uuid === this.currentFieldPaymentMethods)
       payment.currency = this.currentFieldCurrency

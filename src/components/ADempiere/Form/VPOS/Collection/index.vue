@@ -845,6 +845,14 @@ export default {
       return rate
     },
     addCollectToList() {
+      if (this.isEmptyValue(this.listCurrency)) {
+        this.$message({
+          type: 'error',
+          showClose: true,
+          message: this.$t('form.pos.collect.emptyRate')
+        })
+        return
+      }
       const containerUuid = this.containerUuid
       const posUuid = this.currentPointOfSales.uuid
       const orderUuid = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid
