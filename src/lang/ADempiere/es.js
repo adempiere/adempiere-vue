@@ -458,6 +458,7 @@ export default {
           customerData: 'Datos del Cliente',
           billingAddress: 'Dirección de Facturación',
           shippingAddress: 'Dirección de Envió',
+          withoutSetting: 'Sin Establecer',
           taxId: 'Identificación Fiscal'
         }
       },

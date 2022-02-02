@@ -481,6 +481,7 @@ export default {
           customerData: 'Customer Data',
           billingAddress: 'Billing Address',
           shippingAddress: 'Shipping Address',
+          withoutSetting: 'Without Setting',
           taxId: 'Tax Identification'
         }
       },
