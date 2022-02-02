@@ -20,13 +20,13 @@
     <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; overflow: auto; padding-left: 0px;">
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
-          <el-col v-if="!value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
-            <el-card :body-style="{ padding: '0px' }">
+          <el-col v-if="!value.isRefund" :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
+            <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value, iSOCode(value))" fit="contain" />
                 </el-col>
-                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
+                <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
                     v-if="!isDisabled"
                     type="text"
@@ -64,15 +64,15 @@
                         class="clearfix"
                         style="padding-bottom: 20px;"
                       >
-                        <p v-if="!isEmptyValue(value.currencyConvertion)" class="total">
-                          <b style="float: right;">
-                            {{ amountConvertion(value) }}
+                        <p v-if="!isEmptyValue(value.orderCurrencyRate) && value.orderCurrencyRate !== 1" class="total">
+                          <b :style=" isRefundReference ? 'float: right;color: red' : 'float: right;'">
+                            {{ formatPrice(value.amount, iSOCode(value)) }}
                           </b>
                         </p>
                         <br>
                         <p class="total">
-                          <b style="float: right;">
-                            {{ formatPrice(value.amount, iSOCode(value)) }}
+                          <b :style=" isRefundReference ? 'float: right;color: red' : 'float: right;'">
+                            {{ formatPrice(value.amount * value.orderCurrencyRate, currency.iSOCode) }}
                           </b>
                         </p>
                       </div>
@@ -85,17 +85,17 @@
         </template>
       </el-row>
     </el-main>
-    <el-divider v-if="!isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} </h2></el-divider>
-    <el-footer v-if="!isEmptyValue(listRefund)" style="padding: 0px;height: auto;overflow: auto;">
+    <el-divider v-if="!isRefundReference && !isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} / Otros </h2></el-divider>
+    <el-footer v-if="!isRefundReference && !isEmptyValue(listRefund)" style="height: 50%;padding: 0px;overflow: auto;">
       <el-row :gutter="24">
         <template v-for="(value, key) in listRefund">
-          <el-col v-if="value.isRefund" :key="key" :span="12" style="padding-left: 5px; padding-right: 5px;">
-            <el-card :body-style="{ padding: '0px' }">
+          <el-col :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
+            <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
-                  <img :src="imageCard(value.tenderTypeCode)" fit="contain" style="width: 80px; height: 100px">
+                  <el-image style="width: 100px; height: 100px" :src="imageCard(value)" fit="contain" />
                 </el-col>
-                <el-col :span="18" style="padding-right: 10px;padding-top: 10%;padding-left: 10px;">
+                <el-col :span="18" style="padding-right: 0px;padding-left: 40px;">
                   <el-button
                     v-if="!isDisabled"
                     type="text"
@@ -133,15 +133,15 @@
                         class="clearfix"
                         style="padding-bottom: 20px;"
                       >
-                        <p v-if="!isEmptyValue(value.currencyConvertion)" class="total">
+                        <p class="total">
                           <b style="float: right;color: red;">
-                            {{ amountConvertion(value) }}
+                            {{ formatPrice(value.amount, searchRate(value).currencyTo.iSOCode) }}
                           </b>
                         </p>
                         <br>
-                        <p class="total">
+                        <p v-if="(!isEmptyValue(value.currencyUuid) && currentPointOfSales.priceList.currency.uuid !== value.currencyUuid) || (!isEmptyValue(value.currency) && currentPointOfSales.priceList.currency.uuid !== value.currency.uuid)" class="total">
                           <b style="float: right;color: red;">
-                            {{ formatPrice(value.amount, labelCurrency(value.currencyUuid)) }}
+                            {{ formatPrice(value.amount * (isEmptyValue(value.orderCurrencyRate) ? searchRate(value).divideRate : value.orderCurrencyRate), currentPointOfSales.currentPriceList.currency.iSOCode) }}
                           </b>
                         </p>
                       </div>
@@ -197,6 +197,14 @@ export default {
     isLoaded: {
       type: Boolean,
       default: false
+    },
+    size: {
+      type: Number,
+      default: 12
+    },
+    isRefundReference: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -207,6 +215,9 @@ export default {
     }
   },
   computed: {
+    listRefunds() {
+      return this.currentPointOfSales.currentOrder.listPayments.payments.filter(payments => payments.isRefund)
+    },
     typesPayment() {
       return this.$store.getters.getListsPaymentTypes
     },
@@ -221,7 +232,7 @@ export default {
     },
     // Validate if there is a payment in a different type of currency to the point
     paymentCurrency() {
-      return this.currentPointOfSales.currentOrder.listPayments.payments.find(pay => pay.currencyUuid !== this.currency.uuid)
+      return this.listRefund.find(pay => pay.currencyUuid !== this.currency.uuid)
     },
     convertionsList() {
       return this.$store.state['pointOfSales/point/index'].conversionsList
@@ -229,17 +240,21 @@ export default {
     availablePaymentMethods() {
       return this.$store.getters.getPaymentTypeList
     },
-    listRefund() {
-      const refund = this.$store.getters.getListRefund
-      if (this.isEmptyValue(refund)) {
-        return []
+    listRefund: {
+      get() {
+        const refund = this.$store.getters.getListRefund.filter(refund => refund.isRefund)
+        const listRefundsReference = this.$store.getters.getListRefundReference
+        const list = listRefundsReference.concat(refund)
+        return list
+      },
+      set(value) {
+        return value
       }
-      return refund.filter(refund => refund.isRefund)
     }
   },
   watch: {
     listPaymentType(value) {
-      if (!this.isEmptyValue(value.reference)) {
+      if (!this.isEmptyValue(value) && !this.isEmptyValue(value.reference)) {
         this.tenderTypeDisplaye({
           tableName: value.reference.tableName,
           query: value.reference.query
@@ -251,7 +266,7 @@ export default {
     if (!this.isEmptyValue(this.isAddTypePay)) {
       this.convertingPaymentMethods()
     }
-    if (!this.isEmptyValue(this.listPaymentType.reference)) {
+    if (!this.isEmptyValue(this.listPaymentType) && !this.isEmptyValue(this.listPaymentType.reference)) {
       this.tenderTypeDisplaye({
         tableName: this.listPaymentType.reference.tableName,
         query: this.listPaymentType.reference.query
@@ -262,6 +277,37 @@ export default {
     formatDate,
     formatDateToSend,
     formatPrice,
+    searchRate(value) {
+      if (!this.isEmptyValue(value)) {
+        const currency = this.listCurrency.find(currency => {
+          if ((!this.isEmptyValue(value.currencyUuid) && currency.uuid === value.currencyUuid) || (!this.isEmptyValue(value.currency) && currency.uuid === value.currency.uuid)) {
+            return currency
+          }
+        })
+        if (currency === undefined) {
+          return {
+            currencyTo: this.currentPointOfSales.priceList.currency,
+            divideRate: 1,
+            multiplyRate: 1,
+            iSOCode: this.currentPointOfSales.priceList.currency.iSOCode
+          }
+        }
+        const convert = this.convertionsList.find(convert => {
+          if (!this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+            return convert
+          }
+        })
+        if (!this.isEmptyValue(convert)) {
+          return convert
+        }
+      }
+      return {
+        currencyTo: this.currentPointOfSales.priceList.currency,
+        divideRate: 1,
+        multiplyRate: 1,
+        iSOCode: this.currentPointOfSales.priceList.currency.iSOCode
+      }
+    },
     labelCurrency(refunds) {
       const label = this.listCurrency.find(label => label.uuid === refunds)
       if (this.isEmptyValue(label)) {
@@ -271,7 +317,8 @@ export default {
     },
     labelTenderType(tenderType) {
       const currentTenderType = this.availablePaymentMethods.find(label => {
-        if (label.uuid === tenderType.paymentMethodUuid) {
+        const params = !this.isEmptyValue(tenderType.is_paid) ? tenderType.payment_method_uuid : tenderType.paymentMethodUuid
+        if (label.uuid === params) {
           return label
         }
       })
@@ -314,6 +361,14 @@ export default {
         })
           .then(response => {
             this.$store.getters.posAttributes.currentPointOfSales.currentOrder.listPayments.payments.forEach(element => {
+              if (element.currencyUuid !== this.pointOfSalesCurrency.uuid) {
+                element.multiplyRate = element.amount / response.multiplyRate
+                element.amountConvertion = element.amount * response.divideRate
+                element.divideRate = response.multiplyRate
+                element.currencyConvertion = response.currencyTo
+              }
+            })
+            this.listRefund.forEach(element => {
               if (element.currencyUuid !== this.pointOfSalesCurrency.uuid) {
                 element.multiplyRate = element.amount / response.multiplyRate
                 element.amountConvertion = element.amount * response.divideRate
@@ -373,9 +428,10 @@ export default {
       }
       return require('@/image/' + image + '.jpg')
     },
-    imageCard(typePayment) {
+    imageCard(typePayment, currency) {
       let image
-      switch (typePayment) {
+      const params = !this.isEmptyValue(typePayment.is_paid) ? typePayment.tender_type_code : typePayment.tenderTypeCode
+      switch (params) {
         case 'D':
           image = 'MobilePayment.jpg'
           break
@@ -400,14 +456,20 @@ export default {
       }
       return require('@/image/ADempiere/pos/typePayment/' + image)
     },
+    findTypePay(value) {
+      return this.availablePaymentMethods.find(pay => pay.uuid === value.paymentMethodUuid)
+    },
     deleteCollect(key) {
-      const orderUuid = key.orderUuid
       const paymentUuid = key.uuid
-      this.$store.dispatch('deletetPayments', {
+      const deletetPayments = !this.isEmptyValue(key.is_paid) ? 'deleteRefundReferences' : 'deletetPayments'
+      this.$store.dispatch(deletetPayments, {
         posUuid: this.currentPointOfSales.uuid,
-        orderUuid,
+        orderUuid: this.currentOrder.uuid,
+        uuid: key.uuid,
+        customerUuid: this.currentPointOfSales.currentOrder.businessPartner.uuid,
         paymentUuid
       })
+      this.$store.dispatch('reloadOrder', this.currentOrder.uuid)
     },
     // Payment card label
     tenderTypeDisplaye({

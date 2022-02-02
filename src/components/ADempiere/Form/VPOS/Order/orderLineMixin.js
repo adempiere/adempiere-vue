@@ -48,7 +48,7 @@ export default {
           columnName: 'Discount',
           label: this.$t('form.pos.order.discount'),
           isNumeric: true,
-          size: '65px'
+          size: '80px'
         },
         discountTotal: {
           columnName: 'DiscountTotal',
@@ -58,13 +58,13 @@ export default {
         },
         discounDisplayTaxIndicator: {
           columnName: 'taxIndicator',
-          label: this.$t('form.pos.tableProduct.displayTaxIMP'),
+          label: this.$t('form.pos.tableProduct.taxRate'),
           isNumeric: true,
-          size: '60px'
+          size: '80px'
         },
         discounDisplayTaxAmounttTotal: {
           columnName: 'DisplayTaxAmount',
-          label: this.$t('form.pos.tableProduct.displayTaxAmount'),
+          label: this.$t('form.pos.tableProduct.taxAmount'),
           isNumeric: true,
           size: '150px'
         },
@@ -138,6 +138,20 @@ export default {
   methods: {
     formatPercent,
     formatDateToSend,
+    currentValuePriceLine(line) {
+      if (this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
+        return line.price
+      }
+      if (!this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
+        return line.priceWithTax
+      }
+      if (!this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
+        return line.priceList
+      }
+      if (this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
+        return line.priceList
+      }
+    },
     changeLine(command) {
       switch (command.option) {
         case 'Eliminar':
@@ -275,9 +289,6 @@ export default {
       } else if (row.columnName === 'DisplayTaxAmount') {
         return this.currentPointOfSales.isDisplayTaxAmount
       } else if (row.columnName === 'GrandTotal') {
-        if (this.isDisplayIncludingTax) {
-          this.orderLineDefinition.grandTotal.label = this.$t('form.productInfo.totalIncludingTax')
-        }
         return true
       }
       return true
@@ -291,32 +302,36 @@ export default {
       const { columnName } = orderLine
       // const iSOCode = this.isEmptyValue(this.currentPointOfSales.displayCurrency) ? '' : this.currentPointOfSales.displayCurrency.iSOCode
       if (columnName === 'LineDescription') {
-        return row.lineDescription
+        return row.product.value + ' - ' + row.product.name
       }
       const currency = this.pointOfSalesCurrency.iSOCode
       if (columnName === 'CurrentPrice') {
-        return this.formatPrice((row.priceActual * row.taxRate.rate / 100) + row.priceActual, currency)
+        if (this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
+          return this.formatPrice(row.price, currency)
+        }
+        if (!this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
+          return this.formatPrice(row.priceWithTax, currency)
+        }
+        if (!this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
+          return this.formatPrice(row.priceList, currency)
+        }
+        if (this.currentPointOfSales.isDisplayTaxAmount && this.currentPointOfSales.isDisplayDiscount) {
+          return this.formatPrice(row.priceList, currency)
+        }
       } else if (columnName === 'QtyEntered') {
         return this.formatQuantity(row.quantityOrdered)
       } else if (columnName === 'Discount') {
-        return this.formatQuantity(row.discount) + '%'
+        return this.formatQuantity(row.discount) + ' %'
       } else if (columnName === 'taxIndicator') {
         return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
-        if (this.isDisplayIncludingTax) {
-          return this.formatPrice((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal, currency)
-        }
-        return this.formatPrice(row.grandTotal, currency)
+        return this.formatPrice(row.totalAmountWithTax, currency)
       } else if (columnName === 'ConvertedAmount') {
-        if (this.isDisplayIncludingTax) {
-          const price = ((row.grandTotal * row.taxRate.rate / 100) + row.grandTotal).toFixed(2)
-          return this.formatPrice(price / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
-        }
-        return this.formatPrice(row.grandTotal / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
+        return this.formatPrice(row.totalAmountWithTax / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       } else if (columnName === 'DiscountTotal') {
-        return this.formatPrice((row.priceList * row.quantityOrdered) * (row.discountRate / 100), currency)
+        return this.formatPrice(row.totalDiscountAmount, currency)
       } else if (columnName === 'DisplayTaxAmount') {
-        return this.formatPrice((row.grandTotal * row.taxRate.rate / 100), currency)
+        return this.formatPrice(row.totalTaxAmount, currency)
       }
     },
     productPrice(price, discount) {

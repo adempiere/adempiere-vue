@@ -44,6 +44,7 @@
     "element-ui": "2.15.6",
     "file-saver": "2.0.5",
     "fuse.js": "6.4.6",
+    "idle-vue": "^2.0.5",
     "js-cookie": "2.2.1",
     "jsonlint": "1.6.3",
     "jszip": "3.7.0",

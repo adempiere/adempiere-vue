@@ -15,17 +15,27 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 export default {
+  name: 'MixinField',
+
   props: {
-    metadata: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
+    containerUuid: {
+      type: String,
+      required: true
+    },
+    containerManager: {
       type: Object,
       required: true
     },
-    // value received from data result
-    valueModel: {
-      type: [String, Number, Boolean, Date, Array, Object],
-      default: null
+    metadata: {
+      type: Object,
+      required: true
     }
   },
+
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'
@@ -35,22 +45,33 @@ export default {
     },
     cssClassStyle() {
       let styleClass = ''
+      if (this.isEmptyRequired) {
+        styleClass += ' field-empty-required '
+      }
+
       if (!this.isEmptyValue(this.metadata.cssClassName)) {
         styleClass = this.metadata.cssClassName
       }
+
       return styleClass
+    },
+    isEmptyRequired() {
+      return this.isEmptyValue(this.value) && this.metadata.required
     },
     value: {
       get() {
-        const { columnName, containerUuid } = this.metadata
+        const { columnName, containerUuid, inTable } = this.metadata
 
         // table records values
-        if (this.metadata.inTable) {
-          const row = this.$store.getters.getRowData({
-            containerUuid,
-            index: this.metadata.tableIndex
-          })
-          return row[columnName]
+        if (inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.getCell) {
+            return this.containerManager.getCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName
+            })
+          }
         }
 
         // main panel values
@@ -61,15 +82,6 @@ export default {
         })
       },
       set(value) {
-        if (this.metadata.inTable) {
-          this.$store.dispatch('notifyCellTableChange', {
-            parentUuid: this.metadata.parentUuid,
-            containerUuid: this.metadata.containerUuid,
-            newValue: value,
-            field: this.metadata
-          })
-          return
-        }
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
@@ -79,22 +91,38 @@ export default {
       }
     }
   },
+
   async created() {
-    if (this.metadata.isSQLValue && (this.isEmptyValue(this.metadata.value) || this.metadata.value.isSQL)) {
-      const value = await this.$store.dispatch('getValueBySQL', {
+    if (this.metadata.isSQLValue && this.isEmptyValue(this.value)) {
+      let value = this.$store.getters.getStoredDefaultValue({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
         query: this.metadata.defaultValue
       })
+
+      if (this.isEmptyValue(value)) {
+        value = await this.$store.dispatch('getDefaultValue', {
+          parentUuid: this.metadata.parentUuid,
+          containerUuid: this.metadata.containerUuid,
+          columnName: this.metadata.columnName,
+          query: this.metadata.defaultValue
+        })
+      }
+
+      // set value into component and fieldValue store
+      this.value = this.parseValue(value)
+
       // set value and change into store
       this.preHandleChange(value)
     }
   },
+
   mounted() {
     if (this.metadata.handleRequestFocus) {
       this.requestFocus()
     }
   },
+
   methods: {
     /**
      * Parse the value to a new value if required for element-ui component
@@ -157,7 +185,6 @@ export default {
       }
     },
     actionKeyPerformed(value) {
-      // TODO: Delete for production
       if (this.metadata.handleActionKeyPerformed) {
         this.$store.dispatch('notifyActionKeyPerformed', {
           containerUuid: this.metadata.containerUuid,
@@ -180,7 +207,7 @@ export default {
     /**
      * @param {mixed} value, main value in component
      * @param {mixed} valueTo, used in end value in range
-     * @param {string} label, or displayColumn to show in select
+     * @param {string} label, or displayColumnName to show in select
      */
     handleFieldChange({
       value,
@@ -199,22 +226,25 @@ export default {
       // if is custom field, set custom handle change value
       if (this.metadata.isCustomField) {
         if (this.metadata.isActiveLogics) {
+          let fieldsList = []
+          if (this.containerManager.getFieldsList) {
+            fieldsList = this.containerManager.getFieldsList({
+              parentUuid: this.metadata.parentUuid,
+              containerUuid: this.metadata.containerUuid,
+              root: this
+            })
+          }
           this.$store.dispatch('changeDependentFieldsList', {
-            field: this.metadata
+            field: this.metadata,
+            fieldsList
           })
         }
         return
       }
 
-      if (this.metadata.inTable) {
-        this.$store.dispatch('notifyCellTableChange', {
-          parentUuid: this.metadata.parentUuid,
-          containerUuid: this.metadata.containerUuid,
-          field: this.metadata
-        })
-      }
       this.$store.dispatch('notifyFieldChange', {
         containerUuid: this.metadata.containerUuid,
+        containerManager: this.containerManager,
         field: this.metadata,
         columnName: this.metadata.columnName
       })

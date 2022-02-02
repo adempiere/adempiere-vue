@@ -15,9 +15,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div>
-    <el-form-item>
+    <el-form-item @submit.native.prevent="notSubmitForm">
       <template slot="label">
         {{ $t('form.productInfo.codeProduct') }}
         <el-popover
@@ -88,30 +89,51 @@
 </template>
 
 <script>
-/**
- * This component is made to be the prototype of the Product Info search field
- */
+// constants
 import ProductInfoList from './productList'
-import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+
+// components and mixins
+// import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+
+// utils and helper methods
 import {
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 
+/**
+ * This component is made to be the prototype of the Product Info search field
+ */
 export default {
   name: 'FieldProductInfo',
+
   components: {
     ProductInfoList
   },
-  mixins: [
-    fieldMixin
-  ],
+
+  // mixins: [
+  //   fieldMixin
+  // ],
+
   props: {
     popoverName: {
       type: String,
       default: 'isShowPopoverField'
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
+
   data() {
     return {
       visible: false,
@@ -119,6 +141,7 @@ export default {
       timeOut: null
     }
   },
+
   computed: {
     isShowProductsPriceList: {
       get() {
@@ -162,6 +185,7 @@ export default {
       })
     }
   },
+
   watch: {
     getProductValue(value) {
       this.sendProduct = value
@@ -174,6 +198,7 @@ export default {
       })
     }
   },
+
   methods: {
     formatPrice,
     formatQuantity,
@@ -212,7 +237,6 @@ export default {
 
           this.timeOut = setTimeout(() => {
             this.$store.dispatch('listProductPriceFromServer', {
-              containerUuid: 'Products-Price-List',
               pageNumber: 1,
               searchValue: stringToMatch
             })
@@ -293,6 +317,7 @@ export default {
       .header {
         text-overflow: ellipsis;
         overflow: hidden;
+        white-space: initial;
       }
 
       .upc {

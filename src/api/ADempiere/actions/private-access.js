@@ -17,7 +17,14 @@
 // Get Instance for connection
 import { request } from '@/utils/ADempiere/request'
 
-// Get private access for a record
+import { camelizeObjectKeys } from '@/utils/ADempiere/transformObject'
+
+/**
+ * Get private access for a record
+ * @param {string}  tableName
+ * @param {number}  recordId
+ * @param {string}  recordUuid
+ */
 export function getPrivateAccess({
   tableName,
   recordId,
@@ -33,16 +40,16 @@ export function getPrivateAccess({
     }
   })
     .then(responsePrivateAccess => {
-      return {
-        tableName: responsePrivateAccess.table_name,
-        recordId: responsePrivateAccess.id,
-        recordUuid: responsePrivateAccess.uuid,
-        isLocked: responsePrivateAccess.is_locked
-      }
+      return camelizeObjectKeys(responsePrivateAccess)
     })
 }
 
-// Lock a record for a user
+/**
+ * Lock a record for a user
+ * @param {string}  tableName
+ * @param {number}  recordId
+ * @param {string}  recordUuid
+ */
 export function lockPrivateAccess({
   tableName,
   recordId,
@@ -58,15 +65,16 @@ export function lockPrivateAccess({
     }
   })
     .then(responsePrivateAccess => {
-      return {
-        tableName: responsePrivateAccess.table_name,
-        recordId: responsePrivateAccess.record_id,
-        recordUuid: responsePrivateAccess.record_uuid
-      }
+      return camelizeObjectKeys(responsePrivateAccess)
     })
 }
 
-// Unlock a record from a user
+/**
+ * Unlock a record from a user
+ * @param {string}  tableName
+ * @param {number}  recordId
+ * @param {string}  recordUuid
+ */
 export function unlockPrivateAccess({
   tableName,
   recordId,
@@ -82,10 +90,6 @@ export function unlockPrivateAccess({
     }
   })
     .then(responsePrivateAccess => {
-      return {
-        tableName: responsePrivateAccess.table_name,
-        recordId: responsePrivateAccess.record_id,
-        recordUuid: responsePrivateAccess.record_uuid
-      }
+      return camelizeObjectKeys(responsePrivateAccess)
     })
 }

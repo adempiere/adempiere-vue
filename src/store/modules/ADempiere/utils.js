@@ -1,4 +1,3 @@
-import Vue from 'vue'
 
 const initStateUtils = {
   width: 0,
@@ -15,16 +14,6 @@ const initStateUtils = {
   selectionProcess: [],
   isContainerInfo: false,
   documentAction: [],
-  openRoute: {
-    path: '',
-    name: '',
-    route: {},
-    params: {},
-    definedParameters: {},
-    query: {},
-    isReaded: false,
-    isLoaded: false
-  },
   splitWidthRight: 3,
   splitWidthLeft: 3,
   parametersProcessPos: [],
@@ -38,9 +27,21 @@ const initStateUtils = {
   overdrawnInvoice: {
     visible: false
   },
+  searchCompleteOrders: false,
+  searchToDeliveOrders: false,
   isNewOrder: false,
   showProductList: false,
-  confirmDelivery: false
+  confirmDelivery: false,
+  showConfirmDelivery: false,
+  showFastConfirmDelivery: false,
+  showAddNewAddress: false,
+  showAddressUpdate: false,
+  showCashOpen: false,
+  showCashWithdrawl: false,
+  showCashSummaryMovements: false,
+  showAssignSeller: false,
+  showPanelAddress: false,
+  quickSearchOrder: {}
 }
 
 export default {
@@ -85,16 +86,7 @@ export default {
     setReportTypeToShareLink(state, payload) {
       state.reportType = payload
     },
-    setOpenRoute(state, payload) {
-      state.openRoute = {
-        ...state.openRoute,
-        ...payload
-      }
-    },
-    setReadRoute(state, payload) {
-      Vue.set(state.openRoute, 'definedParameters', payload.parameters)
-      Vue.set(state.openRoute, 'isLoaded', true)
-    },
+
     resetStateUtils(state) {
       state = initStateUtils
     },
@@ -128,6 +120,12 @@ export default {
     showUpdateCustomer(state, show) {
       state.updateCustomer = show
     },
+    setShowFastCompleteOrders(state, show) {
+      state.searchCompleteOrders = show
+    },
+    setShowsearchToDeliveOrders(state, show) {
+      state.searchToDeliveOrders = show
+    },
     focusNewOrder(state, payload) {
       state.isNewOrder = payload
     },
@@ -139,6 +137,37 @@ export default {
     },
     setConfirmDelivery(state, payload) {
       state.confirmDelivery = payload
+    },
+    setShowConfirmDelivery(state, payload) {
+      state.showConfirmDelivery = payload
+    },
+    setShowFastConfirmDelivery(state, payload) {
+      state.showFastConfirmDelivery = payload
+    },
+    setShowAddNewAddress(state, payload) {
+      state.showAddNewAddress = payload
+    },
+    setShowAddressUpdate(state, payload) {
+      state.showAddressUpdate = payload
+    },
+    setshowCashOpen(state, payload) {
+      state.showCashOpen = payload
+    },
+    setShowCashWithdrawl(state, payload) {
+      state.showCashWithdrawl = payload
+    },
+    setShowCashSummaryMovements(state, payload) {
+      state.showCashSummaryMovements = payload
+    },
+    setShowAssignSeller(state, payload) {
+      state.showAssignSeller = payload
+    },
+    setQuickSearchOrder(state, order) {
+      state.quickSearchOrder = order
+    },
+    setShowPanelAddress(state, showPanelAddress) {
+      console.log({ showPanelAddress })
+      state.showPanelAddress = showPanelAddress
     }
   },
   actions: {
@@ -172,14 +201,7 @@ export default {
     setProcessSelect({ commit }, params) {
       commit('setProcessSelecetion', params)
     },
-    setOpenRoute({ commit }, routeParameters) {
-      commit('setOpenRoute', {
-        ...routeParameters
-      })
-    },
-    setReadRoute({ commit }, parameters) {
-      commit('setReadRoute', parameters)
-    },
+
     setTempShareLink({ commit }, parameters) {
       if (!parameters.href.includes(String(parameters.processId))) {
         commit('setTempShareLink', parameters.href)
@@ -212,6 +234,9 @@ export default {
     changePopoverListBusinessPartner({ commit }, params) {
       commit('popoverListBusinessPartner', params)
     },
+    changeShowAddNewAddress({ commit }, params) {
+      commit('setShowAddNewAddress', params)
+    },
     changePopoverOverdrawnInvoice({ commit }, { attributePin, visible }) {
       const overdrawn = {
         attributePin,
@@ -230,6 +255,9 @@ export default {
     }
   },
   getters: {
+    getShowPanelAddress: (state) => {
+      return state.showPanelAddress
+    },
     getWidth: (state) => {
       return state.width
     },
@@ -276,12 +304,7 @@ export default {
     getReportType: (state) => {
       return state.reportType
     },
-    getIsLoadedOpenRoute: (state) => {
-      return state.openRoute.isLoaded
-    },
-    getIsReadedOpenRoute: (state) => {
-      return state.openRoute.isReaded
-    },
+
     getOrders: (state) => {
       return state.documentAction
     },
@@ -326,6 +349,39 @@ export default {
     },
     getConfirmDelivery: (state) => {
       return state.confirmDelivery
+    },
+    getShowConfirmDelivery: (state) => {
+      return state.showConfirmDelivery
+    },
+    showConfirmDelivery: (state) => {
+      return state.showFastConfirmDelivery
+    },
+    getSearchCompleteOrderss: (state) => {
+      return state.searchCompleteOrders
+    },
+    getSearchToDeliveOrders: (state) => {
+      return state.searchToDeliveOrders
+    },
+    getShowAddNewAddress: (state) => {
+      return state.showAddNewAddress
+    },
+    getShowAddressUpdate: (state) => {
+      return state.showAddressUpdate
+    },
+    getShowCashOpen: (state) => {
+      return state.showCashOpen
+    },
+    getShowCashWithdrawl: (state) => {
+      return state.showCashWithdrawl
+    },
+    getShowCashSummaryMovements: (state) => {
+      return state.showCashSummaryMovements
+    },
+    getShowAssignSeller: (state) => {
+      return state.showAssignSeller
+    },
+    getQuickSearchOrder: (state) => {
+      return state.quickSearchOrder
     }
   }
 }

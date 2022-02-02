@@ -22,6 +22,7 @@ export default [
     overwriteDefinition: {
       name: 'Search Value',
       sequence: 0,
+      size: 6,
       isCustomField: true
     }
   },
@@ -32,6 +33,7 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 1,
+      size: 6,
       isCustomField: true
     }
   },
@@ -42,16 +44,7 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 2,
-      isCustomField: true
-    }
-  },
-  {
-    elementColumnName: 'EMail',
-    columnName: 'EMail',
-    tableName: 'AD_user',
-    isFromDictionary: true,
-    overwriteDefinition: {
-      sequence: 3,
+      size: 6,
       isCustomField: true
     }
   },
@@ -61,6 +54,7 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 3,
+      size: 6,
       isCustomField: true
     }
   }

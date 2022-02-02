@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,37 +14,57 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { convertBooleanToString } from '@/utils/ADempiere/valueFormat.js'
-import evaluator from '@/utils/ADempiere/evaluator'
 import store from '@/store'
+
+// constants
+import { ACCOUNTING_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'
+
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { convertBooleanToString } from '@/utils/ADempiere/formatValue/booleanFormat.js'
+import evaluator from '@/utils/ADempiere/evaluator'
 
 export default evaluator
 
-// get context state from vuex store
+/**
+ * Get context state from vuex store
+ * @param {string} parentUuid UUID Window
+ * @param {string} containerUuid  UUID Tab, Process, SmartBrowser, Report and Form
+ * @param {boolean} isBooleanToString if convert true to 'Y'
+ * @param {string} columnName (context)  Entity to search
+ * @returns
+ */
 export const getContext = ({
   parentUuid,
   containerUuid,
+  isBooleanToString = false,
   columnName
 }) => {
   let value
   const isPreferenceValue = columnName.startsWith('$') ||
     columnName.startsWith('#') ||
     columnName.startsWith(`P|`)
+
+  // get value to session context
   if (isPreferenceValue) {
     value = store.getters.getPreference({
       parentUuid,
       containerUuid,
       columnName
     })
-  }
-  if (!isPreferenceValue && isEmptyValue(value)) {
+  } else {
+    // get value to container view
     value = store.getters.getValueOfField({
       parentUuid,
       containerUuid,
       columnName
     })
   }
+
+  if (isBooleanToString) {
+    return convertBooleanToString(value)
+  }
+
   return value
 }
 
@@ -77,8 +97,8 @@ export function getPreference({
   // View Preferences
   if (parentUuid) {
     value = getContext({
-      parentUuid: 'P' + parentUuid,
-      containerUuid,
+      parentUuid: 'P|' + parentUuid,
+      containerUuid: 'P|' + containerUuid,
       columnName
     })
     if (!isEmptyValue(value)) {
@@ -145,12 +165,6 @@ export function getParentFields({
   return parentFields
 }
 
-export const specialColumns = [
-  'C_AcctSchema_ID',
-  'C_Currency_ID',
-  'C_Convertion_Type_ID'
-]
-
 /**
  * Parse Context String
  * @param {string} value: (REQUIRED) String to parsing
@@ -175,7 +189,7 @@ export function parseContext({
 
   if (isEmptyValue(value)) {
     value = undefined
-    if (specialColumns.includes(columnName)) {
+    if (ACCOUNTING_COLUMNS.includes(columnName)) {
       value = contextInfo = getContext({
         columnName: '$' + columnName
       })
@@ -231,7 +245,7 @@ export function parseContext({
         })
       } else {
         // get accounting context
-        if (specialColumns.includes(columnName)) {
+        if (ACCOUNTING_COLUMNS.includes(columnName)) {
           contextInfo = getContext({
             columnName: '$' + columnName
           })
@@ -283,3 +297,33 @@ export function parseContext({
     value: outString
   }
 } // parseContext
+
+/**
+ * Get context attribures list
+ * @param {string} containerUuid
+ * @param {array<string>} contextColumnNames
+ * @returns {array<object>}
+ */
+export function getContextAttributes({
+  containerUuid,
+  contextColumnNames = []
+}) {
+  const contextAttriburesList = []
+  if (isEmptyValue(contextColumnNames)) {
+    return contextAttriburesList
+  }
+
+  contextColumnNames.forEach(columnName => {
+    const value = getContext({
+      containerUuid,
+      columnName
+    })
+
+    contextAttriburesList.push({
+      value,
+      columnName
+    })
+  })
+
+  return contextAttriburesList
+}

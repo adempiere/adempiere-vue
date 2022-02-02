@@ -94,8 +94,12 @@ export default {
     }
   },
   beforeDestroy() {
-    const elx = this.$refs.rightMenu
-    elx.remove()
+    this.$nextTick(() => {
+      if (this.$refs.rightMenu) {
+        const elx = this.$refs.rightMenu
+        elx.remove()
+      }
+    })
   },
   methods: {
     addEventClick() {

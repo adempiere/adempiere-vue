@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-container style="background: white; height: 100% !important;">
     <el-main style="background: white; padding: 0px; height: 100% !important; overflow: hidden">
@@ -30,27 +31,6 @@
         <!-- Collection container top panel -->
         <el-header style="height: auto; padding-bottom: 10px; padding-right: 0px; padding-left: 0px">
           <el-card class="box-card" style="padding-left: 0px; padding-right: 0px">
-            <div slot="header" class="clearfix">
-              <p class="total">
-                <b>{{ $t('form.pos.collect.orderTotal') }}:</b>
-                <b style="float: right;">
-                  {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                </b>
-              </p>
-              <p class="total">
-                <b> {{ $t('form.pos.collect.pending') }}: </b>
-                <b style="float: right;">
-                  {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
-                </b>
-              </p>
-              <p v-if="!isEmptyValue(dayRate)" class="total">
-                <b>{{ $t('form.pos.collect.dayRate') }}:</b>
-                <!-- Conversion rate to date -->
-                <b style="float: right;">
-                  {{ showDayRate(dayRate) }}
-                </b>
-              </p>
-            </div>
             <div
               v-if="isLoaded"
               class="text item"
@@ -65,19 +45,22 @@
                   <el-col
                     v-for="field in primaryFieldsList"
                     :key="field.sequence"
-                    :span="8"
+                    :span="size"
                   >
                     <field-definition
                       :metadata-field="field.columnName === 'PayAmt' ? {
                         ...field,
-                        labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
+                        labelCurrency: currentFieldCurrency
                       } : field"
+                      :container-uuid="'Collection'"
+                      :container-manager="containerManager"
                     />
                   </el-col>
-                  <el-col :span="8">
-                    <el-form-item :label="$t('form.pos.collect.paymentMethods')">
+                  <el-col :span="size">
+                    <el-form-item :label="$t('form.pos.collect.paymentMethods')" class="from-field">
                       <el-select
                         v-model="currentFieldPaymentMethods"
+                        style="display: block;"
                         @change="changePaymentMethods"
                       >
                         <el-option
@@ -89,11 +72,12 @@
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="8">
-                    <el-form-item :label="$t('form.pos.collect.Currency')">
+                  <el-col :span="size">
+                    <el-form-item :label="$t('form.pos.collect.Currency')" class="from-field">
                       <el-select
                         v-model="currentFieldCurrency"
                         :disabled="!isEmptyValue(currentAvailablePaymentMethods.reference_currency)"
+                        style="display: block;"
                         @change="changeCurrency"
                       >
                         <el-option
@@ -108,10 +92,12 @@
                   <el-col
                     v-for="field in hiddenFieldsList"
                     :key="field.sequence"
-                    :span="8"
+                    :span="size"
                   >
                     <field-definition
                       :metadata-field="field"
+                      :container-uuid="'Collection'"
+                      :container-manager="containerManager"
                     />
                   </el-col>
                 </el-row>
@@ -121,8 +107,8 @@
           <samp id="buttonCollection" style="float: right;padding-right: 10px;">
             <el-button type="danger" icon="el-icon-close" @click="exit" />
             <el-button type="info" icon="el-icon-minus" :disabled="isDisabled" @click="undoPatment" />
-            <el-button type="primary" icon="el-icon-plus" :disabled="validPay || addPay || isDisabled" @click="addCollectToList(paymentBox)" />
-            <el-button type="success" :disabled="isDisabled" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
+            <el-button type="success" icon="el-icon-plus" :disabled="validPay || addPay || isDisabled" @click="addCollectToList(paymentBox)" />
+            <el-button type="primary" :disabled="validatePaymentBeforeProcessing" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
           </samp>
         </el-header>
         <!-- Panel where they show the payments registered from the collection container -->
@@ -149,38 +135,50 @@
         <!-- Collection container bottom panel -->
         <el-footer id="infoInvoce" height="auto" style="padding-left: 0px; padding-right: 0px;">
           <el-row :gutter="24">
-            <el-col :span="24">
+            <el-col :span="24" style="padding-left:  15px !important;padding-right: 15px !important;">
               <span>
-                <p class="total">
-                  <b>
-                    {{ $t('form.pos.collect.orderTotal') }}:
-                  </b>
-                  <b style="float: right;">
-                    {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
-                  </b>
-                </p>
+                <div style="border: 1px solid rgb(54, 163, 247);padding-left: 10px;padding-right: 10px;">
+                  <p class="total">
+                    <b>
+                      {{ $t('form.pos.collect.orderTotal') }} {{ '(' + currentOrder.documentNo + ')' }}:
+                    </b>
+                    <b style="float: right;">
+                      {{ formatPrice(currentOrder.grandTotal, pointOfSalesCurrency.iSOCode) }}
+                    </b>
+                  </p>
 
-                <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"> <b> {{ $t('form.pos.collect.convertedAmount') }}: </b> <b style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+                  <p v-if="!isEmptyValue(currentPointOfSales.displayCurrency)" class="total"><b> {{ $t('form.pos.collect.convertedAmount') }}: </b><b style="float: right;">{{ formatPrice(currentOrder.grandTotal / totalAmountConverted, currentPointOfSales.displayCurrency.iso_code) }}</b> </p>
+                </div>
+                <div style="padding-left: 10px;padding-right: 10px;">
+                  <p class="total">
+                    {{ $t('form.pos.collect.payment') }}:
+                    <b style="float: right;">
+                      {{ formatPrice(currentOrder.paymentAmount, pointOfSalesCurrency.iSOCode) }}
+                    </b>
+                  </p>
 
-                <p class="total">
-                  {{ $t('form.pos.collect.pending') }}:
-                  <b style="float: right;">
-                    {{ formatPrice(pending, pointOfSalesCurrency.iSOCode) }}
-                  </b>
-                </p>
+                  <p class="total">
+                    {{ $t('form.pos.collect.pending') }}:
+                    <b style="float: right;">
+                      {{ formatPrice(currentOrder.openAmount, pointOfSalesCurrency.iSOCode) }}
+                    </b>
+                  </p>
 
-                <p class="total">
-                  {{ $t('form.pos.collect.payment') }}:
-                  <b style="float: right;">
-                    {{ formatPrice(pay, pointOfSalesCurrency.iSOCode) }}
-                  </b>
-                </p>
-                <p class="total">
-                  {{ $t('form.pos.collect.change') }}:
-                  <b style="float: right;">
-                    {{ formatPrice(change, pointOfSalesCurrency.iSOCode) }}
-                  </b>
-                </p>
+                  <p class="total">
+                    {{ $t('form.pos.collect.change') }}:
+                    <b style="float: right;">
+                      {{ formatPrice(currentOrder.refundAmount, pointOfSalesCurrency.iSOCode) }}
+                    </b>
+                  </p>
+
+                  <p v-if="!isEmptyValue(dayRate)" class="total">
+                    {{ $t('form.pos.collect.dayRate') }}:
+                    <!-- Conversion rate to date -->
+                    <b style="float: right;">
+                      {{ showDayRate(dayRate) }}
+                    </b>
+                  </p>
+                </div>
               </span>
             </el-col>
           </el-row>
@@ -191,25 +189,35 @@
 </template>
 
 <script>
+// constants
+import fieldsListCollection from './fieldsListCollection.js'
+import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
+
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
-import fieldsListCollection from './fieldsListCollection.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
+import overdrawnInvoice from './overdrawnInvoice'
+
+// utils and helper methods
 import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
+
+// api request methods
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
-import { FIELDS_DECIMALS } from '@/utils/ADempiere/references'
-import overdrawnInvoice from '@/components/ADempiere/Form/VPOS/Collection/overdrawnInvoice'
 
 export default {
   name: 'Collection',
+
   components: {
     typeCollection,
     overdrawnInvoice
   },
+
   mixins: [
     formMixin,
     posMixin
   ],
+
   props: {
     isLoadedPanel: {
       type: Boolean,
@@ -227,8 +235,21 @@ export default {
           containerUuid: 'Collection'
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
+
   data() {
     return {
       isCustomForm: true,
@@ -246,6 +267,7 @@ export default {
       currentFieldPaymentMethods: ''
     }
   },
+
   computed: {
     listCurrency() {
       return this.$store.getters.getCurrenciesList
@@ -287,9 +309,9 @@ export default {
     },
     listPayments() {
       const listLocal = this.$store.getters.getPaymentBox
-      const listServer = this.currentOrder.listPayments
+      const listServer = this.$store.getters.getListRefund
       if (!this.sendToServer && !this.isEmptyValue(listServer)) {
-        return listServer.payments.filter(payment => !payment.isRefund)
+        return listServer.filter(payment => !payment.isRefund)
       }
       return listLocal.paymentBox
     },
@@ -310,6 +332,12 @@ export default {
         return []
       }
       return payment
+    },
+    validatePaymentBeforeProcessing() {
+      if (this.isEmptyValue(this.listPayments)) {
+        return true
+      }
+      return this.isDisabled
     },
     cashPayment() {
       const cash = this.listPayments.filter(pay => {
@@ -425,7 +453,7 @@ export default {
         fieldsList: fieldLogic,
         isValidate: true
       })
-      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate) && this.currentFieldCurrency !== this.currentPointOfSales.currentPriceList.currency.iSOCode) {
+      if (this.$t('form.pos.collect.emptyRate') === this.showDayRate(this.dayRate) && this.isEmptyValue(this.currentFieldCurrency) && this.currentFieldCurrency !== this.currentPointOfSales.currentPriceList.currency.iSOCode) {
         return true
       }
       const paymentMethods = this.availablePaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
@@ -599,14 +627,63 @@ export default {
         return allRefund[0].amount
       }
       return this.change
+    },
+    dateConvertions() {
+      const date = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'DateTrx'
+      })
+      if (this.isEmptyValue(date) && !this.isEmptyValue(this.currentPointOfSales.currentOrder.dateOrdered)) {
+        const emptyDate = new Date()
+        this.$store.commit('updateValueOfField', {
+          containerUuid: this.containerUuid,
+          columnName: 'DateTrx',
+          value: emptyDate.getFullYear() + '-' + String(emptyDate.getMonth() + 1).padStart(2, '0') + '-' + String(emptyDate.getDate()).padStart(2, '0')
+        })
+        return this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
+      }
+      return date
+    },
+    selectCurrentFieldCurrency() {
+      return this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+    },
+    size() {
+      const size = this.$store.getters.getWidthRight
+      if (this.primaryFieldsList.length <= 1 && this.hiddenFieldsList.length <= 1) {
+        return 12
+      }
+      return 24 / size
+    },
+    amountForTheRate() {
+      const amount = this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(amount) && !this.isEmptyValue(convert.currencyTo) && amount.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== amount.id) {
+          return convert
+        }
+      })
+      if (!this.isEmptyValue(convert) && this.currentPointOfSales.currentPriceList.currency.id !== amount.id) {
+        return convert.divideRate
+      }
+      return 1
     }
   },
+
   watch: {
+    dateConvertions(value) {
+      if (!this.isEmptyValue(this.currentPointOfSales.conversionTypeUuid) && !this.isEmptyValue(this.currentPointOfSales.priceList.currency.uuid) && !this.isEmptyValue(this.selectCurrentFieldCurrency.uuid) && !this.isEmptyValue(value) && this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered) !== value) {
+        this.$store.dispatch('searchConversion', {
+          conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
+          currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
+          currencyToUuid: this.selectCurrentFieldCurrency.uuid,
+          conversionDate: value
+        })
+      }
+    },
     pending(value) {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: this.round(value, this.standardPrecision)
+        value: this.currentOrder.openAmount / this.amountForTheRate
       })
     },
     convertAllPayment(value) {
@@ -620,7 +697,7 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
     },
@@ -629,13 +706,13 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending / value.divideRate, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       } else {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
     },
@@ -679,6 +756,7 @@ export default {
       return this.$store.getters.getCurrency.standardPrecision
     }
   },
+
   created() {
     this.currentFieldCurrency = this.pointOfSalesCurrency.iSOCode
     this.$store.dispatch('addRateConvertion', this.pointOfSalesCurrency)
@@ -690,12 +768,13 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       }
     }, 1500)
     this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
   },
+
   methods: {
     formatDateToSend,
     showDayRate(rate) {
@@ -743,8 +822,8 @@ export default {
       let sum = 0
       if (!this.isEmptyValue(cash)) {
         cash.forEach((pay) => {
-          if (!this.isEmptyValue(pay.divideRate)) {
-            const searchConversion = this.$store.state['pointOfSales/point/index'].conversionsList.find(currency => currency.currencyTo.uuid === pay.currencyUuid)
+          const searchConversion = this.$store.state['pointOfSales/point/index'].conversionsList.find(currency => !this.isEmptyValue(currency.currencyTo) && currency.currencyTo.uuid === pay.currencyUuid)
+          if (!this.isEmptyValue(pay.divideRate) && !this.isEmptyValue(searchConversion)) {
             sum += pay.amount * searchConversion.divideRate
           } else {
             sum += pay.amount
@@ -764,10 +843,6 @@ export default {
       }
       const rate = (currencyPay.divideRate > currencyPay.multiplyRate) ? currencyPay.divideRate : currencyPay.multiplyRate
       return rate
-    },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     },
     addCollectToList() {
       const containerUuid = this.containerUuid
@@ -857,7 +932,7 @@ export default {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.containerUuid,
           columnName: 'PayAmt',
-          value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
+          value: this.currentOrder.openAmount / this.amountForTheRate
         })
       })
       this.defaultValueCurrency()
@@ -887,7 +962,7 @@ export default {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'PayAmt',
-        value: this.round(this.pending / this.dayRate.divideRate, this.standardPrecision)
+        value: this.currentOrder.openAmount / this.amountForTheRate
       })
       this.defaultValueCurrency()
       this.$store.commit('currencyDivideRateCollection', 1)
@@ -969,14 +1044,10 @@ export default {
       })
     },
     validateOrder(payment) {
-      this.porcessInvoce = true
-      if (this.validateReturn !== this.change) {
-        this.completePreparedOrder(payment)
-        return
-      }
-      if (this.pay > this.currentOrder.grandTotal) {
+      // this.porcessInvoce = true
+      if (this.currentOrder.paymentAmount > this.currentOrder.grandTotal) {
         this.$store.commit('dialogoInvoce', { show: true, type: 1 })
-      } else if (this.pay < this.currentOrder.grandTotal) {
+      } else if (this.currentOrder.paymentAmount < this.currentOrder.grandTotal && Math.abs(this.currentOrder.openAmount) > this.currentPointOfSales.writeOffAmountTolerance) {
         if (this.isPosRequiredPin) {
           const attributePin = {
             payment: payment,
@@ -1011,13 +1082,14 @@ export default {
         payments: payment
       })
         .then(response => {
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
           this.$store.dispatch('reloadOrder', response.uuid)
           this.$message({
             type: 'success',
             message: this.$t('notifications.completed'),
             showClose: true
           })
-          this.$store.dispatch('printTicket', { posUuid, orderUuid })
+          this.newOrderAfterPrintTicket()
         })
         .catch(error => {
           this.$message({
@@ -1045,6 +1117,12 @@ export default {
         day = '0' + day
       }
       return [year, month, day].join('-')
+    },
+    newOrderAfterPrintTicket() {
+      this.clearOrder()
+      this.$store.commit('setShowPOSCollection', false)
+      this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
+      this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
@@ -1158,5 +1236,9 @@ export default {
   }
   .el-col {
     border-radius: 4px;
+  }
+  .total {
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 </style>

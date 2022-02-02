@@ -68,7 +68,12 @@ export default {
         if (menu.path === '/PriceChecking') {
           return {
             ...viewSearch,
-            hidden: false
+            hidden: !this.$store.state['user'].role.isAllowInfoProduct
+          }
+        } else if (menu.path === '/ProductInfo') {
+          return {
+            ...menu,
+            hidden: !this.$store.state['user'].role.isAllowInfoProduct
           }
         }
         return menu

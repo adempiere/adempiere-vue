@@ -418,7 +418,15 @@ export const asyncRoutes = [
 
 const createRouter = () => new Router({
   // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: (to, from, savedPosition) => {
+    // does not position the scroll at the top when changing the query
+    if (to.path !== from.path) {
+      return {
+        x: 0,
+        y: 0
+      }
+    }
+  },
   routes: constantRoutes
 })
 

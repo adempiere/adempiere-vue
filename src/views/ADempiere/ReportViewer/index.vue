@@ -18,14 +18,7 @@
 -->
 <template>
   <div v-if="isLoading" key="report-viewer-loaded" style="min-height: inherit;">
-    <context-menu
-      v-if="showContextMenu"
-      :container-uuid="reportResult.processUuid"
-      :panel-type="panelType"
-      :is-report="true"
-      :last-parameter="reportResult.processUuid"
-      :report-format="reportFormat"
-    />
+    <!-- TODO: Add action menu -->
 
     <el-row type="flex" style="min-height: inherit;">
       <el-col :span="24">
@@ -35,37 +28,15 @@
             :name="processMetadata.name"
             :help="processMetadata.help"
           />
-
-          <iframe
-            v-if="reportFormat === 'pdf'"
-            key="report-content-pdf"
-            class="content-api"
+          <file-render
+            :format="reportFormat"
+            :content="reportContent"
             :src="url"
-            width="100%"
-            height="100%"
+            :mime-type="getterCachedReport.output.mimeType"
+            :name="getterCachedReport.name"
+            :stream="getterCachedReport.output.outputStream"
           />
-          <div
-            v-else-if="['html', 'txt'].includes(reportFormat)"
-            key="report-content-html"
-            class="content-txt"
-          >
-            <el-container class="sub-content-html">
-              <el-main style="padding: 0;">
-                <div
-                  class="el-table--striped el-table--border el-table--scrollable-y el-table--scrollable-x"
-                  v-html="reportContent"
-                />
-              </el-main>
-            </el-container>
-          </div>
-          <div
-            v-else-if="reportFormatsList.includes(reportFormat)"
-            key="report-content-all"
-            class="content-api"
-            :src="url"
-          />
-        </div>
-      </el-col>
+        </div></el-col>
     </el-row>
 
     <modal-dialog
@@ -76,42 +47,43 @@
     />
   </div>
 
-  <div
+  <loading-view
     v-else
     key="report-viewer-loading"
-    v-loading="!isLoading"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="view-loading"
   />
 </template>
 
 <script>
-import ContextMenu from '@/components/ADempiere/ContextMenu'
-import ModalDialog from '@/components/ADempiere/Dialog'
+// components and mixins
+import FileRender from '@/components/ADempiere/FileRender'
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import ModalDialog from '@/components/ADempiere/Dialog/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+
+// utils and helper methods
 import { showNotification } from '@/utils/ADempiere/notification'
-import { reportFormatsList } from '@/utils/ADempiere/exportUtil.js'
 
 export default {
   name: 'ReportViewer',
+
   components: {
-    ContextMenu,
+    FileRender,
+    LoadingView,
     ModalDialog,
     TitleAndHelp
   },
+
   data() {
     return {
       panelType: 'process',
       processMetadata: {},
       reportFormat: '',
-      reportFormatsList,
       reportContent: '',
       isLoading: false,
       reportResult: {}
     }
   },
+
   computed: {
     // TODO: Add get metadata from server to open report view from link
     showContextMenu() {
@@ -127,13 +99,16 @@ export default {
       return this.$store.getters.getCachedReport(this.$route.params.instanceUuid)
     }
   },
+
   created() {
     this.processMetadata = this.getterProcess
   },
+
   mounted() {
     this.getCachedReport()
     this.$route.meta.reportFormat = this.reportFormat
   },
+
   methods: {
     showNotification,
     displayReport(reportResult) {
@@ -190,41 +165,9 @@ export default {
     position: absolute;
     top: 0%;
   }
-	.content-html {
-		width: 100%;
+  .el-table__body-wrapper {
+    position: relative;
     height: 100%;
-    padding: 10px;
-	}
-  .content-api {
-		width: 100%;
-    height: 90%;
-    padding-right: 10px;
-	}
-  .content-txt {
-		width: 100%;
-		height: inherit;
-    padding-left: 10px;
-    padding-right: 10px;
-
-    .sub-content-html {
-      min-height: inherit;
-      height: inherit;
-      max-height: -webkit-max-content;
-      max-height: -moz-max-content;
-      max-height: max-content;
-      width: 100%;
-      padding-bottom: 4%;
-    }
-	}
-  .content-excel {
-    width: 100%;
-    margin-top:20px;
-  }
-  .container {
-    width: 200%;
-    /* left: 50%; */
-  }
-  .container-report {
-    width: 100%;
+    overflow-y: 'auto';
   }
 </style>

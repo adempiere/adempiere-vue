@@ -37,6 +37,18 @@ export default {
     metadata: {
       type: Object,
       required: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {
@@ -61,7 +73,10 @@ export default {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
     },
     allowsCollectOrder() {
-      return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCollectOrder
+      if (this.isValidForDeleteLine(this.listOrderLine)) {
+        return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCollectOrder
+      }
+      return false
     },
     allowsModifyQuantity() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsModifyQuantity
@@ -78,9 +93,9 @@ export default {
     isSetTemplateBP() {
       const currentPOS = this.currentPointOfSales
       if (!this.isEmptyValue(currentPOS) &&
-        !this.isEmptyValue(currentPOS.templateBusinessPartner) &&
+        !this.isEmptyValue(currentPOS.templateCustomer) &&
         this.isEmptyValue(this.$route.query.action)) {
-        return currentPOS.templateBusinessPartner
+        return currentPOS.templateCustomer
       }
       return false
     },
@@ -265,7 +280,6 @@ export default {
         })
     },
     pinAction(action) {
-      const { BankAccountType, A_Ident_SSN, C_Bank_ID_UUID, EMail, IsACH } = !this.isEmptyValue(this.$store.getters.getAddRefund) ? this.$store.getters.getAddRefund.customer.customerAccount : ''
       action = this.isEmptyValue(action) ? this.$store.getters.getOverdrawnInvoice.attributePin : action
       if (action.type === 'updateOrder') {
         switch (action.columnName) {
@@ -321,6 +335,9 @@ export default {
           case 'newOrder':
             this.createOrder({ withLine: action.withLine, newOrder: action.newOrder, customer: action.customer })
             break
+          case 'maximumRefundAllowed':
+            this.$store.dispatch('sendCreateCustomerAccount', action.payments)
+            break
           case 'changePriceList':
             this.$store.commit('setCurrentPriceList', action)
             break
@@ -330,27 +347,10 @@ export default {
                 this.refundAllowed(this.currentPointOfSales.uuid, this.currentOrder.uuid, action.payment)
                 break
               case 1:
-                this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
-                  .then(response => {
-                    if (response.type === 'success') {
-                      this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
-                    }
-                  })
+                this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
                 break
               case 3:
-                this.$store.dispatch('customerBankAccount', {
-                  customerUuid: this.currentOrder.businessPartner.uuid,
-                  posUuid: this.currentPointOfSales.uuid,
-                  email: EMail,
-                  socialSecurityNumber: A_Ident_SSN,
-                  name: this.currentOrder.businessPartner.name,
-                  bankAccountType: BankAccountType,
-                  bankUuid: C_Bank_ID_UUID,
-                  isAch: IsACH
-                })
-                  .then(response => {
-                    this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
-                  })
+                this.refundAllowed(action.posUuid, action.orderUuid, action.payments)
                 break
             }
             this.$store.commit('dialogoInvoce', { show: true, type: 2 })
@@ -379,17 +379,15 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
+        isOpenRefund: true,
         createPayments: !this.isEmptyValue(payments),
         payments: payments
       })
         .then(response => {
-          this.$store.dispatch('reloadOrder', response.uuid)
-          this.$message({
-            type: 'success',
-            message: this.$t('notifications.completed'),
-            showClose: true
-          })
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
+          this.clearOrder()
+          this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
+          this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
         })
         .catch(error => {
           this.$message({
@@ -515,7 +513,7 @@ export default {
         })
         .finally(() => {
           this.$store.commit('updateValuesOfContainer', {
-            containerUuid: this.metadata.containerUuid,
+            containerUuid: this.$route.meta.uuid,
             attributes: [{
               columnName: 'ProductValue',
               value: undefined
@@ -543,7 +541,7 @@ export default {
           columnName: 'C_DocTypeTarget_ID_UUID'
         })
         if (this.isEmptyValue(customerUuid) || id === 1000006) {
-          customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+          customerUuid = this.currentPointOfSales.templateCustomer.uuid
         }
         if (customer) {
           customerUuid = customer
@@ -731,8 +729,8 @@ export default {
               break
             case 'C_BPartner_ID_UUID': {
               const bPartnerValue = mutation.payload.value
-              if (!this.isEmptyValue(this.currentPointOfSales.templateBusinessPartner) && this.$route.meta.uuid === mutation.payload.containerUuid) {
-                const bPartnerPOS = this.currentPointOfSales.templateBusinessPartner.uuid
+              if (!this.isEmptyValue(this.currentPointOfSales.templateCustomer) && this.$route.meta.uuid === mutation.payload.containerUuid) {
+                const bPartnerPOS = this.currentPointOfSales.templateCustomer.uuid
                 this.updateOrder(mutation.payload)
                 // Does not send values to server, when empty values are set or
                 // if BPartner set equal to BPartner POS template
@@ -812,7 +810,7 @@ export default {
       }).catch(() => {
       }).finally(() => {
         this.$store.commit('setListPayments', {})
-        const { templateBusinessPartner } = this.currentPointOfSales
+        const { templateCustomer } = this.currentPointOfSales
         this.$store.commit('updateValuesOfContainer', {
           containerUuid: this.metadata.containerUuid,
           attributes: [{
@@ -825,15 +823,15 @@ export default {
           },
           {
             columnName: 'C_BPartner_ID',
-            value: templateBusinessPartner.id
+            value: templateCustomer.id
           },
           {
             columnName: 'DisplayColumn_C_BPartner_ID',
-            value: templateBusinessPartner.name
+            value: templateCustomer.name
           },
           {
             columnName: ' C_BPartner_ID_UUID',
-            value: templateBusinessPartner.uuid
+            value: templateCustomer.uuid
           }]
         })
         this.$store.dispatch('setOrder', {

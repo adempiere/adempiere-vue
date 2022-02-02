@@ -29,7 +29,42 @@
       @submit.native.prevent="notSubmitForm"
     >
       <el-form-item label="Código Producto">
-        <el-input ref="searchValue" v-model="input" :placeholder="$t('quickAccess.searchWithEnter')" @input="searchProduct" />
+        <el-autocomplete
+          ref="searchValue"
+          v-model="input"
+          :fetch-suggestions="querySearchAsyncDelivery"
+          :select-when-unmatched="true"
+          :trigger-on-focus="false"
+          :placeholder="$t('quickAccess.searchWithEnter')"
+          class="search-delivery"
+          @select="searchProduct"
+        >
+          <template slot="prefix">
+            <svg-icon
+              icon-class="shopping"
+              class="el-input__icon"
+            />
+          </template>
+
+          <template slot-scope="props">
+            <div class="header" style="margin: 0px">
+              <b> {{ props.item.product.value }} - {{ props.item.product.name }} </b>
+            </div>
+            <div style="margin: 0px">
+              <div style="float: left;width: 70%;margin: 0px">
+                <p style="overflow: hidden;text-overflow: ellipsis;text-align: inherit;margin: 0px">
+                  {{ props.item.product.upc }} <br>
+                  {{ props.item.product.description }}
+                </p>
+              </div>
+              <div style="width: 30%;float: right;margin: 0px">
+                <p style="overflow: hidden;text-overflow: ellipsis;text-align: end;margin: 0px">
+                  {{ formatQuantity(props.item.quantityOrdered) }}
+                </p>
+              </div>
+            </div>
+          </template>
+        </el-autocomplete>
       </el-form-item>
     </el-form>
     <el-table
@@ -107,34 +142,32 @@
       :title="$t('form.pos.optionsPoinSales.salesOrder.confirmDelivery')"
       :visible.sync="dialogVisible"
       width="30%"
-      :modal="false"
+      :append-to-body="true"
     >
-      <span>
-        <p class="total">
-          {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}:
-          <b class="order-info">
-            {{ currentOrder.businessPartner.name }}
-          </b>
-        </p>
-        <p class="total">
-          {{ $t('form.pos.order.order') }}:
-          <b class="order-info">
-            {{ currentOrder.documentNo }}
-          </b>
-        </p>
-        <p class="total">
-          {{ $t('form.pos.order.itemQuantity') }}:
-          <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
-            {{ getItemQuantity }}
-          </b>
-        </p>
-        <p class="total">
-          {{ $t('form.pos.order.numberLines') }}:
-          <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
-            {{ numberOfLines }}
-          </b>
-        </p>
-      </span>
+      <p class="total">
+        {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}:
+        <b class="order-info">
+          {{ currentOrder.businessPartner.name }}
+        </b>
+      </p>
+      <p class="total">
+        {{ $t('form.pos.order.order') }}:
+        <b class="order-info">
+          {{ currentOrder.documentNo }}
+        </b>
+      </p>
+      <p class="total">
+        {{ $t('form.pos.order.itemQuantity') }}:
+        <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
+          {{ getItemQuantity }}
+        </b>
+      </p>
+      <p class="total">
+        {{ $t('form.pos.order.numberLines') }}:
+        <b v-if="!isEmptyValue(productdeliveryList)" class="order-info">
+          {{ numberOfLines }}
+        </b>
+      </p>
       <span slot="footer" class="dialog-footer">
         <el-row :gutter="24">
           <el-col :span="24">
@@ -149,6 +182,8 @@
                 type="primary"
                 class="custom-button-create-bp"
                 icon="el-icon-check"
+                :loading="isLoadedConfirm"
+                :disabled="isLoadedConfirm"
                 @click="makeDelivery"
               />
             </samp>
@@ -180,7 +215,7 @@
 
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
+import { formatPrice, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
 import {
   createShipmentLine,
   createShipment,
@@ -231,6 +266,8 @@ export default {
       deliveryList: [],
       showInfo: false,
       value: false,
+      isLoadedConfirm: false,
+      isLoadedProcessShipment: false,
       timeOut: null
     }
   },
@@ -319,6 +356,7 @@ export default {
   },
   methods: {
     formatPrice,
+    formatQuantity,
     keyAction(event) {
       switch (event.srcKey) {
         case 'refreshList':
@@ -341,6 +379,7 @@ export default {
       this.$store.dispatch('listProductPriceFromServer', {})
     },
     close() {
+      this.$store.commit('setShowFastConfirmDelivery', false)
       this.$store.commit('setConfirmDelivery', false)
     },
     listShipments({ shipmentUuid }) {
@@ -358,20 +397,12 @@ export default {
         })
     },
     searchProduct(value) {
+      const searchValue = this.isEmptyValue(value.product) ? value : value.product.value
       clearTimeout(this.timeOut)
       this.timeOut = setTimeout(() => {
         this.isSearchProduct = true
-        const product = this.findProductFromOrder(value)
-        if (product) {
-          this.addLineShipment({ shipmentUuid: this.currentShipment.uuid, orderLineUuid: product.uuid })
-        } else {
-          this.$message({
-            type: 'error',
-            message: this.$t('form.pos.optionsPoinSales.salesOrder.emptyProductDelivery'),
-            duration: 1500,
-            showClose: true
-          })
-        }
+        const product = this.findProductFromOrder(searchValue)
+        this.addLineShipment({ shipmentUuid: this.currentShipment.uuid, orderLineUuid: product.uuid })
         this.input = ''
       }, 500)
     },
@@ -393,10 +424,43 @@ export default {
         })
         .finally(() => {
           this.listShipments({ shipmentUuid })
+          this.$refs.searchValue.focus()
         })
     },
+    createFilter(queryString) {
+      return (link) => {
+        const search = queryString.toLowerCase()
+        return link.product.value.toLowerCase().includes(search) || link.product.name.toLowerCase().includes(search) || link.product.upc.toLowerCase().includes(search)
+      }
+    },
+    querySearchAsyncDelivery(queryString, callBack) {
+      const results = queryString ? this.currentOrderLine.filter(this.createFilter(queryString)) : this.currentOrderLine
+      clearTimeout(this.timeout)
+      this.timeout = setTimeout(() => {
+        if (this.isEmptyValue(results)) {
+          this.$message({
+            type: 'error',
+            message: this.$t('form.pos.optionsPoinSales.salesOrder.emptyProductDelivery'),
+            duration: 3500,
+            showClose: true
+          })
+        }
+        const suggestionOpen = results.length
+        if (this.isEmptyValue(queryString) || queryString.length < 4) {
+          // not show list
+          callBack(results)
+          return
+        }
+        if (suggestionOpen <= 1) {
+          this.searchProduct(results[0])
+          this.$refs.searchValue.close()
+        }
+        callBack(results)
+      }, 500)
+    },
     findProductFromOrder(value) {
-      return this.currentOrderLine.find(line => line.product.name === value || line.product.value === value || line.product.upc === value)
+      const search = typeof value === 'string' ? value : value.value
+      return this.currentOrderLine.find(line => line.product.name === search || line.product.value === search || line.product.upc === search)
     },
     deleteLine(line) {
       deleteShipment({
@@ -420,6 +484,7 @@ export default {
         })
         .finally(() => {
           this.listShipments({ shipmentUuid: this.currentShipment.uuid })
+          this.$refs.searchValue.focus()
         })
     },
     /**
@@ -462,6 +527,8 @@ export default {
       if (this.isEmptyValue(this.currentShipment)) {
         return
       }
+      this.isLoadedConfirm = true
+      this.isLoadedProcessShipment = false
       processShipment({
         shipmentUuid: this.currentShipment.uuid
       })
@@ -484,6 +551,8 @@ export default {
         })
         .finally(() => {
           this.dialogVisible = false
+          this.isLoadedProcessShipment = true
+          this.isLoadedConfirm = false
           this.$store.commit('setShowPOSOptions', false)
           this.$store.commit('setConfirmDelivery', false)
         })
@@ -497,7 +566,14 @@ export default {
     },
     closeDialog() {
       this.dialogVisible = false
+      this.$store.commit('setConfirmDelivery', false)
     }
   }
 }
 </script>
+<style scoped>
+  .search-delivery {
+    position: relative;
+    display: contents;
+  }
+</style>

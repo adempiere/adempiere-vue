@@ -15,382 +15,301 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
-  <div
-    v-if="isLoaded"
-    key="window-loaded"
-  >
-    <el-container style="height: 86vh;">
-      <Split>
-        <SplitArea :size="sizePanel" :min-size="100">
-          <el-aside width="100%">
-            <split-pane :min-percent="30" :default-percent="defaultPorcentSplitPane" split="vertical">
-              <template slot="paneL">
-                <!-- this slot is 'paneL' (with 'L' in uppercase) do not change -->
-                <div class="left-container">
-                  <el-aside v-show="isShowedRecordNavigation" width="100%">
-                    <div class="small-4 columns" style="height: 100%;">
-                      <div class="w">
-                        <div class="open-left" />
-                        <div :class="styleTableNavigation">
-                          <!-- close record navigation and advanced query panel -->
-                          <el-button
-                            v-show="!isShowedRecordPanel"
-                            :icon="iconShowedRecordNavigation"
-                            circle
-                            style="margin-left: 10px;"
-                            class="el-button-window"
-                            @click="handleChangeShowedRecordNavigation(false)"
-                          />
-                          <!-- complete expand record navigation and advanced query panel  -->
-                          <el-button
-                            v-show="!isMobile"
-                            :icon="iconIsShowedAside"
-                            circle
-                            class="el-button-window"
-                            @click="handleChangeShowedPanel()"
-                          />
-                        </div>
-                        <data-table
-                          :parent-uuid="windowUuid"
-                          :container-uuid="windowMetadata.currentTab.uuid"
-                          :table-name="windowMetadata.currentTab.tableName"
-                          :is-showed-panel-record="true"
-                          :is-parent="true"
-                        />
-                      </div>
-                    </div>
-                  </el-aside>
-                </div>
-              </template>
-              <template slot="paneR">
-                <el-container id="PanelRight" style="height: 86vh;">
-                  <resize-observer @notify="handleResize" />
-                  <Split v-shortkey="['f8']" direction="vertical" @onDrag="onDrag" @shortkey.native="handleChangeShowedRecordNavigation(!isShowedRecordNavigation)">
-                    <SplitArea :size="sizeAreaStyle" :style="splitAreaStyle">
-                      <el-header
-                        v-if="showContextMenu"
-                        :style="isWorkflowBarStatus ? 'height: 45px; background: #F5F7FA' : 'height: 40px'"
-                      >
-                        <el-container>
-                          <el-aside width="100%" style="overflow: hidden;">
-                            <el-scrollbar>
-                              <workflow-status-bar
-                                v-if="isWorkflowBarStatus"
-                                :style-steps="styleStepsSimple"
-                                :container-uuid="windowMetadata.currentTabUuid"
-                                :parent-uuid="windowUuid"
-                                :panel-type="panelType"
-                              />
-                            </el-scrollbar>
-                          </el-aside>
-                          <el-main>
-                            <context-menu
-                              :menu-parent-uuid="$route.meta.parentUuid"
-                              :parent-uuid="windowUuid"
-                              :container-uuid="windowMetadata.currentTabUuid"
-                              :table-name="windowMetadata.currentTab.tableName"
-                              :panel-type="panelType"
-                              :is-insert-record="windowMetadata.currentTab.isInsertRecord"
-                              :is-list-record="isShowedRecordNavigation"
-                            />
-                          </el-main>
-                        </el-container>
-                      </el-header>
-                      <el-main :style="styleMainTab">
-                        <tab-parent
-                          :window-uuid="windowUuid"
-                          :window-metadata="windowMetadata"
-                          :tabs-list="windowMetadata.tabsListParent"
-                          :record="currentRecord"
-                          class="tab-window"
-                        />
-                        <div v-if="isMobile">
-                          <el-card class="box-card" style="height: 90vh">
-                            <el-tabs v-model="activeInfo" :stretch="true" @tab-click="handleClick">
-                              <el-tab-pane
-                                name="listChatEntries"
-                              >
-                                <span slot="label">
-                                  <i class="el-icon-s-comment" />
-                                  {{ $t('window.containerInfo.notes') }}
-                                </span>
-                                <list-chat-entry
-                                  :table-name="getTableName"
-                                  :record-id="recordId"
-                                />
-                              </el-tab-pane>
-
-                              <el-tab-pane
-                                name="listRecordLogs"
-                              >
-                                <span slot="label">
-                                  <svg-icon icon-class="tree-table" />
-                                  {{ $t('window.containerInfo.changeLog') }}
-                                </span>
-                                <div
-                                  key="change-log-loaded"
-                                >
-                                  <record-logs />
-                                </div>
-                              </el-tab-pane>
-
-                              <el-tab-pane
-                                v-if="getIsWorkflowLog"
-                                name="listWorkflowLogs"
-                              >
-                                <span slot="label">
-                                  <i class="el-icon-s-help" />
-                                  {{ $t('window.containerInfo.workflowLog') }}
-                                </span>
-                                <div
-                                  v-if="getIsWorkflowLog"
-                                  key="workflow-log-loaded"
-                                >
-                                  <workflow-logs />
-                                </div>
-                              </el-tab-pane>
-                              <el-tab-pane
-                                name="attachments"
-                              >
-                                <span slot="label">
-                                  <i class="el-icon-paperclip" />
-                                  {{ $t('window.containerInfo.attachment') }}
-                                </span>
-                                <div
-                                  key="attachment-logs"
-                                >
-                                  <attachment />
-                                </div>
-                              </el-tab-pane>
-                            </el-tabs>
-                          </el-card>
-                        </div>
-                        <div style="right: 0%; top: 40%; position: absolute;">
-                          <!-- open container info -->
-                          <el-button
-                            v-show="!showContainerInfo && !isMobile"
-                            type="info"
-                            icon="el-icon-info"
-                            circle
-                            style="float: right;"
-                            class="el-button-window"
-                            @click="contentInfo"
-                          />
-                        </div>
-                        <div class="small-4 columns">
-                          <div class="wrapper">
-                            <div
-                              v-show="!isEmptyValue(windowMetadata.tabsListChildren)"
-                              class="open-detail"
-                            />
-                            <!-- open childs tabs -->
-                            <el-button
-                              v-if="windowMetadata.tabsListChildren.length &&
-                                (isMobile && !isShowedRecordNavigation || !isMobile)"
-                              v-show="!isShowedTabsChildren"
-                              icon="el-icon-caret-top"
-                              :class="classIsMobile"
-                              circle
-                              type="primary"
-                              @click="handleChangeShowedTabChildren(true)"
-                            />
-                          </div>
-                        </div>
-                        <modal-dialog
-                          v-if="!showRecordAccess"
-                          :parent-uuid="windowUuid"
-                          :container-uuid="windowMetadata.currentTabUuid"
-                        />
-                        <embedded
-                          v-else
-                          :parent-uuid="windowUuid"
-                          :container-uuid="windowMetadata.currentTabUuid"
-                        >
-                          <record-access
-                            :table-name="getTableName"
-                            :record="getRecord"
-                          />
-                        </embedded>
-                        <div class="small-4 columns">
-                          <div class="w">
-                            <div class="open-left" />
-                            <el-button
-                              v-if="isMobile"
-                              :icon="iconShowedRecordNavigation"
-                              circle
-                              style="position: absolute;top: 40%;"
-                              type="primary"
-                              @click="handleChangeShowedRecordNavigation(true)"
-                            />
-                            <!-- open record navigation and advanced query if is closed -->
-                            <el-button
-                              v-if="!isMobile"
-                              v-show="!isShowedRecordNavigation"
-                              :icon="iconShowedRecordNavigation"
-                              class="open-navegation"
-                              circle
-                              type="primary"
-                              @click="handleChangeShowedRecordNavigation(true)"
-                            />
-                          </div>
-                        </div>
-                      </el-main>
-                    </SplitArea>
-                    <SplitArea v-show="isShowedTabsChildren" :size="50">
-                      <el-header
-                        v-if="isShowedTabsChildren && !isEmptyValue(windowMetadata.tabsListChildren)"
-                        style="height: auto; padding-right: 35px !important; padding-bottom: 33px;"
-                      >
-                        <div class="w-33">
-                          <div class="center">
-                            <!-- close tab children if is openend -->
-                            <el-button
-                              icon="el-icon-caret-bottom"
-                              circle
-                              class="el-button-window"
-                              @click="handleChangeShowedTabChildren(false)"
-                            />
-                          </div>
-                        </div>
-                        <tab-children
-                          :window-uuid="windowUuid"
-                          :window-metadata="windowMetadata"
-                          :tabs-list="windowMetadata.tabsListChildren"
-                          :first-tab-uuid="windowMetadata.firstTabUuid"
-                          :style="{ 'height': getHeightPanelBottom + 'vh' }"
-                        />
-                      </el-header>
-                    </SplitArea>
-                  </Split>
-                </el-container>
-              </template>
-            </split-pane>
-          </el-aside>
-        </SplitArea>
-        <SplitArea :size="showContainerInfo ? isSize : 0">
-          <el-main>
-            <div :class="isCloseInfo">
-              <!-- close container info if is opened -->
-              <el-button
-                v-show="showContainerInfo"
-                type="info"
-                icon="el-icon-info"
-                circle
-                style="float: right;"
-                class="el-button-window"
-                @click="contentInfo"
-              />
-            </div>
-            <div id="example-1">
-              <transition name="slide-fade">
-                <p v-if="showContainerInfo">
-                  <el-card class="box-card">
-                    <el-tabs v-model="activeInfo" @tab-click="handleClick">
-                      <el-tab-pane
-                        name="listChatEntries"
-                      >
-                        <span slot="label">
-                          <i class="el-icon-s-comment" />
-                          {{ $t('window.containerInfo.notes') }}
-                        </span>
-                        <chat-entries
-                          :table-name="getTableName"
-                          :record-id="recordId"
-                        />
-                      </el-tab-pane>
-
-                      <el-tab-pane
-                        name="listRecordLogs"
-                      >
-                        <span slot="label">
-                          <svg-icon icon-class="tree-table" />
-                          {{ $t('window.containerInfo.changeLog') }}
-                        </span>
-                        <div
-                          v-if="getIsChangeLog"
-                          key="change-log-loaded"
-                        >
-                          <record-logs />
-                        </div>
-                      </el-tab-pane>
-
-                      <el-tab-pane
-                        name="listWorkflowLogs"
-                      >
-                        <span slot="label">
-                          <i class="el-icon-s-help" />
-                          {{ $t('window.containerInfo.workflowLog') }}
-                        </span>
-                        <div
-                          key="workflow-log-loaded"
-                        >
-                          <workflow-logs />
-                        </div>
-                      </el-tab-pane>
-                      <el-tab-pane
-                        name="attachments"
-                      >
-                        <span slot="label">
-                          <i class="el-icon-paperclip" />
-                          {{ $t('window.containerInfo.attachment') }}
-                        </span>
-                        <div
-                          key="attachment-logs"
-                        >
-                          <attachment />
-                        </div>
-                      </el-tab-pane>
-                    </el-tabs>
-                  </el-card>
-                </p>
-              </transition>
-            </div>
-          </el-main>
-        </SplitArea>
-      </Split>
-      <right-panel
-        v-if="panelContextMenu && isMobile"
-      >
-        <chat-entries
-          v-if="currentFieldOption.name === $t('data.addNote')"
-          :table-name="getTableName"
-          :record-id="recordId"
-          :right-panel="true"
-        />
-        <record-access
-          v-else-if="showRecordAccess && currentFieldOption.name !== $t('data.addNote')"
-          :table-name="getTableName"
-          :record="getRecord"
-        />
+  <div v-if="isLoaded" key="window-loaded" class="view-base">
+    <el-container style="min-height: calc(100vh - 84px)">
+      <el-aside style="width: 100%; margin-bottom: 0px; padding-right: 10px; padding-left: 10px;">
         <component
-          :is="componentRender"
-          v-else-if="!showRecordAccess && currentFieldOption.name !== $t('data.addNote')"
-          :field-attributes="currentFieldOption.fieldAttributes"
-          :field-value="currentFieldOption.valueField"
+          :is="renderWindowComponent"
+          :window-manager="containerManagerWindow"
+          :window-metadata="windowMetadata"
         />
-      </right-panel>
+      </el-aside>
     </el-container>
   </div>
-  <div
+
+  <loading-view
     v-else
     key="window-loading"
-    v-loading="!isLoaded"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="view-loading"
   />
 </template>
 
-<script src="./windowLogicComponent.js" >
-// if you use separate component files like this, the script.js should not
-// be named 'index.js' as you would have to specify the '/index.vue' suffix
-// on your import for every import where this component is used, otherwise
-// you might have problems with the template compiler similar to:
-// [Vue warn]: Failed to mount component: template or render function not defined.
-</script>
+<script>
+import { defineComponent, computed, ref } from '@vue/composition-api'
 
-<style lang="scss" src="./windowStyleGlobal.scss">
-</style>
-<style lang="scss" scoped src="./windowStyleScoped.scss">
-</style>
+// components and mixins
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+
+// constants
+import { READ_ONLY_FORM_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'
+
+// utils and helper methods
+import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
+import {
+  generateWindow,
+  // panel
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  // table
+  isDisplayedColumn,
+  isMandatoryColumn,
+  isReadOnlyColumn
+} from '@/utils/ADempiere/dictionary/window.js'
+
+export default defineComponent({
+  name: 'Window',
+
+  components: {
+    LoadingView
+  },
+
+  props: {
+    // implement by test view
+    uuid: {
+      type: String,
+      default: ''
+    },
+    metadata: {
+      type: Object,
+      default: () => {}
+    },
+    containerManager: {
+      type: Object,
+      default: () => {}
+    }
+  },
+
+  setup(props, { root }) {
+    let containerManagerWindow = {
+      actionPerformed: function(eventInfo) {
+        console.log('actionPerformed: ', eventInfo)
+        return new Promise()
+      },
+
+      setDefaultValues: ({ parentUuid, containerUuid }) => {
+        root.$store.dispatch('setTabDefaultValues', {
+          parentUuid,
+          containerUuid
+        })
+      },
+
+      seekRecord: function(eventInfo) {
+        console.log('seekRecord: ', eventInfo)
+        // return new Promise()
+      },
+
+      seekTab: function(eventInfo) {
+        console.log('seekTab: ', eventInfo)
+        return new Promise()
+      },
+
+      getFieldsList: ({ parentUuid, containerUuid }) => {
+        return root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
+      },
+
+      isDisplayedField,
+      isDisplayedColumn,
+
+      isReadOnlyField({
+        field,
+        // records values
+        clientId,
+        isActive,
+        isProcessing,
+        isProcessed,
+        isWithRecord
+      }) {
+        if (isWithRecord) {
+          // evaluate client id context with record
+          const preferenceClientId = root.$store.getters.getPreferenceClientId
+          if (preferenceClientId !== clientId) {
+            return true
+          }
+
+          // not updateable and record saved
+          if (!field.isUpdateable) {
+            return true
+          }
+
+          // record is inactive isReadOnlyFromForm
+          if (!isActive && field.columnName !== 'IsActive') {
+            return true
+          }
+          if (isProcessing || isProcessed) {
+            return true
+          }
+        }
+
+        if (field.isAlwaysUpdateable) {
+          return false
+        }
+
+        return isReadOnlyField(field) || field.isReadOnlyFromForm
+      },
+
+      isReadOnlyColumn({
+        field,
+        // records values
+        row
+      }) {
+        // read only with metadata
+        if (isReadOnlyColumn(field)) {
+          true
+        }
+
+        // not updateable and record saved
+        const isWithRecord = !root.isEmptyValue(row.UUID)
+        if (!field.isUpdateable && isWithRecord) {
+          return true
+        }
+
+        // evaluate client id context with record
+        const preferenceClientId = root.$store.getters.getPreferenceClientId
+        if (preferenceClientId !== parseInt(row.AD_Client_ID, 10) && isWithRecord) {
+          return true
+        }
+
+        // columnName: IsActive
+        const fieldReadOnlyForm = READ_ONLY_FORM_COLUMNS.find(item => {
+          return !item.isChangedAllForm &&
+            // columnName: IsActive, Processed, Processing
+            Object.prototype.hasOwnProperty.call(row, item.columnName)
+        })
+
+        if (fieldReadOnlyForm) {
+          const { columnName, valueIsReadOnlyForm } = fieldReadOnlyForm
+          // compare if is same key
+          return field.columnName !== columnName &&
+            // compare if is same value
+            row[columnName] === valueIsReadOnlyForm
+        }
+
+        return false
+      },
+
+      isMandatoryField,
+      isMandatoryColumn,
+
+      getRow: ({ containerUuid, rowIndex, rowUuid }) => {
+        return root.$store.getters.getTabRowData({
+          containerUuid,
+          rowIndex,
+          rowUuid
+        })
+      },
+
+      getCell: ({ containerUuid, rowIndex, rowUuid, columnName }) => {
+        return root.$store.getters.getTabCellData({
+          containerUuid,
+          rowIndex,
+          rowUuid,
+          columnName
+        })
+      },
+
+      setSelection: ({
+        containerUuid,
+        recordsSelected
+      }) => {
+        root.$store.commit('setTabSelectionsList', {
+          containerUuid,
+          selectionsList: recordsSelected
+        })
+      },
+      getSelection: ({
+        containerUuid
+      }) => {
+        return root.$store.getters.getTabSelectionsList({
+          containerUuid
+        })
+      },
+
+      changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
+        root.$store.dispatch('changeTabFieldShowedFromUser', {
+          parentUuid,
+          containerUuid,
+          fieldsShowed
+        })
+      }
+
+    }
+
+    if (!root.isEmptyValue(props.containerManager)) {
+      containerManagerWindow = {
+        ...containerManagerWindow,
+        // overwirte methods
+        ...props.containerManager
+      }
+    }
+
+    const isLoaded = ref(false)
+    const windowMetadata = ref({})
+
+    let windowUuid = root.$route.meta.uuid
+    // set uuid from test
+    if (!root.isEmptyValue(props.uuid)) {
+      windowUuid = props.uuid
+    }
+
+    const storedWindow = computed(() => {
+      return root.$store.getters.getStoredWindow(windowUuid)
+    })
+
+    function setLoadWindow(window) {
+      windowMetadata.value = window
+      isLoaded.value = true
+    }
+
+    // get window from vuex store or request from server
+    function getWindow() {
+      let window = storedWindow.value
+      if (!root.isEmptyValue(window)) {
+        setLoadWindow(window)
+        return
+      }
+      // metadata props use for test
+      if (!root.isEmptyValue(props.metadata)) {
+        // from server response
+        window = convertWindow(props.metadata)
+        // add apps properties
+        window = generateWindow(window)
+        // add into store
+        return root.$store.dispatch('addWindow', window)
+          .then(windowResponse => {
+            // to obtain the load effect
+            setTimeout(() => {
+              setLoadWindow(windowResponse)
+            }, 1000)
+          })
+      }
+      root.$store.dispatch('getWindowDefinitionFromServer', {
+        uuid: windowUuid
+      })
+        .then(windowResponse => {
+          // add apps properties
+          setLoadWindow(windowResponse)
+        })
+    }
+
+    const renderWindowComponent = computed(() => {
+      const windowComponent = () => import('@/views/ADempiere/Window/MultiTabWindow.vue')
+
+      return windowComponent
+    })
+
+    // load metadata and generate window
+    getWindow()
+
+    return {
+      windowUuid,
+      containerManagerWindow,
+      windowMetadata,
+      // computed
+      renderWindowComponent,
+      isLoaded
+    }
+  }
+})
+</script>

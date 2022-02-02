@@ -19,7 +19,7 @@ import FilterFields from '@/components/ADempiere/FilterFields'
 import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils.js'
 import { parsedValueComponent } from '@/utils/ADempiere/valueUtils.js'
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
-import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/dataUtils.js'
+import { LOG_COLUMNS_NAME_LIST } from '@/utils/ADempiere/constants/systemColumns'
 
 export default {
   name: 'MainPanelMixin',

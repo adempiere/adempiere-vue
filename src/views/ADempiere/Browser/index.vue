@@ -15,268 +15,394 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-container
-    v-if="isLoaded"
+    v-if="isLoadedMetadata"
     key="browser-loaded"
-    class="view-base"
+    class="view-base browser-view"
     style="height: 86vh;"
   >
-    <modal-dialog
-      :parent-uuid="browserMetadata.uuid"
-      :container-uuid="browserUuid"
-      :panel-type="panelType"
-    />
-    <el-header
-      v-if="showContextMenu"
-    >
-      <context-menu
-        :menu-parent-uuid="$route.meta.parentUuid"
-        :container-uuid="browserUuid"
-        :panel-type="panelType"
-      />
-      <div class="w-33">
-        <div class="center">
-          <title-and-help
-            :name="browserMetadata.name"
-            :help="browserMetadata.help"
-          />
-        </div>
+    <el-header v-if="isShowContextMenu">
+      <div class="center" style="width: 100%">
+        <!-- TODO: Correct when the title is large -->
+        <title-and-help
+          :name="browserMetadata.name"
+          :help="browserMetadata.help"
+        />
       </div>
+
+      <action-menu
+        :container-uuid="browserUuid"
+        :actions-manager="actionsManager"
+        :relations-manager="relationsManager"
+      />
     </el-header>
 
     <el-main>
-
       <el-collapse
-        v-model="activeSearch"
-        class="container-collasep-open"
-        @change="handleChange"
+        v-model="openedCriteria"
+        class="browser-collapse"
       >
         <el-collapse-item :title="$t('views.searchCriteria')" name="opened-criteria">
-          <main-panel
+          <panel-definition
+            class="browser-query-criteria"
             :container-uuid="browserUuid"
-            :metadata="browserMetadata"
-            :panel-type="panelType"
+            :panel-metadata="browserMetadata"
+            :container-manager="containerManager"
           />
         </el-collapse-item>
       </el-collapse>
-      <data-table
-        v-if="isLoaded"
+
+      <!-- result of records in the table -->
+      <default-table
+        class="browser-table-result"
         :container-uuid="browserUuid"
-        :panel-type="panelType"
-        :metadata="browserMetadata"
+        :container-manager="containerManagerTable"
+        :panel-metadata="browserMetadata"
+        :header="tableHeader"
+        :data-table="recordsList"
+        :record-count="recordCount"
       />
     </el-main>
   </el-container>
 
-  <div
+  <loading-view
     v-else
     key="browser-loading"
-    v-loading="!isLoaded"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="view-loading"
   />
 </template>
 
 <script>
-// When supporting the processes, smart browser and reports,
-// the ContextMenu and sticky must be placed in the layout
-import ContextMenu from '@/components/ADempiere/ContextMenu'
-import MainPanel from '@/components/ADempiere/Panel'
-import DataTable from '@/components/ADempiere/DataTable'
-import ModalDialog from '@/components/ADempiere/Dialog'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+import { computed, defineComponent, ref } from '@vue/composition-api'
 
-export default {
+// componets and mixins
+import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
+import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
+
+// utils and helper methods
+import {
+  isDisplayedField, isDisplayedColumn,
+  isMandatoryField, isMandatoryColumn,
+  isReadOnlyField, isReadOnlyColumn
+} from '@/utils/ADempiere/dictionary/browser.js'
+
+export default defineComponent({
   name: 'BrowserView',
+
   components: {
-    MainPanel,
-    DataTable,
-    ContextMenu,
-    ModalDialog,
+    ActionMenu,
+    DefaultTable,
+    LoadingView,
+    PanelDefinition,
     TitleAndHelp
   },
+
   props: {
-    isEdit: {
-      type: Boolean,
-      default: false
+    // implement by test view
+    uuid: {
+      type: String,
+      default: ''
     }
   },
-  data() {
-    return {
-      browserMetadata: {},
-      browserUuid: this.$route.meta.uuid,
-      activeSearch: [],
-      isLoaded: false,
-      panelType: 'browser'
+
+  setup(props, { root }) {
+    const isLoadedMetadata = ref(false)
+    const browserMetadata = ref({})
+
+    let browserUuid = root.$route.meta.uuid
+    // set uuid from test
+    if (!root.isEmptyValue(props.uuid)) {
+      browserUuid = props.uuid
     }
-  },
-  computed: {
-    showContextMenu() {
-      return this.$store.state.settings.showContextMenu
-    },
-    getterBrowser() {
-      return this.$store.getters.getBrowser(this.browserUuid)
-    },
-    isLoadedRecords() {
-      return this.$store.getters.getDataRecordAndSelection(this.browserUuid).isLoaded
-    },
-    isReadyToSearch() {
-      if (this.browserMetadata.awaitForValuesToQuery) {
-        return false
-      }
-      return !this.$store.getters.isNotReadyForSubmit(this.browserUuid)
-    },
-    isShowedCriteria() {
-      if (this.browserMetadata) {
-        return this.browserMetadata.isShowedCriteria
-      }
-      return false
-    }
-  },
-  watch: {
-    isShowedCriteria(value) {
-      this.handleCollapse(value)
-    }
-  },
-  created() {
-    this.getBrowser()
-    this.$store.dispatch('settings/changeSetting', {
+
+    const storedBrowser = computed(() => {
+      return root.$store.getters.getStoredBrowser(browserUuid)
+    })
+
+    // TODO: Handle per individual smart browser
+    // by default enable context menu and title
+    root.$store.dispatch('settings/changeSetting', {
       key: 'showContextMenu',
       value: true
     })
-  },
-  methods: {
-    handleChange(value) {
-      let showCriteria = false
-      if (this.activeSearch.length) {
-        showCriteria = true
+
+    const isShowContextMenu = computed(() => {
+      return root.$store.state.settings.showContextMenu
+    })
+
+    const isReadyToSearch = computed(() => {
+      if (browserMetadata.value.awaitForValuesToQuery) {
+        return false
       }
-      this.$store.dispatch('changeBrowserAttribute', {
-        containerUuid: this.browserUuid,
-        attributeName: 'isShowedCriteria',
-        attributeValue: showCriteria
-      })
-    },
-    /**
-     * Manage open or closed component collapse of criteria
-     */
-    handleCollapse(isShowedCriteria) {
-      // by default criteria if closed
-      const activeSearch = []
-      if (isShowedCriteria) {
-        // open criteria
-        activeSearch.push('opened-criteria')
+      return root.isEmptyValue(
+        root.$store.getters.getBrowserFieldsEmptyMandatory({
+          containerUuid: browserUuid
+        })
+      )
+    })
+
+    const openedCriteria = computed({
+      get() {
+        // by default criteria if closed
+        const openCriteria = []
+        const browser = storedBrowser.value
+        if (!root.isEmptyValue(browser)) {
+          if (browser.isShowedCriteria) {
+            // open criteria
+            openCriteria.push('opened-criteria')
+          }
+        }
+        return openCriteria
+      },
+      set(value) {
+        let showCriteria = false
+        if (value.length) {
+          showCriteria = true
+        }
+
+        root.$store.commit('changeBrowserAttribute', {
+          uuid: browserUuid,
+          attributeName: 'isShowedCriteria',
+          attributeValue: showCriteria
+        })
       }
-      this.activeSearch = activeSearch
-    },
-    getBrowser() {
-      const browser = this.getterBrowser
+    })
+
+    const tableHeader = computed(() => {
+      return storedBrowser.value.fieldsList
+    })
+
+    function getBrowserDefinition() {
+      const browser = storedBrowser.value
       if (browser) {
-        this.browserMetadata = browser
-        this.isLoaded = true
-        this.defaultSearch()
+        browserMetadata.value = browser
+        isLoadedMetadata.value = true
         return
       }
-      this.$store.dispatch('getPanelAndFields', {
-        containerUuid: this.browserUuid,
-        panelType: this.panelType,
-        routeToDelete: this.$route
-      })
+
+      root.$store.dispatch('getBrowserDefinitionFromServer', browserUuid)
         .then(browserResponse => {
-          this.browserMetadata = browserResponse
-          this.handleCollapse(browserResponse.isShowedCriteria)
-          this.defaultSearch()
-        })
-        .finally(() => {
-          this.isLoaded = true
-        })
-    },
-    defaultSearch() {
-      if (this.isLoadedRecords) {
-        // not research
-        return
-      }
+          browserMetadata.value = browserResponse
 
-      if (this.isReadyToSearch) {
+          defaultSearch()
+        }).finally(() => {
+          isLoadedMetadata.value = true
+        })
+    }
+
+    function defaultSearch() {
+      // if (this.isLoadedRecords) {
+      //   // not research
+      //   return
+      // }
+      if (isReadyToSearch.value) {
         // first search by default
-        this.$store.dispatch('getBrowserSearch', {
-          containerUuid: this.browserUuid
+        root.$store.dispatch('getBrowserSearch', {
+          containerUuid: browserUuid
+        })
+
+        // hide showed criteria
+        root.$store.commit('changeBrowserAttribute', {
+          uuid: browserUuid,
+          attributeName: 'isShowedCriteria',
+          attributeValue: false
         })
         return
       }
 
-      // set default values into data
-      this.$store.dispatch('setRecordSelection', {
-        containerUuid: this.browserUuid,
-        panelType: this.panelType
+      // set empty values into container data
+      root.$store.commit('setBrowserData', {
+        containerUuid: browserUuid
       })
     }
+
+    const containerManager = {
+      actionPerformed({ field, value, valueTo, containerUuid }) {
+        return root.$store.dispatch('browserActionPerformed', {
+          containerUuid,
+          field,
+          value,
+          valueTo
+        })
+      },
+
+      setDefaultValues: ({ parentUuid, containerUuid }) => {
+        root.$store.dispatch('setBrowserDefaultValues', {
+          parentUuid,
+          containerUuid
+        })
+      },
+
+      /**
+       * Is displayed field in panel single record
+       */
+      isDisplayedField,
+
+      isMandatoryField,
+
+      isReadOnlyField({ field }) {
+        return isReadOnlyField(field)
+      },
+
+      changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
+        root.$store.dispatch('changeBrowserFieldShowedFromUser', {
+          containerUuid,
+          fieldsShowed
+        })
+      },
+
+      getFieldsList({ containerUuid }) {
+        return root.$store.getters.getStoredFieldsFromBrowser(containerUuid)
+      }
+    }
+
+    const containerManagerTable = {
+      ...containerManager,
+
+      /**
+       * Is displayed column in table multi record
+       */
+      isDisplayedColumn,
+
+      isMandatoryColumn,
+
+      isReadOnlyColumn({
+        field,
+        row
+      }) {
+        // read only with metadata
+        if (isReadOnlyColumn(field)) {
+          true
+        }
+
+        return false
+      },
+
+      seekRecord: ({
+        containerUuid,
+        row
+      }) => {
+        console.log(containerUuid, row)
+      },
+
+      getRow: ({ containerUuid, rowIndex }) => {
+        return root.$store.getters.getBrowserRowData({
+          containerUuid,
+          rowIndex
+        })
+      },
+      getCell: ({ containerUuid, rowIndex, columnName }) => {
+        return root.$store.getters.getBrowserCellData({
+          containerUuid,
+          rowIndex,
+          columnName
+        })
+      },
+
+      setPage: ({ containerUuid, pageNumber }) => {
+        root.$store.commit('getBrowserSearch', {
+          containerUuid,
+          pageNumber
+        })
+      },
+
+      setSelection: ({
+        containerUuid,
+        recordsSelected
+      }) => {
+        root.$store.commit('setBrowserSelectionsList', {
+          containerUuid,
+          selectionsList: recordsSelected
+        })
+      },
+      getSelection: ({
+        containerUuid
+      }) => {
+        return root.$store.getters.getBrowserSelectionsList({
+          containerUuid
+        })
+      }
+    }
+
+    const actionsManager = ref({
+      containerUuid: browserUuid,
+
+      defaultActionName: root.$t('actionMenu.runProcessOrReport'),
+
+      getActionList: () => root.$store.getters.getStoredActionsMenu({
+        containerUuid: browserUuid
+      })
+    })
+
+    const relationsManager = ref({
+      menuParentUuid: root.$route.meta.parentUuid
+    })
+
+    // get records list
+    const recordsList = computed(() => {
+      return root.$store.getters.getBrowserRecordsList({
+        containerUuid: browserUuid
+      })
+    })
+
+    const recordCount = computed(() => {
+      const data = root.$store.getters.getBrowserData({
+        containerUuid: browserUuid
+      })
+      if (data && data.recordCount) {
+        return data.recordCount
+      }
+      return 0
+    })
+
+    getBrowserDefinition()
+
+    return {
+      isLoadedMetadata,
+      browserUuid,
+      browserMetadata,
+      containerManager,
+      containerManagerTable,
+      actionsManager,
+      relationsManager,
+      // computed
+      openedCriteria,
+      isShowContextMenu,
+      tableHeader,
+      recordCount,
+      recordsList
+    }
   }
-}
+})
 </script>
 
-<style>
-  .el-collapse-item__header:hover {
-    background-color: #fcfcfc;
+<style lang="scss">
+/* removes the title link effect on collapse */
+.el-collapse-item__header:hover {
+  background-color: #fcfcfc;
+}
+
+.browser-view {
+  .browser-collapse {
+    margin-bottom: 10px;
   }
+}
 </style>
 <style scoped>
-  .el-main {
-    display: block;
-    -webkit-box-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
-    -ms-flex-preferred-size: auto;
-    flex-basis: auto;
-    overflow: auto;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    padding-bottom: 0px;
-    padding-right: 20px;
-    padding-top: 0px;
-    padding-left: 20px;
-  }
-  .el-header {
-    height: 50px;
-  }
-  .containert {
-    padding-left: 20px;
-    padding-right: 20px;
-    width: 50%;
-  }
-  .menu {
-    height: 40px;
-  }
-  .center {
-    text-align: center;
-  }
-  .w-33 {
-    width: 100%;
-    background-color: transparent;
-  }
-  .container-panel {
-    bottom: 0;
-    right: 0;
-    z-index: 0;
-    transition: width 0.28s;
-    border: 1px solid #e5e9f2;
-  }
-  .container-panel-open {
-    bottom: 0;
-    right: 0;
-    border: 1px solid #e5e9f2;
-    height: -webkit-fill-available;
-    height:-webkit-calc(100% - 100px);
-    z-index: 0;
-    transition: width 0.28s;
-  }
-  .container-collasep-open {
-    bottom: 0;
-    right: 0;
-    z-index: 0;
-    transition: width 0.28s;
-  }
+.el-main {
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+.el-header {
+  height: 50px !important;
+}
+
+.center {
+  text-align: center;
+}
 </style>

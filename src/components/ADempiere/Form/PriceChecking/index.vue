@@ -1,7 +1,7 @@
 <!--
  ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
  Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
- Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+ Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div
     v-if="isLoaded"
@@ -38,11 +39,13 @@
           style="z-index: -1;"
           @submit.native.prevent="notSubmitForm"
         >
-          <field
+          <field-definition
             v-for="(field) in fieldsList"
             id="ProductValue"
             ref="ProductValue"
             :key="field.columnName"
+            :container-uuid="containerUuid"
+            :container-manager="containerManager"
             :metadata-field="field"
             :v-model="field.value"
             class="product-value"
@@ -102,29 +105,46 @@
       </el-main>
     </el-container>
   </div>
-  <div
+
+  <loading-view
     v-else
     key="form-loading"
-    v-loading="!isLoaded"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="loading-panel"
   />
 </template>
 
 <script>
-import formMixin from '@/components/ADempiere/Form/formMixin.js'
+// constants
 import fieldsList from './fieldsList.js'
+
+// components and mixins
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import formMixin from '@/components/ADempiere/Form/formMixin.js'
+
+// api request methods
 import { getProductPrice } from '@/api/ADempiere/form/price-checking.js'
+
+// methods and helpers
 import { formatPercent, formatPrice, formatDateToSend, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
 import { getImagePath } from '@/utils/ADempiere/resource.js'
 
 export default {
   name: 'PriceChecking',
+
+  components: {
+    LoadingView
+  },
+
   mixins: [
     formMixin
   ],
+
+  props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    }
+  },
+
   data() {
     return {
       messageError: true,
@@ -132,12 +152,12 @@ export default {
       productPrice: {},
       organizationBackground: '',
       currentImageOfProduct: '',
-      search: 'sad',
+      search: '',
       resul: '',
-      backgroundForm: '',
-      unsubscribe: () => {}
+      backgroundForm: ''
     }
   },
+
   computed: {
     organizationImagePath() {
       return this.$store.getters.corporateBrandingImage
@@ -164,6 +184,7 @@ export default {
         }
       })
       if (convert) {
+        console.log(convert)
         return convert
       }
       return {}
@@ -182,9 +203,7 @@ export default {
       return 1
     }
   },
-  created() {
-    this.unsubscribe = this.subscribeChanges()
-  },
+
   mounted() {
     this.backgroundForm = this.defaultImage
     this.getImageFromSource(this.organizationImagePath)
@@ -192,9 +211,7 @@ export default {
       this.$store.dispatch('listPointOfSalesFromServer')
     }
   },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
+
   methods: {
     formatPercent,
     formatDateToSend,
@@ -405,7 +422,8 @@ export default {
     text-align: end;
   }
   .inquiry-form {
-    position: absolute;
+    // position: absolute;
+    position: inherit;
     right: 5%;
     width: 100%;
     top: 10%;

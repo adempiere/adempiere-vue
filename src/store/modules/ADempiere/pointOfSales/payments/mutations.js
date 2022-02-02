@@ -82,5 +82,23 @@ export default {
   },
   setShipment(state, shipment) {
     state.shipment = shipment
+  },
+  setListCashSummary(state, list) {
+    state.listCashSummary = list
+  },
+  setListCastOpen(state, shipment) {
+    state.listCastOpen = shipment
+  },
+  setListWithdrawal(state, list) {
+    state.listWithdrawal = list
+  },
+  setCurrentCustomerBankAccount(state, bankAccount) {
+    state.currentCustomerBankAccount = bankAccount
+  },
+  setListCustomerBankAccounts(state, list) {
+    state.listCustomerBankAccounts = list
+  },
+  setListRefundReference(state, list) {
+    state.listRefundReference = list
   }
 }

@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div>
     <div style="text-align: center">
@@ -48,7 +49,6 @@
               <el-popover
                 v-model="showListOrdes"
                 placement="right"
-                width="900"
                 trigger="click"
                 @show="seeOrderList"
               >
@@ -108,7 +108,7 @@
                 width="450"
                 :disabled="!isProcessed"
               >
-                <el-row :gutter="24" class="container-reverse">
+                <el-row v-if="!isLoadingReverse" :gutter="24" class="container-reverse">
                   <el-col :span="24" class="container-reverse">
                     <p class="container-popover">
                       <b class="container-popover">
@@ -142,6 +142,15 @@
                     </samp>
                   </el-col>
                 </el-row>
+                <div
+                  v-else
+                  key="form-loading"
+                  v-loading="isLoadingReverse"
+                  :element-loading-text="$t('notifications.loading')"
+                  :element-loading-spinner="'el-icon-loading'"
+                  element-loading-background="rgba(255, 255, 255, 0.8)"
+                  class="view-loading"
+                />
                 <el-button slot="reference" type="text" style="min-height: 50px;width: -webkit-fill-available;white-space: normal;">
                   <i class="el-icon-error" />
                   <br>
@@ -212,7 +221,7 @@
               </p>
             </el-card>
           </el-col>
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="allowsConfirmShipment" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
                 v-model="popoverConfirmDelivery"
@@ -243,33 +252,43 @@
 
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.cashManagement.title')" name="cashManagement">
         <el-row :gutter="12" style="padding-right: 10px;">
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsCashOpening" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
-                :style="blockOption"
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
               >
                 <i class="el-icon-sell" />
                 <br>
-                {{ $t('form.pos.optionsPoinSales.cashManagement.cashOpening') }}
+                <el-button
+                  type="text"
+                  @click="openCashOpening()"
+                >
+                  {{ $t('form.pos.optionsPoinSales.cashManagement.cashOpening') }}
+                </el-button>
               </p>
             </el-card>
           </el-col>
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsCashWithdrawal" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
-                :style="blockOption"
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
               >
                 <i class="el-icon-money" />
                 <br>
-                {{ $t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal') }}
+                <el-button
+                  type="text"
+                  @click="openCashWithdrawal()"
+                >
+                  {{ $t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal') }}
+                </el-button>
               </p>
             </el-card>
           </el-col>
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsCashClosing" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
-                :style="blockOption"
-                @click="cashClosing"
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
+                @click="openCashClosing()"
               >
                 <i class="el-icon-sold-out" />
                 <br>
@@ -277,105 +296,26 @@
               </p>
             </el-card>
           </el-col>
+          <el-col v-if="isAllowsAllocateSeller" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <p
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.assignSeller')) : assignSeller()"
+              >
+                <i class="el-icon-sold-out" />
+                <br>
+                {{ $t('form.pos.optionsPoinSales.cashManagement.assignSeller') }}
+              </p>
+            </el-card>
+          </el-col>
         </el-row>
       </el-collapse-item>
 
       <el-collapse-item :title="$t('form.pos.optionsPoinSales.generalOptions.title')" name="generalOptions">
-        <el-row :gutter="24" style="padding-right: 10px;">
-          <el-col :span="size">
-            <el-card shadow="hover" style="height: 100px">
-              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="adviserPin ? validateOption($t('form.pos.optionsPoinSales.generalOptions.changePos')) : changePos()">
-                <p
-                  style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
-                >
-                  <i class="el-icon-mobile-phone" />
-                  <br>
-                  {{ $t('form.pos.optionsPoinSales.generalOptions.changePos') }}
-                </p>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-for="item in listPointOfSales"
-                    :key="item.uuid"
-                    :command="item"
-                  >
-                    {{ item.name }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-card>
-          </el-col>
-          <!-- Product List Price -->
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
-              <el-popover
-                placement="right"
-                trigger="click"
-                width="800"
-              >
-                <list-product-price
-                  :is-selectable="false"
-                  popover-name="isShowPopoverMenu"
-                />
-                <div
-                  slot="reference"
-                  :style="blockOption"
-                  @click="isShowProductsPriceList = !isShowProductsPriceList"
-                >
-                  <svg-icon icon-class="shopping" />
-                  <br>
-                  {{ $t('form.pos.optionsPoinSales.generalOptions.listProducts') }}
-                </div>
-              </el-popover>
-            </el-card>
-          </el-col>
-          <!-- List Warehouse -->
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
-              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
-                <p
-                  style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
-                >
-                  <svg-icon icon-class="tree-table" />
-                  <br>
-                  {{ $t('form.pos.optionsPoinSales.generalOptions.changeWarehouseList') }}
-                </p>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-for="item in warehousesListPointOfSales"
-                    :key="item.id"
-                    :command="item"
-                  >
-                    {{ item.name }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-card>
-          </el-col>
-          <!-- List Price -->
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
-              <el-dropdown trigger="click" style="padding-top: 8px;color: black;display: block;" @command="changePos">
-                <p
-                  style="cursor: pointer;text-align: center !important;color: black;min-height: 50px;margin: 0px;"
-                >
-                  <svg-icon icon-class="list" />
-                  <br>
-                  {{ $t('form.pos.optionsPoinSales.generalOptions.changePriceList') }} </p>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-for="item in priceListPointOfSales"
-                    :key="item.uuid"
-                    :command="item"
-                  >
-                    {{ item.name }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-card>
-          </el-col>
-        </el-row>
+        <general-options :metadata="metadata" />
       </el-collapse-item>
     </el-collapse>
+
     <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + attributePin.label" width="40%" :visible.sync="visible">
       <el-input
         id="pin"
@@ -401,46 +341,93 @@
         />
       </span>
     </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.cashOpening')"
+      :visible.sync="showCashOpen"
+      width="60%"
+      center
+    >
+      <cash-opening />
+    </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal')"
+      :visible.sync="showCashWithdrawl"
+      width="60%"
+      center
+    >
+      <cash-withdrawal />
+    </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.closeBox')"
+      :visible.sync="showCashSummaryMovements"
+      width="60%"
+      center
+    >
+      <cash-summary-movements />
+    </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.assignSeller')"
+      :visible.sync="showAssignSeller"
+      :is-loaded-panel="showAssignSeller"
+      width="60%"
+      center
+      class="dialogo-seller"
+    >
+      <assign-seller />
+    </el-dialog>
   </div>
 </template>
 
 <script>
+// components and mixins
 import OrdersList from '@/components/ADempiere/Form/VPOS/OrderList/index'
-import ListProductPrice from '@/components/ADempiere/Form/VPOS/ProductInfo/productList'
 import ConfirmDelivery from '@/components/ADempiere/Form/VPOS/ConfirmDelivery'
+import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
+import CashOpening from './CashOpening'
+import CashSummaryMovements from './CashSummaryMovements'
+import CashWithdrawal from './Cashwithdrawal'
+import AssignSeller from './AssignSeller'
+import ModalDialog from '@/components/ADempiere/Dialog'
+import GeneralOptions from '@/components/ADempiere/Form/VPOS/Options/generalOptions.vue'
+
+// api request methods
 import {
   generateImmediateInvoice,
   withdrawal,
   createNewReturnOrder,
-  cashClosing,
   deleteOrder,
-  createOrder,
   reverseSales,
   processOrder
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { createShipment, shipments } from '@/api/ADempiere/form/point-of-sales.js'
 import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
-import ModalDialog from '@/components/ADempiere/Dialog'
-import posProcess from '@/utils/ADempiere/constants/posProcess'
-import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
+// import posProcess from '@/utils/ADempiere/constants/posProcess'
 
 export default {
-  name: 'Options',
+  name: 'PointOfSalesOptions',
+
   components: {
-    ListProductPrice,
-    OrdersList,
+    AssignSeller,
+    CashOpening,
+    CashSummaryMovements,
+    CashWithdrawal,
+    ConfirmDelivery,
+    GeneralOptions,
     ModalDialog,
-    ConfirmDelivery
+    OrdersList
   },
+
   mixins: [
     orderLineMixin
   ],
+
   props: {
     metadata: {
       type: Object,
       default: () => {}
     }
   },
+
   data() {
     return {
       activeName: '',
@@ -450,13 +437,29 @@ export default {
       validatePin: true,
       visible: false,
       visibleReverse: false,
+      isLoadingReverse: false,
       showFieldListOrder: false,
       messageReverseSales: '',
-      showConfirmDelivery: false,
-      posProcess
+      showConfirmDelivery: false
     }
   },
+
   computed: {
+    isAllowsCashOpening() {
+      return this.currentPointOfSales.isAllowsCashOpening
+    },
+    isAllowsCashClosing() {
+      return this.currentPointOfSales.isAllowsCashClosing
+    },
+    isAllowsCashWithdrawal() {
+      return this.currentPointOfSales.isAllowsCashWithdrawal
+    },
+    isAllowsAllocateSeller() {
+      return this.currentPointOfSales.isAllowsAllocateSeller
+    },
+    allowsConfirmShipment() {
+      return this.currentPointOfSales.isAllowsConfirmShipment
+    },
     infowOverdrawnInvoice() {
       if (this.$store.getters.getOverdrawnInvoice.attributePin) {
         return this.$store.getters.getOverdrawnInvoice.attributePin
@@ -469,19 +472,6 @@ export default {
     allowsCreateOrder() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsCreateOrder
     },
-    isShowProductsPriceList: {
-      get() {
-        return this.$store.state['pointOfSales/point/index'].productPrice.isShowPopoverMenu
-      },
-      set(isShowed) {
-        if (!this.isEmptyValue(this.$route.query.pos)) {
-          this.$store.commit('showListProductPrice', {
-            attribute: 'isShowPopoverMenu',
-            isShowed
-          })
-        }
-      }
-    },
     isShowOrdersList: {
       get() {
         return this.ordersList.isShowPopover
@@ -490,6 +480,38 @@ export default {
         if (!this.isEmptyValue(this.$route.query.pos)) {
           this.$store.commit('showListOrders', value)
         }
+      }
+    },
+    showCashWithdrawl: {
+      get() {
+        return this.$store.getters.getShowCashWithdrawl
+      },
+      set(value) {
+        this.$store.commit('setShowCashWithdrawl', value)
+      }
+    },
+    showCashOpen: {
+      get() {
+        return this.$store.getters.getShowCashOpen
+      },
+      set(value) {
+        this.$store.commit('setshowCashOpen', value)
+      }
+    },
+    showCashSummaryMovements: {
+      get() {
+        return this.$store.getters.getShowCashSummaryMovements
+      },
+      set(value) {
+        this.$store.commit('setShowCashSummaryMovements', value)
+      }
+    },
+    showAssignSeller: {
+      get() {
+        return this.$store.getters.getShowAssignSeller
+      },
+      set(value) {
+        this.$store.commit('setShowAssignSeller', value)
       }
     },
     adviserPin() {
@@ -507,23 +529,6 @@ export default {
     },
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
-    },
-    listPointOfSales() {
-      return this.$store.getters.posAttributes.pointOfSalesList
-    },
-    priceListPointOfSales() {
-      const list = this.$store.getters.posAttributes.currentPointOfSales.pricesList
-      if (this.isEmptyValue(list)) {
-        return []
-      }
-      return list
-    },
-    warehousesListPointOfSales() {
-      const list = this.$store.getters.posAttributes.currentPointOfSales.warehousesList
-      if (this.isEmptyValue(list)) {
-        return []
-      }
-      return list
     },
     ordersList() {
       if (this.isEmptyValue(this.currentPointOfSales)) {
@@ -574,6 +579,7 @@ export default {
       return false
     }
   },
+
   watch: {
     // popoverConfirmDelivery(value) {
     //   this.showConfirmDelivery = value
@@ -586,9 +592,7 @@ export default {
       }
     }
   },
-  created() {
-    this.findProcess(this.posProcess)
-  },
+
   methods: {
     openDelivery() {
       if (!this.isProcessed) {
@@ -626,6 +630,24 @@ export default {
             break
         }
       }
+    },
+    openCashOpening() {
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('listPaymentOpen', posUuid)
+      this.$store.commit('setshowCashOpen', true)
+    },
+    openCashWithdrawal() {
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('listPaymentWithdrawal', posUuid)
+      this.$store.commit('setShowCashWithdrawl', true)
+    },
+    openCashClosing() {
+      const posUuid = this.currentPointOfSales.uuid
+      this.$store.dispatch('listCashSummary', posUuid)
+      this.$store.commit('setShowCashSummaryMovements', true)
+    },
+    assignSeller() {
+      this.$store.commit('setShowAssignSeller', true)
     },
     openListOrdes() {
       this.showFieldListOrder = true
@@ -708,11 +730,19 @@ export default {
         case this.$t('form.pos.pinMessage.newOrder'):
           this.newOrder()
           break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.cashOpening'):
+          this.openCashOpening()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal'):
+          this.openCashWithdrawal()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.closeBox'):
+          this.openCashClosing()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.assignSeller'):
+          this.assignSeller()
+          break
       }
-    },
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
     },
     printTicket() {
       const orderUuid = this.currentOrder.uuid
@@ -749,6 +779,7 @@ export default {
         payments: []
       })
         .then(response => {
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
           this.$store.dispatch('reloadOrder', response.uuid)
           this.$message({
             type: 'success',
@@ -775,14 +806,18 @@ export default {
         })
     },
     reverseSalesTransaction() {
+      this.isLoadingReverse = true
       reverseSales({
         posUuid: this.currentPointOfSales.uuid,
         orderUuid: this.currentOrder.uuid,
         description: this.messageReverseSales
       })
         .then(response => {
-          const orderUuid = this.currentOrder.uuid
-          this.$store.dispatch('reloadOrder', { orderUuid })
+          const posUuid = this.currentPointOfSales.uuid
+          const orderUuid = response.uuid
+          this.$store.dispatch('printTicket', { posUuid, orderUuid })
+          this.$store.dispatch('setCurrentPOS', this.currentPointOfSales)
+          this.clearOrder()
         })
         .catch(error => {
           console.error(error.message)
@@ -793,6 +828,7 @@ export default {
           })
         })
         .finally(() => {
+          this.isLoadingReverse = false
           this.visibleReverse = false
           this.messageReverseSales = ''
         })
@@ -827,61 +863,10 @@ export default {
       if (this.isEmptyValue(this.currentOrder.uuid)) {
         return ''
       }
-      this.processPos = posProcess[1].uuid
-      const posUuid = this.currentPointOfSales.uuid
-      const parametersList = [{
-        columnName: 'C_Order_ID',
-        value: this.currentOrder.id
-      }]
-      this.$store.commit('setShowPOSCollection', false)
-      this.$store.dispatch('addParametersProcessPos', parametersList)
-      createOrder({
-        posUuid,
-        customerUuid: this.currentOrder.businessPartner.uuid,
-        priceListUuid: this.currentPointOfSales.currentPriceList.uuid,
-        warehouseUuid: this.currentPointOfSales.currentWarehouse.uuid
-      })
-        .then(order => {
-          this.$store.dispatch('currentOrder', order)
-
-          this.$router.push({
-            params: {
-              ...this.$route.params
-            },
-            query: {
-              ...this.$route.query,
-              action: order.uuid
-            }
-          }).then(() => {
-          }).catch(() => {})
-
-          this.$store.commit('setIsReloadListOrders')
-        })
-        .catch(error => {
-          console.error(error.message)
-          this.$message({
-            type: 'error',
-            message: error.message,
-            showClose: true
-          })
-        })
-        .finally(() => {
-          const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
-          this.showModal(process)
-          // close panel lef
-          this.$store.commit('setShowPOSOptions', false)
-        })
     },
     copyLineOrder() {
       const process = this.$store.getters.getProcess(this.posProcess[1].uuid)
       this.showModal(process)
-    },
-    cashClosing() {
-      const { uuid: posUuid, id: posId } = this.currentPointOfSales
-      cashClosing({
-        posId,
-        posUuid
-      })
     },
     deleteOrder() {
       if (this.isEmptyValue(this.currentOrder.uuid)) {
@@ -906,6 +891,7 @@ export default {
           this.$store.dispatch('updateOrderPos', false)
           // close panel lef
           this.$store.commit('setShowPOSOptions', false)
+          this.newOrder()
         })
     },
     seeOrderList() {
@@ -913,15 +899,12 @@ export default {
         this.$store.dispatch('listOrdersFromServer', {})
       }
     },
-    findProcess() {
-      const findServer = this.$store.getters.getProcess('a42ad0c6-fb40-11e8-a479-7a0060f0aa01')
-      if (this.isEmptyValue(findServer)) {
-        posProcess.forEach(item => {
-          this.$store.dispatch('getProcessFromServer', { containerUuid: item.uuid, processId: item.id })
-        })
-      }
-    },
     changePos(posElement) {
+      if (this.adviserPin) {
+        this.validateOption(this.$t('form.pos.optionsPoinSales.generalOptions.changePos'))
+        return
+      }
+
       this.$store.dispatch('setCurrentPOS', posElement)
       this.clearOrder()
     },
@@ -940,7 +923,7 @@ export default {
         columnName: 'C_DocTypeTarget_ID_UUID'
       })
       if (this.isEmptyValue(customerUuid) || id === 1000006) {
-        customerUuid = this.currentPointOfSales.templateBusinessPartner.uuid
+        customerUuid = this.currentPointOfSales.templateCustomer.uuid
       }
       this.$store.dispatch('createOrder', {
         posUuid,
@@ -978,7 +961,7 @@ export default {
       }).catch(() => {
       }).finally(() => {
         this.$store.commit('setListPayments', {})
-        const { templateBusinessPartner } = this.currentPointOfSales
+        const { templateCustomer } = this.currentPointOfSales
         this.$store.commit('updateValuesOfContainer', {
           containerUuid: this.metadata.containerUuid,
           attributes: [{
@@ -991,15 +974,15 @@ export default {
           },
           {
             columnName: 'C_BPartner_ID',
-            value: templateBusinessPartner.id
+            value: templateCustomer.id
           },
           {
             columnName: 'DisplayColumn_C_BPartner_ID',
-            value: templateBusinessPartner.name
+            value: templateCustomer.name
           },
           {
             columnName: ' C_BPartner_ID_UUID',
-            value: templateBusinessPartner.uuid
+            value: templateCustomer.uuid
           }]
         })
         this.$store.dispatch('setOrder', {
@@ -1057,6 +1040,9 @@ export default {
     padding-right: 10px;
     background-color:white;
     background:white;
+  }
+  .dialogo-seller {
+    overflow: hidden;
   }
 </style>
 <style>

@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div
     v-if="isLoaded"
@@ -35,7 +36,7 @@
           label-width="10px"
           @submit.native.prevent="notSubmitForm"
         >
-          <field
+          <field-definition
             v-for="(field) in fieldsList"
             ref="ProductValue"
             :key="field.columnName"
@@ -78,29 +79,39 @@
       </el-main>
     </el-container>
   </div>
-  <div
+
+  <loading-view
     v-else
     key="form-loading"
-    v-loading="!isLoaded"
-    :element-loading-text="$t('notifications.loading')"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(255, 255, 255, 0.8)"
-    class="loading-panel"
   />
 </template>
 
 <script>
-import formMixin from '@/components/ADempiere/Form/formMixin.js'
+// constants
 import fieldsList from './fieldsListBarCode.js'
+
+// components and mixins
+import formMixin from '@/components/ADempiere/Form/formMixin.js'
+import LoadingView from '@/components/ADempiere/LoadingView'
+
+// api request methods
+import { requestImage } from '@/api/ADempiere/common/resource.js'
+
+// utils and helper methods
 import { formatPercent, formatPrice } from '@/utils/ADempiere/valueFormat.js'
 import { buildImageFromArrayBuffer } from '@/utils/ADempiere/resource.js'
-import { requestImage } from '@/api/ADempiere/common/resource.js'
 
 export default {
   name: 'BarcodeReader',
+
+  components: {
+    LoadingView
+  },
+
   mixins: [
     formMixin
   ],
+
   props: {
     metadata: {
       type: Object,
@@ -113,16 +124,17 @@ export default {
       }
     }
   },
+
   data() {
     return {
       fieldsList,
       productPrice: {},
       organizationBackground: '',
       currentImageOfProduct: '',
-      search: 'sad',
-      unsubscribe: () => {}
+      search: ''
     }
   },
+
   computed: {
     organizationImagePath() {
       return this.$store.getters.corporateBrandingImage
@@ -137,15 +149,11 @@ export default {
       return this.currentImageOfProduct
     }
   },
-  created() {
-    this.unsubscribe = this.subscribeChanges()
-  },
+
   mounted() {
     this.getImage()
   },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
+
   methods: {
     async getImage(imageName = '') {
       let isSetOrg = false

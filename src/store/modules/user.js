@@ -29,6 +29,7 @@ import {
 import { resetRouter } from '@/router'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { ORGANIZATION, WAREHOUSE } from '@/utils/ADempiere/constants/systemColumns'
 import language from '@/lang'
 
 const state = {
@@ -43,12 +44,12 @@ const state = {
   userInfo: {},
   organizationsList: [],
   organization: {},
+  currentOrganizationId: 0,
   warehousesList: [],
   warehouse: {},
   isSession: false,
   sessionInfo: {},
-  corporateBrandingImage: '',
-  currentOrganizationId: 0
+  corporateBrandingImage: ''
 }
 
 const mutations = {
@@ -73,8 +74,8 @@ const mutations = {
   SET_ORGANIZATIONS_LIST: (state, payload) => {
     state.organizationsList = payload
   },
-  SET_CURRENT_ORGANIZATION_ID: (state, payload) => {
-    state.currentOrganizationId = payload
+  SET_CURRENT_ORGANIZATION_ID: (state, organizationId) => {
+    state.currentOrganizationId = organizationId
   },
   SET_ORGANIZATION: (state, organization) => {
     state.organization = organization
@@ -152,6 +153,7 @@ const actions = {
             name: sessionInfo.name,
             processed: sessionInfo.processed
           })
+
           const { userInfo } = sessionInfo
           commit('SET_NAME', sessionInfo.name)
           commit('SET_INTRODUCTION', userInfo.description)
@@ -176,12 +178,12 @@ const actions = {
           const { role } = sessionInfo
           commit('SET_ROLE', role)
           setCurrentRole(role.uuid)
-          const organizationIdOfSession = sessionInfo.defaultContext.find(context => {
-            if (context.key === '#AD_Org_ID') {
+          const currentOrganizationSession = sessionInfo.defaultContext.find(context => {
+            if (context.key === `#${ORGANIZATION}`) {
               return context
             }
           })
-          commit('SET_CURRENT_ORGANIZATION_ID', organizationIdOfSession.value)
+          commit('SET_CURRENT_ORGANIZATION_ID', currentOrganizationSession.value)
 
           // wait to establish the client and organization to generate the menu
           await dispatch('getOrganizationsListFromServer', role.uuid)
@@ -199,6 +201,13 @@ const actions = {
             displaySequence: sessionInfo.displaySequence,
             language: sessionInfo.language,
             standardPrecision: sessionInfo.standardPrecision
+          }, {
+            root: true
+          })
+
+          // get country definition of context session
+          dispatch('getCountryDefinition', {
+            id: sessionInfo.countryId
           }, {
             root: true
           })
@@ -255,7 +264,7 @@ const actions = {
   },
 
   // user logout
-  logout({ commit, state, dispatch }) {
+  logout({ commit, state, getters, rootState, dispatch }) {
     const token = state.token
     return new Promise((resolve, reject) => {
       commit('SET_TOKEN', '')
@@ -263,13 +272,7 @@ const actions = {
       removeToken()
 
       commit('setIsSession', false)
-      dispatch('resetStateBusinessData', null, {
-        root: true
-      })
-      dispatch('dictionaryResetCache', null, {
-        root: true
-      })
-
+      rootState['pointOfSales/point/index'].showPOSCollection = false
       // reset visited views and cached views
       // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
       dispatch('tagsView/delAllViews', null, { root: true })
@@ -353,31 +356,29 @@ const actions = {
       roleUuid = getCurrentRole()
     }
 
-    const currentOrganizationId = getters.getCurrentOrgId
-    const currentOrganizationUuid = getCurrentOrganization()
-
     return requestOrganizationsList({ roleUuid })
       .then(response => {
         commit('SET_ORGANIZATIONS_LIST', response.organizationsList)
 
-        let organization
-        // set with uuid
-        if (!isEmptyValue(currentOrganizationUuid)) {
+        // TODO: Change id from session context server
+        const currentOrganizationId = getters.getCurrentOrgId
+        // set organization with AD_Org_ID context
+        let organization = response.organizationsList.find(item => {
+          if (item.id === currentOrganizationId) {
+            return item
+          }
+        })
+
+        // set organization with cookie uuid
+        if (!isEmptyValue(organization)) {
           organization = response.organizationsList.find(item => {
-            if (item.uuid === currentOrganizationUuid) {
+            if (item.uuid === getCurrentOrganization()) {
               return item
             }
           })
         }
-        // set with id
-        if (isEmptyValue(organization) && !isEmptyValue(currentOrganizationId)) {
-          organization = response.organizationsList.find(item => {
-            if (item.id === currentOrganizationId) {
-              return item
-            }
-          })
-        }
-        // set first of list
+
+        // set first organization of list
         if (isEmptyValue(organization)) {
           organization = response.organizationsList[0]
         }
@@ -386,7 +387,7 @@ const actions = {
         commit('SET_ORGANIZATION', organization)
         commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
         commit('setPreferenceContext', {
-          columnName: '#AD_Org_ID',
+          columnName: `#${ORGANIZATION}`,
           value: organization.id
         }, {
           root: true
@@ -428,7 +429,7 @@ const actions = {
         commit('SET_ORGANIZATION', organization)
         commit('SET_CURRENT_ORGANIZATION_ID', organization.id)
         commit('setPreferenceContext', {
-          columnName: '#AD_Org_ID',
+          columnName: `#${ORGANIZATION}`,
           value: organization.id
         }, {
           root: true
@@ -436,13 +437,6 @@ const actions = {
 
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
-
-        dispatch('resetStateBusinessData', null, {
-          root: true
-        })
-        dispatch('dictionaryResetCache', null, {
-          root: true
-        })
 
         dispatch('getWarehousesList', organizationUuid)
 
@@ -489,7 +483,7 @@ const actions = {
           setCurrentWarehouse(warehouse.uuid)
           commit('SET_WAREHOUSE', warehouse)
           commit('setPreferenceContext', {
-            columnName: '#M_Warehouse_ID',
+            columnName: `#${WAREHOUSE}`,
             value: warehouse.id
           }, {
             root: true
@@ -510,7 +504,7 @@ const actions = {
     commit('SET_WAREHOUSE', currentWarehouse)
 
     commit('setPreferenceContext', {
-      columnName: '#M_Warehouse_ID',
+      columnName: `#${WAREHOUSE}`,
       value: currentWarehouse.id
     }, {
       root: true
@@ -548,13 +542,6 @@ const actions = {
         // Update user info and context associated with session
         dispatch('getSessionInfo', uuid)
 
-        dispatch('resetStateBusinessData', null, {
-          root: true
-        })
-        dispatch('dictionaryResetCache', null, {
-          root: true
-        })
-
         showMessage({
           message: language.t('notifications.successChangeRole'),
           type: 'success',
@@ -582,27 +569,31 @@ const actions = {
 }
 
 const getters = {
-  getRoles: (state) => {
-    return state.rolesList
+  getIsSession: (state) => {
+    return state.isSession
   },
   getOrganizations: (state) => {
     return state.organizationsList
   },
-  getWarehouses: (state) => {
-    return state.warehousesList
+  getOrganization: (state) => {
+    return state.organization
+  },
+  getCurrentOrgId: (state) => {
+    return state.currentOrganizationId
+  },
+  getRoles: (state) => {
+    return state.rolesList
   },
   // current role info
   getRole: (state) => {
     return state.role
   },
-  getOrganization: (state) => {
-    return state.organization
+  getWarehouses: (state) => {
+    return state.warehousesList
   },
+  // TODO: Manage with vuex module to warehouse
   getWarehouse: (state) => {
     return state.warehouse
-  },
-  getIsSession: (state) => {
-    return state.isSession
   },
   getUserUuid: (state) => {
     return state.userUuid
@@ -610,11 +601,9 @@ const getters = {
   userInfo: (state) => {
     return state.userInfo
   },
+  // TODO: Manage with vuex module to personal lock
   getIsPersonalLock: (state) => {
     return state.role.isPersonalLock
-  },
-  getCurrentOrgId: (state) => {
-    return state.currentOrganizationId
   }
 }
 

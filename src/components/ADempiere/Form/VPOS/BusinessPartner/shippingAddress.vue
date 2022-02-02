@@ -22,29 +22,36 @@
         <span>{{ $t('form.pos.order.BusinessPartnerCreate.shippingAddress') }}</span>
       </div>
       <div class="text item">
-        <el-scrollbar wrap-class="scroll-child">
-          <field-definition
-            v-for="(field) in fieldsListLocationShippingAddress"
-            :ref="field.columnName"
-            :key="field.columnName"
-            :metadata-field="{
-              ...field,
-              isReadOnly: disabled
-            }"
-          />
-        </el-scrollbar>
+        <field-location
+          :ref="fieldsList[0].columnName"
+          :value-model="fieldsList[0].value"
+
+          :metadata="{
+            ...fieldsList[0],
+            isReadOnly: disabled
+          }"
+          :container-uuid="'Shipping-Address'"
+          :container-manager="containerManager"
+        />
       </div>
     </el-card>
   </el-col>
 </template>
 
 <script>
+// constants
+import fieldsList from './shippingFieldLocation/fieldsList'
+
+// mixins and components
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldListShippingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
+import FieldLocation from './shippingFieldLocation'
 
 export default {
   name: 'ShippingAddress',
+  components: {
+    FieldLocation
+  },
   mixins: [
     formMixin,
     BParterMixin
@@ -67,6 +74,18 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {

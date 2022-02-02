@@ -414,7 +414,6 @@ export default {
     pos: {
       title: 'POS',
       priceList: 'Price List',
-      discountList: 'Discount List',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
         salesOrder: {

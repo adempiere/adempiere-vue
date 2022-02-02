@@ -21,7 +21,13 @@ import {
   updatePayment,
   getPaymentsList,
   // Customer Bank Account
-  createCustomerBankAccount
+  createCustomerBankAccount,
+  listCustomerBankAccounts,
+  // Cash Summary Movements
+  cashSummaryMovements,
+  RefundReferenceRequest,
+  listRefundReference,
+  deleteRefundReference
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
@@ -97,7 +103,7 @@ export default {
         .then(response => {
           const orderUuid = response.orderUuid
           dispatch('listPayments', { posUuid, orderUuid })
-          dispatch('updateOrder', { posUuid, orderUuid })
+          dispatch('reloadOrder', { posUuid, orderUuid })
         })
         .catch(error => {
           console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -222,7 +228,7 @@ export default {
         .then(response => {
           const orderUuid = response.orderUuid
           dispatch('listPayments', { posUuid, orderUuid })
-          dispatch('updateOrder', { posUuid, orderUuid })
+          dispatch('reloadOrder', { posUuid, orderUuid })
           return {
             ...response,
             type: 'Success'
@@ -254,7 +260,7 @@ export default {
         .then(response => {
           const orderUuid = response.order_uuid
           dispatch('listPayments', { posUuid, orderUuid })
-          dispatch('updateOrder', { posUuid, orderUuid })
+          dispatch('reloadOrder', { posUuid, orderUuid })
           return {
             ...response,
             type: 'Success'
@@ -284,7 +290,7 @@ export default {
     })
       .then(response => {
         dispatch('listPayments', { posUuid, orderUuid })
-        dispatch('updateOrder', { posUuid, orderUuid })
+        dispatch('reloadOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -307,6 +313,8 @@ export default {
           payments: response.listPayments.reverse(),
           isLoaded: true
         })
+        dispatch('listRefunds', { posUuid, orderUuid })
+        dispatch('reloadOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -455,9 +463,10 @@ export default {
     addressVerified,
     zipVerified,
     routingNo,
+    AccountNo,
     iban
   }) {
-    createCustomerBankAccount({
+    return createCustomerBankAccount({
       customerUuid,
       posUuid,
       city,
@@ -473,13 +482,16 @@ export default {
       paymentMethodUuid,
       bankUuid,
       isAch,
+      AccountNo,
       addressVerified,
       zipVerified,
       routingNo,
       iban
     })
       .then(response => {
-        console.log(response)
+        commit('setCurrentCustomerBankAccount', response)
+        dispatch('listCustomerBankAccounts', { customerUuid: response.customerUuid })
+        return response
       })
       .catch(error => {
         console.warn(`conversionDivideRate: ${error.message}. Code: ${error.code}.`)
@@ -488,6 +500,94 @@ export default {
           message: error.message,
           showClose: true
         })
+      })
+  },
+  listCustomerBankAccounts({ commit, dispatch }, {
+    customerUuid,
+    pageToken
+  }) {
+    listCustomerBankAccounts({
+      customerUuid,
+      pageToken
+    })
+      .then(response => {
+        commit('setListCustomerBankAccounts', response.records)
+      })
+  },
+  refundReference({ commit, dispatch }, {
+    posUuid,
+    description,
+    amount,
+    date,
+    tenderTypeCode,
+    currencyUuid,
+    conversionTypeUuid,
+    paymentMethodUuid,
+    paymentAccountDate,
+    customerBankAccountUuid,
+    orderUuid,
+    customerUuid,
+    salesRepresentativeUuid
+  }) {
+    RefundReferenceRequest({
+      posUuid,
+      description,
+      amount,
+      date,
+      tenderTypeCode,
+      currencyUuid,
+      conversionTypeUuid,
+      paymentMethodUuid,
+      paymentAccountDate,
+      orderUuid,
+      customerBankAccountUuid,
+      salesRepresentativeUuid
+    })
+      .then(response => {
+        dispatch('listRefunds', {
+          posUuid,
+          customerUuid,
+          orderUuid
+        })
+        dispatch('reloadOrder', { posUuid, orderUuid })
+      })
+  },
+  listRefunds({ commit }, {
+    posUuid,
+    orderUuid
+  }) {
+    listRefundReference({
+      posUuid,
+      orderUuid
+    })
+      .then(response => {
+        commit('setListRefundReference', response.records)
+      })
+  },
+  deleteRefundReferences({ dispatch }, {
+    posUuid,
+    customerUuid,
+    orderUuid,
+    uuid
+  }) {
+    deleteRefundReference({
+      uuid
+    })
+      .then(response => {
+        dispatch('listRefunds', {
+          posUuid,
+          orderUuid
+        })
+        dispatch('reloadOrder', { posUuid, orderUuid })
+      })
+      .catch(error => {
+        console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
+        showMessage({
+          type: 'error',
+          message: error.message,
+          showClose: true
+        })
+        return { type: 'error' }
       })
   },
   addDeliveryList({ commit, state, getters }, product) {
@@ -513,6 +613,48 @@ export default {
       })
       commit('setDeliveryList', deliveryList)
     }
+  },
+  listCashSummary({ commit, state }, posUuid) {
+    cashSummaryMovements({
+      posUuid
+    })
+      .then(response => {
+        commit('setListCashSummary', response)
+      })
+  },
+  listPaymentOpen({ commit, state }, posUuid) {
+    getPaymentsList({
+      posUuid,
+      isOnlyReceipt: true
+    })
+      .then(response => {
+        commit('setListCastOpen', response.listPayments)
+      })
+      .catch(error => {
+        this.$message({
+          message: error.message,
+          isShowClose: true,
+          type: 'error'
+        })
+        console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+      })
+  },
+  listPaymentWithdrawal({ commit, state }, posUuid) {
+    getPaymentsList({
+      posUuid,
+      isOnlyRefund: true
+    })
+      .then(response => {
+        commit('setListWithdrawal', response.listPayments)
+      })
+      .catch(error => {
+        this.$message({
+          message: error.message,
+          isShowClose: true,
+          type: 'error'
+        })
+        console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+      })
   }
 
 }

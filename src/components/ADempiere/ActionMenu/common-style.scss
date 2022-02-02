@@ -1,0 +1,65 @@
+// ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
+// Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+.el-dropdown-menu {
+  // top menu space for the list of main menu buttons
+  margin-top: 3px;
+  padding: 0px;
+
+  .label {
+    font-size: 14px;
+    margin-top: 0% !important;
+    margin-left: 0px;
+    text-align: initial;
+    word-break: break-word !important;
+    line-height: 14px;
+  }
+
+  .contents {
+    display: inline-flex;
+    width: 100%;
+  }
+
+  .description {
+    margin: 0px;
+    font-size: 12px;
+    text-align: initial;
+    word-break: break-word !important;
+    line-height: 14px;
+  }
+
+  .auxiliary-menu-icon {
+    margin-right: 8px;
+
+    >i {
+      vertical-align: -webkit-baseline-middle;
+      vertical-align: -moz-middle-with-baseline;
+      vertical-align: middle baseline;
+      font-weight: bolder
+    }
+  }
+}
+
+.auxiliary-menu {
+  // space between main menu buttons
+  >.el-dropdown {
+    margin-right: 3px;
+
+    &:last-child {
+      margin-right: 10px;
+    }
+  }
+}

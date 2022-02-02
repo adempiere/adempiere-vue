@@ -42,23 +42,16 @@ export default {
     },
     billingAddress() {
       const billingAddress = this.addressForm(this.$store.getters.getValuesView({
-        containerUuid: 'Billing-Address',
+        containerUuid: 'Billing-Address-Location-Address',
         format: 'object'
       }))
       billingAddress.is_default_billing = true
       billingAddress.is_default_shipping = false
-      const region = this.$store.getters.getValueOfField({
-        containerUuid: 'Billing-Address',
-        columnName: 'C_Region_ID_UUID'
-      })
-      if (this.isEmptyValue(region)) {
-        return []
-      }
       return billingAddress
     },
     shippingAddress() {
       let shippingAddress = this.addressForm(this.$store.getters.getValuesView({
-        containerUuid: 'Shipping-Address',
+        containerUuid: 'Shipping-Address-Location-Address',
         format: 'object'
       }))
       shippingAddress.is_default_shipping = true
@@ -86,14 +79,14 @@ export default {
   watch: {
     showPopover(value) {
       if (!value) {
-        this.clearAddresses('Billing-Address')
-        this.clearAddresses('Shipping-Address')
+        this.clearAddresses('Billing-Address-Location-Address')
+        this.clearAddresses('Shipping-Address-Location-Address')
       }
     },
     showCustomer(value) {
       if (value) {
-        this.clearAddresses('Billing-Address')
-        this.clearAddresses('Shipping-Address')
+        this.clearAddresses('Billing-Address-Location-Address')
+        this.clearAddresses('Shipping-Address-Location-Address')
       }
     }
   },
@@ -238,7 +231,7 @@ export default {
       valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
       return valuesToSend
     },
-    setBusinessPartner({ id, name, uuid }, isCloseForm = true) {
+    setBusinessPartner({ id, name, uuid, value }, isCloseForm = true) {
       const { parentUuid, containerUuid } = this.parentMetadata
       // set ID value
       this.$store.commit('updateValueOfField', {
@@ -254,7 +247,7 @@ export default {
         containerUuid,
         // DisplayColumn_'ColumnName'
         columnName: 'DisplayColumn_C_BPartner_ID', // this.parentMetadata.displayColumnName,
-        value: name
+        value: value + ' - ' + name
       })
 
       // set UUID value
