@@ -227,6 +227,7 @@ export default {
           title: this.$t('form.byInvoice.toDeliver'),
           params: {
             isOnlyProcessed: true,
+            isOnlyAisleSeller: true,
             isWaitingForShipment: true
           },
           isVisible: false,
