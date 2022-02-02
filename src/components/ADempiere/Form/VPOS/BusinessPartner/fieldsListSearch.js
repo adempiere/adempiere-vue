@@ -38,9 +38,10 @@ export default [
     }
   },
   {
-    elementColumnName: 'Name',
-    columnName: 'Name',
-    tableName: 'C_BPartner',
+    elementColumnName: 'TaxID',
+    columnName: 'TaxID',
+    fieldUuid: '8cef473e-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8cef473e-fb40-11e8-a479-7a0060f0aa01',
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 2,
@@ -49,8 +50,9 @@ export default [
     }
   },
   {
-    elementColumnName: 'Phone',
-    columnName: 'Phone',
+    elementColumnName: 'Name',
+    columnName: 'Name',
+    tableName: 'C_BPartner',
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 3,

@@ -60,23 +60,21 @@
         {{ $t('businessPartner.emptyBusinessPartner') }}
       </p>
       <el-table-column
-        :label="$t('form.productInfo.code')"
+        v-for="(heard, key) in labelTable"
+        :key="key"
+        :label="heard.label"
         prop="value"
-        width="100"
-      />
-      <el-table-column
-        prop="name"
-        :label="$t('form.productInfo.name')"
-      />
-      <el-table-column
-        :label="$t('form.productInfo.lastName')"
-        prop="lastName"
-      />
-      <el-table-column
-        :label="$t('form.pos.order.BusinessPartnerCreate.taxId')"
-        prop="taxId"
-        align="right"
-      />
+      >
+        <span v-if="heard.columnName === 'Value'" slot-scope="scope">
+          {{ scope.row.value }}
+        </span>
+        <span v-else-if="heard.columnName === 'Name'" slot-scope="scope">
+          {{ scope.row.name }}
+        </span>
+        <span v-else-if="heard.columnName === 'TaxID'" slot-scope="scope">
+          {{ scope.row.taxId }}
+        </span>
+      </el-table-column>
     </el-table>
     <custom-pagination
       :total="businessParners.recordCount"
@@ -199,6 +197,16 @@ export default {
     },
     popoverListBusinessParnet() {
       return this.$store.getters.getPopoverListBusinessParnet
+    },
+    labelTable() {
+      const listFilters = this.metadataList.filter(field => field.columnName !== 'Code')
+      const label = listFilters.map(field => {
+        return {
+          label: field.name,
+          columnName: field.columnName
+        }
+      })
+      return label
     }
   },
 
