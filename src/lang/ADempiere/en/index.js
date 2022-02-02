@@ -382,7 +382,7 @@ export default {
       priceList: 'Price List',
       releaseOrder: 'Release It',
       applyDiscountOnOrder: 'Apply Discount on Order',
-      discountRate: 'Porcentaje de Descuento',
+      discountRate: '% Descuento',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
         emptyAvailablePaymentMethodsRefudn: 'This Terminal does not have a Payment Method configured to allow Pending Refund',
