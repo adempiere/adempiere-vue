@@ -357,7 +357,7 @@ export default {
       priceList: 'Lista de Precio',
       releaseOrder: 'Liberar',
       applyDiscountOnOrder: 'Apply Discount on Order',
-      discountRate: 'Discount Percentage',
+      discountRate: '% Discount',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
         emptyAvailablePaymentMethods: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso',
