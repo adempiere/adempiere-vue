@@ -15,10 +15,24 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
-  <div v-if="!inTable">
+  <div class="field-definition">
+    <component
+      :is="componentRender"
+      v-if="inTable"
+      :id="field.panelType !== 'form' ? field.columnName : ''"
+      key="is-table-template"
+      :class="classField"
+      :parent-uuid="parentUuid"
+      :container-uuid="containerUuid"
+      :container-manager="containerManager"
+      :metadata="fieldAttributes"
+      :in-table="true"
+    />
+
     <el-col
-      v-if="isDisplayedField"
+      v-else-if="!inTable && isDisplayedField"
       key="is-panel-template"
       :xs="sizeField.xs"
       :sm="sizeField.sm"
@@ -31,6 +45,8 @@
         <template slot="label">
           <field-options
             :metadata="fieldAttributes"
+            :container-manager="containerManager"
+            :record-uuid="recordUuid"
           />
         </template>
 
@@ -38,27 +54,28 @@
           :is="componentRender"
           :id="field.panelType !== 'form' ? field.columnName : ''"
           :ref="field.columnName"
+          :parent-uuid="parentUuid"
+          :container-uuid="containerUuid"
+          :container-manager="containerManager"
           :metadata="fieldAttributes"
-          :value-model="recordDataFields"
         />
       </el-form-item>
     </el-col>
   </div>
-  <component
-    :is="componentRender"
-    v-else
-    :id="field.panelType !== 'form' ? field.columnName : ''"
-    key="is-table-template"
-    :class="classField"
-    :metadata="fieldAttributes"
-    :value-model="recordDataFields"
-    :in-table="true"
-  />
 </template>
 
 <script>
-import { evalutateTypeField, fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
-import FieldOptions from '@/components/ADempiere/Field/FieldOptions'
+// components and mixins
+import FieldOptions from '@/components/ADempiere/Field/FieldOptions/index.vue'
+
+// constants
+import { TEXT } from '@/utils/ADempiere/references'
+import {
+  ACTIVE, CLIENT, PROCESSING, PROCESSED
+} from '@/utils/ADempiere/constants/systemColumns'
+
+// utils and helper methods
+import { evalutateTypeField } from '@/utils/ADempiere/dictionaryUtils'
 
 /**
  * This is the base component for linking the components according to the
@@ -72,14 +89,22 @@ export default {
   },
 
   props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
+    containerUuid: {
+      type: String,
+      required: true
+    },
+    containerManager: {
+      type: Object,
+      required: true
+    },
     // receives the property that is an object with all the attributes
     metadataField: {
       type: Object,
       default: () => ({})
-    },
-    recordDataFields: {
-      type: [Number, String, Boolean, Array, Object, Date],
-      default: undefined
     },
     inGroup: {
       type: Boolean,
@@ -94,29 +119,34 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       field: {}
     }
   },
+
   computed: {
     isMobile() {
       return this.$store.state.app.device === 'mobile'
     },
     classFrom() {
-      if (this.field.componentPath === 'FieldTextLong' || this.field.componentPath === 'FieldImage') {
-        return 'from-text-long'
+      if (['FieldTextLong', 'FieldImage'].includes(this.field.componentPath)) {
+        return 'field-text-long'
       }
-      return 'from-field'
+      if ([TEXT.id].includes(this.field.displayType)) {
+        return 'field-text-area'
+      }
+      return 'field-standard'
     },
     sizeField() {
-      if (this.field.isShowedRecordNavigation) {
+      if (this.isEmptyValue(this.field.size)) {
         return {
-          xs: this.field.size.xs,
-          sm: this.field.size.sm * 2,
-          md: this.field.size.md * 2,
-          lg: this.field.size.lg * 2,
-          xl: this.field.size.xl * 2
+          xs: 24,
+          sm: 24,
+          md: 24,
+          lg: 24,
+          xl: 24
         }
       }
       return {
@@ -189,8 +219,8 @@ export default {
         isPanelWindow: this.isPanelWindow,
         isAdvancedQuery: this.isAdvancedQuery,
         // DOM properties
-        required: this.isMandatory,
-        readonly: this.isReadOnly,
+        required: this.isMandatoryField,
+        readonly: this.isReadOnlyField,
         displayed: this.isDisplayedField,
         disabled: !this.field.isActive,
         isSelectCreated: this.isSelectCreated,
@@ -199,81 +229,86 @@ export default {
     },
 
     isDisplayedField() {
-      if (this.isAdvancedQuery) {
-        return this.field.isShowedFromUser
-      }
-
-      return fieldIsDisplayed(this.field) &&
-        (this.isMandatory || this.field.isShowedFromUser || this.inTable)
-    },
-
-    isMandatory() {
-      if (this.isAdvancedQuery) {
-        return false
-      }
-      return this.field.isMandatory || this.field.isMandatoryFromLogic
-    },
-    isPanelWindow() {
-      return this.field.panelType === 'window'
-    },
-    preferenceClientId() {
-      if (this.isPanelWindow) {
-        return this.$store.getters.getPreferenceClientId
-      }
-      return undefined
+      // validate with container manager
+      return this.containerManager.isDisplayedField(this.field) &&
+        (this.isMandatoryField || this.field.isShowedFromUser || this.inTable)
     },
     /**
      * Idicate if field is read only
-     * TODO: Create common method to evaluate isReadOnly
      */
-    isReadOnly() {
-      if (this.isAdvancedQuery) {
-        if (['NULL', 'NOT_NULL'].includes(this.field.operator)) {
-          return true
-        }
+    isReadOnlyField() {
+      if (this.inTable) {
+        // table manage with isReadOnlyColumn method
+        // if rendered the component is editable
         return false
       }
 
-      if (!this.field.isActive) {
-        return true
-      }
+      // TODO: Add validate method to record uuid uuid without route.action
+      // edit mode is diferent to create new
+      const isWithRecord = this.recordUuid !== 'create-new' &&
+        !this.isEmptyValue(this.recordUuid)
 
-      const isUpdateableAllFields = this.field.isReadOnly || this.field.isReadOnlyFromLogic
-
-      if (this.isPanelWindow) {
-        // TODO: Evaluate record uuid without route.action
-        // edit mode is diferent to create new
-        let isWithRecord = this.field.recordUuid !== 'create-new'
-        // TODO: Remove false condition to production
-        // evaluate context
-        if ((this.preferenceClientId !== this.metadataField.clientId && 1 === 2) && isWithRecord) {
-          return true
-        }
-
-        if (this.field.isAlwaysUpdateable) {
-          return false
-        }
-        if (this.field.isProcessingContext || this.field.isProcessedContext) {
-          return true
-        }
-
-        if (this.inTable) {
-          isWithRecord = !this.isEmptyValue(this.field.recordUuid)
-        }
-
-        return (!this.field.isUpdateable && isWithRecord) ||
-          (isUpdateableAllFields || this.field.isReadOnlyFromForm)
-      } else if (this.field.panelType === 'browser') {
-        if (this.inTable) {
-          // browser result
-          return this.field.isReadOnly
-        }
-        // query criteria
-        return this.field.isReadOnlyFromLogic
-      }
-      // other type of panels (process/report)
-      return Boolean(isUpdateableAllFields)
+      // validate with container manager
+      return this.containerManager.isReadOnlyField({
+        field: this.field,
+        // record values
+        clientId: this.containerClientId,
+        isActive: this.containerIsActive,
+        isProcessing: this.containerIsProcessing,
+        isProcessed: this.containerIsProcessed,
+        isWithRecord
+      })
     },
+    isMandatoryField() {
+      // validate with container manager
+      return this.containerManager.isMandatoryField(this.field)
+    },
+
+    isPanelWindow() {
+      return this.field.panelType === 'window'
+    },
+
+    recordUuid() {
+      // is active record
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: 'UUID'
+      })
+    },
+    containerIsActive() {
+      // panel processing value
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: ACTIVE
+      })
+    },
+    containerIsProcessing() {
+      // panel processing value
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: PROCESSING
+      })
+    },
+    containerIsProcessed() {
+      // panel processed value
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: PROCESSED
+      })
+    },
+    containerClientId() {
+      // panel client value
+      return this.$store.getters.getValueOfField({
+        parentUuid: this.parentUuid,
+        containerUuid: this.containerUuid,
+        columnName: CLIENT
+      })
+    },
+
     isFieldOnly() {
       if (this.inTable || this.field.isFieldOnly) {
         return undefined
@@ -295,11 +330,13 @@ export default {
       return ''
     }
   },
+
   watch: {
     metadataField(value) {
       this.field = value
     }
   },
+
   created() {
     // assined field with prop
     this.field = this.metadataField
@@ -321,6 +358,7 @@ export default {
       }
     }
   },
+
   methods: {
     focusField() {
       if (this.field.handleRequestFocus || (this.field.displayed && !this.field.readonly)) {
@@ -332,6 +370,7 @@ export default {
 </script>
 
 <style lang="scss">
+.field-definition {
   /**
    * Separation between elements (item) of the form
    */
@@ -343,55 +382,67 @@ export default {
     max-height: 65px;
   }
   .el-form-item {
-    margin-bottom: 10px !important;
+    margin-bottom: 12px !important;
     margin-left: 10px;
     margin-right: 10px;
+  }
+  .field-text-long {
+    max-height: 300px;
+    min-height: 250px;
   }
 
   /**
    * Maximum height to avoid distorting the field list
    */
-  .el-form-item__content {
-    max-height: 36px !important;
+  .field-standard {
+    &:not(.in-table) {
+      max-height: 79px;
+    }
+
+    .el-form-item__content {
+      max-height: 36px !important;
+    }
   }
 
-  /**
-   * Reduce the spacing between the form element and its label
-   */
-  .el-form--label-top .el-form-item__label {
-    padding-bottom: 0px !important;
-  }
-
+  /*
   .in-table {
     margin-bottom: 0px !important;
     margin-left: 0px;
     margin-right: 0px;
   }
+  */
 
   /**
    * Min height all text area, not into table
    */
   .el-textarea__inner:not(.in-table) {
     min-height: 36px !important;
-    /*
-    height: 36px auto !important;
-    max-height: 54.2333px !important;
-    */
+    // height: 36px auto !important;
+    // max-height: 54.2333px !important;
   }
 
   /**
    * Reduce the spacing between the form element and its label
    */
-  .el-form--label-top .el-form-item__label {
-    padding-bottom: 0px !important;
+  .el-form-item__label {
+    padding-bottom: 0px;
   }
+
+  /*
   .pre-formatted {
     white-space: pre;
   }
-  .el-submenu__title {
-    padding: 0;
+  */
+
+  /**
+   * Red border in empty mandatory field
+   */
+  .field-empty-required {
+    .el-input__inner,
+    .tui-editor-defaultUI,
+    .el-textarea__inner {
+      border-color: #f55 !important;
+    }
   }
-  .el-submenu .el-submenu__icon-arrow  {
-    visibility: hidden;
-  }
+}
 </style>

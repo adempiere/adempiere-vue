@@ -578,6 +578,7 @@ export default {
           posUuid,
           orderUuid
         })
+        dispatch('reloadOrder', { posUuid, orderUuid })
       })
       .catch(error => {
         console.warn(`ListPaymentsFromServer: ${error.message}. Code: ${error.code}.`)
@@ -586,6 +587,7 @@ export default {
           message: error.message,
           showClose: true
         })
+        return { type: 'error' }
       })
   },
   addDeliveryList({ commit, state, getters }, product) {
@@ -654,4 +656,5 @@ export default {
         console.warn(`Error: ${error.message}. Code: ${error.code}.`)
       })
   }
+
 }

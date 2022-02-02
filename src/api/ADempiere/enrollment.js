@@ -34,6 +34,7 @@ export function requestEnrollUser({
 }) {
   return request({
     url: '/user/enrollment/enroll',
+    method: 'post',
     data: {
       user_name: userName,
       name,
@@ -66,6 +67,7 @@ export function requestForgotPassword(eMailOrUserName) {
 
   return request({
     url: '/user/enrollment/reset-password',
+    method: 'post',
     data: {
       user_name: userName,
       email: eMail,
@@ -74,10 +76,7 @@ export function requestForgotPassword(eMailOrUserName) {
     }
   })
     .then(forgotResponse => {
-      return {
-        responseType: forgotResponse.response_type,
-        responseTypeStatus: forgotResponse.response_type_status
-      }
+      return forgotResponse
     })
 }
 
@@ -92,6 +91,7 @@ export function requestChangePassword({
 }) {
   return request({
     url: '/user/enrollment/change-password',
+    method: 'post',
     data: {
       token,
       password,
@@ -100,10 +100,7 @@ export function requestChangePassword({
     }
   })
     .then(changePasswordResponse => {
-      return {
-        responseType: changePasswordResponse.response_type,
-        responseTypeStatus: changePasswordResponse.response_type_status
-      }
+      return changePasswordResponse
     })
 }
 
@@ -117,6 +114,7 @@ export function requestActivateUser({
 }) {
   return request({
     url: '/user/enrollment/activate-user',
+    method: 'post',
     data: {
       token,
       client_version: clientVersion,

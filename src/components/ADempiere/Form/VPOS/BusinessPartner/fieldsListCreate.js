@@ -30,7 +30,7 @@ export default [
       handleFocusGained: true,
       handleFocusLost: true,
       sequence: 0,
-      size: 6,
+      size: 8,
       isMandatory: true
     }
   },
@@ -44,7 +44,7 @@ export default [
       isCustomField: true,
       tabindex: 0,
       sequence: 0,
-      size: 6,
+      size: 8,
       isMandatory: false
     }
   },
@@ -57,7 +57,7 @@ export default [
     overwriteDefinition: {
       tabindex: 1,
       isCustomField: true,
-      size: 6,
+      size: 8,
       sequence: 1,
       isMandatory: true
     }
@@ -72,7 +72,7 @@ export default [
       tabindex: 2,
       isCustomField: true,
       sequence: 2,
-      size: 6
+      size: 8
     }
   },
   {
@@ -87,7 +87,7 @@ export default [
       tabindex: 3,
       isCustomField: true,
       sequence: 3,
-      size: 6
+      size: 8
     }
   },
   {
@@ -99,7 +99,7 @@ export default [
       name: language.t('form.pos.order.BusinessPartnerCreate.phone'),
       isCustomField: true,
       isMandatory: true,
-      size: 6
+      size: 8
     }
   }
 ]

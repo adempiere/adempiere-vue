@@ -60,14 +60,18 @@
 // - query
 // - directQuery
 // - tableName
-// - displayColumn
+// - displayColumnName
 // - defaultValue
 
+import store from '@/store'
+
+// constants
 import { CHAR, DEFAULT_SIZE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
 import { evalutateTypeField, getDefaultValue, getEvaluatedLogics } from '@/utils/ADempiere/dictionaryUtils.js'
+
+// utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { getParentFields } from '@/utils/ADempiere/contextUtils.js'
-import store from '@/store'
 
 // Create a Field from UUID based on server meta-data
 export function createFieldFromDictionary({

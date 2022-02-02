@@ -37,6 +37,18 @@ export default {
     metadata: {
       type: Object,
       required: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {
@@ -323,6 +335,9 @@ export default {
           case 'newOrder':
             this.createOrder({ withLine: action.withLine, newOrder: action.newOrder, customer: action.customer })
             break
+          case 'maximumRefundAllowed':
+            this.$store.dispatch('sendCreateCustomerAccount', action.payments)
+            break
           case 'changePriceList':
             this.$store.commit('setCurrentPriceList', action)
             break
@@ -498,7 +513,7 @@ export default {
         })
         .finally(() => {
           this.$store.commit('updateValuesOfContainer', {
-            containerUuid: this.metadata.containerUuid,
+            containerUuid: this.$route.meta.uuid,
             attributes: [{
               columnName: 'ProductValue',
               value: undefined

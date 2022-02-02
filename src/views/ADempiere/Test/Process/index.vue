@@ -26,10 +26,10 @@
 <script>
 import { defineComponent } from '@vue/composition-api'
 
-import ProcessView from '@/views/ADempiere/ProcessView'
+import ProcessView from '@/views/ADempiere/Process'
 
 export default defineComponent({
-  name: 'TestProcessView',
+  name: 'TestProcess',
 
   setup() {
     // Generate Surrogate Key UUID for all tables

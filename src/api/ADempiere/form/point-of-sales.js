@@ -19,6 +19,7 @@ import { request } from '@/utils/ADempiere/request'
 import { config } from '@/utils/ADempiere/config'
 import { isEmptyValue } from '@/utils/ADempiere'
 import { camelizeObjectKeys } from '@/utils/ADempiere/transformObject.js'
+
 /**
  * method in api/price-checking.js as getProductPrice
  * @author elsiosanchez <elsiosanches@gmail.com>
@@ -1367,6 +1368,32 @@ export function holdOrder({
       pos_uuid: posUuid,
       sales_representative_uuid: salesRepresentativeUuid,
       order_uuid: orderUuid
+    }
+  })
+    .then(response => {
+      return camelizeObjectKeys(response)
+    })
+}
+
+/**
+ * GET List Available Sellers
+ *
+ * token - user token
+ * page_size - custom page size for batch
+ * page_token - specific page token
+ * pos_uuid - POS UUID reference
+ * is_only_allocated - Only allocated to current point of sales
+ */
+export function availableSellers({
+  posUuid,
+  isOnlyAllocated
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/available-sellers`,
+    method: 'get',
+    params: {
+      pos_uuid: posUuid,
+      is_only_allocated: isOnlyAllocated
     }
   })
     .then(response => {

@@ -1,4 +1,3 @@
-import Vue from 'vue'
 
 const initStateUtils = {
   width: 0,
@@ -15,16 +14,6 @@ const initStateUtils = {
   selectionProcess: [],
   isContainerInfo: false,
   documentAction: [],
-  openRoute: {
-    path: '',
-    name: '',
-    route: {},
-    params: {},
-    definedParameters: {},
-    query: {},
-    isReaded: false,
-    isLoaded: false
-  },
   splitWidthRight: 3,
   splitWidthLeft: 3,
   parametersProcessPos: [],
@@ -51,6 +40,7 @@ const initStateUtils = {
   showCashWithdrawl: false,
   showCashSummaryMovements: false,
   showAssignSeller: false,
+  showPanelAddress: false,
   quickSearchOrder: {}
 }
 
@@ -96,16 +86,7 @@ export default {
     setReportTypeToShareLink(state, payload) {
       state.reportType = payload
     },
-    setOpenRoute(state, payload) {
-      state.openRoute = {
-        ...state.openRoute,
-        ...payload
-      }
-    },
-    setReadRoute(state, payload) {
-      Vue.set(state.openRoute, 'definedParameters', payload.parameters)
-      Vue.set(state.openRoute, 'isLoaded', true)
-    },
+
     resetStateUtils(state) {
       state = initStateUtils
     },
@@ -183,6 +164,10 @@ export default {
     },
     setQuickSearchOrder(state, order) {
       state.quickSearchOrder = order
+    },
+    setShowPanelAddress(state, showPanelAddress) {
+      console.log({ showPanelAddress })
+      state.showPanelAddress = showPanelAddress
     }
   },
   actions: {
@@ -216,14 +201,7 @@ export default {
     setProcessSelect({ commit }, params) {
       commit('setProcessSelecetion', params)
     },
-    setOpenRoute({ commit }, routeParameters) {
-      commit('setOpenRoute', {
-        ...routeParameters
-      })
-    },
-    setReadRoute({ commit }, parameters) {
-      commit('setReadRoute', parameters)
-    },
+
     setTempShareLink({ commit }, parameters) {
       if (!parameters.href.includes(String(parameters.processId))) {
         commit('setTempShareLink', parameters.href)
@@ -256,6 +234,9 @@ export default {
     changePopoverListBusinessPartner({ commit }, params) {
       commit('popoverListBusinessPartner', params)
     },
+    changeShowAddNewAddress({ commit }, params) {
+      commit('setShowAddNewAddress', params)
+    },
     changePopoverOverdrawnInvoice({ commit }, { attributePin, visible }) {
       const overdrawn = {
         attributePin,
@@ -274,6 +255,9 @@ export default {
     }
   },
   getters: {
+    getShowPanelAddress: (state) => {
+      return state.showPanelAddress
+    },
     getWidth: (state) => {
       return state.width
     },
@@ -320,12 +304,7 @@ export default {
     getReportType: (state) => {
       return state.reportType
     },
-    getIsLoadedOpenRoute: (state) => {
-      return state.openRoute.isLoaded
-    },
-    getIsReadedOpenRoute: (state) => {
-      return state.openRoute.isReaded
-    },
+
     getOrders: (state) => {
       return state.documentAction
     },

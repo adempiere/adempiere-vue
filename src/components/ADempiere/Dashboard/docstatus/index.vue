@@ -45,6 +45,7 @@
 
 <script>
 import { getPendingDocumentsFromServer } from '@/api/ADempiere/dashboard/tasks'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 import mixinDashboard from '@/components/ADempiere/Dashboard/mixinDashboard.js'
 
 export default {
@@ -101,36 +102,21 @@ export default {
       })
     },
     handleClick(row) {
-      const viewSearch = this.recursiveTreeSearch({
-        treeData: this.permissionRoutes,
-        attributeValue: row.windowUuid,
-        attributeName: 'meta',
-        secondAttribute: 'uuid',
-        attributeChilds: 'children'
-      })
-
-      if (viewSearch) {
-        let tabParent
-        if (row.action === 'window') {
-          tabParent = 0
-        }
-
-        this.$router.push({
-          name: viewSearch.name,
-          params: {
-            ...row.criteria
-          },
-          query: {
-            action: 'criteria',
-            tabParent
-          }
-        }, () => {})
-      } else {
-        this.$message({
-          type: 'error',
-          message: this.$t('notifications.noRoleAccess')
-        })
+      let tabParent
+      if (row.action === 'window') {
+        tabParent = 0
       }
+
+      zoomIn({
+        uuid: row.windowUuid,
+        params: {
+          ...row.criteria
+        },
+        query: {
+          tabParent,
+          action: 'criteria'
+        }
+      })
       // conditions for the registration amount (operador: row.criteria.whereClause)
     }
   }

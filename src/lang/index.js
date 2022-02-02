@@ -10,8 +10,8 @@ import zhLocale from './zh'
 import esLocale from './es'
 import jaLocale from './ja'
 
-import esADempiere from './ADempiere/es'
-import enADempiere from './ADempiere/en'
+import esADempiere from './ADempiere/es/index.js'
+import enADempiere from './ADempiere/en/index.js'
 
 Vue.use(VueI18n)
 

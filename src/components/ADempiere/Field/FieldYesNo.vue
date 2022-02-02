@@ -15,14 +15,14 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-switch
     :ref="metadata.columnName"
     v-model="value"
-    :active-text="value ? $t('components.switchActiveText') : $t('components.switchInactiveText')"
+    :active-text="$t('components.switchActiveText')"
+    :inactive-text="$t('components.switchInactiveText')"
     :class="cssClassStyle"
-    :true-value="true"
-    :false-value="false"
     :disabled="isDisabled"
     @change="preHandleChange"
     @blur="focusLost"
@@ -31,16 +31,17 @@
 </template>
 
 <script>
-import { fieldIsDisplayed } from '@/utils/ADempiere'
-import { COLUMNS_READ_ONLY_FORM } from '@/utils/ADempiere/references'
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import { convertStringToBoolean } from '@/utils/ADempiere/valueFormat.js'
+
+import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
 export default {
   name: 'FieldYesNo',
+
   mixins: [
     fieldMixin
   ],
+
   computed: {
     cssClassStyle() {
       let styleClass = ' custom-field-yes-no '
@@ -48,18 +49,13 @@ export default {
         styleClass += this.metadata.cssClassName
       }
       return styleClass
-    },
-    columnReadOnlyForm() {
-      return COLUMNS_READ_ONLY_FORM.find(item => {
-        return item.columnName === this.metadata.columnName
-      })
     }
   },
+
   mounted() {
-    if (!this.isEmptyValue(this.columnReadOnlyForm)) {
-      this.isReadOnlyForm(this.value)
-    }
+    this.isReadOnlyForm(this.value)
   },
+
   methods: {
     parseValue(value) {
       return convertStringToBoolean(value)
@@ -67,32 +63,39 @@ export default {
     preHandleChange(value) {
       this.metadata.value = value
       this.handleFieldChange({ value })
-      if (!this.metadata.inTable && !this.metadata.isAdvancedQuery) {
-        this.isReadOnlyForm(this.value)
-      }
+
+      this.isReadOnlyForm(this.value)
     },
+
+    /**
+     * Set is read only form
+     * IsActive, Processed, Processing
+     * @param {boolean|string} value
+     */
     isReadOnlyForm(value) {
-      const fieldReadOnlyForm = this.columnReadOnlyForm
-
-      // columnName: IsActive, Processed, Processing
-      if (!this.isEmptyValue(fieldReadOnlyForm) && fieldIsDisplayed(this.metadata)) {
-        const fieldsExcludes = []
-        // if isChangedAllForm it does not exclude anything, otherwise it excludes this columnName
-        if (!fieldReadOnlyForm.isChangedAllForm) {
-          fieldsExcludes.push(this.metadata.columnName)
-        }
-
-        this.$store.dispatch('changeFieldAttributesBoolean', {
-          containerUuid: this.metadata.containerUuid,
-          fieldsIncludes: [],
-          attribute: 'isReadOnlyFromForm',
-          valueAttribute: Boolean(fieldReadOnlyForm.valueIsReadOnlyForm !== value),
-          fieldsExcludes,
-          currenValue: value
-        })
+      if (this.metadata.inTable ||
+        !this.metadata.isColumnReadOnlyForm ||
+        !this.metadata.displayed) {
+        return
       }
+
+      const fieldsExcludes = []
+      // if isChangedAllForm it does not exclude anything, otherwise it excludes this columnName
+      if (!this.metadata.isChangedAllForm) {
+        fieldsExcludes.push(this.metadata.columnName)
+      }
+
+      this.$store.dispatch('changeFieldAttributesBoolean', {
+        containerUuid: this.metadata.containerUuid,
+        fieldsIncludes: [],
+        attribute: 'isReadOnlyFromForm',
+        valueAttribute: Boolean(this.metadata.valueIsReadOnlyForm !== value),
+        fieldsExcludes,
+        currenValue: value
+      })
     }
   }
+
 }
 </script>
 

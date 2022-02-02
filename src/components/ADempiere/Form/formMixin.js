@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Edwin Betancourt edwinBetanc0urt@hotmail.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,21 +14,38 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Field from '@/components/ADempiere/Field'
+// components and mixins
+import FieldDefinition from '@/components/ADempiere/Field'
+
+// utils and helper methods
 import { createFieldFromDefinition, createFieldFromDictionary } from '@/utils/ADempiere/lookupFactory'
 
 export default {
   name: 'FormMixn',
+
   components: {
-    Field,
-    FieldDefinition: Field
+    FieldDefinition
   },
+
   props: {
     metadata: {
       type: Object,
       default: () => {}
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return true },
+        setDefaultValues: () => {}
+      })
     }
   },
+
   data() {
     let containerUuid = this.$route.meta.uuid
     if (!this.isEmptyValue(this.metadata)) {
@@ -49,25 +66,24 @@ export default {
       panelType: 'form'
     }
   },
+
   computed: {
     getterPanel() {
       return this.$store.getters.getPanel(this.containerUuid)
     }
   },
+
   created() {
     this.getPanel()
   },
+
   methods: {
     createFieldFromDefinition,
     createFieldFromDictionary,
     /**
-     * Using forms and events with the enter key prevents the page from reloading
-     * with @submit.native.prevent="notSubmitForm" in el-form component
+     * Vuex suscription
+     * @override
      */
-    notSubmitForm(event) {
-      event.preventDefault()
-      return false
-    },
     async getPanel() {
       const panel = this.getterPanel
       if (!this.isEmptyValue(panel)) {

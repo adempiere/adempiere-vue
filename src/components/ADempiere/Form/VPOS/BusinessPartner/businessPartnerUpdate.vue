@@ -15,10 +15,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-main
     v-loading="loading"
-    v-shortkey="showCustomer ? {close: ['esc'], enter: ['enter']} : {}"
+    v-shortkey="showCustomer ? { close: ['esc'], enter: ['enter'] } : {}"
     @shortkey.native="actionUpdate"
   >
     <el-form
@@ -43,6 +44,8 @@
                   ...field,
                   isReadOnly: validateCustomerTemplate
                 }"
+                :container-uuid="'Business-Partner-Update'"
+                :container-manager="containerManager"
               />
             </div>
           </el-card>
@@ -65,6 +68,28 @@
                 >
                   Editar
                 </el-button>
+                <!--<el-popover
+                  v-model="showPanelAddress"
+                  placement="left-start"
+                  :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
+                  width="600"
+                  trigger="click"
+                >
+                  {{ address.first_name }}
+                  <add-address
+                    :is-updated-address="showAddressUpdate"
+                    :address-to-update="addressUpdate"
+                    :shows-popovers="showAddressUpdate"
+                  />
+                  <el-button
+                    slot="reference"
+                    style="float: right; padding: 3px 0"
+                    type="text"
+                    @click="openEditAddress(address)"
+                  >
+                    Editar
+                  </el-button>
+                </el-popover>-->
               </div>
               <el-scrollbar wrap-class="scroll-customer-description">
                 <el-descriptions class="margin-top" :title="$t('form.pos.order.BusinessPartnerCreate.address.managementDescription')" :column="1">
@@ -73,10 +98,18 @@
                       {{ labelDirecction(address) }}
                     </el-tag>
                   </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.region')"> {{ labelAddress(address.region) }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.city')"> {{ labelAddress(address.city) }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.address')"> {{ address.address_1 }} </el-descriptions-item>
-                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.postCode')"> {{ address.postal_code }} </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.region')">
+                    {{ labelAddress(address.region) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.city')">
+                    {{ labelAddress(address.city) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.address')">
+                    {{ address.address_1 }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="$t('form.pos.order.BusinessPartnerCreate.address.postCode')">
+                    {{ address.postal_code }}
+                  </el-descriptions-item>
                 </el-descriptions>
               </el-scrollbar>
             </el-card>
@@ -104,14 +137,16 @@
     </el-form>
     <el-dialog
       :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
-      :visible.sync="showAddressUpdate"
+      :visible.sync="isShowModal"
+      :show-close="true"
+      :append-to-body="true"
+      :modal-append-to-body="true"
       :modal="false"
-      :show-close="false"
     >
       <add-address
         :is-updated-address="showAddressUpdate"
         :address-to-update="addressUpdate"
-        :shows-popovers="showAddNewAddress"
+        :shows-popovers="showAddressUpdate"
       />
     </el-dialog>
   </el-main>
@@ -122,7 +157,7 @@ import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
-import AddAddress from './addAddress'
+import AddAddress from './addAddress.vue'
 import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
 
 export default {
@@ -145,6 +180,18 @@ export default {
         }
       }
     },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
+    },
     showsPopovers: {
       type: Boolean,
       default: false
@@ -162,6 +209,7 @@ export default {
       isCustomForm: true,
       loading: true,
       index: 0,
+      isShowModal: false,
       isShowEditAddress: false,
       addressUpdate: {},
       currentCustomer: {},
@@ -189,8 +237,23 @@ export default {
         return value
       }
     },
-    showAddressUpdate() {
-      return this.$store.getters.getShowAddressUpdate
+    showAddressUpdate: {
+      get() {
+        return this.$store.getters.getShowAddressUpdate
+      },
+      set(value) {
+        this.$store.commit('setShowAddNewAddress', value)
+        return value
+      }
+    },
+    showPanelAddress: {
+      get() {
+        return this.$store.getters.getShowPanelAddress
+      },
+      set(value) {
+        this.$store.commit('setShowPanelAddress', value)
+        return value
+      }
     },
     fieldsListLocation() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
@@ -229,6 +292,9 @@ export default {
     showCustomer() {
       return this.$store.getters.getShowUpdateCustomer
     },
+    showUpdate() {
+      return this.$store.getters.getShowUpdateCustomer
+    },
     copyShippingAddress() {
       return this.$store.getters.getCopyShippingAddress
     },
@@ -250,6 +316,10 @@ export default {
   },
   methods: {
     requestGetCountryDefinition,
+    closePanelAddress() {
+      this.isShowModal = false
+      this.showPanelAddress = false
+    },
     actionUpdate(commands) {
       if (commands.srcKey) {
         switch (commands.srcKey) {
@@ -273,7 +343,9 @@ export default {
       this.shippingAddress.uuid = this.isEmptyValue(this.shipping) ? '' : this.shipping.uuid
       this.billingAddress.uuid = this.isEmptyValue(this.billing) ? '' : this.billing.uuid
       this.billingAddress.email = values.email
+      this.billingAddress.phone = values.phone
       this.shippingAddress.email = values.email
+      this.shippingAddress.phone = values.phone
       values.addresses = [this.billingAddress, this.shippingAddress]
       values.uuid = this.$store.getters.getValueOfField({
         containerUuid: this.$route.meta.uuid,
@@ -398,7 +470,7 @@ export default {
           value: this.isEmptyValue(customer.addresses) ? '' : customer.addresses[0].email
         }, {
           columnName: 'Phone',
-          value: this.isEmptyValue(customer.addresses) ? '' : customer.addresses[0].phone
+          value: this.isEmptyValue(customer.addresses) ? '' : this.isEmptyValue(customer.addresses[0].phone) ? customer.addresses[1].phone : customer.addresses[0].phone
         }, {
           columnName: 'Value',
           value: customer.value
@@ -506,7 +578,9 @@ export default {
       return ''
     },
     openEditAddress(address) {
+      this.showPanelAddress = true
       this.$store.commit('setShowAddressUpdate', true)
+      this.$store.commit('setShowPanelAddress', true)
       this.addressUpdate = address
       this.loadAddresses(address, 'Add-Location-Address')
       this.$store.commit('updateValueOfField', {

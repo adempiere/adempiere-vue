@@ -26,10 +26,10 @@
 <script>
 import { defineComponent } from '@vue/composition-api'
 
-import SmartBrowserView from '@/views/ADempiere/BrowserView'
+import SmartBrowserView from '@/views/ADempiere/Browser'
 
 export default defineComponent({
-  name: 'TestSmartBrowserView',
+  name: 'TestSmartBrowser',
 
   setup() {
     // Request Browser

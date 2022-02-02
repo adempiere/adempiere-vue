@@ -16,12 +16,26 @@
 
 import language from '@/lang'
 
+/**
+ * For lookup fields with context info
+ */
 export const infoOptionItem = {
   name: language.t('field.info'),
   enabled: true,
   svg: false,
   icon: 'el-icon-info',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/contextInfo')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/ContextInfo')
+}
+
+/**
+ * For zoom window of the field
+ */
+export const zoomInOptionItem = {
+  name: language.t('table.ProcessActivity.zoomIn'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-files',
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/EmptyOption')
 }
 
 /**
@@ -32,29 +46,18 @@ export const operatorOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-rank',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/operatorComparison')
-}
-
-/**
- * For lookup fields with context info
- */
-export const zoomInOptionItem = {
-  name: language.t('table.ProcessActivity.zoomIn'),
-  enabled: true,
-  svg: false,
-  icon: 'el-icon-files',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/contextInfo')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/OperatorComparison')
 }
 
 /**
  * Only when is translate option
  */
 export const translateOptionItem = {
-  name: language.t('language'),
+  name: language.t('fieldOptions.translation'),
   enabled: true,
   svg: true,
   icon: 'language',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/translated')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/TranslatedField')
 }
 
 /**
@@ -65,15 +68,15 @@ export const calculatorOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-s-operation',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/calculator')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/CalculatorField')
 }
 
-export const preferenceOptionItem = {
+export const preferenceValueOptionItem = {
   name: language.t('field.preference'),
   enabled: true,
   svg: false,
   icon: 'el-icon-notebook-2',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/preference')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/PreferenceValue')
 }
 
 export const logsOptionItem = {
@@ -81,7 +84,7 @@ export const logsOptionItem = {
   enabled: true,
   svg: true,
   icon: 'tree-table',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/changeLogs')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/ChangeLogs')
 }
 
 /**
@@ -92,12 +95,23 @@ export const documentStatusOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-set-up',
-  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/documentStatus')
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/DocumentStatus')
+}
+
+/**
+ * Hide only this field
+ */
+export const hideThisField = {
+  name: language.t('fieldOptions.hideThisField'),
+  enabled: true,
+  svg: true,
+  icon: 'eye',
+  componentRender: () => import('@/components/ADempiere/Field/FieldOptions/EmptyOption')
 }
 
 export const optionsListStandad = [
   infoOptionItem,
-  preferenceOptionItem,
+  preferenceValueOptionItem,
   logsOptionItem
 ]
 

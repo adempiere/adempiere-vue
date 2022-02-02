@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-form-item>
     <template slot="label">
@@ -30,11 +31,44 @@
               placement="left-start"
               width="900"
               trigger="click"
+              style="padding: 0px"
             >
-              <business-partner-create
-                :parent-metadata="parentMetadata"
-                :show-field="popoverCreateBusinessParnet"
-              />
+              <el-scrollbar wrap-class="scroll-child">
+                <business-partner-create
+                  :parent-metadata="parentMetadata"
+                  :show-field="popoverCreateBusinessParnet"
+                  :is-visible-address="isVisibleAddress"
+                />
+              </el-scrollbar>
+              <br>
+              <el-row :gutter="24">
+                <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
+                  <samp style="float: right; padding-right: 10px;">
+                    <el-checkbox v-model="isVisibleAddress">
+                      {{ $t('form.pos.order.BusinessPartnerCreate.addBillingAddress') }}
+                    </el-checkbox>
+                    <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
+                      {{ $t('form.byInvoice.copyShippingAddress') }}
+                    </el-checkbox>
+                  </samp>
+                </el-col>
+                <el-col :span="24">
+                  <samp style="float: right; padding-right: 10px;">
+                    <el-button
+                      type="primary"
+                      class="custom-button-create-bp"
+                      icon="el-icon-check"
+                      @click="createBusinessParter"
+                    />
+                    <el-button
+                      type="danger"
+                      class="custom-button-create-bp"
+                      icon="el-icon-close"
+                      @click="clearValues()"
+                    />
+                  </samp>
+                </el-col>
+              </el-row>
               <el-button
                 slot="reference"
                 type="text"
@@ -78,8 +112,9 @@
               v-if="!isEmptyValue(currentOrder)"
               v-model="showUpdate"
               placement="left-start"
-              width="900"
+              width="950"
               trigger="click"
+              style="padding: 0px; margin: 0px"
             >
               <business-partner-update
                 :shows-popovers="showUpdate"
@@ -94,7 +129,7 @@
                   class="el-icon-edit"
                   style="font-size: 22px"
                 />
-                Actualizar Socio de Negocio {{ selectAddress.first_name }}
+                Actualizar Socio de Negocio
               </el-button>
             </el-popover>
           </el-dropdown-item>
@@ -108,7 +143,9 @@
               <el-row>
                 <el-col :span="24">
                   <add-address
+                    v-if="showAddNewAddress"
                     :shows-popovers="showAddNewAddress"
+                    :address-to-update="selectCustomerValue"
                   />
                 </el-col>
               </el-row>
@@ -149,7 +186,9 @@
         </el-dropdown-menu>
       </el-dropdown>
     </template>
+
     <el-autocomplete
+      ref="displayBPartner"
       v-model="displayedValue"
       :placeholder="$t('quickAccess.searchWithEnter')"
       :fetch-suggestions="localSearch"
@@ -191,18 +230,28 @@
  * TODO: Before creating you must make a search for all the filled fields.
  */
 import { requestGetBusinessPartner } from '@/api/ADempiere/system-core.js'
-import BusinessPartnerCreate from './businessPartnerCreate'
+import BusinessPartnerCreate from './businessPartnerCreate.vue'
 import BusinessPartnerUpdate from './businessPartnerUpdate'
+import { createCustomer } from '@/api/ADempiere/form/point-of-sales.js'
 import AddAddress from './addAddress'
 // import FieldListBusinessPartner from './fieldBusinessPartners/index'
 import BusinessPartnersList from './businessPartnersList'
 import BParterMixin from './mixinBusinessPartner.js'
+
+// api request methods
+
+// utils and helper methods
 const { setBusinessPartner } = BParterMixin.methods
 const { searchBPartnerList } = BusinessPartnersList.methods
 import { trimPercentage } from '@/utils/ADempiere/valueFormat.js'
 
+/**
+ * This component is made to be the prototype of the Business Partner search field
+ * TODO: Before creating you must make a search for all the filled fields.
+ */
 export default {
   name: 'FieldBusinessPartner',
+
   components: {
     BusinessPartnerCreate,
     BusinessPartnersList,
@@ -210,6 +259,9 @@ export default {
     AddAddress
     // FieldListBusinessPartner
   },
+  mixins: [
+    BParterMixin
+  ],
   props: {
     parentMetadata: {
       type: Object,
@@ -229,6 +281,7 @@ export default {
       default: false
     }
   },
+
   data() {
     return {
       controlDisplayed: this.displayedValue,
@@ -237,14 +290,26 @@ export default {
       showFieldList: false,
       showCreate: false,
       visible: false,
-      selectAddress: '',
+      selectAddress: {},
       labelAddress: '',
       visibleAddress: false,
       customerValue: '',
-      selectCustomerValue: ''
+      oldValueCustomer: '',
+      visibleSelectAddress: false,
+      selectCustomerValue: {},
+      isVisibleAddress: false
     }
   },
+
   computed: {
+    copyShippingAddress: {
+      get() {
+        return this.$store.getters.getCopyShippingAddress
+      },
+      set(value) {
+        this.$store.dispatch('changeCopyShippingAddress', value)
+      }
+    },
     value: {
       get() {
         return this.$store.getters.getValueOfField({
@@ -261,17 +326,14 @@ export default {
       }
     },
     listAddress() {
-      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
-      const orderCustomer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
-      if (!this.isEmptyValue(templateCustomer) && templateCustomer.uuid !== orderCustomer.uud) {
-        return orderCustomer.addresses
+      if (!this.isEmptyValue(this.templateCustomer) && this.templateCustomer.uuid !== this.orderCustomer.uud) {
+        return this.orderCustomer.addresses
       }
       return []
     },
     listAddressCustomer() {
-      const orderCustomer = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
-      if (!this.isEmptyValue(orderCustomer.addresses)) {
-        return orderCustomer.addresses
+      if (!this.isEmptyValue(this.orderCustomer.addresses)) {
+        return this.orderCustomer.addresses
       }
       return []
     },
@@ -279,25 +341,48 @@ export default {
       get() {
         const display = this.$store.getters.getValueOfField({
           containerUuid: this.parentMetadata.containerUuid,
-          // DisplayColumn_'ColumnName'
           columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.displayColumnName
         })
-        if (display === undefined) {
-          return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer.name
+        if (this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid)) {
+          if (!this.isEmptyValue(this.oldValueCustomer) && !this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
+            return this.oldValueCustomerData + this.displayAddress(this.selectAddress.first_name)
+          }
+          if (!this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
+            return this.templateCustomerData + this.displayAddress(this.selectAddress.first_name)
+          }
+          return display
+        } else {
+          if (!this.isEmptyValue(this.oldValueCustomer) && !this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
+            return this.oldValueCustomerData + this.displayAddress(this.selectAddress.first_name)
+          }
+          if (!this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
+            return this.orderCustomerData + this.displayAddress(this.selectAddress.first_name)
+          }
+          return display
         }
-        if (this.isEmptyValue(this.selectAddress)) {
-          return this.customerValue + display
-        }
-        return this.customerValue + '-' + display + '-' + this.selectAddress.first_name
       },
       set(value) {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.parentMetadata.containerUuid,
-          // DisplayColumn_'ColumnName'
-          columnName: 'DisplayColumn_C_BPartner_ID', // this.parentMetadata.displayColumnName,
+          columnName: 'DisplayColumn_C_BPartner_ID',
           value
         })
       }
+    },
+    templateCustomer() {
+      return this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
+    },
+    templateCustomerData() {
+      return this.templateCustomer.value + ' - ' + this.templateCustomer.name
+    },
+    orderCustomer() {
+      return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner
+    },
+    orderCustomerData() {
+      return this.orderCustomer.value + ' - ' + this.orderCustomer.name
+    },
+    oldValueCustomerData() {
+      return this.oldValueCustomer.value + ' - ' + this.oldValueCustomer.name
     },
     recordsBusinessPartners() {
       return this.$store.getters.getBusinessPartnersList
@@ -364,11 +449,12 @@ export default {
     },
     updatedCustomerValue() {
       return this.$store.getters.posAttributes.currentPointOfSales.currentOrder.businessPartner.value
-    },
-    copyShippingAddress() {
-      return this.$store.getters.getCopyShippingAddress
     }
+    // copyShippingAddress() {
+    //   return this.$store.getters.getCopyShippingAddress
+    // }
   },
+
   watch: {
     popoverListBusinessParnet(value) {
       if (!value) {
@@ -405,9 +491,137 @@ export default {
       }
     }
   },
+
   methods: {
     setBusinessPartner,
     searchBPartnerList,
+    displayAddress(address) {
+      if (!this.isEmptyValue(address)) {
+        return ' - ' + address
+      }
+      return ''
+    },
+    changeShipping(value) {
+      this.$store.dispatch('changeCopyShippingAddress', value)
+    },
+    clearValues() {
+      this.$store.dispatch('changePopover', false)
+
+      this.$store.dispatch('setDefaultValues', {
+        containerUuid: this.containerUuid,
+        panelType: this.panelType
+      })
+      this.clearAddresses('Location-Address-Create')
+      this.clearAddresses('Shipping-Address')
+      this.clearDataCustomer(this.containerUuid)
+    },
+    createBusinessParter() {
+      const values = this.datesForm(this.$store.getters.getValuesView({
+        containerUuid: 'Business-Partner-Create',
+        format: 'object'
+      }))
+      const billingAddress = this.billingAddress
+      if (this.isEmptyValue(billingAddress.first_name)) {
+        const region = this.$store.getters.getValueOfField({
+          containerUuid: 'Billing-Address',
+          columnName: 'DisplayColumn_C_Region_ID'
+        })
+        const city = this.$store.getters.getValueOfField({
+          containerUuid: 'Billing-Address',
+          columnName: 'DisplayColumn_C_City_ID'
+        })
+        billingAddress.first_name = region + '/' + city
+      }
+      const validateValueCustomer = this.$store.getters.getValueOfField({
+        containerUuid: 'Business-Partner-Create',
+        columnName: 'Value'
+      })
+      this.billingAddress.email = values.email
+      this.billingAddress.phone = values.phone
+      this.shippingAddress.phone = values.phone
+      this.shippingAddress.email = values.email
+      if (this.isEmptyValue(validateValueCustomer)) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'Business-Partner-Create',
+          columnName: 'Value',
+          value: values.taxId
+        })
+        values.value = values.taxId
+      }
+      values.addresses = [this.billingAddress, this.shippingAddress]
+      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
+        containerUuid: this.containerUuid,
+        formatReturn: 'name'
+      })
+      if (this.isEmptyValue(emptyMandatoryFields)) {
+        this.isLoadingRecord = true
+        createCustomer(
+          values
+        )
+          .then(responseBPartner => {
+            // TODO: Add new record into vuex store.
+            this.setBusinessPartner(responseBPartner)
+            this.clearValues()
+            this.$message({
+              type: 'success',
+              message: this.$t('form.pos.order.BusinessPartnerCreate.businessPartner'),
+              duration: 1500,
+              showClose: true
+            })
+          })
+          .catch(error => {
+            this.showsPopovers.isShowCreate = true
+            this.$message({
+              type: 'warning',
+              message: error.message + 'Name',
+              duration: 1500,
+              showClose: true
+            })
+            console.warn(`Error create Business Partner. Message: ${error.message}, code ${error.code}.`)
+          })
+          .finally(() => {
+            this.isLoadingRecord = false
+          })
+      } else {
+        this.$message({
+          type: 'warn',
+          message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
+          duration: 1500,
+          showClose: true
+        })
+      }
+    },
+    datesForm(values) {
+      const valuesToSend = {}
+      Object.keys(values).forEach(key => {
+        const value = values[key]
+        if (this.isEmptyValue(value)) {
+          return
+        }
+        switch (key) {
+          case 'Value':
+            valuesToSend['value'] = value
+            break
+          case 'Name':
+            valuesToSend['name'] = value
+            break
+          case 'Name2':
+            valuesToSend['lastName'] = value
+            break
+          case 'TaxID':
+            valuesToSend['taxId'] = value
+            break
+          case 'Phone':
+            valuesToSend['phone'] = value
+            break
+          case 'EMail':
+            valuesToSend['email'] = value
+            break
+        }
+      })
+      valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
+      return valuesToSend
+    },
     handleCommandAddress(address) {
       this.selectAddress = address
     },
@@ -419,13 +633,15 @@ export default {
     },
     setNewDisplayedValue() {
       this.customerValue = ''
+      this.visibleSelectAddress = false
       const displayValue = this.displayedValue
       if (this.controlDisplayed !== displayValue) {
         this.controlDisplayed = displayValue
       }
     },
     setOldDisplayedValue() {
-      this.customerValue = this.selectCustomerValue
+      this.visibleSelectAddress = true
+      this.customerValue = this.isEmptyValue(this.updatedCustomerValue) ? this.updatedCustomerValue : this.updatedCustomerValue + ' - '
       if (this.controlDisplayed !== this.displayedValue) {
         this.displayedValue = this.controlDisplayed
       }
@@ -500,12 +716,14 @@ export default {
       })
     },
     handleSelect(selectedValue) {
+      this.oldValueCustomer = selectedValue
       let businessPartner = selectedValue
       if (this.isEmptyValue(businessPartner)) {
         businessPartner = this.blankBPartner
       }
+      this.selectAddress = {}
       this.customerValue = businessPartner.value
-      this.selectCustomerValue = businessPartner.value
+      this.selectCustomerValue = businessPartner
       this.setBusinessPartner(businessPartner, false)
     },
     onClose() {

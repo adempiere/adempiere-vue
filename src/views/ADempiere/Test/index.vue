@@ -22,11 +22,7 @@
     style="height: max-content !important;"
   >
     <el-header style="height: 39px;">
-      <context-menu
-        :menu-parent-uuid="$route.meta.parentUuid"
-        :container-uuid="metadata.containerUuid"
-        :panel-type="panelType"
-      />
+      <!-- TODO: Add action menu -->
     </el-header>
     <el-main>
       <el-row :gutter="20">
@@ -60,13 +56,10 @@
             <!-- emulated component form -->
 
           </el-card>
-          <div
+
+          <loading-view
             v-else
             key="form-loading"
-            v-loading="!isLoaded"
-            :element-loading-text="$t('notifications.loading')"
-            element-loading-background="rgba(255, 255, 255, 0.8)"
-            class="view-loading"
           />
         </el-col>
       </el-row>
@@ -75,18 +68,26 @@
 </template>
 
 <script>
-import formMixin from '@/components/ADempiere/Form/formMixin'
-import fieldsList from './fieldsList.js'
-import ContextMenu from '@/components/ADempiere/ContextMenu'
+// components and mixins
+import FormMixin from '@/components/ADempiere/Form/formMixin'
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+
+// constants
+import fieldsList from './fieldsList.js'
 
 export default {
   name: 'TestView',
+
   components: {
-    ContextMenu,
+    LoadingView,
     TitleAndHelp
   },
-  mixins: [formMixin],
+
+  mixins: [
+    FormMixin
+  ],
+
   props: {
     metadata: {
       type: Object,
@@ -98,6 +99,7 @@ export default {
       }
     }
   },
+
   data() {
     return {
       fieldsList,
@@ -105,12 +107,15 @@ export default {
       unsubscribe: () => {}
     }
   },
+
   created() {
     this.unsubscribe = this.subscribeChanges()
   },
+
   beforeDestroy() {
     this.unsubscribe()
   },
+
   methods: {
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {

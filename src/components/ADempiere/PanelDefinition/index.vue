@@ -19,13 +19,15 @@
 <template>
   <component
     :is="componentRender"
+    :parent-uuid="parentUuid"
     :container-uuid="containerUuid"
+    :container-manager="containerManager"
     :panel-metadata="metadata"
   />
 </template>
 
 <script>
-import { defineComponent, computed } from '@vue/composition-api'
+import { defineComponent, computed, ref } from '@vue/composition-api'
 
 export default defineComponent({
   name: 'PanelDefinition',
@@ -39,6 +41,10 @@ export default defineComponent({
       type: String,
       required: true
     },
+    containerManager: {
+      type: Object,
+      required: true
+    },
     panelMetadata: {
       type: Object,
       required: false
@@ -46,12 +52,17 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
-    const storedMetadata = computed(() => {
-      return root.$store.getters.getPanel(props.containerUuid)
-    })
+    const metadata = ref({})
+
+    if (root.$route.query.action === 'create-new') {
+      props.containerManager.setDefaultValues({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid
+      })
+    }
 
     const componentRender = computed(() => {
-      return () => import('@/components/ADempiere/PanelDefinition/StandardPanel')
+      return () => import('@/components/ADempiere/PanelDefinition/StandardPanel.vue')
     })
 
     /**
@@ -59,22 +70,9 @@ export default defineComponent({
      * the fields it contains
      */
     const getPanel = () => {
-      let panel = storedMetadata.value
-      if (root.isEmptyValue(panel)) {
-        // not in store, set with prop
-        panel = props.panelMetadata
-      }
-      if (!root.isEmptyValue(panel) && panel.fieldsList) {
-        // not regenerate fields
-        return
-      }
-
-      // generate fields and set into store
-      root.$store.dispatch('getFieldsFromTab', {
-        parentUuid: props.parentUuid,
-        containerUuid: props.containerUuid,
-        panelMetadata: panel
-      })
+      // generated panel properties
+      // set panel genereated
+      metadata.value = props.panelMetadata
     }
 
     getPanel()
@@ -82,7 +80,7 @@ export default defineComponent({
     return {
       // computeds
       componentRender,
-      metadata: storedMetadata
+      metadata
     }
   }
 })

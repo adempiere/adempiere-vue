@@ -17,30 +17,54 @@
 -->
 
 <template>
-  <el-main style="padding: 0px !important; overflow: hidden;">
+  <el-main class="default-table">
+    <el-row>
+      <el-col :span="23">
+        <el-input
+          v-model="valueToSearch"
+          clearable
+          size="mini"
+          class="input-search"
+        >
+          <i
+            slot="prefix"
+            class="el-icon-search el-input__icon"
+          />
+        </el-input>
+      </el-col>
+      <el-col :span="1">
+        <columns-display-option
+          :option="currentOption"
+        />
+      </el-col>
+    </el-row>
+
     <el-table
       ref="multipleTable"
-      style="width: 100%"
+      style="width: 100%; height: 88% !important;"
       border
+      height="90% !important"
       :row-key="keyColumn"
       reserve-selection
       highlight-current-row
-      :data="[]"
+      :data="recordsWithFilter"
       :element-loading-text="$t('notifications.loading')"
       element-loading-background="rgba(255, 255, 255, 0.8)"
       @row-click="handleRowClick"
+      @select="handleSelection"
+      @select-all="handleSelectionAll"
     >
       <!-- column with the checkbox -->
       <el-table-column
+        v-if="isTableSelection"
         type="selection"
         :prop="keyColumn"
         fixed
         min-width="50"
       />
 
-      <template v-for="(fieldAttributes, key) in fieldsList">
+      <template v-for="(fieldAttributes, key) in headerList">
         <el-table-column
-          v-if="isDisplayed(fieldAttributes)"
           :key="key"
           :label="headerLabel(fieldAttributes)"
           :column-key="fieldAttributes.columnName"
@@ -52,7 +76,10 @@
           <template slot-scope="scope">
             <!-- formatted displayed value -->
             <cell-info
+              :container-uuid="containerUuid"
               :field-attributes="fieldAttributes"
+              :container-manager="containerManager"
+              :scope="scope"
               :data-row="scope.row"
             />
           </template>
@@ -62,7 +89,7 @@
 
     <!-- pagination table, set custom or use default change page method -->
     <custom-pagination
-      :total="0"
+      :total="recordCount"
       :current-page="1"
       :selection="0"
       :handle-change-page="handleChangePage"
@@ -71,20 +98,24 @@
 </template>
 
 <script>
-import { defineComponent, computed } from '@vue/composition-api'
+import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
 
-import FieldDefinition from '@/components/ADempiere/Field'
-import CellInfo from './CellInfo'
-import CustomPagination from '@/components/ADempiere/Pagination'
-import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils'
+// components and mixins
+import CellInfo from './CellInfo.vue'
+import ColumnsDisplayOption from './ColumnsDisplayOption'
+import CustomPagination from './CustomPagination.vue'
+
+// utils and helper methods
+import { isLookup } from '@/utils/ADempiere/references'
+import { tableColumnDataType } from '@/utils/ADempiere/valueUtils'
 
 export default defineComponent({
   name: 'DefaultTable',
 
   components: {
     CellInfo,
-    CustomPagination,
-    FieldDefinition
+    ColumnsDisplayOption,
+    CustomPagination
   },
 
   props: {
@@ -95,53 +126,90 @@ export default defineComponent({
     containerUuid: {
       type: String,
       required: true
+    },
+    containerManager: {
+      type: Object,
+      required: true
+    },
+    panelMetadata: {
+      type: Object,
+      required: true
+    },
+    // get the table header
+    header: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+    dataTable: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
+    recordCount: {
+      type: Number,
+      default: 0
+    },
+    // Show check column from selection row
+    isTableSelection: {
+      type: Boolean,
+      default: true
     }
   },
 
-  setup(props, { root }) {
-    const panelMetadata = computed(() => {
-      return root.$store.getters.getPanel(props.containerUuid)
+  setup(props, { root, refs }) {
+    const valueToSearch = ref('')
+
+    const currentOption = computed(() => {
+      return root.$store.getters.getTableOption
     })
 
     const keyColumn = computed(() => {
-      if (panelMetadata.value) {
-        return panelMetadata.value.keyColumn
+      if (props.panelMetadata) {
+        return props.panelMetadata.keyColumn
       }
+      return undefined
     })
 
-    const fieldsList = computed(() => {
-      const panel = panelMetadata.value
-      if (panel && panel.fieldsList) {
-        return panel.fieldsList
-      }
-      return []
+    const headerList = computed(() => {
+      return props.header.filter(fieldItem => {
+        return isDisplayed(fieldItem) &&
+          // fieldItem.isShowedTableFromUser &&
+          tableColumnDataType(fieldItem, currentOption.value)
+      })
     })
 
-    const handleRowClick = (row, column, event) => {
-      // this.currentTable = this.recordsData.findIndex(item => item.UUID === row.UUID)
-      // if (this.uuidCurrentRecordSelected !== row.UUID) {
-      //   this.uuidCurrentRecordSelected = row.UUID
-      //   // disabled rollback when change route
-      //   // root.$store.dispatch('setDataLog', {})
-      // }
-      const tableName = panelMetadata.value.tableName
-      // TODO: Replace with general dispatch to set current record
-      root.$router.push({
-        name: root.$route.name,
-        query: {
-          ...root.$route.query,
-          action: row.UUID
-        },
-        params: {
-          ...root.$router.params,
-          tableName,
-          recordId: row[`${tableName}_ID`]
-        }
-      }, () => {})
-      // root.$store.commit('setCurrentRecord', row)
+    /**
+     * Selection columns to be taken into account during the search
+     */
+    const selectionColumns = computed(() => {
+      const displayColumnsName = []
+      const columnsName = props.header
+        .filter(fieldItem => {
+          return fieldItem.isSelectionColumn
+        }).map(fieldItem => {
+          if (isLookup(fieldItem.diplayType)) {
+            displayColumnsName.push(fieldItem.displayColumnName)
+          }
+          return fieldItem.columnName
+        })
+      return columnsName.concat(displayColumnsName)
+    })
+
+    function handleRowClick(row, column, event) {
+      props.containerManager.seekRecord({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        row,
+        tableName: props.panelMetadata.tableName
+      })
+
+      if (!row.isEditRow) {
+        row.isEditRow = true
+      }
     }
 
-    const headerLabel = (field) => {
+    function headerLabel(field) {
       if (field.isMandatory || field.isMandatoryFromLogic) {
         return '* ' + field.name
       }
@@ -152,28 +220,126 @@ export default defineComponent({
     /**
      * Verify is displayed column/field in table
      */
-    const isDisplayed = (field) => {
-      return fieldIsDisplayed(field, true)
+    function isDisplayed(field) {
+      // validate with container manager
+      return props.containerManager.isDisplayedColumn(field)
     }
 
     /**
      * custom method to handle change page
      */
-    const handleChangePage = () => {
-      return
+    function handleChangePage(pageNumber) {
+      props.containerManager.setPage({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        pageNumber
+      })
     }
 
+    // get table data
+    const recordsWithFilter = computed(() => {
+      if (!root.isEmptyValue(valueToSearch.value)) {
+        return props.dataTable.filter(row => {
+          return selectionColumns.value.some(columnName => {
+            const value = !root.isEmptyValue(row[columnName]) ? row[columnName].toString() : ''
+            const search = valueToSearch.value
+            if (value) {
+              return value
+                .trim()
+                .toLowerCase()
+                .includes(
+                  search
+                    .trim()
+                    .toLowerCase()
+                )
+            }
+          })
+        })
+      }
+      return props.dataTable
+    })
+
+    function handleSelection(selections, rowSelected) {
+      props.containerManager.setSelection({
+        containerUuid: props.containerUuid,
+        recordsSelected: selections
+      })
+    }
+
+    function handleSelectionAll(selections) {
+      props.containerManager.setSelection({
+        containerUuid: props.containerUuid,
+        recordsSelected: selections
+      })
+    }
+
+    /**
+     * Select or unselect rows
+     * USE ONLY MOUNTED
+     */
+    function toggleSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          refs.multipleTable.toggleRowSelection(row)
+        })
+      } else {
+        refs.multipleTable.clearSelection()
+      }
+    }
+
+    onMounted(() => {
+      if (props.isTableSelection) {
+        const selectionsList = props.containerManager.getSelection({
+          containerUuid: props.containerUuid
+        })
+
+        toggleSelection(selectionsList)
+      }
+    })
+
     return {
+      // data
+      valueToSearch,
       // computeds
+      headerList,
+      recordsWithFilter,
+      currentOption,
       keyColumn,
-      panelMetadata,
-      fieldsList,
       // methods
       headerLabel,
       handleChangePage,
       handleRowClick,
+      handleSelection,
+      handleSelectionAll,
       isDisplayed
     }
   }
 })
 </script>
+
+<style lang="scss">
+.default-table {
+  padding: 0px !important;
+  display: contents;
+  height: 50% !important;
+  overflow: hidden;
+
+  .input-search {
+    width: 100%;
+    padding-right: 20px;
+    margin-right: 20px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+  }
+
+  .el-table__cell {
+    // height table row
+    padding: 0px !important;
+  }
+
+  .el-table--scrollable-y .el-table__body-wrapper {
+    overflow-y: auto;
+    height: 90% !important;
+  }
+}
+</style>

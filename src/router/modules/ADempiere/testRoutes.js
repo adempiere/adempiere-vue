@@ -53,12 +53,12 @@ const testRoutes = [
   },
 
   {
-    path: '/test/multitab/window',
+    path: '/test/window/multitab',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: '/test/multitab/window',
+        path: '/test/window/multitab',
         component: () => import('@/views/ADempiere/Test/MultiTabWindow'),
         name: 'Multi Tab Window View',
         meta: {

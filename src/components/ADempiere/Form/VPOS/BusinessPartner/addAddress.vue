@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-col :span="24">
     <el-card class="box-card" shadow="never" style="height: 350px;">
@@ -29,6 +30,8 @@
             :ref="fieldsList[0].columnName"
             :metadata="fieldsList[0]"
             :value-model="fieldsList[0].value"
+            :container-uuid="'New-Address'"
+            :container-manager="containerManager"
           />
         </el-row>
       </div>
@@ -69,11 +72,17 @@
 </template>
 
 <script>
+// constants
+import fieldsList from '@/components/ADempiere/Field/FieldLocation/fieldsList.js'
+
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import fieldsList from './fieldListBillingAddress.js'
 import BParterMixin from './mixinBusinessPartner.js'
 import FieldLocation from './AddNewFieldLocation'
+
+// api request methods
 import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
+
 export default {
   name: 'AddAddress',
   components: {
@@ -113,6 +122,18 @@ export default {
     showsPopovers: {
       type: Boolean,
       default: false
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {
@@ -193,13 +214,18 @@ export default {
     showCustomer(value) {
       this.getCustomer()
     },
+    showsPopovers(value) {
+      const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
+      if (value && this.isEmptyValue(this.addressToUpdate) && !this.isEmptyValue(templateCustomer)) {
+        this.clearAddresses()
+        this.loadAddresses(templateCustomer.addresses[0])
+      } else if (value && !this.isEmptyValue(this.addressToUpdate)) {
+        this.loadAddresses(this.addressToUpdate)
+      }
+    },
     isUpdatedAddress(value) {
       if (value && !this.isEmptyValue(this.addressToUpdate)) {
-        this.$store.commit('updateValueOfField', {
-          containerUuid: 'Add-Location-Address',
-          columnName: 'C_Country_ID',
-          value: this.addressToUpdate.country_id
-        })
+        this.loadAddresses(this.addressToUpdate)
       }
     }
   },
@@ -215,6 +241,87 @@ export default {
         .then(response => {
           this.currentCustomer = response
         })
+    },
+    loadAddresses(address) {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid: 'Add-Location-Address',
+        attributes: [{
+          columnName: 'C_Country_ID',
+          value: address.country_id
+        }, {
+          columnName: 'C_Country_ID_UUID',
+          value: address.country_uuid
+        }, {
+          columnName: 'C_Region_ID',
+          value: !this.isEmptyValue(address.region) ? address.region.id : ''
+        }, {
+          columnName: 'C_Region_ID_UUID',
+          value: !this.isEmptyValue(address.region) ? address.region.uuid : ''
+        }, {
+          columnName: 'DisplayColumn_C_Region_ID',
+          value: !this.isEmptyValue(address.region) ? address.region.name : ''
+        }, {
+          columnName: 'C_City_ID',
+          value: this.isEmptyValue(address.city.id) ? '' : address.city.id
+        }, {
+          columnName: 'C_City_ID_UUID',
+          value: this.isEmptyValue(address.city.uuid) ? '' : address.city.uuid
+        }, {
+          columnName: 'DisplayColumn_C_City_ID',
+          value: this.isEmptyValue(address.city.name) ? '' : address.city.name
+        }, {
+          columnName: 'Address1',
+          value: address.address_1
+        }, {
+          columnName: 'Address2',
+          value: address.address_2
+        }, {
+          columnName: 'Address3',
+          value: address.address_3
+        }, {
+          columnName: 'Address4',
+          value: address.address_4
+        }, {
+          columnName: 'Postal',
+          value: address.postal_code
+        }, {
+          columnName: 'Name',
+          value: address.first_name
+        }]
+      })
+    },
+    clearAddresses() {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid: 'Add-Location-Address',
+        attributes: [{
+          columnName: 'C_Country_ID',
+          value: undefined
+        }, {
+          columnName: 'C_Region_ID',
+          value: undefined
+        }, {
+          columnName: 'C_City_ID',
+          value: undefined
+        }, {
+          columnName: 'Address1',
+          value: undefined
+        }, {
+          columnName: 'Address2',
+          value: undefined
+        }, {
+          columnName: 'Address3',
+          value: undefined
+        }, {
+          columnName: 'Address4',
+          value: undefined
+        }, {
+          columnName: 'Postal',
+          value: undefined
+        }, {
+          columnName: 'Name',
+          value: undefined
+        }]
+      })
     },
     addressForm(values) {
       const valuesToSend = {}
@@ -287,7 +394,7 @@ export default {
         addresses = [
           {
             ...values,
-            uuid: this.addressToUpdate.uuid,
+            uuid: this.isEmptyValue(this.addressToUpdate) ? '' : this.addressToUpdate.uuid,
             is_default_billing: false,
             is_default_shipping: this.isShippingAddress
           },
@@ -301,13 +408,15 @@ export default {
         addresses = [
           {
             ...values,
-            uuid: !this.isEmptyValue(this.addressToUpdate) ? this.addressToUpdate.uuid : '',
+            uuid: this.isEmptyValue(this.addressToUpdate) ? '' : this.addressToUpdate.uuid,
             is_default_billing: this.isBillingAddress,
             is_default_shipping: this.isShippingAddress
           }
         ]
       }
       const newAddress = { uuid: customer.uuid, value: customer.value, taxId: customer.taxId, name: customer.name, addresses, posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid }
+      newAddress.uuid = this.isEmptyValue(customer.uuid) ? this.$store.getters.getValueOfField({ containerUuid: this.$route.meta.uuid, columnName: 'C_BPartner_ID_UUID' }) : customer.uuid
+      newAddress.value = this.isEmptyValue(customer.value) ? this.addressToUpdate.value : customer.value
       updateCustomer(newAddress)
         .then(response => {
           const orderUuid = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid
@@ -330,6 +439,7 @@ export default {
         })
     },
     close() {
+      this.clearAddresses()
       this.$store.commit('setShowAddressUpdate', false)
       this.$store.dispatch('changeShowUpdateCustomer', false)
       this.$store.commit('setShowAddNewAddress', false)

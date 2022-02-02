@@ -30,17 +30,18 @@
       <div v-if="caseOrder === 1">
         <el-form>
           <el-form-item>
-            <el-radio v-model="option" :label="1"> {{ $t('form.pos.collect.overdrawnInvoice.returned') }} {{ formatPrice(change, currency.iSOCode) }} </el-radio>
+            <el-radio v-model="option" :label="1"> {{ $t('form.pos.collect.overdrawnInvoice.returned') }} {{ formatPrice(currentOrder.refundAmount, currency.iSOCode) }} </el-radio>
             <el-radio v-model="option" :label="3"> {{ $t('form.pos.collect.overdrawnInvoice.returnMoney') }}</el-radio>
             <el-radio v-model="option" :label="4"> {{ $t('form.pos.collect.overdrawnInvoice.adjustDocument') }}</el-radio>
           </el-form-item>
         </el-form>
-        <el-card v-if="option === 1" class="box-card">
+        <el-empty v-if="option === 1 && isEmptyValue(paymentTypeListRefund)" :description="$t('form.pos.optionsPoinSales.emptyAvailablePaymentMethods')" />
+        <el-card v-else-if="option === 1" class="box-card">
           <div slot="header" class="clearfix">
-            <span v-if="isEmptyValue(selectionTypeRefund)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
+            <span v-if="isEmptyValue(currentFieldPaymentMethods)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <template v-else>
               <span>
-                {{ selectionTypeRefund.name }}
+                {{ currentPaymentMethods }}
               </span>
               <span style="float: right;text-align: end">
                 <b>
@@ -66,6 +67,8 @@
                       ...fieldsList[0],
                       labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
                     }"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
                 <el-col :span="8">
@@ -107,6 +110,8 @@
                 >
                   <field-definition
                     :metadata-field="field"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
               </el-row>
@@ -129,7 +134,7 @@
           </div>
         </el-card>
         <type-collection
-          v-if="!isEmptyValue(listPaymentsRefund) && option === 1"
+          v-if="!isEmptyValue(listRefund) && option === 1"
           id="cardCollection"
           :is-add-type-pay="listPaymentsRefund"
           :currency="pointOfSalesCurrency"
@@ -156,18 +161,21 @@
                     v-if="field.sequence < 3"
                     :key="field.columnName"
                     :metadata-field="field"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
               </el-row>
             </el-form>
           </div>
         </el-card>
-        <el-card v-if="option === 3" class="box-card">
+        <el-empty v-if="option === 3 && isEmptyValue(paymentTypeList)" :description="$t('form.pos.optionsPoinSales.emptyAvailablePaymentMethodsRefudn')" />
+        <el-card v-else-if="option === 3" class="box-card">
           <div slot="header" class="clearfix">
-            <span v-if="isEmptyValue(selectionTypeRefund)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
+            <span v-if="isEmptyValue(currentFieldPaymentMethods)">{{ $t('form.pos.collect.overdrawnInvoice.above') }}</span>
             <template v-else>
               <span>
-                {{ selectionTypeRefund.name }}
+                {{ currentPaymentMethods }}
               </span>
               <span style="float: right;text-align: end">
                 <b>
@@ -193,6 +201,8 @@
                       ...fieldsList[0],
                       labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
                     }"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
                 <el-col :span="8">
@@ -251,6 +261,8 @@
                 >
                   <field-definition
                     :metadata-field="field"
+                    :container-uuid="'OverdrawnInvoice'"
+                    :container-manager="containerManager"
                   />
                 </el-col>
               </el-row>
@@ -260,7 +272,7 @@
               type="success"
               icon="el-icon-plus"
               :disabled="validPay && (currentOrder.refundAmount === 0)"
-              @click="addPostPayment"
+              @click="validateSubsequentPayment()"
             />
             <el-button
               style="float: right;margin-left: 9px;margin-right: 5px;"
@@ -297,6 +309,31 @@
           </el-form>
         </el-card>
       </div>
+      <el-dialog ref="dialog" :title="$t('form.pos.pinMessage.pin') + $t('form.pos.collect.overdrawnInvoice.amountLimitOrder')" width="40%" :visible.sync="visiblePin" :append-to-body="true">
+        <el-input
+          id="pin"
+          ref="pinPostPayment"
+          v-model="pinPostPayment"
+          v-shortkey="visiblePin ? {close: ['esc'], enter: ['enter']} : {}"
+          autofocus
+          type="password"
+          :placeholder="$t('form.pos.tableProduct.pin')"
+          :focus="true"
+          @shortkey.native="theActionPin"
+        />
+        <span style="float: right;">
+          <el-button
+            type="danger"
+            icon="el-icon-close"
+            @click="closePinPayment()"
+          />
+          <el-button
+            type="primary"
+            icon="el-icon-check"
+            @click="openPinPayment(pin)"
+          />
+        </span>
+      </el-dialog>
       <span slot="footer" class="dialog-footer">
         <el-button
           type="danger"
@@ -323,6 +360,7 @@ import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOverdrawnInvoice from './fieldsListOverdrawnInvoice.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
+import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 // import typeRefund from './typeRefund/index.vue'
 
 export default {
@@ -364,6 +402,18 @@ export default {
           containerUuid: 'OverdrawnInvoice'
         }
       }
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
   data() {
@@ -375,22 +425,23 @@ export default {
       currentFieldCurrency: '',
       currentFieldPaymentMethods: '',
       currentPaymentType: '',
+      visiblePin: false,
+      pinPostPayment: '',
+      refundOptionVAlidate: {},
       currentBankAccount: ''
     }
   },
   computed: {
     validateOverdrawnInvoice() {
       if (this.option === 1) {
-        return this.isEmptyValue(this.listPaymentsRefund)
+        return this.isEmptyValue(this.listRefund)
       } else if (this.option === 3) {
-        return this.isEmptyValue(this.listRefundsReference)
+        return this.isEmptyValue(this.listRefund)
       }
       return false
     },
     listRefund() {
-      const refund = this.$store.getters.getListRefund.filter(refund => refund.isRefund)
-      const listRefundsReference = this.$store.getters.getListRefundReference
-      const list = listRefundsReference.concat(refund)
+      const list = this.listRefundsReference.concat(this.listPaymentsRefund)
       return list
     },
     listRefundsReference() {
@@ -402,6 +453,9 @@ export default {
         return listServer.filter(payment => payment.isRefund)
       }
       return []
+    },
+    listAllPayments() {
+      return this.$store.getters.getListRefund
     },
     hiddenFieldsList() {
       return this.fieldsList.filter(field => {
@@ -427,6 +481,15 @@ export default {
       return {
         name: ''
       }
+    },
+    currentPaymentMethods() {
+      if (!this.isEmptyValue(this.currentFieldPaymentMethods)) {
+        const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+        if (!this.isEmptyValue(payment)) {
+          return payment.name
+        }
+      }
+      return ''
     },
     componentRender() {
       let typePay
@@ -479,6 +542,12 @@ export default {
       return this.$store.state['pointOfSales/payments/index'].dialogoInvoce.type
     },
     maximumRefundAllowed() {
+      if (!this.isEmptyValue(this.currentFieldPaymentMethods)) {
+        const currency = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+        if (!this.isEmptyValue(currency)) {
+          return currency.maximum_refund_allowed
+        }
+      }
       if (!this.isEmptyValue(this.selectionTypeRefund) && !this.isEmptyValue(this.selectionTypeRefund.maximum_refund_allowed) && this.selectionTypeRefund.maximum_refund_allowed > 0) {
         return this.selectionTypeRefund.maximum_refund_allowed
       }
@@ -491,6 +560,12 @@ export default {
       return this.paymentTypeListRefund
     },
     maximumDailyRefundAllowed() {
+      if (!this.isEmptyValue(this.currentFieldPaymentMethods)) {
+        const currency = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+        if (!this.isEmptyValue(currency)) {
+          return currency.maximum_daily_refund_allowed
+        }
+      }
       if (!this.isEmptyValue(this.selectionTypeRefund) && !this.isEmptyValue(this.selectionTypeRefund.maximum_daily_refund_allowed) && this.selectionTypeRefund.maximum_daily_refund_allowed > 0) {
         return this.selectionTypeRefund.maximum_daily_refund_allowed
       }
@@ -605,7 +680,14 @@ export default {
     validPay() {
       const containerUuid = this.metadata.containerUuid
       // filter by visible fields
+      const amount = this.$store.getters.getValueOfField({
+        containerUuid,
+        columnName: 'PayAmt'
+      })
       const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
+      if (amount <= 0) {
+        return true
+      }
       const fieldsEmpty = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid,
         fieldsList: fieldLogic,
@@ -614,9 +696,6 @@ export default {
       const paymentMethods = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
       if (!this.isEmptyValue(paymentMethods) && paymentMethods.tender_type === 'X') {
         return false
-      }
-      if (this.isEmptyValue(this.currentFieldPaymentMethods)) {
-        return this.isEmptyValue(this.currentFieldPaymentMethods)
       }
       if (this.isEmptyValue(fieldsEmpty)) {
         return false
@@ -632,12 +711,17 @@ export default {
   },
   watch: {
     searchRefundCurrency(value) {
+      const clear = false
+      this.clearAccountData(clear)
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       if (this.isEmptyValue(value) && this.showDialogo) {
         this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
       }
     },
     option(value) {
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      const clear = false
+      this.clearAccountData(clear)
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       this.selectionTypeRefund = {}
       if (value === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
         this.selectPayment(this.paymentTypeListRefund[0])
@@ -648,9 +732,19 @@ export default {
       if (value === 3) {
         this.$store.dispatch('listCustomerBankAccounts', { customerUuid: this.currentOrder.businessPartner.uuid })
       }
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'OverdrawnInvoice',
+        columnName: 'PayAmt',
+        value: this.refundAmount / this.dayRate.divideRate
+      })
     },
     showDialogo(value) {
       if (value) {
+        this.$store.commit('updateValueOfField', {
+          containerUuid: 'OverdrawnInvoice',
+          columnName: 'PayAmt',
+          value: this.refundAmount / this.dayRate.divideRate
+        })
         if (this.option === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
           this.selectPayment(this.paymentTypeListRefund[0])
         }
@@ -679,12 +773,18 @@ export default {
         columnName: 'PayAmt',
         value: value / this.dayRate.divideRate
       })
+    },
+    currentBankAccount(value) {
+      if (this.isEmptyValue(value)) {
+        const clear = false
+        this.clearAccountData(clear)
+      }
     }
   },
   mounted() {
     const containerUuid = 'OverdrawnInvoice'
-    this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
-    this.selectionTypeRefund = {}
+    this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
+    this.selectionTypeRefund = this.paymentTypeListRefund[0]
     this.$store.commit('updateValueOfField', {
       containerUuid,
       columnName: 'PayAmt',
@@ -694,6 +794,31 @@ export default {
   methods: {
     formatPrice,
     formatDateToSend,
+    sumRefund(cash) {
+      let sum = 0
+      if (!this.isEmptyValue(cash)) {
+        cash.forEach((pay) => {
+          sum += pay.amount
+        })
+      }
+      return sum
+    },
+    showDayRateAmount(rate) {
+      const currency = this.listCurrency.find(currency => !this.isEmptyValue(rate) && currency.uuid === rate)
+      const convert = this.convertionsList.find(convert => {
+        if (!this.isEmptyValue(currency) && !this.isEmptyValue(convert.currencyTo) && currency.id === convert.currencyTo.id && this.currentPointOfSales.currentPriceList.currency.id !== currency.id) {
+          return convert
+        }
+      })
+      if (!this.isEmptyValue(convert)) {
+        return convert
+      }
+      return {
+        currencyTo: this.currentPointOfSales.currentPriceList.currency,
+        divideRate: 1,
+        iSOCode: this.currentPointOfSales.currentPriceList.currency.iSOCode
+      }
+    },
     addPostPayment(customerBankAccountUuid) {
       const values = this.$store.getters.getValuesView({
         containerUuid: 'OverdrawnInvoice',
@@ -709,14 +834,11 @@ export default {
       })
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
       const refund = this.convertValuesToSend(values)
-      if (refund.amount > this.currentOrder.refundAmount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
-          duration: 1500,
-          showClose: true
-        })
-        return
+      let account = this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+      if (this.isEmptyValue(refund.AccountNo) && payment.tender_type === 'Z') {
+        account = refund.email
+      } else if (this.isEmptyValue(refund.AccountNo) && payment.tender_type === 'P') {
+        account = refund.phone
       }
       const currencySelected = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       if (this.isEmptyValue(this.currentBankAccount)) {
@@ -727,12 +849,12 @@ export default {
           email: refund.email,
           driverLicense: value,
           socialSecurityNumber: value,
-          name: nameAccount,
+          name: this.isEmptyValue(nameAccount) ? this.currentOrder.businessPartner.name + '-' + this.currentPaymentMethods : nameAccount + '-' + this.currentPaymentMethods,
           bankAccountType: refund.bankAccountType,
           bankUuid: refund.bankUuid,
           paymentMethodUuid: payment.uuid,
           isAch: true,
-          AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+          AccountNo: account
         })
           .then(response => {
             this.$store.dispatch('refundReference', {
@@ -750,7 +872,7 @@ export default {
               bankUuid: refund.bankID,
               paymentMethodUuid: payment.uuid,
               isAch: true,
-              AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+              AccountNo: account
             })
           })
         this.clearAccountData()
@@ -771,19 +893,122 @@ export default {
         bankUuid: refund.bankAccountType,
         paymentMethodUuid: payment.uuid,
         isAch: true,
-        AccountNo: this.isEmptyValue(refund.AccountNo) ? refund.phone : refund.AccountNo
+        AccountNo: account
       })
       this.clearAccountData()
       return
     },
-
+    validateSubsequentPayment() {
+      const values = this.$store.getters.getValuesView({
+        containerUuid: 'OverdrawnInvoice',
+        format: 'object'
+      })
+      const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
+      const referencePaymentCurrency = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
+      const refund = this.convertValuesToSend(values)
+      const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
+      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', fieldsList: fieldLogic, isValidate: true, formatReturn: 'name' })
+      if (!this.isEmptyValue(this.fieldLogic) && !this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency)) {
+        this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
+        this.$message({
+          type: 'warning',
+          message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
+          duration: 1500,
+          showClose: true
+        })
+        return
+      }
+      if ((refund.amount / this.showDayRateAmount(referencePaymentCurrency.uuid).multiplyRate) > this.currentOrder.refundAmount) {
+        this.$message({
+          type: 'warning',
+          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
+          duration: 1500,
+          showClose: true
+        })
+        return
+      }
+      const filterPayment = this.listRefund.filter(list => {
+        if (list.paymentMethodUuid === payment.uuid || list.payment_method_uuid === payment.uuid) {
+          return list
+        }
+      })
+      const allPayMaximunRefund = this.sumRefund(filterPayment)
+      if (refund.amount > this.maximumRefundAllowed || (this.maximumRefundAllowed - allPayMaximunRefund) < refund.amount) {
+        this.visiblePin = true
+        setTimeout(() => {
+          this.$refs.pinPostPayment.focus()
+        }, 500)
+        return
+      }
+      this.addPostPayment()
+    },
+    theActionPin(event) {
+      if (this.visiblePin) {
+        switch (event.srcKey) {
+          case 'enter':
+            this.openPinPayment(this.pinPostPayment)
+            break
+          case 'close':
+            this.closePinPayment()
+            break
+        }
+      }
+    },
+    openPinPayment(pin) {
+      validatePin({
+        posUuid: this.currentPointOfSales.uuid,
+        pin: this.pinPostPayment
+      })
+        .then(response => {
+          this.pinPostPayment = ''
+          this.visiblePin = false
+          this.$message({
+            type: 'success',
+            message: 'Acción a realizar',
+            showClose: true
+          })
+          if (!this.isEmptyValue(this.refundOptionVAlidate)) {
+            this.$store.dispatch('sendCreateCustomerAccount', this.refundOptionVAlidate)
+          } else {
+            this.addPostPayment()
+          }
+        })
+        .catch(error => {
+          console.error(error.message)
+          this.$message({
+            type: 'error',
+            message: error.message,
+            showClose: true
+          })
+          this.pinPostPayment = ''
+        })
+        .finally(() => {
+          this.visiblePin = false
+          this.pinPostPayment = ''
+          this.refundOptionVAlidate = {}
+        })
+    },
+    closePinPayment() {
+      this.visiblePin = false
+      this.refundOptionVAlidate = {}
+      this.pinPostPayment = ''
+    },
     selectedBanckAccount(value) {
+      const fieldBank = this.fieldsList.find(fields => fields.columnName === 'C_Bank_ID')
+      let listBank
+      if (!this.isEmptyValue(fieldBank) && fieldBank.reference) {
+        listBank = this.$store.getters.getLookupList({
+          containerUuid: this.metadata.containerUuid,
+          query: fieldBank.reference.query,
+          tableName: fieldBank.reference.tableName
+        })
+      }
       const account = this.bankAccountList.find(banck => banck.customer_bank_account_uuid === value)
       this.$store.dispatch('listRefunds', {
         posUuid: this.currentPointOfSales.uuid,
-        customerUuid: this.customer_uuid,
         orderUuid: this.currentOrder.uuid
       })
+      account.bank = this.isEmptyValue(listBank) || this.isEmptyValue(account.bank_uuid) ? { uuid: '', id: 0, labe: '' } : listBank.find(bank => bank.uuid === account.bank_uuid)
       this.uploadAccountData(account)
     },
     convertValuesToSend(values) {
@@ -859,11 +1084,23 @@ export default {
           },
           {
             columnName: 'AccountNo',
-            value: value.routing_no
+            value: value.account_no
+          },
+          {
+            columnName: 'Phone',
+            value: value.account_no
+          },
+          {
+            columnName: 'C_Bank_ID',
+            value: value.bank.id
           },
           {
             columnName: 'C_Bank_ID_UUID',
-            value: value.bank_uuid
+            value: value.bank.uuid
+          },
+          {
+            columnName: 'DisplayColumn_C_Bank_ID',
+            value: value.bank.label
           },
           {
             columnName: 'BankAccountType',
@@ -876,7 +1113,7 @@ export default {
         ]
       })
     },
-    clearAccountData() {
+    clearAccountData(clear = true) {
       const containerUuid = 'OverdrawnInvoice'
       this.$store.commit('updateValuesOfContainer', {
         containerUuid,
@@ -898,6 +1135,10 @@ export default {
             value: undefined
           },
           {
+            columnName: 'DisplayColumn_C_Bank_ID',
+            value: undefined
+          },
+          {
             columnName: 'BankAccountType',
             value: undefined
           },
@@ -915,7 +1156,9 @@ export default {
           }
         ]
       })
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      if (clear) {
+        this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
+      }
     },
     undoPatment() {
       const list = this.listPaymentsRefund[this.listPaymentsRefund.length - 1]
@@ -926,7 +1169,7 @@ export default {
         orderUuid,
         paymentUuid
       })
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
     },
     empty(value, params) {
       if (this.isEmptyValue(value[params])) {
@@ -958,6 +1201,36 @@ export default {
         containerUuid,
         columnName: 'ReferenceNo'
       })
+      const filterPayment = this.listRefund.filter(payment => payment.paymentMethodUuid === paymentMethodUuid || payment.payment_method_uuid === paymentMethodUuid)
+      const allPayMaximunRefund = this.sumRefund(filterPayment)
+      if ((amount * this.dayRate.divideRate) > this.currentOrder.refundAmount) {
+        this.$message({
+          type: 'warning',
+          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
+          duration: 1500,
+          showClose: true
+        })
+        return
+      }
+      if (this.maximumRefundAllowed < amount || (this.maximumRefundAllowed - allPayMaximunRefund) < amount) {
+        this.visiblePin = true
+        setTimeout(() => {
+          this.$refs.pinPostPayment.focus()
+        }, 500)
+        this.refundOptionVAlidate = {
+          posUuid,
+          orderUuid,
+          bankUuid,
+          referenceNo,
+          amount: amount,
+          convertedAmount: amount * this.dayRate.divideRate,
+          paymentDate,
+          tenderTypeCode,
+          paymentMethodUuid,
+          currencyUuid
+        }
+        return
+      }
       this.$store.dispatch('sendCreateCustomerAccount', {
         posUuid,
         orderUuid,
@@ -970,7 +1243,7 @@ export default {
         paymentMethodUuid,
         currencyUuid
       })
-      this.currentFieldPaymentMethods = this.searchPaymentMethods[0].uuid
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
     },
     actionOverdrawnInvoice(commands) {
       if (commands.srcKey === 'close') {
@@ -1017,29 +1290,9 @@ export default {
         containerUuid: this.renderComponentContainer,
         format: 'object'
       })
-      const customer = {
-        customerAccount: values,
-        currencyUuid: this.$store.getters.getCurrencyRedund.uuid,
-        orderUuid: this.currentOrder.uuid,
-        posUuid: this.currentPointOfSales.uuid,
-        tenderTypeCode: this.selectionTypeRefund.tender_type
-      }
       const posUuid = this.currentPointOfSales.uuid
       const orderUuid = this.currentOrder.uuid
       const payments = this.currentOrder.listPayments.payments
-      const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: this.renderComponentContainer, formatReturn: 'name' })
-      if (this.caseOrder === 1 && (!this.isEmptyValue(emptyMandatoryFields) || this.isEmptyValue(this.refundReferenceCurrency))) {
-        this.isEmptyValue(this.$store.getters.getCurrencyRedund.uuid) ? emptyMandatoryFields.push(this.$t('form.pos.collect.Currency')) : emptyMandatoryFields
-        if (this.option !== 4) {
-          this.$message({
-            type: 'warning',
-            message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
-            duration: 1500,
-            showClose: true
-          })
-          return
-        }
-      }
       Object.keys(values).forEach(element => {
         this.$store.commit('updateValueOfField', {
           containerUuid: this.renderComponentContainer,
@@ -1057,19 +1310,7 @@ export default {
         this.success()
         return
       }
-      this.$store.dispatch('addCreateCustomerAccount', {
-        posUuid,
-        customer,
-        orderUuid,
-        bankUuid: customer.C_Bank_ID_UUID,
-        amount: this.round(this.change / this.dayRate.divideRate, this.defaultReferenceCurrency.standard_precision),
-        tenderTypeCode: this.selectionTypeRefund.tender_type,
-        paymentMethodUuid: this.selectionTypeRefund.uuid,
-        currencyUuid: this.defaultReferenceCurrency.uuid
-      })
-        .then(response => {
-          this.success()
-        })
+      this.success()
     },
     success() {
       const customerDetails = []
@@ -1092,6 +1333,7 @@ export default {
     },
     close() {
       this.selectionTypeRefund = {}
+      this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
       this.$store.commit('dialogoInvoce', { show: false })
     },
     changeCurrency(value) {
@@ -1181,18 +1423,13 @@ export default {
               this.visible = true
               this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
             } else {
-              this.$store.dispatch('sendCreateCustomerAccount', this.$store.getters.getAddRefund)
-                .then(response => {
-                  if (response.type === 'success') {
-                    this.completePreparedOrder(posUuid, orderUuid, payments)
-                    this.$message({
-                      type: 'success',
-                      message: this.$t('notifications.completed'),
-                      showClose: true
-                    })
-                    this.$store.commit('dialogoInvoce', { show: false, success: true })
-                  }
-                })
+              this.completePreparedOrder(posUuid, orderUuid, payments)
+              this.$message({
+                type: 'success',
+                message: this.$t('notifications.completed'),
+                showClose: true
+              })
+              this.$store.commit('dialogoInvoce', { show: false, success: true })
             }
           } else {
             this.$message({
@@ -1245,8 +1482,8 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
-        createPayments: !this.isEmptyValue(payments),
-        payments: payments
+        createPayments: !this.isEmptyValue(this.listAllPayments),
+        payments: this.listAllPayments
       })
         .then(response => {
           this.$store.dispatch('printTicket', { posUuid, orderUuid })

@@ -38,7 +38,8 @@ export default {
   createOrder({ commit, dispatch, rootGetters }, {
     posUuid,
     customerUuid,
-    documentTypeUuid
+    documentTypeUuid,
+    warehouseUuid
   }) {
     const { currentPriceList, currentWarehouse, defaultCampaignUuid } = rootGetters.posAttributes.currentPointOfSales
     return createOrder({

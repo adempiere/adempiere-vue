@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div class="wrapper">
     <el-form
@@ -24,14 +25,18 @@
       class="location-address"
       @shortkey.native="keyAction"
     >
-      <el-row :gutter="24">
+      <el-row :gutter="0">
         <template v-if="isLoaded">
           <el-col v-for="(field) in fieldsListLocation" :key="field.columnName" :span="12">
-            <field
+            <field-definition
+              :parent-uuid="parentUuid"
+              :container-uuid="containerUuid"
+              :container-manager="containerManagerLocation"
               :metadata-field="field"
             />
           </el-col>
         </template>
+
         <div
           v-else
           key="form-loading"
@@ -42,6 +47,7 @@
           style="min-height: calc(50vh - 84px)"
           class="loading-panel"
         />
+
         <el-col v-show="!parentMetadata.pos" :span="24" style="padding-left: 12px;padding-right: 12px;padding-top: 3%;padding-bottom: 3%;">
           <samp style="float: right; padding-right: 10px;">
             <el-button
@@ -55,7 +61,7 @@
               type="danger"
               class="custom-button-address-location"
               icon="el-icon-close"
-              @click="setShowedLocationForm(false)"
+              @click="cancelChanges"
             />
           </samp>
         </el-col>
@@ -65,33 +71,47 @@
 </template>
 
 <script>
+// components and mixins
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
-import mixinLocation from './mixinLocation.js'
-import fieldsList from './fieldsList.js'
+import mixinLocation, { LOCATION_ADDRESS_FORM } from './mixinLocation.js'
+
+// constants
+import FieldsList from './fieldsList.js'
+
+// api request methods
 import {
   createLocationAddress,
   updateLocationAddress
 } from '@/api/ADempiere/field/location.js'
+
+// utils and helper methods
 import { showNotification } from '@/utils/ADempiere/notification.js'
 import { getSequenceAsList } from '@/utils/ADempiere/location'
 
 /**
- * TODO: Add sequence fields by country selected
+ * Location Address form to field
  */
 export default {
   name: 'LocationAdressFrom',
+
   mixins: [
     formMixin,
     mixinLocation
   ],
+
   props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
     metadata: {
       type: Object,
       default: () => {
         return {
           // TODO: Add container uuid parent
-          uuid: 'Location-Address-Create',
-          containerUuid: 'Location-Address-Create'
+          uuid: LOCATION_ADDRESS_FORM,
+          containerUuid: LOCATION_ADDRESS_FORM,
+          isSetDefaultValues: false
         }
       }
     },
@@ -105,19 +125,32 @@ export default {
       default: () => {}
     }
   },
+
   data() {
     return {
-      fieldsList,
-      isCustomForm: true,
-      request: 0
+      fieldsList: FieldsList,
+      isCustomForm: true
     }
   },
+
   computed: {
+    containerManagerLocation() {
+      return {
+        ...this.containerManager,
+
+        getFieldsList({ containerUuid, root }) {
+          return root.$store.getters.getFieldLocation
+        }
+      }
+    },
     fieldsListLocation() {
       if (!this.isEmptyValue(this.$store.getters.getFieldLocation)) {
         return this.$store.getters.getFieldLocation
       }
-      return this.fieldsList
+
+      // return this.fieldsList
+
+      return this.getterPanel.fieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({
@@ -127,14 +160,17 @@ export default {
       })
     }
   },
+
   created() {
-    if (this.parentMetadata.pos) {
-      this.fieldsList.forEach(element => {
-        element.containerUuid = this.parentMetadata.containerUuid
+    this.unsubscribe = this.subscribeChanges()
+
+    if (!this.isEmptyValue(this.values)) {
+      this.setValues({
+        values: this.values
       })
     }
-    this.unsubscribe = this.subscribeChanges()
   },
+
   mounted() {
     if (this.parentMetadata.pos) {
       this.fieldsList.forEach(element => {
@@ -143,75 +179,109 @@ export default {
     }
     this.getLocation()
   },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
+
   methods: {
     keyAction(event) {
       if (event.srcKey === 'closeForm') {
         this.toggleShowedLocationForm()
       }
     },
+    cancelChanges() {
+      // TODO: Set old values
+      this.isShowedLocationForm = false
+    },
     sortSequence(itemA, itemB) {
       return itemA.index - itemB.index
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
-        const withOutColumnNames = ['C_Country_ID', 'DisplayColumn_C_Country_ID', 'C_Location_ID']
+        // when first load country field with value
+        if (
+          mutation.type === 'setLookupItem' &&
+          mutation.payload.containerUuid === this.metadata.containerUuid &&
+          mutation.payload.tableName === 'C_Country'
+        ) {
+          this.changeCaptureSequence(mutation.payload.value)
+        }
 
-        if (mutation.type === 'updateValueOfField' &&
-          mutation.payload.containerUuid === this.parentMetadata.containerUuid) {
-          if (mutation.payload.columnName === 'C_Country_ID') {
-            const values = []
-            // Get country definition to sequence fields and displayed value
-            if (mutation.payload.value !== this.currentCountryDefinition.countryId) {
-              this.requestGetCountryDefinition({
-                id: mutation.payload.value
+        // if changed country field
+        if (
+          mutation.type === 'updateValueOfField' &&
+          mutation.payload.containerUuid === this.metadata.containerUuid &&
+          mutation.payload.columnName === 'C_Country_ID'
+        ) {
+          const withOutColumnNames = ['C_Country_ID', 'DisplayColumn_C_Country_ID', 'C_Location_ID']
+          // Get country definition to sequence fields and displayed value
+          this.changeCaptureSequence(mutation.payload.value)
+
+          // clear values
+          const values = []
+          FieldsList.forEach(item => {
+            if (!withOutColumnNames.includes(item.columnName)) {
+              values.push({
+                columnName: item.columnName,
+                value: undefined
               })
-                .then(responseCountry => {
-                  const newSequence = getSequenceAsList(responseCountry.captureSequence)
-                  const newFieldsList = this.fieldsList.map(item => {
-                    if (newSequence.includes(item.sequenceFields)) {
-                      return {
-                        ...item,
-                        isDisplayed: true,
-                        index: newSequence.indexOf(item.sequenceFields)
-                      }
-                    }
-                    return {
-                      ...item,
-                      isDisplayed: false
-                    }
-                  })
-                  this.$store.dispatch('changeSequence', newFieldsList.sort(this.sortSequence))
-                })
-                .catch(error => {
-                  this.$message({
-                    message: error.message,
-                    isShowClose: true,
-                    type: 'error'
-                  })
-                  console.warn(`Error getting Country Definition: ${error.message}. Code: ${error.code}.`)
-                })
             }
+            if (!withOutColumnNames.includes(item.displayColumnName)) {
+              values.push({
+                columnName: item.displayColumnName,
+                value: undefined
+              })
+            }
+          })
 
-            fieldsList.forEach(item => {
-              if (!withOutColumnNames.includes(item.columnName)) {
-                values.push({
-                  columnName: item.columnName,
-                  value: undefined
-                })
-              }
-            })
-
-            this.setValues({
-              values,
-              withOutColumnNames
-            })
-          }
+          this.setValues({
+            values,
+            withOutColumnNames
+          })
         }
       })
     },
+
+    /**
+     * Change fields order
+     * @param {number} countryId
+     */
+    changeCaptureSequence(countryId) {
+      this.$store.dispatch('getCountryDefinition', {
+        id: countryId
+      })
+        .then(responseCountry => {
+          // capture sequence by form fields
+          const newSequence = getSequenceAsList(responseCountry.captureSequence)
+          const newFieldsList = this.fieldsListLocation.map(item => {
+            if (newSequence.includes(item.sequenceFields)) {
+              return {
+                ...item,
+                isDisplayed: true,
+                index: newSequence.indexOf(item.sequenceFields)
+              }
+            }
+            return {
+              ...item,
+              isDisplayed: false
+            }
+          }).sort((itemA, itemB) => {
+            return itemA.index - itemB.index
+          })
+
+          this.$store.dispatch('changeSequence', newFieldsList)
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error getting Country Definition: ${error.message}. Code: ${error.code}.`)
+        })
+    },
+
+    /**
+     * set context values to parent continer
+     * @param {object} values
+     */
     setParentValues(values) {
       const {
         parentUuid,
@@ -234,39 +304,53 @@ export default {
         columnName: displayColumnName,
         value: this.getDisplayedValue(values)
       })
-
-      this.$store.commit('updateValueOfField', {
-        parentUuid,
-        containerUuid,
-        columnName: 'Postal',
-        value: values.Postal
-      })
-
-      this.$store.commit('updateValueOfField', {
-        parentUuid,
-        containerUuid,
-        columnName: 'C_Country_ID',
-        value: values.C_Country_ID
-      })
-
-      this.$store.commit('updateValueOfField', {
-        parentUuid,
-        containerUuid,
-        columnName: 'C_City_ID',
-        value: values.C_City_ID
-      })
-
-      // active update record to server
-      // this.$store.dispatch('notifyFieldChange', {
-      //   containerUuid,
-      //   field: this.parentMetadata
-      // })
     },
+
+    /**
+     * Get attributes list to server
+     * @returns {array} attributesToServer
+     */
+    getAttributesToServer(attributesList) {
+      const attributesToServer = attributesList
+        .filter(attributeItem => {
+          const { columnName } = attributeItem
+          if (columnName.includes('DisplayColumn_') || columnName === 'C_Location_ID') {
+            return false
+          }
+          return true
+        })
+
+      const cityName = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'DisplayColumn_C_City_ID'
+      })
+      if (!this.isEmptyValue(cityName)) {
+        attributesToServer.push({
+          columnName: 'City',
+          value: cityName
+        })
+      }
+
+      const regionName = this.$store.getters.getValueOfField({
+        containerUuid: this.containerUuid,
+        columnName: 'DisplayColumn_C_Region_ID'
+      })
+      if (!this.isEmptyValue(cityName)) {
+        attributesToServer.push({
+          columnName: 'RegionName',
+          value: regionName
+        })
+      }
+
+      return attributesToServer
+    },
+
     sendValuesToServer() {
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: this.containerUuid,
         formatReturn: 'name'
       })
+
       if (!this.isEmptyValue(emptyMandatoryFields)) {
         showNotification({
           type: 'warning',
@@ -278,21 +362,10 @@ export default {
         return
       }
 
-      const locationId = this.locationId
-
       const attributes = this.$store.getters.getValuesView({
         containerUuid: this.containerUuid
       })
-      const attributesToServer = attributes.filter(attributeItem => {
-        const { columnName } = attributeItem
-        if (columnName.includes('DisplayColumn_')) {
-          return false
-        }
-        if (columnName === 'C_Location_ID') {
-          return false
-        }
-        return true
-      })
+      const attributesToServer = this.getAttributesToServer(attributes)
 
       const updateLocation = (responseLocation) => {
         // set form values
@@ -302,23 +375,44 @@ export default {
 
         // set field parent values
         this.setParentValues(responseLocation.attributes)
-        this.setShowedLocationForm(false)
+        this.isShowedLocationForm = false
 
-        // set context values to parent continer
-        if (this.parentMetadata.isSendParentValues) {
-          this.$store.dispatch('updateValuesOfContainer', {
-            parentUuid: this.parentMetadata.parentUuid,
-            containerUuid: this.parentMetadata.containerUuid,
-            attributes
-          })
-        }
+        // set context values to form continer
+        this.$store.dispatch('updateValuesOfContainer', {
+          parentUuid: this.parentUuid,
+          containerUuid: this.containerUuid,
+          attributes
+        })
+
+        return responseLocation.attributes
       }
 
+      const locationId = this.locationId
       if (this.isEmptyValue(locationId) || locationId === 0) {
         createLocationAddress({
           attributesList: attributesToServer
         })
           .then(updateLocation)
+          .then(responseCreate => {
+            const {
+              parentUuid,
+              containerUuid,
+              columnName // 'C_Location_ID' by default
+            } = this.parentMetadata
+
+            const recordUuid = this.$store.getters.getValueOfField({
+              parentUuid,
+              containerUuid,
+              columnName: 'UUID'
+            })
+
+            this.containerManager.actionPerformed({
+              containerUuid,
+              field: this.parentMetadata,
+              value: responseCreate[columnName],
+              recordUuid
+            })
+          })
           .catch(error => {
             this.$message({
               message: error.message,
@@ -343,10 +437,12 @@ export default {
           })
           console.warn(`Error update Location Address: ${error.message}. Code: ${error.code}.`)
         })
-      this.$store.dispatch('changeSequence', fieldsList)
     },
+    /**
+     * TODO: Manage with vuex module
+     */
     getLocation() {
-      if (this.request > 0) {
+      if (this.isGettingLocation) {
         return
       }
 
@@ -362,6 +458,7 @@ export default {
         return
       }
 
+      this.isGettingLocation = true
       this.getLocationAddress({
         id
       })
@@ -371,10 +468,12 @@ export default {
           this.setValues({
             values
           })
-          this.request++
         })
         .catch(error => {
           console.warn(`Get Location Address, Form Location - Error ${error.code}: ${error.message}.`)
+        })
+        .finally(() => {
+          this.isGettingLocation = false
         })
     }
   }
