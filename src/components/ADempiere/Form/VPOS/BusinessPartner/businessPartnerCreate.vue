@@ -38,7 +38,7 @@
               </div>
               <div class="text item">
                 <field-definition
-                  v-for="(field) in datos"
+                  v-for="(field) in metaDataFromList"
                   :ref="field.columnName"
                   :key="field.columnName"
                   :metadata-field="field"
@@ -55,40 +55,8 @@
             <shipping-address v-if="!copyShippingAddress" />
           </el-scrollbar>
         </el-row>
-        <!-- <el-row :gutter="24">
-          <el-col :span="24" style="padding-left: 12px;padding-right: 12px;padding-bottom: 15px;">
-            <samp style="float: right; padding-right: 10px;">
-              <el-checkbox v-model="isVisibleAddress">
-                {{ $t('form.pos.order.BusinessPartnerCreate.addBillingAddress') }}
-              </el-checkbox>
-              <el-checkbox v-model="copyShippingAddress" @change="changeShipping">
-                {{ $t('form.byInvoice.copyShippingAddress') }}
-              </el-checkbox>
-            </samp>
-          </el-col>
-        </el-row> -->
       </el-form>
     </el-main>
-    <!-- <el-footer>
-      <el-row :gutter="24">
-        <el-col :span="24">
-          <samp style="float: right; padding-right: 10px;">
-            <el-button
-              type="primary"
-              class="custom-button-create-bp"
-              icon="el-icon-check"
-              @click="createBusinessParter"
-            />
-            <el-button
-              type="danger"
-              class="custom-button-create-bp"
-              icon="el-icon-close"
-              @click="clearValues()"
-            />
-          </samp>
-        </el-col>
-      </el-row>
-    </el-footer> -->
   </el-container>
 </template>
 
@@ -170,7 +138,7 @@ export default {
       }
       return this.fieldsList.filter(field => field.tabindex > 2)
     },
-    datos() {
+    metaDataFromList() {
       return this.fieldsList
     },
     adviserPin() {

@@ -55,16 +55,16 @@
                 <el-col :span="24">
                   <samp style="float: right; padding-right: 10px;">
                     <el-button
-                      type="primary"
-                      class="custom-button-create-bp"
-                      icon="el-icon-check"
-                      @click="createBusinessParter"
-                    />
-                    <el-button
                       type="danger"
                       class="custom-button-create-bp"
                       icon="el-icon-close"
                       @click="clearValues()"
+                    />
+                    <el-button
+                      type="primary"
+                      class="custom-button-create-bp"
+                      icon="el-icon-check"
+                      @click="createBusinessParter"
                     />
                   </samp>
                 </el-col>
