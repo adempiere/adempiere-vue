@@ -19,18 +19,18 @@
 <template>
   <div
     v-if="isLoaded"
-    style="height: 100% !important;"
+    style="height: 100% !important;display: -webkit-box;"
     @click="focusProductValue"
   >
 
     <img
       fit="contain"
-      :src="backgroundForm"
+      :src="defaultImage"
       class="background-price-checking"
-      style="z-index: 5;"
+      style="z-index: 5;display: flex;"
     >
     <el-container style="height: 100% !important;">
-      <el-main>
+      <el-main style="display: contents">
         <el-form
           key="form-loaded"
           class="inquiry-form"
@@ -142,6 +142,18 @@ export default {
     parentUuid: {
       type: String,
       default: undefined
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
     }
   },
 
@@ -204,6 +216,14 @@ export default {
     }
   },
 
+  beforeMount() {
+    this.unsubscribe = this.subscribeChanges()
+  },
+
+  beforeDestroy() {
+    this.unsubscribe()
+  },
+
   mounted() {
     this.backgroundForm = this.defaultImage
     this.getImageFromSource(this.organizationImagePath)
@@ -245,9 +265,11 @@ export default {
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
+        console.log({ mutation, state })
         if ((mutation.type === 'currentPointOfSales') || (mutation.type === 'setListProductPrice') || (mutation.type === 'addFocusLost')) {
           this.focusProductValue()
         }
+        console.log(mutation.type, mutation.payload.columnName, 'ProductValue', this.productPrice.upc, mutation.payload.value)
         if ((mutation.type === 'addActionKeyPerformed') && mutation.payload.columnName === 'ProductValue' && (this.productPrice.upc !== mutation.payload.value)) {
           // cleans all values except column name 'ProductValue'
           this.search = mutation.payload.value

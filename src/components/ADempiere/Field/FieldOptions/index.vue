@@ -222,7 +222,6 @@ export default defineComponent({
       if (typeValue(window) === 'ARRAY') {
         window = window[0]
       }
-
       let value = valueField.value
       let columnName = props.metadata.columnName
       // TODO: Evaluate reference.keyColumnName

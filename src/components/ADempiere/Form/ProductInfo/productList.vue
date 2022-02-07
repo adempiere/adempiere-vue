@@ -82,7 +82,6 @@
       <el-table-column
         :label="$t('form.productInfo.quantityAvailable')"
         align="right"
-        width="100"
       >
         <template slot-scope="scope">
           {{ formatQuantity(scope.row.quantityAvailable) }}
@@ -99,7 +98,6 @@
       <el-table-column
         :label="$t('form.productInfo.taxAmount')"
         align="right"
-        width="200"
       >
         <template slot-scope="scope">
           {{ formatPrice(getTaxAmount(scope.row.priceStandard, scope.row.taxRate.rate), scope.row.currency.iSOCode) }}
@@ -108,7 +106,6 @@
       <el-table-column
         :label="$t('form.productInfo.grandTotal')"
         align="right"
-        width="300"
       >
         <template slot-scope="scope">
           {{ formatPrice(getTaxAmount(scope.row.priceStandard, scope.row.taxRate.rate) + scope.row.priceStandard, scope.row.currency.iSOCode) }}
