@@ -196,7 +196,6 @@ export default {
         }
       })
       if (convert) {
-        console.log(convert)
         return convert
       }
       return {}
@@ -265,11 +264,9 @@ export default {
     },
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
-        console.log({ mutation, state })
         if ((mutation.type === 'currentPointOfSales') || (mutation.type === 'setListProductPrice') || (mutation.type === 'addFocusLost')) {
           this.focusProductValue()
         }
-        console.log(mutation.type, mutation.payload.columnName, 'ProductValue', this.productPrice.upc, mutation.payload.value)
         if ((mutation.type === 'addActionKeyPerformed') && mutation.payload.columnName === 'ProductValue' && (this.productPrice.upc !== mutation.payload.value)) {
           // cleans all values except column name 'ProductValue'
           this.search = mutation.payload.value
