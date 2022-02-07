@@ -64,7 +64,8 @@ export default {
     recordLocked: 'This record has been locked',
     recordUnlocked: 'This record has been unlocked',
     noRoleAccess: 'With your current role and settings, you cannot view this information.',
-    errorPointOfSale: 'No point of sale selected'
+    errorPointOfSale: 'No point of sale selected',
+    emptyPos: 'This User has no Assigned POS Terminal'
   },
   navbar: {
     badge: {

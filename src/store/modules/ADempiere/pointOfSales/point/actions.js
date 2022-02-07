@@ -27,6 +27,7 @@ import {
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
+import language from '@/lang'
 
 /**
  * Pos Actions
@@ -74,17 +75,25 @@ export default {
     })
       .then(response => {
         pointOfSalesList = response.sellingPointsList
-        if (isEmptyValue(pos) && isEmptyValue(posToSet)) {
+        if (isEmptyValue(pos) && isEmptyValue(posToSet) && !isEmptyValue(pointOfSalesList)) {
           pos = pointOfSalesList.find(itemPOS => itemPOS.salesRepresentative.uuid === userUuid)
         }
-        if (isEmptyValue(pos)) {
+        if (isEmptyValue(pos) && !isEmptyValue(pointOfSalesList)) {
           pos = pointOfSalesList[0]
         }
-        if (!isEmptyValue(router.app._route.query.pos)) {
-          pos = response.sellingPointsList.find(point => point.id === parseInt(router.app._route.query.pos))
+        if (!isEmptyValue(router.app._route.query.pos) && !isEmptyValue(pointOfSalesList)) {
+          pos = pointOfSalesList.find(point => point.id === parseInt(router.app._route.query.pos))
         }
         commit('setPointOfSalesList', pointOfSalesList)
-        dispatch('setCurrentPOS', pos)
+        if (pos) {
+          dispatch('setCurrentPOS', pos)
+        } else {
+          showMessage({
+            type: 'error',
+            message: language.t('notifications.emptyPos'),
+            showClose: true
+          })
+        }
       })
       .catch(error => {
         console.warn(`listPointOfSalesFromServer: ${error.message}. Code: ${error.code}.`)

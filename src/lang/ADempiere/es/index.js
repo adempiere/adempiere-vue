@@ -64,7 +64,8 @@ export default {
     recordLocked: 'Este registro ha sido bloqueado',
     recordUnlocked: 'Este registro ha sido desbloqueado',
     noRoleAccess: 'Con su rol y configuración actuales, no puede ver esta información.',
-    errorPointOfSale: 'Sin punto de venta seleccionado'
+    errorPointOfSale: 'Sin punto de venta seleccionado',
+    emptyPos: 'Este Usuario no tiene Ningún Terminal de PDV Asignado'
   },
   navbar: {
     badge: {
