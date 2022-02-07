@@ -107,6 +107,36 @@ export default [
       isMandatory: true
     }
   },
+  // WHDocumentNo
+  {
+    elementColumnName: 'WHDocumentNo',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 10,
+      handleActionKeyPerformed: true,
+      handleContentSelection: true,
+      handleActionPerformed: true,
+      displayLogicPayment: 'ISLR',
+      size: 24,
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
+  // WH_Type_ID
+  {
+    elementColumnName: 'WH_Type_ID',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      sequence: 11,
+      handleActionKeyPerformed: true,
+      handleContentSelection: true,
+      handleActionPerformed: true,
+      displayLogicPayment: 'ISLR',
+      size: 24,
+      isActiveLogics: true,
+      isMandatory: true
+    }
+  },
   // type credit card
   {
     tableName,
