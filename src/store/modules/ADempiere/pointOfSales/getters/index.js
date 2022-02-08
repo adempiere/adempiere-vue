@@ -49,7 +49,6 @@ export default {
    * List Prices
    */
   posAttributes: (state) => {
-    console.log(state.newCustomer, { state })
     return {
       pointOfSalesList: state.pointOfSalesList,
       currentPointOfSales: {

@@ -707,6 +707,9 @@ export default {
     },
     refundAmount() {
       return this.currentPointOfSales.currentOrder.refundAmount
+    },
+    currentBusinessPartner() {
+      return this.currentOrder.businessPartner.uuid
     }
   },
   watch: {
@@ -717,6 +720,9 @@ export default {
       if (this.isEmptyValue(value) && this.showDialogo) {
         this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
       }
+    },
+    currentBusinessPartner(customerUuid) {
+      this.$store.dispatch('listCustomerBankAccounts', { customerUuid: this.currentOrder.businessPartner.uuid })
     },
     option(value) {
       const clear = false
