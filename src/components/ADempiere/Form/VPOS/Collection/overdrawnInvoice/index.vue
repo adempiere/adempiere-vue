@@ -65,7 +65,7 @@
                   <field-definition
                     :metadata-field="{
                       ...fieldsList[0],
-                      labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
+                      labelCurrency: refundReferenceCurrency
                     }"
                     :container-uuid="'OverdrawnInvoice'"
                     :container-manager="containerManager"
@@ -199,7 +199,7 @@
                   <field-definition
                     :metadata-field="{
                       ...fieldsList[0],
-                      labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
+                      labelCurrency: refundReferenceCurrency
                     }"
                     :container-uuid="'OverdrawnInvoice'"
                     :container-manager="containerManager"

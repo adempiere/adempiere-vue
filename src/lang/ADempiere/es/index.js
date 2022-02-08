@@ -500,7 +500,7 @@ export default {
           emptyPayment: 'Método de pago no soportado',
           emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
-          amountChange: 'Monto superior al cambio',
+          amountChange: 'Monto superior al cambio permitido',
           amountLimitOrder: 'Monto Superior al Límite de la Orden',
           incompleteChange: 'Cambio Incompleto',
           fieldList: {
