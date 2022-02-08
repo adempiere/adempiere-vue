@@ -18,7 +18,7 @@
 // related to upload to server side and downdload from server side to client side.
 // Please add the necessary functions here:
 import { config } from '@/utils/ADempiere/config'
-
+import { getToken } from '@/utils/auth'
 // Merge two arrays and return merged array
 export function mergeByteArray(currentArray, arrayToMerge) {
   const mergedArray = new currentArray.constructor(currentArray.length + arrayToMerge.length)
@@ -76,7 +76,7 @@ export function getImagePath({
   operation = 'fit'
 }) {
   const url = config.adempiere.images.url
-  const urn = `img?action=${operation}&width=${width}&height=${height}&url=${file}`
+  const urn = `img?&token=${getToken()}&action=${operation}&width=${width}&height=${height}&url=${file}`
   const uri = `${url}${urn}`
 
   return {

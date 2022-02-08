@@ -179,10 +179,9 @@ export default {
     listAvailableSellers(isOnlyAllocated) {
       availableSellers({
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
-        isOnlyAllocated
+        isOnlyAllocated: false
       })
         .then(response => {
-          console.log(response.records)
           this.listSeller = response.records
         })
         .catch(error => {
@@ -195,7 +194,6 @@ export default {
         })
     },
     changeSeller(value) {
-      console.log({ value })
       this.salesRepresentative = value
     },
     changeOnlyAllocated(value) {
