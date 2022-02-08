@@ -379,7 +379,7 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
-        isOpenRefund: true,
+        isOpenRefund: !this.isEmptyValue(this.$store.getters.getListRefundReference),
         createPayments: !this.isEmptyValue(payments),
         payments: payments
       })
