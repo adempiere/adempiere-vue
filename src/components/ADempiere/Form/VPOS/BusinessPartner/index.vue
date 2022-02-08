@@ -297,7 +297,8 @@ export default {
       oldValueCustomer: '',
       visibleSelectAddress: false,
       selectCustomerValue: {},
-      isVisibleAddress: false
+      isVisibleAddress: false,
+      editBusinessPartner: false
     }
   },
 
@@ -343,6 +344,9 @@ export default {
           containerUuid: this.parentMetadata.containerUuid,
           columnName: 'DisplayColumn_C_BPartner_ID' // this.parentMetadata.displayColumnName
         })
+        if (this.isEmptyValue(this.oldValueCustomer) && !this.isEmptyValue(this.newCustomer) && !this.editBusinessPartner && this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid)) {
+          return this.newCustomer.value + this.newCustomer.name
+        }
         if (this.isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid)) {
           if (!this.isEmptyValue(this.oldValueCustomer) && !this.isEmptyValue(this.$refs.displayBPartner) && !this.$refs.displayBPartner.$refs.input.focused) {
             return this.oldValueCustomerData + this.displayAddress(this.selectAddress.first_name)
@@ -368,6 +372,9 @@ export default {
           value
         })
       }
+    },
+    newCustomer() {
+      return this.$store.getters.getNewCustomer
     },
     templateCustomer() {
       const templateCustomer = this.$store.getters.posAttributes.currentPointOfSales.templateCustomer
@@ -566,6 +573,7 @@ export default {
           values
         )
           .then(responseBPartner => {
+            this.$store.commit('customer', responseBPartner)
             // TODO: Add new record into vuex store.
             this.setBusinessPartner(responseBPartner)
             this.clearValues()
@@ -640,6 +648,7 @@ export default {
     },
     setNewDisplayedValue() {
       this.customerValue = ''
+      this.editBusinessPartner = true
       this.visibleSelectAddress = false
       const displayValue = this.displayedValue
       if (this.controlDisplayed !== displayValue) {
@@ -648,6 +657,7 @@ export default {
     },
     setOldDisplayedValue() {
       this.visibleSelectAddress = true
+      this.editBusinessPartner = false
       this.customerValue = this.isEmptyValue(this.updatedCustomerValue) ? this.updatedCustomerValue : this.updatedCustomerValue + ' - '
       if (this.controlDisplayed !== this.displayedValue) {
         this.displayedValue = this.controlDisplayed
@@ -723,6 +733,7 @@ export default {
       })
     },
     handleSelect(selectedValue) {
+      this.$store.commit('customer', selectedValue)
       this.oldValueCustomer = selectedValue
       let businessPartner = selectedValue
       if (this.isEmptyValue(businessPartner)) {

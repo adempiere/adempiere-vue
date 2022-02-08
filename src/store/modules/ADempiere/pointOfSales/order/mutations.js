@@ -41,5 +41,8 @@ export default {
   },
   findOrder(state, findOrder) {
     state.findOrder = findOrder
+  },
+  customer(state, newCustomer) {
+    state.newCustomer = newCustomer
   }
 }

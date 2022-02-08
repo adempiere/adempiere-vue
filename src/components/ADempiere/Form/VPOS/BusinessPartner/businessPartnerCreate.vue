@@ -355,7 +355,7 @@ export default {
           values
         )
           .then(responseBPartner => {
-            // TODO: Add new record into vuex store.
+            this.$store.commit('customer', responseBPartner)
             this.setBusinessPartner(responseBPartner)
             this.clearValues()
             this.$message({

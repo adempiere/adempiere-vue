@@ -39,6 +39,7 @@ export default {
     uuid: ''
   },
   findOrder: {},
+  newCustomer: {},
   listOrder: {
     ...withoutResponse,
     isShowPopover: false

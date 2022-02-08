@@ -977,7 +977,7 @@ export default {
       }
       this.$store.dispatch('createOrder', {
         posUuid,
-        customerUuid,
+        customerUuid: this.isEmptyValue(this.$store.getters.getNewCustomer) ? customerUuid : this.$store.getters.getNewCustomer.uuid,
         salesRepresentativeUuid: this.currentPointOfSales.salesRepresentative.uuid,
         documentTypeUuid
       })

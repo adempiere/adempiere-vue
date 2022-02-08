@@ -49,6 +49,7 @@ export default {
    * List Prices
    */
   posAttributes: (state) => {
+    console.log(state.newCustomer, { state })
     return {
       pointOfSalesList: state.pointOfSalesList,
       currentPointOfSales: {
@@ -165,5 +166,8 @@ export default {
   },
   getShowList: (state) => {
     return state.listOrder.isShowPopover
+  },
+  getNewCustomer: (state) => {
+    return state.newCustomer
   }
 }
