@@ -17,10 +17,10 @@
 // List of fields to send in search
 export default [
   {
+    elementColumnName: 'Code',
     columnName: 'Code',
     tableName: 'C_BPartner',
     overwriteDefinition: {
-      name: 'Search Value',
       sequence: 0,
       size: 6,
       isCustomField: true
