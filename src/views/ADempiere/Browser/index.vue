@@ -63,6 +63,7 @@
         :header="tableHeader"
         :data-table="recordsList"
         :record-count="recordCount"
+        :is-show-search="false"
       />
     </el-main>
   </el-container>

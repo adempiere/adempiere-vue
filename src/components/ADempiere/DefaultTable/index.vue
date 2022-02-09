@@ -19,7 +19,7 @@
 <template>
   <el-main class="default-table">
     <el-row>
-      <el-col :span="23">
+      <el-col v-if="isShowSearch" :span="23">
         <el-input
           v-model="valueToSearch"
           clearable
@@ -32,7 +32,7 @@
           />
         </el-input>
       </el-col>
-      <el-col :span="1">
+      <el-col :span="sizeOption" :style="styleOption">
         <columns-display-option
           :option="currentOption"
         />
@@ -154,6 +154,10 @@ export default defineComponent({
     isTableSelection: {
       type: Boolean,
       default: true
+    },
+    isShowSearch: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -177,6 +181,20 @@ export default defineComponent({
           // fieldItem.isShowedTableFromUser &&
           tableColumnDataType(fieldItem, currentOption.value)
       })
+    })
+
+    const sizeOption = computed(() => {
+      if (props.isShowSearch) {
+        return 1
+      }
+      return 24
+    })
+
+    const styleOption = computed(() => {
+      if (props.isShowSearch) {
+        return ''
+      }
+      return 'text-align: end; padding-right: 5px;'
     })
 
     /**
@@ -302,6 +320,8 @@ export default defineComponent({
       valueToSearch,
       // computeds
       headerList,
+      sizeOption,
+      styleOption,
       recordsWithFilter,
       currentOption,
       keyColumn,
