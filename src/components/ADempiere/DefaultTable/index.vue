@@ -18,27 +18,6 @@
 
 <template>
   <el-main class="default-table">
-    <el-row>
-      <el-col v-if="isShowSearch" :span="23">
-        <el-input
-          v-model="valueToSearch"
-          clearable
-          size="mini"
-          class="input-search"
-        >
-          <i
-            slot="prefix"
-            class="el-icon-search el-input__icon"
-          />
-        </el-input>
-      </el-col>
-      <el-col :span="sizeOption" :style="styleOption">
-        <columns-display-option
-          :option="currentOption"
-        />
-      </el-col>
-    </el-row>
-
     <el-table
       ref="multipleTable"
       style="width: 100%; height: 88% !important;"
@@ -70,7 +49,7 @@
           :column-key="fieldAttributes.columnName"
           :prop="fieldAttributes.columnName"
           sortable
-          min-width="200"
+          min-width="210"
           :fixed="fieldAttributes.isFixedTableColumn"
         >
           <template slot-scope="scope">
@@ -85,6 +64,16 @@
           </template>
         </el-table-column>
       </template>
+      <el-table-column
+        fixed="right"
+        width="40"
+      >
+        <template slot="header">
+          <columns-display-option
+            :option="currentOption"
+          />
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- pagination table, set custom or use default change page method -->
