@@ -40,20 +40,20 @@
     </el-header>
 
     <el-main>
-      <el-collapse
-        v-model="openedCriteria"
-        class="browser-collapse"
+      <collapse
+        :title="$t('views.searchCriteria')"
+        :container-uuid="browserUuid"
+        :panel-metadata="browserMetadata"
+        :container-manager="containerManager"
       >
-        <el-collapse-item :title="$t('views.searchCriteria')" name="opened-criteria">
-          <panel-definition
-            class="browser-query-criteria"
-            :container-uuid="browserUuid"
-            :panel-metadata="browserMetadata"
-            :container-manager="containerManager"
-          />
-        </el-collapse-item>
-      </el-collapse>
-
+        <panel-definition
+          class="browser-query-criteria"
+          :container-uuid="browserUuid"
+          :panel-metadata="browserMetadata"
+          :container-manager="containerManager"
+          :is-show-filter="false"
+        />
+      </collapse>
       <!-- result of records in the table -->
       <default-table
         class="browser-table-result"
@@ -80,6 +80,7 @@ import { computed, defineComponent, ref } from '@vue/composition-api'
 // componets and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
+import Collapse from '@/components/ADempiere/Collapse/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
@@ -97,6 +98,7 @@ export default defineComponent({
   components: {
     ActionMenu,
     DefaultTable,
+    Collapse,
     LoadingView,
     PanelDefinition,
     TitleAndHelp

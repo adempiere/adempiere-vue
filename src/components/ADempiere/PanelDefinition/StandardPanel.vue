@@ -25,6 +25,7 @@
       <div class="cards-not-group">
         <div class="card">
           <filter-fields
+            v-if="isShowFilter"
             :parent-uuid="parentUuid"
             :container-uuid="containerUuid"
             :fields-list="fieldsList"
@@ -84,6 +85,10 @@ export default defineComponent({
     panelMetadata: {
       type: Object,
       default: () => {}
+    },
+    isShowFilter: {
+      type: Boolean,
+      default: true
     }
   },
 

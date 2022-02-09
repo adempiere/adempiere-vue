@@ -23,6 +23,7 @@
     :container-uuid="containerUuid"
     :container-manager="containerManager"
     :panel-metadata="metadata"
+    :is-show-filter="isShowFilter"
   />
 </template>
 
@@ -48,6 +49,10 @@ export default defineComponent({
     panelMetadata: {
       type: Object,
       required: false
+    },
+    isShowFilter: {
+      type: Boolean,
+      default: true
     }
   },
 
