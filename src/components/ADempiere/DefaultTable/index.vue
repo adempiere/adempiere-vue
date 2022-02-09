@@ -18,6 +18,22 @@
 
 <template>
   <el-main class="default-table">
+    <el-row>
+      <el-col v-if="isShowSearch" :span="24">
+        <el-input
+          v-model="valueToSearch"
+          clearable
+          size="mini"
+          class="input-search"
+        >
+          <i
+            slot="prefix"
+            class="el-icon-search el-input__icon"
+          />
+        </el-input>
+      </el-col>
+    </el-row>
+
     <el-table
       ref="multipleTable"
       style="width: 100%; height: 88% !important;"
@@ -66,7 +82,7 @@
       </template>
       <el-table-column
         fixed="right"
-        width="40"
+        width="50"
       >
         <template slot="header">
           <columns-display-option
