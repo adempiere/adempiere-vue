@@ -910,7 +910,6 @@ export default {
         format: 'object'
       })
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
-      const referencePaymentCurrency = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       const refund = this.convertValuesToSend(values)
       const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', fieldsList: fieldLogic, isValidate: true, formatReturn: 'name' })
@@ -919,15 +918,6 @@ export default {
         this.$message({
           type: 'warning',
           message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
-          duration: 1500,
-          showClose: true
-        })
-        return
-      }
-      if ((refund.amount / this.showDayRateAmount(referencePaymentCurrency.uuid).multiplyRate) > this.currentOrder.refundAmount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
           duration: 1500,
           showClose: true
         })
@@ -1209,15 +1199,6 @@ export default {
       })
       const filterPayment = this.listRefund.filter(payment => payment.paymentMethodUuid === paymentMethodUuid || payment.payment_method_uuid === paymentMethodUuid)
       const allPayMaximunRefund = this.sumRefund(filterPayment)
-      if ((amount * this.dayRate.divideRate) > this.currentOrder.refundAmount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
-          duration: 1500,
-          showClose: true
-        })
-        return
-      }
       if (this.maximumRefundAllowed < amount || (this.maximumRefundAllowed - allPayMaximunRefund) < amount) {
         this.visiblePin = true
         setTimeout(() => {
