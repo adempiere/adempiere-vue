@@ -29,7 +29,7 @@ import {
 import { resetRouter } from '@/router'
 import { showMessage } from '@/utils/ADempiere/notification'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
-import { ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns'
+import { ORGANIZATION, WAREHOUSE } from '@/utils/ADempiere/constants/systemColumns'
 import language from '@/lang'
 
 const state = {
@@ -483,7 +483,7 @@ const actions = {
           setCurrentWarehouse(warehouse.uuid)
           commit('SET_WAREHOUSE', warehouse)
           commit('setPreferenceContext', {
-            columnName: '#' + ORGANIZATION,
+            columnName: `#${WAREHOUSE}`,
             value: warehouse.id
           }, {
             root: true
@@ -504,7 +504,7 @@ const actions = {
     commit('SET_WAREHOUSE', currentWarehouse)
 
     commit('setPreferenceContext', {
-      columnName: '#' + ORGANIZATION,
+      columnName: `#${WAREHOUSE}`,
       value: currentWarehouse.id
     }, {
       root: true
