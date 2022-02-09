@@ -21,7 +21,7 @@
       <el-card class="box-card" style="padding-left: 0px;padding-right: 0px;">
         <el-scrollbar wrap-class="scroll-seller">
           <el-row style="padding: 2px">
-            <template v-for="(seller, key) in listSeller">
+            <template v-for="(seller, key) in listSellers">
               <el-col :key="key" :span="8">
                 <el-card
                   :shadow="seller.uuid === salesRepresentative.uuid ? 'always' : 'never'"
@@ -34,7 +34,7 @@
                         shape="circle"
                         :size="100"
                         fit="fill"
-                        :src="avatarResize(seller.image)"
+                        :src="seller.image"
                       />
                     </div>
                     <div class="footer-product">
@@ -141,6 +141,17 @@ export default {
     },
     showAssignSeller() {
       return this.isEmptyValue(this.$store.getters.getShowAssignSeller) ? false : this.$store.getters.getShowAssignSeller
+    },
+    listSellers() {
+      if (!this.isEmptyValue(this.listSeller)) {
+        return this.listSeller.map(seller => {
+          return {
+            ...seller,
+            image: this.avatarResize(seller.image)
+          }
+        })
+      }
+      return []
     }
   },
   watch: {
@@ -161,8 +172,8 @@ export default {
 
       const { uri } = getImagePath({
         file: image,
-        width: 40,
-        height: 40
+        width: 500,
+        height: 500
       })
 
       return uri
