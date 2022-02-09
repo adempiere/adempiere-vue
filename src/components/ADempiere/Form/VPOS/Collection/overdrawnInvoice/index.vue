@@ -465,11 +465,6 @@ export default {
       })
     },
     currentAvailablePaymentMethods() {
-      if (this.isEmptyValue(this.paymentTypeListRefund)) {
-        return {
-          name: ''
-        }
-      }
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
       if (!this.isEmptyValue(payment)) {
         return payment
@@ -634,14 +629,10 @@ export default {
       return this.$store.getters.getPaymentTypeList.filter(type => type.is_allowed_to_refund_open)
     },
     paymentTypeListRefund() {
-      return this.$store.getters.getPaymentTypeList.filter(type => {
-        if (type.is_allowed_to_refund) {
-          return type
-        }
-      })
+      return this.$store.getters.getPaymentTypeList.filter(type => type.is_allowed_to_refund)
     },
     searchRefundCurrency() {
-      if (this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
+      if (this.isEmptyValue(this.selectionTypeRefund) || this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
         return {}
       }
       const currency = this.convertionsList.filter(type => {
@@ -717,7 +708,7 @@ export default {
       const clear = false
       this.clearAccountData(clear)
       this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
-      if (this.isEmptyValue(value) && this.showDialogo) {
+      if (this.isEmptyValue(value) && !this.isEmptyValue(this.selectionTypeRefund) && this.showDialogo && !this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
         this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
       }
     },
@@ -754,15 +745,6 @@ export default {
         if (this.option === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
           this.selectPayment(this.paymentTypeListRefund[0])
         }
-      }
-    },
-    selectionTypeRefund(value) {
-      if (value.tender_type === 'D') {
-        this.$store.commit('updateValueOfField', {
-          containerUuid: 'ACH',
-          columnName: 'IsACH', // this.parentMetadata.columnName,
-          value: true
-        })
       }
     },
     currentFieldPaymentMethods(value) {
