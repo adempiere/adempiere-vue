@@ -88,7 +88,7 @@ export default defineComponent({
   },
 
   setup(props, { root, refs }) {
-    const isShowPanel = ref(true)
+    const isShowPanel = ref(false)
 
     const icon = computed(() => {
       if (isShowPanel.value) {
