@@ -975,7 +975,7 @@ export default {
       const fieldBank = this.fieldsList.find(fields => fields.columnName === 'C_Bank_ID')
       let listBank
       if (!this.isEmptyValue(fieldBank) && fieldBank.reference) {
-        listBank = this.$store.getters.getLookupList({
+        listBank = this.$store.getters.getStoredLookupList({
           containerUuid: this.metadata.containerUuid,
           query: fieldBank.reference.query,
           tableName: fieldBank.reference.tableName
@@ -1070,7 +1070,7 @@ export default {
           },
           {
             columnName: 'C_Bank_ID',
-            value: value.bank.id
+            value: value.bank.value
           },
           {
             columnName: 'C_Bank_ID_UUID',

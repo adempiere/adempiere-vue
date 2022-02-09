@@ -23,6 +23,7 @@ export default [
     overwriteDefinition: {
       sequence: 0,
       size: 6,
+      componentPath: 'FieldText',
       isCustomField: true
     }
   },
@@ -33,6 +34,7 @@ export default [
     isFromDictionary: true,
     overwriteDefinition: {
       sequence: 1,
+      componentPath: 'FieldText',
       size: 6,
       isCustomField: true
     }

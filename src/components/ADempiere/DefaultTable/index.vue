@@ -19,7 +19,7 @@
 <template>
   <el-main class="default-table">
     <el-row>
-      <el-col :span="23">
+      <el-col v-if="isShowSearch" :span="24">
         <el-input
           v-model="valueToSearch"
           clearable
@@ -31,11 +31,6 @@
             class="el-icon-search el-input__icon"
           />
         </el-input>
-      </el-col>
-      <el-col :span="1">
-        <columns-display-option
-          :option="currentOption"
-        />
       </el-col>
     </el-row>
 
@@ -70,7 +65,7 @@
           :column-key="fieldAttributes.columnName"
           :prop="fieldAttributes.columnName"
           sortable
-          min-width="200"
+          min-width="210"
           :fixed="fieldAttributes.isFixedTableColumn"
         >
           <template slot-scope="scope">
@@ -85,6 +80,16 @@
           </template>
         </el-table-column>
       </template>
+      <el-table-column
+        fixed="right"
+        width="50"
+      >
+        <template slot="header">
+          <columns-display-option
+            :option="currentOption"
+          />
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- pagination table, set custom or use default change page method -->
@@ -154,6 +159,10 @@ export default defineComponent({
     isTableSelection: {
       type: Boolean,
       default: true
+    },
+    isShowSearch: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -177,6 +186,20 @@ export default defineComponent({
           // fieldItem.isShowedTableFromUser &&
           tableColumnDataType(fieldItem, currentOption.value)
       })
+    })
+
+    const sizeOption = computed(() => {
+      if (props.isShowSearch) {
+        return 1
+      }
+      return 24
+    })
+
+    const styleOption = computed(() => {
+      if (props.isShowSearch) {
+        return ''
+      }
+      return 'text-align: end; padding-right: 5px;'
     })
 
     /**
@@ -302,6 +325,8 @@ export default defineComponent({
       valueToSearch,
       // computeds
       headerList,
+      sizeOption,
+      styleOption,
       recordsWithFilter,
       currentOption,
       keyColumn,
