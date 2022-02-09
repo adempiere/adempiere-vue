@@ -328,14 +328,28 @@ export default defineComponent({
       }
     }
 
-    const actionsManager = ref({
-      containerUuid: browserUuid,
+    const processName = computed(() => {
+      const browser = storedBrowser.value
+      if (!root.isEmptyValue(browser)) {
+        const process = storedBrowser.value.process
+        if (!root.isEmptyValue(process)) {
+          return process.name
+        }
+      }
 
-      defaultActionName: root.$t('actionMenu.runProcessOrReport'),
+      return root.$t('actionMenu.runProcessOrReport')
+    })
 
-      getActionList: () => root.$store.getters.getStoredActionsMenu({
-        containerUuid: browserUuid
-      })
+    const actionsManager = computed(() => {
+      return {
+        containerUuid: browserUuid,
+
+        defaultActionName: processName.value,
+
+        getActionList: () => root.$store.getters.getStoredActionsMenu({
+          containerUuid: browserUuid
+        })
+      }
     })
 
     const relationsManager = ref({
@@ -381,14 +395,24 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-/* removes the title link effect on collapse */
-.el-collapse-item__header:hover {
-  background-color: #fcfcfc;
-}
-
 .browser-view {
   .browser-collapse {
     margin-bottom: 10px;
+  }
+
+  /* removes the title link effect on collapse */
+  .el-collapse-item__header {
+    &:hover {
+      background-color: #fcfcfc;
+      color: #000;
+    }
+    &.focusing:focus:not(:hover) {
+      color: #000;
+    }
+
+    /* browser criteria title */
+    font-weight: bold;
+    font-size: 16px;
   }
 }
 </style>

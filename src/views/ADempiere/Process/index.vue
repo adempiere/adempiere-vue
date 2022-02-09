@@ -208,6 +208,8 @@ export default defineComponent({
     const actionsManager = ref({
       containerUuid: processUuid,
 
+      defaultActionName: root.$t('actionMenu.runProcessOrReport'),
+
       getActionList: () => [
         runProcessOrReport,
         sharedLink

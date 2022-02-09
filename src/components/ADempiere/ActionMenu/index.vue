@@ -38,9 +38,9 @@
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
 
-import MenuActions from './Actions'
-import MenuRelations from './Relations'
-import MenuReferences from './References'
+import MenuActions from './Actions.vue'
+import MenuRelations from './Relations.vue'
+import MenuReferences from './References.vue'
 
 export default defineComponent({
   name: 'ActionMenu',

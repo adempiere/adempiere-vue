@@ -29,7 +29,7 @@
     @command="runAction"
     @click="runDefaultAction"
   >
-    {{ actionsManager.defaultActionName }}
+    {{ defaultActionName }}
 
     <el-dropdown-menu slot="dropdown">
       <el-dropdown-item
@@ -177,6 +177,16 @@ export default defineComponent({
       return actionsList.value[0]
     })
 
+    const defaultActionName = computed(() => {
+      if (!root.isEmptyValue(props.actionsManager.defaultActionName)) {
+        return props.actionsManager.defaultActionName
+      }
+      if (!root.isEmptyValue(actionsList.value)) {
+        return actionsList.value[0].name
+      }
+      return root.$t('actionMenu.runProcessOrReport')
+    })
+
     /**
      * Run default action with last parameters
      */
@@ -202,6 +212,7 @@ export default defineComponent({
 
     return {
       actionsList,
+      defaultActionName,
       // methods
       runAction,
       runDefaultAction
