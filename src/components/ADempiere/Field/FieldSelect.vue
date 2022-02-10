@@ -385,7 +385,10 @@ export default {
      */
     getDataLookupList(isShowList) {
       if (isShowList) {
+        // get stored list values
         const list = this.getLookupList
+        // refresh local list component
+        this.optionsList = list
         if (this.isEmptyValue(list) || (list.length === 1 &&
           this.blankValues.includes(list[0].value))) {
           this.remoteMethod()
