@@ -43,7 +43,10 @@
                   :key="field.columnName"
                   :metadata-field="field"
                   :container-uuid="'Business-Partner-Create'"
-                  :container-manager="containerManager"
+                  :container-manager="{
+                    ...containerManager,
+                    isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic}
+                  }"
                 />
               </div>
             </el-card>

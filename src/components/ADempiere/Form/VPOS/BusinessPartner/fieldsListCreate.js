@@ -44,7 +44,7 @@ export default [
       tabindex: 0,
       sequence: 0,
       size: 8,
-      isMandatory: false
+      isMandatory: true
     }
   },
   {

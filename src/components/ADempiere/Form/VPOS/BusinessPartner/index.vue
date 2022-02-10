@@ -19,7 +19,7 @@
 <template>
   <el-form-item>
     <template slot="label">
-      {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }} {{ showUpdate }}
+      {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}
       <el-dropdown trigger="click">
         <span class="el-dropdown-link">
           <svg-icon icon-class="tree-table" />
