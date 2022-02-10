@@ -149,7 +149,7 @@ export default {
 
       // return this.fieldsList
 
-      return this.getterPanel.fieldsList
+      return this.FieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({

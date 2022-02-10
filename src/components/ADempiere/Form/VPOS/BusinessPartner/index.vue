@@ -19,7 +19,7 @@
 <template>
   <el-form-item>
     <template slot="label">
-      {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }}
+      {{ $t('form.pos.order.BusinessPartnerCreate.businessPartner') }} {{ showUpdate }}
       <el-dropdown trigger="click">
         <span class="el-dropdown-link">
           <svg-icon icon-class="tree-table" />
@@ -454,6 +454,9 @@ export default {
     },
     showUpdate: {
       get() {
+        if (!this.$store.getters.getShowUpdateCustomer && this.$store.getters.getShowAddressUpdate) {
+          return true
+        }
         return this.$store.getters.getShowUpdateCustomer
       },
       set(value) {

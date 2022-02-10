@@ -123,11 +123,11 @@ export default [
     elementColumnName: 'Name',
     isFromDictionary: true,
     overwriteDefinition: {
-      tabindex: 1,
       isCustomField: true,
       size: 24,
-      name: language.t('components.contextMenuReferences'),
       sequenceFields: 'P',
+      index: 9,
+      name: language.t('components.contextMenuReferences'),
       isMandatory: true
     }
   }

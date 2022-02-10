@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// import language from '@/lang'
+import language from '@/lang'
 
 const fieldBase = {
   tableName: 'C_Location',
@@ -122,8 +122,7 @@ export default [
       sequenceFields: 'P',
       index: 9
     }
-  }
-  /*,
+  },
   {
     elementColumnName: 'Name',
     isFromDictionary: true,
@@ -134,8 +133,8 @@ export default [
       size: 24,
       name: language.t('components.contextMenuReferences'),
       sequence: 1,
+      sequenceFields: 'P',
       isMandatory: true
     }
   }
-  */
 ]
