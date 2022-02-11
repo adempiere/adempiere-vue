@@ -16,6 +16,7 @@
 
 // Get Instance for connection
 import { request } from '@/utils/ADempiere/request'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 /**
  * Object List from window
@@ -47,18 +48,19 @@ export function getEntities({
     }
   })
 
-  let attributesValues
-  if (attributes) {
-    attributesValues = attributes.map(attributeValue => {
-      return {
+  // context attributes
+  if (!isEmptyValue(attributes)) {
+    attributes.forEach(attributeValue => {
+      filters.push({
         column_name: attributeValue.columnName,
+        operator: attributeValue.operator,
         value: attributeValue.value
-      }
+      })
     })
   }
 
   let sortingDefinition
-  if (sorting) {
+  if (!isEmptyValue(sorting)) {
     sortingDefinition = sorting.map(sortValue => {
       return {
         column_name: sortValue.columnName,
@@ -77,7 +79,6 @@ export function getEntities({
       filters,
       columns,
       // replace sql values
-      context_attributes: attributesValues,
       sorting: sortingDefinition,
       // Page Data
       page_token: pageToken,
