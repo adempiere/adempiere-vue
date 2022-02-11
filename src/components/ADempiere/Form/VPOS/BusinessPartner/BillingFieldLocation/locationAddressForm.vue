@@ -31,7 +31,11 @@
             <field-definition
               :parent-uuid="parentUuid"
               :container-uuid="containerUuid"
-              :container-manager="containerManagerLocation"
+              :container-manager="{
+                ...containerManager,
+                isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic},
+                isDisplayedField({ isDisplayed, isDisplayedFromLogic }) {return field.isDisplayed || field.isDisplayedFromLogic}
+              }"
               :metadata-field="field"
             />
           </el-col>

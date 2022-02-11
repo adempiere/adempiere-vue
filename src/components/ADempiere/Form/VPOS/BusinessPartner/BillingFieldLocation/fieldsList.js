@@ -70,6 +70,7 @@ export default [
     columnName: 'Address1',
     overwriteDefinition: {
       isCustomField: true,
+      isMandatory: true,
       size: 24,
       sequenceFields: 'A1',
       index: 5

@@ -47,7 +47,7 @@ export default [
       size: 24,
       sequenceFields: 'R',
       index: 3,
-      isMandatory: false
+      isMandatory: true
     }
   },
   {
@@ -70,6 +70,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       isUpdateable: true,
+      isMandatory: true,
       size: 24,
       sequenceFields: 'A1',
       index: 5

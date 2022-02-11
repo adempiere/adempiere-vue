@@ -31,7 +31,11 @@
             :metadata="fieldsList[0]"
             :value-model="fieldsList[0].value"
             :container-uuid="'New-Address'"
-            :container-manager="containerManager"
+            :container-manager="{
+              ...containerManager,
+              isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic},
+              isDisplayedField({ isDisplayed, isDisplayedFromLogic }) {return field.isDisplayed || field.isDisplayedFromLogic}
+            }"
           />
         </el-row>
       </div>
