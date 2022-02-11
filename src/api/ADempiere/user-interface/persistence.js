@@ -34,19 +34,22 @@ export function getEntities({
   columns = [],
   attributes = [],
   sorting = [],
+  filters,
   pageToken,
   pageSize
 }) {
-  const filters = conditions.map(condition => {
-    const { value, operator, columnName, valueTo, values } = condition
-    return {
-      column_name: columnName,
-      value,
-      operator,
-      value_to: valueTo,
-      values
-    }
-  })
+  if (isEmptyValue(filters)) {
+    filters = conditions.map(condition => {
+      const { value, operator, columnName, valueTo, values } = condition
+      return {
+        column_name: columnName,
+        value,
+        operator,
+        value_to: valueTo,
+        values
+      }
+    })
+  }
 
   // context attributes
   if (!isEmptyValue(attributes)) {

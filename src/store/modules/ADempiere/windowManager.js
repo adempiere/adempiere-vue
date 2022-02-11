@@ -93,6 +93,7 @@ const windowManager = {
     }, {
       parentUuid,
       containerUuid,
+      filters = [],
       pageNumber
     }) {
       let pageToken
@@ -125,6 +126,7 @@ const windowManager = {
           windowUuid: parentUuid,
           tabUuid: containerUuid,
           attributes: contextAttriburesList,
+          filters,
           pageToken
         })
           .then(dataResponse => {

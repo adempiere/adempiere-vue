@@ -25,6 +25,8 @@
           clearable
           size="mini"
           class="input-search"
+          @change="filterRecord"
+          @input="handleChangeSearch"
         >
           <i
             slot="prefix"
@@ -209,7 +211,7 @@ export default defineComponent({
       const displayColumnsName = []
       const columnsName = props.header
         .filter(fieldItem => {
-          return fieldItem.isSelectionColumn
+          return fieldItem.isSelectionColumn && fieldItem.valueType === 'STRING'
         }).map(fieldItem => {
           if (isLookup(fieldItem.diplayType)) {
             displayColumnsName.push(fieldItem.displayColumnName)
@@ -258,29 +260,42 @@ export default defineComponent({
         pageNumber
       })
     }
+    const timeOut = ref(() => {})
+    function handleChangeSearch(value) {
+      clearTimeout(timeOut.value)
+      timeOut.value = setTimeout(() => {
+        // get records
+        this.filterRecord(value)
+      }, 1000)
+    }
 
     // get table data
     const recordsWithFilter = computed(() => {
-      if (!root.isEmptyValue(valueToSearch.value)) {
-        return props.dataTable.filter(row => {
-          return selectionColumns.value.some(columnName => {
-            const value = !root.isEmptyValue(row[columnName]) ? row[columnName].toString() : ''
-            const search = valueToSearch.value
-            if (value) {
-              return value
-                .trim()
-                .toLowerCase()
-                .includes(
-                  search
-                    .trim()
-                    .toLowerCase()
-                )
-            }
-          })
-        })
-      }
       return props.dataTable
     })
+
+    let isLoadFilter = ref(false)
+    function filterRecord(selections) {
+      isLoadFilter = true
+      const params = []
+      selectionColumns.value.forEach(filter => {
+        params.push({
+          column_name: filter,
+          operator: 'LIKE',
+          value: '%' + selections + '%'
+        })
+      })
+      root.$store.dispatch('getEntities', {
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        filters: params
+      })
+        .then(() => {
+          isLoadFilter = false
+          clearTimeout(timeOut.value)
+          return
+        })
+    }
 
     function handleSelection(selections, rowSelected) {
       props.containerManager.setSelection({
@@ -323,6 +338,7 @@ export default defineComponent({
     return {
       // data
       valueToSearch,
+      isLoadFilter,
       // computeds
       headerList,
       sizeOption,
@@ -331,6 +347,8 @@ export default defineComponent({
       currentOption,
       keyColumn,
       // methods
+      filterRecord,
+      handleChangeSearch,
       headerLabel,
       handleChangePage,
       handleRowClick,
