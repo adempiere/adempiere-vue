@@ -531,6 +531,22 @@ export default {
       this.clearAddresses('Location-Address-Create')
       this.clearAddresses('Shipping-Address')
       this.clearDataCustomer(this.containerUuid)
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid: 'Business-Partner-Create',
+        attributes: [{
+          columnName: 'Name',
+          value: undefined
+        }, {
+          columnName: 'Value',
+          value: undefined
+        }, {
+          columnName: 'TaxID',
+          value: undefined
+        }, {
+          columnName: 'Phone',
+          value: undefined
+        }]
+      })
     },
     createBusinessParter() {
       const values = this.datesForm(this.$store.getters.getValuesView({
