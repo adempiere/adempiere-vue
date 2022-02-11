@@ -89,9 +89,6 @@ export default {
   },
 
   computed: {
-    isPanelWindow() {
-      return this.metadata.panelType === 'window'
-    },
     isSelectMultiple() {
       return ['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery
     },
@@ -165,14 +162,29 @@ export default {
         })
       },
       set(value) {
+        const { columnName, containerUuid, inTable } = this.metadata
+
+        // table records values
+        if (inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.setCell) {
+            return this.containerManager.setCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName,
+              value
+            })
+          }
+        }
+
         const option = this.findOption(value)
         // always update uuid
         this.uuidValue = option.uuid
 
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
-          containerUuid: this.metadata.containerUuid,
-          columnName: this.metadata.columnName,
+          containerUuid,
+          columnName,
           value
         })
       }
@@ -225,9 +237,24 @@ export default {
         })
       },
       set(value) {
+        const { displayColumnName, containerUuid, inTable } = this.metadata
+
+        // table records values
+        if (inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.setCell) {
+            return this.containerManager.setCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName: displayColumnName,
+              value
+            })
+          }
+        }
+
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
-          containerUuid: this.metadata.containerUuid,
+          containerUuid,
           // DisplayColumn_'ColumnName'
           columnName: this.metadata.displayColumnName,
           value
@@ -302,19 +329,15 @@ export default {
           this.uuidValue = option.uuid
         } else {
           if (!this.isEmptyValue(this.displayedValue)) {
-            // verify if exists to add
+            // verify if exists to add (in table)
             this.optionsList.push({
               value,
               uuid: option.uuid,
               label: this.displayedValue
             })
           } else {
-            if (!this.isPanelWindow || (this.isPanelWindow &&
-              !this.isEmptyValue(this.$route.query) &&
-              this.$route.query.action === 'create-new')) {
-              // request lookup
-              this.getDataLookupItem()
-            }
+            // request lookup
+            this.getDataLookupItem()
           }
         }
       }

@@ -26,7 +26,6 @@
       :panel-metadata="panelMetadata"
       :header="tableheaders"
       :data-table="recordsList"
-      :record-count="recordCount"
     />
   </el-container>
 </template>
@@ -110,10 +109,6 @@ export default defineComponent({
       return tabData.value.recordsList
     })
 
-    const recordCount = computed(() => {
-      return tabData.value.recordCount
-    })
-
     const actionAdvancedQuery = () => {
       const activeNames = []
       if (!activeName.value.length) {
@@ -126,7 +121,6 @@ export default defineComponent({
       activeName,
       // computeds
       recordsList,
-      recordCount,
       isLoadedPanel,
       panelMetadata,
       tableheaders,

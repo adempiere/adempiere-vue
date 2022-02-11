@@ -46,6 +46,7 @@
       :element-loading-text="$t('notifications.loading')"
       element-loading-background="rgba(255, 255, 255, 0.8)"
       @row-click="handleRowClick"
+      @row-dblclick="handleRowDblClick"
       @select="handleSelection"
       @select-all="handleSelectionAll"
     >
@@ -94,9 +95,9 @@
 
     <!-- pagination table, set custom or use default change page method -->
     <custom-pagination
-      :total="recordCount"
+      :total="recordsLength"
       :current-page="1"
-      :selection="0"
+      :selection="selectionsLength"
       :handle-change-page="handleChangePage"
     />
   </el-main>
@@ -151,10 +152,6 @@ export default defineComponent({
       required: true,
       default: () => []
     },
-    recordCount: {
-      type: Number,
-      default: 0
-    },
     // Show check column from selection row
     isTableSelection: {
       type: Boolean,
@@ -202,6 +199,15 @@ export default defineComponent({
       return 'text-align: end; padding-right: 5px;'
     })
 
+    const selectionsLength = computed(() => {
+      return props.containerManager.getSelection({
+        containerUuid: props.containerUuid
+      }).length
+    })
+    const recordsLength = computed(() => {
+      return props.dataTable.length
+    })
+
     /**
      * Selection columns to be taken into account during the search
      */
@@ -227,9 +233,21 @@ export default defineComponent({
         tableName: props.panelMetadata.tableName
       })
 
+      /*
       if (!row.isEditRow) {
         row.isEditRow = true
       }
+      if (!row.isSelectedRow) {
+        row.isEditRow = false
+      }
+      */
+    }
+
+    /**
+     * To confirm edit record row
+     */
+    function handleRowDblClick(row, column, event) {
+      row.isEditRow = false
     }
 
     function headerLabel(field) {
@@ -283,6 +301,9 @@ export default defineComponent({
     })
 
     function handleSelection(selections, rowSelected) {
+      rowSelected.isSelectedRow = !rowSelected.isSelectedRow
+      rowSelected.isEditRow = rowSelected.isSelectedRow // edit record if is selected
+
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
         recordsSelected: selections
@@ -330,10 +351,13 @@ export default defineComponent({
       recordsWithFilter,
       currentOption,
       keyColumn,
+      recordsLength,
+      selectionsLength,
       // methods
       headerLabel,
       handleChangePage,
       handleRowClick,
+      handleRowDblClick,
       handleSelection,
       handleSelectionAll,
       isDisplayed

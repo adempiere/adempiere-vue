@@ -67,6 +67,25 @@ const browserControl = {
       Vue.set(state.browserData[containerUuid], 'selectionsList', selectionsList)
     },
 
+    setBrowserRow(state, {
+      containerUuid,
+      rowIndex,
+      row
+    }) {
+      Vue.set(state.browserData[containerUuid].recordsList, rowIndex, row)
+    },
+
+    setBrowserCell(state, {
+      containerUuid,
+      rowIndex,
+      columnName,
+      value
+    }) {
+      Vue.set(state.browserData[containerUuid].recordsList[rowIndex], columnName, value)
+      // TODO: Change selection columns
+      // Vue.set(state.browserData[containerUuid].selectionsList[rowIndex], columnName, value)
+    },
+
     resetStateBrowserManager(state) {
       state = initState
     }

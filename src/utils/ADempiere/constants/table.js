@@ -18,13 +18,20 @@
  * Row default app attributes
  */
 export const ROW_ATTRIBUTES = {
+  // indicate if is new record (add mew row)
   isNewRow: false,
+  // indicate if is edit record to render fields
   isEditRow: false,
+  // indicate if is selected record to manage
+  isSelectedRow: false,
+  // row index to fast manager
   rowIndex: 0,
+  // indicate if is read only row (same isReadOnlyForm)
   isReadOnlyFromRow: false
 }
 
 /**
  * Row table key name attributes
+ * not to send to the server
  */
 export const ROW_KEY_ATTRIBUTES = Object.keys(ROW_ATTRIBUTES)

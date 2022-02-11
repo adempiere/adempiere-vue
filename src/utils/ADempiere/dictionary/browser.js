@@ -57,6 +57,11 @@ export function isMandatoryColumn({ isMandatory, isMandatoryFromLogic }) {
   return isMandatory || isMandatoryFromLogic
 }
 
+/**
+ * Read only column in table multi record
+ * @param {boolean} isReadOnly
+ * @returns {boolean}
+ */
 export function isReadOnlyColumn({ isReadOnly }) {
   return isReadOnly
 }

@@ -218,10 +218,12 @@ export default defineComponent({
     }
 
     function isRowCanBeEdited(record) {
+      if (!record.isSelectedRow) {
+        return false
+      }
       if (!isReadOnly.value && record.isEditRow) {
         return true
       }
-
       return false
     }
 

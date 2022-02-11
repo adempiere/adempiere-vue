@@ -62,7 +62,6 @@
         :panel-metadata="browserMetadata"
         :header="tableHeader"
         :data-table="recordsList"
-        :record-count="recordCount"
         :is-show-search="false"
       />
     </el-main>
@@ -266,6 +265,10 @@ export default defineComponent({
     const containerManagerTable = {
       ...containerManager,
 
+      actionPerformed({ field, value, valueTo, containerUuid }) {
+        // TODO: Logic to implement in table
+      },
+
       /**
        * Is displayed column in table multi record
        */
@@ -278,24 +281,36 @@ export default defineComponent({
         row
       }) {
         // read only with metadata
-        if (isReadOnlyColumn(field)) {
-          true
-        }
-
-        return false
+        return isReadOnlyColumn(field)
       },
 
       seekRecord: ({
         containerUuid,
         row
       }) => {
-        console.log(containerUuid, row)
+        // TODO: Logic to implement in table
       },
 
+      setRow: ({ containerUuid, rowIndex, row }) => {
+        return root.$store.commit('setBrowserRow', {
+          containerUuid,
+          rowIndex,
+          row
+        })
+      },
       getRow: ({ containerUuid, rowIndex }) => {
         return root.$store.getters.getBrowserRowData({
           containerUuid,
           rowIndex
+        })
+      },
+
+      setCell: ({ containerUuid, rowIndex, columnName, value }) => {
+        return root.$store.commit('setBrowserCell', {
+          containerUuid,
+          rowIndex,
+          columnName,
+          value
         })
       },
       getCell: ({ containerUuid, rowIndex, columnName }) => {
@@ -366,16 +381,6 @@ export default defineComponent({
       })
     })
 
-    const recordCount = computed(() => {
-      const data = root.$store.getters.getBrowserData({
-        containerUuid: browserUuid
-      })
-      if (data && data.recordCount) {
-        return data.recordCount
-      }
-      return 0
-    })
-
     getBrowserDefinition()
 
     return {
@@ -390,7 +395,6 @@ export default defineComponent({
       openedCriteria,
       isShowContextMenu,
       tableHeader,
-      recordCount,
       recordsList
     }
   }
