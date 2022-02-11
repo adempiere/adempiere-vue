@@ -82,6 +82,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A2',
       index: 6
     }
@@ -93,6 +94,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A3',
       index: 7
     }
@@ -104,6 +106,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A4',
       index: 8
     }

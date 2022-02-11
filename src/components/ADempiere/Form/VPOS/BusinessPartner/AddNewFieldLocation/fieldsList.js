@@ -83,6 +83,7 @@ export default [
       isCustomField: true,
       isUpdateable: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A2',
       index: 6
     }
@@ -95,6 +96,7 @@ export default [
       isCustomField: true,
       isUpdateable: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A3',
       index: 7
     }
@@ -107,6 +109,7 @@ export default [
       isCustomField: true,
       isUpdateable: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A4',
       index: 8
     }

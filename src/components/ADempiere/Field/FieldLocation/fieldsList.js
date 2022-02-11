@@ -95,6 +95,7 @@ export default [
       isUpdateable: true,
       size: 24,
       sequenceFields: 'A2',
+      isMandatory: false,
       index: 6
     }
   },
@@ -107,6 +108,7 @@ export default [
       isUpdateable: true,
       size: 24,
       sequenceFields: 'A3',
+      isMandatory: false,
       index: 7
     }
   },
@@ -119,6 +121,7 @@ export default [
       isUpdateable: true,
       size: 24,
       sequenceFields: 'A4',
+      isMandatory: false,
       index: 8
     }
   },
