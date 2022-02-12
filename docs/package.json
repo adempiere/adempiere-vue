@@ -32,6 +32,6 @@
     "axios": ">=0.21.1",
     "blockadblock": "3.2.1",
     "sweetalert2": "9.10.9",
-    "webpack-dev-middleware": "3.6.0"
+    "webpack-dev-middleware": "3.7.3"
   }
 }
