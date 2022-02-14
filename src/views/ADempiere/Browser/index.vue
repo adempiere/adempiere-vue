@@ -355,7 +355,7 @@ export default defineComponent({
         }
       }
 
-      return root.$t('actionMenu.runProcessOrReport')
+      return root.$t('actionMenu.runProcess')
     })
 
     const actionsManager = computed(() => {

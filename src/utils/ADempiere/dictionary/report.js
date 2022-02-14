@@ -14,25 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const actionMenu = {
-  // actions
-  refreshRecords: 'Refrescar Registros',
-  deleteRecord: 'Eliminar Registro',
-  createNewRecord: 'Nuevo Registro',
-  shareLink: 'Compartir Enlace',
-  withoutActions: 'Sin Actiones',
-  zoomWindow: 'Acercar Ventana',
-  // process
-  runProcess: 'Ejecutar',
-  // report
-  generateReport: 'Generar',
-  generateReportAs: 'Generar Como',
-  // relations
-  relations: 'Relaciones',
-  withoutRelations: 'Sin Relaciones',
-  // references
-  references: 'Referencias',
-  withoutReferences: 'Sin referencias para el registro'
-}
+/**
+ * Suppoerted render files
+ */
+export const viewerSupportedFormats = [
+  'csv',
+  'html',
+  'pdf',
+  'ssv',
+  'txt',
+  'xls',
+  'xlsx'
+]
 
-export default actionMenu
+export const reportFormatsList = [
+  'arxml',
+  'csv',
+  'pdf',
+  'ps',
+  'ssv',
+  'txt',
+  'xls',
+  'xlsx',
+  'xml'
+]

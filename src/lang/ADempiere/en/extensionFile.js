@@ -14,25 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const actionMenu = {
-  // actions
-  refreshRecords: 'Refrescar Registros',
-  deleteRecord: 'Eliminar Registro',
-  createNewRecord: 'Nuevo Registro',
-  shareLink: 'Compartir Enlace',
-  withoutActions: 'Sin Actiones',
-  zoomWindow: 'Acercar Ventana',
-  // process
-  runProcess: 'Ejecutar',
-  // report
-  generateReport: 'Generar',
-  generateReportAs: 'Generar Como',
-  // relations
-  relations: 'Relaciones',
-  withoutRelations: 'Sin Relaciones',
-  // references
-  references: 'Referencias',
-  withoutReferences: 'Sin referencias para el registro'
+const extensionFile = {
+  arxml: '(arxml) Adempiere Report Definition',
+  csv: '(csv) Comma Separated Values file',
+  html: '(html) HyperText Markup Languaje file',
+  pdf: '(pdf) Acrobat PDF file',
+  ps: '(ps) Postscript file',
+  ssv: '(ssv) Semicolon Separated Values file',
+  txt: '(txt) Tab delimited file',
+  xlsx: '(xlsx) Extension Excel file',
+  xls: '(xls) Excel file',
+  xml: '(xml) Extensible Markup Languaje file'
 }
 
-export default actionMenu
+export default extensionFile

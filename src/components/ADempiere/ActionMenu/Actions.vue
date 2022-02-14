@@ -73,23 +73,23 @@
               >
                 <el-scrollbar wrap-class="scroll-child">
                   <el-dropdown-item
-                    v-for="(childs, key) in action.childs"
+                    v-for="(actionChild, key) in action.childs"
                     :key="key"
-                    :command="childs"
+                    :command="actionChild"
                     :divided="true"
                   >
                     <span class="contents">
-                      <b class="label" @click="runAction(childs)">
-                        {{ childs.name }}
+                      <b class="label" @click="runAction(actionChild)">
+                        {{ actionChild.name }}
                       </b>
                     </span>
 
-                    <p class="description">
-                      <template v-if="isEmptyValue(childs.description)">
+                    <p class="description" @click="runAction(actionChild)">
+                      <template v-if="isEmptyValue(actionChild.description)">
                         {{ $t('data.noDescription') }}
                       </template>
                       <template v-else>
-                        {{ childs.description }}
+                        {{ actionChild.description }}
                       </template>
                     </p>
                   </el-dropdown-item>
@@ -184,7 +184,7 @@ export default defineComponent({
       if (!root.isEmptyValue(actionsList.value)) {
         return actionsList.value[0].name
       }
-      return root.$t('actionMenu.runProcessOrReport')
+      return root.$t('actionMenu.runProcess')
     })
 
     /**

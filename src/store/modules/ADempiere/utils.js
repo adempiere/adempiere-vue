@@ -5,9 +5,7 @@ const initStateUtils = {
   splitHeight: 50,
   splitHeightTop: 0,
   widthLayout: 0,
-  tempShareLink: '',
   oldAction: undefined,
-  reportType: '',
   isShowedTable: false,
   isShowedTabChildren: false,
   recordTable: 0,
@@ -79,12 +77,6 @@ export default {
     },
     setProcessSelecetion(state, selectionProcess) {
       state.selectionProcess = selectionProcess
-    },
-    setTempShareLink(state, payload) {
-      state.tempShareLink = payload
-    },
-    setReportTypeToShareLink(state, payload) {
-      state.reportType = payload
     },
 
     resetStateUtils(state) {
@@ -202,14 +194,6 @@ export default {
       commit('setProcessSelecetion', params)
     },
 
-    setTempShareLink({ commit }, parameters) {
-      if (!parameters.href.includes(String(parameters.processId))) {
-        commit('setTempShareLink', parameters.href)
-      }
-    },
-    setReportTypeToShareLink({ commit }, value) {
-      commit('setReportTypeToShareLink', value)
-    },
     setOrder({ commit }, params) {
       commit('setOrder', params)
     },
@@ -297,12 +281,6 @@ export default {
         return split.splitHeight
       }
       return 50
-    },
-    getTempShareLink: (state) => {
-      return state.tempShareLink
-    },
-    getReportType: (state) => {
-      return state.reportType
     },
 
     getOrders: (state) => {

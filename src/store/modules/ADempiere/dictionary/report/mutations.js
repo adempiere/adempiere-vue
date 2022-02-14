@@ -14,25 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const actionMenu = {
-  // actions
-  refreshRecords: 'Refrescar Registros',
-  deleteRecord: 'Eliminar Registro',
-  createNewRecord: 'Nuevo Registro',
-  shareLink: 'Compartir Enlace',
-  withoutActions: 'Sin Actiones',
-  zoomWindow: 'Acercar Ventana',
-  // process
-  runProcess: 'Ejecutar',
-  // report
-  generateReport: 'Generar',
-  generateReportAs: 'Generar Como',
-  // relations
-  relations: 'Relaciones',
-  withoutRelations: 'Sin Relaciones',
-  // references
-  references: 'Referencias',
-  withoutReferences: 'Sin referencias para el registro'
-}
+import Vue from 'vue'
 
-export default actionMenu
+/**
+ * Report Mutations
+ * All related to global store of Dictionary Window
+ */
+export default {
+  addReportToList(state, report) {
+    Vue.set(state.storedReports, report.uuid, report)
+  },
+
+  /**
+   * Change report field attribute
+   * @param {object} field
+   * @param {string} attributeName
+   * @param {mixed} attributeValue
+   */
+  changeReportFieldAttribute(state, payload) {
+    const { attributeName, attributeValue } = payload
+
+    payload.field[attributeName] = attributeValue
+  }
+}

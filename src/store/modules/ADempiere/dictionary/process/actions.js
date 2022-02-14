@@ -55,13 +55,6 @@ export default {
 
           dispatch('addProcessToList', processDefinition)
           resolve(processDefinition)
-
-          if (processDefinition.isReport) {
-            dispatch('getListPrintFormats', {
-              processUuid: uuid,
-              processId: processDefinition.id
-            })
-          }
         })
         .catch(error => {
           reject(error)
@@ -126,15 +119,6 @@ export default {
       })
 
       resolve(defaultAttributes)
-    })
-  },
-  setReportDefaultValues({ dispatch }, {
-    containerUuid,
-    fieldsList = []
-  }) {
-    dispatch('setProcessDefaultValues', {
-      containerUuid,
-      fieldsList
     })
   }
 

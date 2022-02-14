@@ -114,7 +114,7 @@ export default defineComponent({
         root.$router.push({
           name: 'Report Viewer',
           params: {
-            processId: activity.processId,
+            reportUuid: activity.uuid,
             instanceUuid: activity.instanceUuid,
             fileName: activity.output.fileName
           }

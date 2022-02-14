@@ -10,7 +10,7 @@ const mutations = {
     if (view.name === 'Report Viewer') {
       if (state.visitedViews.some(v =>
         v.params &&
-        v.params.processId === view.params.processId &&
+        v.params.reportUuid === view.params.reportUuid &&
         v.params.tableName === view.params.tableName
       )) return
       state.visitedViews.push(

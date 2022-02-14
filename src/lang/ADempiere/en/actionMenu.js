@@ -23,7 +23,10 @@ const actionMenu = {
   withoutActions: 'Without Actions',
   zoomWindow: 'Zoom Window',
   // process
-  runProcessOrReport: 'Run',
+  runProcess: 'Run',
+  // report
+  generateReport: 'Generate',
+  generateReportAs: 'Generate As',
   // relations
   relations: 'Relations',
   withoutRelations: 'Without Relations',

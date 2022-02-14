@@ -19,8 +19,9 @@
     <el-container class="sub-content-excel">
       <el-main style="padding: 0;">
         <el-button
-          style="margin:0 0 20px 20px;"
+          style="margin:0 0 10px 20px;"
           type="primary"
+          size="mini"
           icon="el-icon-download"
           @click="handleDownload"
         >
@@ -95,6 +96,11 @@ export default defineComponent({
     }
 
     function handleDownload() {
+      if (props.format === 'ssv') {
+        downloadWithLink()
+        return
+      }
+
       const header = excelData.value.header
       const data = excelData.value.results
       return new Promise((resolve) => {
@@ -161,7 +167,6 @@ export default defineComponent({
     return {
       excelData,
       // methods
-      downloadWithLink,
       handleDownload
     }
   }

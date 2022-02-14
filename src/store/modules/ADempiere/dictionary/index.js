@@ -15,9 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * For window, process and smart browser
+ * For window, process, report and smart browser
  */
-
 import windowState from './window/state.js'
 import windowActions from './window/actions.js'
 import windowMutations from './window/mutations.js'
@@ -26,6 +25,10 @@ import processState from './process/state.js'
 import processActions from './process/actions.js'
 import processMutations from './process/mutations.js'
 import processGetters from './process/getters.js'
+import reportState from './report/state.js'
+import reportActions from './report/actions.js'
+import reportMutations from './report/mutations.js'
+import reportGetters from './report/getters.js'
 import browserState from './browser/state.js'
 import browserActions from './browser/actions.js'
 import browserMutations from './browser/mutations.js'
@@ -35,21 +38,25 @@ const dictionary = {
   state: {
     ...windowState,
     ...processState,
+    ...reportState,
     ...browserState
   },
   mutations: {
     ...windowMutations,
     ...processMutations,
+    ...reportMutations,
     ...browserMutations
   },
   actions: {
     ...windowActions,
     ...processActions,
+    ...reportActions,
     ...browserActions
   },
   getters: {
     ...windowGetters,
     ...processGetters,
+    ...reportGetters,
     ...browserGetters
   }
 }

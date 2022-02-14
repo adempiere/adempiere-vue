@@ -1,5 +1,6 @@
 
 import actionMenu from './actionMenu'
+import extensionFile from './extensionFile'
 import fieldDisplayOptions from './fieldDisplayOptions'
 import fieldOptions from './fieldOptions'
 import recordManager from './recordManager'
@@ -7,6 +8,7 @@ import window from './window'
 
 export default {
   actionMenu,
+  extensionFile,
   fieldDisplayOptions,
   fieldOptions,
   recordManager,

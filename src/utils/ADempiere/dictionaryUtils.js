@@ -482,7 +482,11 @@ export function fieldIsDisplayedTable({
     !isKey
 }
 
-// Convert action to action name for route
+/**
+ * Convert action to action name for route
+ * @param {string} action
+ * @returns {object}
+ */
 export function convertAction(action) {
   const actionAttributes = {
     name: '',
@@ -509,7 +513,7 @@ export function convertAction(action) {
     case 'R':
       actionAttributes.name = 'report'
       actionAttributes.icon = 'skill'
-      actionAttributes.component = () => import('@/views/ADempiere/Process')
+      actionAttributes.component = () => import('@/views/ADempiere/Report')
       break
     case 'S':
       actionAttributes.name = 'browser'

@@ -14,25 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-const actionMenu = {
-  // actions
-  refreshRecords: 'Refrescar Registros',
-  deleteRecord: 'Eliminar Registro',
-  createNewRecord: 'Nuevo Registro',
-  shareLink: 'Compartir Enlace',
-  withoutActions: 'Sin Actiones',
-  zoomWindow: 'Acercar Ventana',
-  // process
-  runProcess: 'Ejecutar',
-  // report
-  generateReport: 'Generar',
-  generateReportAs: 'Generar Como',
-  // relations
-  relations: 'Relaciones',
-  withoutRelations: 'Sin Relaciones',
-  // references
-  references: 'Referencias',
-  withoutReferences: 'Sin referencias para el registro'
+const extensionFile = {
+  arxml: '(arxml) Archivo de Definición de Reporte ADempiere',
+  csv: '(csv) Archivo Separado por Coma',
+  html: '(html) Archivo Lenguaje de Marcas de Hipertexto',
+  pdf: '(pdf) Archivo PDF Acrobat',
+  ps: '(ps) Archivo Postscript',
+  ssv: '(ssv) Archivo separado por punto y coma',
+  txt: '(txt) Archivo de Texto Delimitado por Tabuladores',
+  xlsx: '(xlsx) Extencion de Archivo Excel',
+  xls: '(xls) Archivo Excel',
+  xml: '(xml) Archivo Lenguaje de marcas Extensible'
 }
 
-export default actionMenu
+export default extensionFile

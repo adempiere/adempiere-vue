@@ -16,6 +16,16 @@
 
 <template>
   <div class="html-content">
+    <el-button
+      style="margin:0 0 10px 20px;"
+      type="primary"
+      size="mini"
+      icon="el-icon-download"
+      @click="handleDownload"
+    >
+      {{ $t('components.contextMenuDownload') }}
+    </el-button>
+
     <el-container class="sub-content-html">
       <el-main style="padding: 0;">
         <div
@@ -30,6 +40,9 @@
 <script>
 import { defineComponent } from '@vue/composition-api'
 
+// utils and helper methods
+import { buildLinkHref } from '@/utils/ADempiere/resource'
+
 export default defineComponent({
   name: 'HTML-TXT-File',
 
@@ -37,6 +50,38 @@ export default defineComponent({
     content: {
       type: [Object, String],
       required: true
+    },
+    mimeType: {
+      type: String,
+      default: undefined
+    },
+    format: {
+      type: String,
+      default: 'xlsx'
+    },
+    name: {
+      type: String,
+      default: undefined
+    },
+    stream: {
+      type: [Object, Array],
+      required: true
+    }
+  },
+
+  setup(props) {
+    function handleDownload() {
+      buildLinkHref({
+        fileName: `${props.name}.${props.format}`,
+        mimeType: props.mimeType,
+        outputStream: props.stream,
+        isDownload: true
+      })
+    }
+
+    return {
+      // mehtods
+      handleDownload
     }
   }
 

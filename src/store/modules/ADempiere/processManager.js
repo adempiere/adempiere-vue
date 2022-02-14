@@ -52,7 +52,7 @@ const processManager = {
         const processDefinition = rootGetters.getStoredProcess(containerUuid)
 
         const parametersList = rootGetters.getProcessParameters({
-          containerUuid: processDefinition.uuid
+          containerUuid
         })
 
         const isSession = !isEmptyValue(getToken())
