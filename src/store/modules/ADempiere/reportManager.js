@@ -116,6 +116,7 @@ const reportManager = {
             }
             if (output && output.outputStream) {
               link = buildLinkHref({
+                fileName: output.fileName,
                 outputStream: output.outputStream,
                 type: output.mimeType
               })
