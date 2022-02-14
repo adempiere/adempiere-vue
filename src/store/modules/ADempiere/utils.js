@@ -158,7 +158,6 @@ export default {
       state.quickSearchOrder = order
     },
     setShowPanelAddress(state, showPanelAddress) {
-      console.log({ showPanelAddress })
       state.showPanelAddress = showPanelAddress
     }
   },

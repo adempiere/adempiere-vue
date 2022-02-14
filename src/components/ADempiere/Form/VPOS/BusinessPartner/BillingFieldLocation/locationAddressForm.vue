@@ -134,9 +134,9 @@ export default {
         return this.$store.getters.getFieldsListLocationBilling
       }
 
-      // return this.fieldsList
+      return this.fieldsList
 
-      return this.getterPanel.fieldsList
+      // return this.getterPanel.fieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({

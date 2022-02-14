@@ -31,11 +31,7 @@
             :metadata="fieldsList[0]"
             :value-model="fieldsList[0].value"
             :container-uuid="'New-Address'"
-            :container-manager="{
-              ...containerManager,
-              isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic},
-              isDisplayedField({ isDisplayed, isDisplayedFromLogic }) {return field.isDisplayed || field.isDisplayedFromLogic}
-            }"
+            :container-manager="containerManager"
           />
         </el-row>
       </div>
@@ -421,7 +417,6 @@ export default {
       newAddress.uuid = this.isEmptyValue(customer.uuid) ? this.$store.getters.getValueOfField({ containerUuid: this.$route.meta.uuid, columnName: 'C_BPartner_ID_UUID' }) : customer.uuid
       newAddress.value = this.isEmptyValue(this.$store.getters.getNewCustomer.value) ? customer.value : this.$store.getters.getNewCustomer.value
       newAddress.name = customer.name
-      console.log(newAddress, customer, this.addressToUpdate, this.isEmptyValue(this.$store.getters.getNewCustomer.value))
       updateCustomer(newAddress)
         .then(response => {
           const orderUuid = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid

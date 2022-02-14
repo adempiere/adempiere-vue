@@ -153,7 +153,7 @@ export default {
 
       // return this.fieldsList
 
-      return this.FieldsList
+      return this.fieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({
