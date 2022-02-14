@@ -8,8 +8,10 @@
       filterable
       default-first-option
       remote
-      :placeholder="$t('table.dataTable.search')"
+      :popper-class="styleInput"
       class="header-search-select"
+      :placeholder="$t('table.dataTable.search')"
+      @focus="openSearch"
       @change="change"
     >
       <el-option
@@ -18,8 +20,14 @@
         :value="element.item"
         :label="element.item.title.join(' > ')"
       >
-        {{ element.item.title.join(' > ') }}
-        <svg-icon :icon-class="element.item.meta.icon" />
+        <span v-if="isMobile">
+          <svg-icon :icon-class="element.item.meta.icon" />
+          {{ element.item.title.join(' > ') }}
+        </span>
+        <span v-else>
+          {{ element.item.title.join(' > ') }}
+          <svg-icon :icon-class="element.item.meta.icon" />
+        </span>
       </el-option>
     </el-select>
   </div>
@@ -56,6 +64,12 @@ export default {
     },
     supportPinyinSearch() {
       return this.$store.state.settings.supportPinyinSearch
+    },
+    styleInput() {
+      if (this.isMobile) {
+        return 'search-menu-mobile'
+      }
+      return ''
     }
   },
   watch: {
@@ -84,6 +98,12 @@ export default {
     this.searchPool = this.generateRoutes(this.routes)
   },
   methods: {
+    openSearch() {
+      if (this.show) {
+        this.querySearch('document')
+      }
+    },
+
     generateTitle,
     async addPinyinField(list) {
       const { default: pinyin } = await import('pinyin')
@@ -194,6 +214,15 @@ export default {
     querySearch(query) {
       if (query !== '') {
         this.options = this.fuse.search(query)
+        this.options.map(menu => {
+          if (this.isMobile && menu.item.title.length > 0) {
+            return {
+              ...menu,
+              title: menu.item.title.reverse()
+            }
+          }
+          return menu
+        })
       } else {
         this.options = []
       }
@@ -201,6 +230,20 @@ export default {
   }
 }
 </script>
+<style>
+.search-menu-mobile {
+  position: absolute;
+  top: 46px;
+  left: -444px;
+  transform-origin: center top;
+  z-index: 2002;
+  min-width: 150px;
+  max-width: 350px;
+}
+.search-scroll-mobile {
+  max-width: 350px;
+}
+</style>
 
 <style lang="scss" scoped>
 .header-search {
