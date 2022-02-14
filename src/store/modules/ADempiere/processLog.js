@@ -18,7 +18,6 @@ import {
   requestListProcessesLogs
 } from '@/api/ADempiere/process.js'
 import { showNotification } from '@/utils/ADempiere/notification.js'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import language from '@/lang'
 
 /**
@@ -58,41 +57,18 @@ const processLog = {
       pageToken,
       pageSize
     }) {
+      console.log({ rootGetters, getters })
       // process Activity
       return requestListProcessesLogs({ pageToken, pageSize })
         .then(processActivityResponse => {
-          const responseList = processActivityResponse.processLogsList.map(processLogItem => {
-            const { uuid: containerUuid } = processLogItem
-            const processMetadata = rootGetters.getProcess(containerUuid)
-
-            // if no exists metadata into store
-            if (isEmptyValue(processMetadata)) {
-              const processRequest = getters.getInRequestMetadata(containerUuid)
-              // if no request dictionary metadata in progess
-              if (isEmptyValue(processRequest)) {
-                commit('addInRequestMetadata', containerUuid)
-
-                dispatch('getProcessFromServer', {
-                  containerUuid
-                })
-                  .finally(() => {
-                    commit('deleteInRequestMetadata', containerUuid)
-                  })
-              }
-            }
-
-            const process = {
-              ...processLogItem,
-              processUuid: containerUuid
-            }
-            return process
-          })
+          const responseList = processActivityResponse.processLogsList
 
           const processResponseList = {
             recordCount: processActivityResponse.recordCount,
             processList: responseList,
             nextPageToken: processActivityResponse.nextPageToken
           }
+          console.log({ processResponseList })
           commit('setSessionProcess', processResponseList)
 
           return processResponseList
