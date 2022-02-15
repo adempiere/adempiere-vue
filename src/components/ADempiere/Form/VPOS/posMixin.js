@@ -78,6 +78,21 @@ export default {
       }
       return false
     },
+    validateOpenAmount() {
+      if (this.currentOrder.openAmount > 0) {
+        return false
+      }
+      if (!this.isEmptyValue(this.pendingPayments)) {
+        return this.isEmptyValue(this.pendingPayments)
+      }
+      return this.isDisabled
+    },
+    pendingPayments() {
+      if (!this.isEmptyValue(this.currentOrder.listPayments.payments)) {
+        return this.currentOrder.listPayments.payments.filter(payment => payment.documentStatus.value === 'DR')
+      }
+      return []
+    },
     allowsModifyQuantity() {
       return this.$store.getters.posAttributes.currentPointOfSales.isAllowsModifyQuantity
     },

@@ -39,7 +39,7 @@
                 label-position="top"
                 label-width="10px"
                 style="float: right; display: flex; line-height: 10px;"
-                :disabled="isDisabled"
+                :disabled="validateOpenAmount"
               >
                 <el-row id="fieldListCollection">
                   <el-col
@@ -107,7 +107,7 @@
           <samp id="buttonCollection" style="float: right;padding-right: 10px;">
             <el-button type="danger" icon="el-icon-close" @click="exit" />
             <el-button type="info" icon="el-icon-minus" :disabled="isDisabled" @click="undoPatment" />
-            <el-button type="success" icon="el-icon-plus" :disabled="validPay || addPay || isDisabled" @click="addCollectToList(paymentBox)" />
+            <el-button type="success" icon="el-icon-plus" :disabled="validPay || addPay || validateOpenAmount" @click="addCollectToList(paymentBox)" />
             <el-button type="primary" :disabled="validatePaymentBeforeProcessing" icon="el-icon-shopping-cart-full" @click="validateOrder(listPayments)" />
           </samp>
         </el-header>
@@ -337,7 +337,19 @@ export default {
       if (this.isEmptyValue(this.listPayments)) {
         return true
       }
+      return this.validateOpenAmount
+    },
+    validateOpenAmount() {
+      if (this.currentOrder.openAmount > 0) {
+        return false
+      }
+      if (!this.isEmptyValue(this.pendingPayments)) {
+        return this.isEmptyValue(this.pendingPayments)
+      }
       return this.isDisabled
+    },
+    pendingPayments() {
+      return this.listPayments.filter(payment => payment.documentStatus.value === 'DR')
     },
     cashPayment() {
       const cash = this.listPayments.filter(pay => {
