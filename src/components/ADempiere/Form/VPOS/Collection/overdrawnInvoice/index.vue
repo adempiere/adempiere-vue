@@ -65,7 +65,7 @@
                   <field-definition
                     :metadata-field="{
                       ...fieldsList[0],
-                      labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
+                      labelCurrency: refundReferenceCurrency
                     }"
                     :container-uuid="'OverdrawnInvoice'"
                     :container-manager="containerManager"
@@ -199,7 +199,7 @@
                   <field-definition
                     :metadata-field="{
                       ...fieldsList[0],
-                      labelCurrency: isEmptyValue(dayRate.divideRate) ? dayRate : dayRate.currencyTo
+                      labelCurrency: refundReferenceCurrency
                     }"
                     :container-uuid="'OverdrawnInvoice'"
                     :container-manager="containerManager"
@@ -465,11 +465,6 @@ export default {
       })
     },
     currentAvailablePaymentMethods() {
-      if (this.isEmptyValue(this.paymentTypeListRefund)) {
-        return {
-          name: ''
-        }
-      }
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
       if (!this.isEmptyValue(payment)) {
         return payment
@@ -634,14 +629,10 @@ export default {
       return this.$store.getters.getPaymentTypeList.filter(type => type.is_allowed_to_refund_open)
     },
     paymentTypeListRefund() {
-      return this.$store.getters.getPaymentTypeList.filter(type => {
-        if (type.is_allowed_to_refund) {
-          return type
-        }
-      })
+      return this.$store.getters.getPaymentTypeList.filter(type => type.is_allowed_to_refund)
     },
     searchRefundCurrency() {
-      if (this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
+      if (this.isEmptyValue(this.selectionTypeRefund) || this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
         return {}
       }
       const currency = this.convertionsList.filter(type => {
@@ -707,6 +698,9 @@ export default {
     },
     refundAmount() {
       return this.currentPointOfSales.currentOrder.refundAmount
+    },
+    currentBusinessPartner() {
+      return this.currentOrder.businessPartner.uuid
     }
   },
   watch: {
@@ -714,9 +708,12 @@ export default {
       const clear = false
       this.clearAccountData(clear)
       this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
-      if (this.isEmptyValue(value) && this.showDialogo) {
+      if (this.isEmptyValue(value) && !this.isEmptyValue(this.selectionTypeRefund) && this.showDialogo && !this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
         this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
       }
+    },
+    currentBusinessPartner(customerUuid) {
+      this.$store.dispatch('listCustomerBankAccounts', { customerUuid: this.currentOrder.businessPartner.uuid })
     },
     option(value) {
       const clear = false
@@ -748,15 +745,6 @@ export default {
         if (this.option === 1 && !this.isEmptyValue(this.paymentTypeListRefund)) {
           this.selectPayment(this.paymentTypeListRefund[0])
         }
-      }
-    },
-    selectionTypeRefund(value) {
-      if (value.tender_type === 'D') {
-        this.$store.commit('updateValueOfField', {
-          containerUuid: 'ACH',
-          columnName: 'IsACH', // this.parentMetadata.columnName,
-          value: true
-        })
       }
     },
     currentFieldPaymentMethods(value) {
@@ -904,7 +892,6 @@ export default {
         format: 'object'
       })
       const payment = this.searchPaymentMethods.find(payment => payment.uuid === this.currentFieldPaymentMethods)
-      const referencePaymentCurrency = this.listCurrency.find(currency => currency.iso_code === this.refundReferenceCurrency)
       const refund = this.convertValuesToSend(values)
       const fieldLogic = this.hiddenFieldsList.filter(field => field.isDisplayedFromLogic === true)
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({ containerUuid: 'OverdrawnInvoice', fieldsList: fieldLogic, isValidate: true, formatReturn: 'name' })
@@ -913,15 +900,6 @@ export default {
         this.$message({
           type: 'warning',
           message: this.$t('notifications.mandatoryFieldMissing') + emptyMandatoryFields,
-          duration: 1500,
-          showClose: true
-        })
-        return
-      }
-      if ((refund.amount / this.showDayRateAmount(referencePaymentCurrency.uuid).multiplyRate) > this.currentOrder.refundAmount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
           duration: 1500,
           showClose: true
         })
@@ -997,7 +975,7 @@ export default {
       const fieldBank = this.fieldsList.find(fields => fields.columnName === 'C_Bank_ID')
       let listBank
       if (!this.isEmptyValue(fieldBank) && fieldBank.reference) {
-        listBank = this.$store.getters.getLookupList({
+        listBank = this.$store.getters.getStoredLookupList({
           containerUuid: this.metadata.containerUuid,
           query: fieldBank.reference.query,
           tableName: fieldBank.reference.tableName
@@ -1092,7 +1070,7 @@ export default {
           },
           {
             columnName: 'C_Bank_ID',
-            value: value.bank.id
+            value: value.bank.value
           },
           {
             columnName: 'C_Bank_ID_UUID',
@@ -1203,15 +1181,6 @@ export default {
       })
       const filterPayment = this.listRefund.filter(payment => payment.paymentMethodUuid === paymentMethodUuid || payment.payment_method_uuid === paymentMethodUuid)
       const allPayMaximunRefund = this.sumRefund(filterPayment)
-      if ((amount * this.dayRate.divideRate) > this.currentOrder.refundAmount) {
-        this.$message({
-          type: 'warning',
-          message: this.$t('form.pos.collect.overdrawnInvoice.amountChange'),
-          duration: 1500,
-          showClose: true
-        })
-        return
-      }
       if (this.maximumRefundAllowed < amount || (this.maximumRefundAllowed - allPayMaximunRefund) < amount) {
         this.visiblePin = true
         setTimeout(() => {
@@ -1482,6 +1451,7 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
+        isOpenRefund: !this.isEmptyValue(this.$store.getters.getListRefundReference),
         createPayments: !this.isEmptyValue(this.listAllPayments),
         payments: this.listAllPayments
       })

@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Elsio Sanchez esanchez@erpya.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -15,33 +15,26 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Order State
+ * Suppoerted render files
  */
-const withoutResponse = {
-  isLoaded: false,
-  isReload: true,
-  recordCount: 0,
-  nextPageToken: undefined
-}
-export default {
-  order: {
-    documentType: {},
-    documentStatus: {
-      value: ''
-    },
-    totalLines: 0,
-    grandTotal: 0,
-    salesRepresentative: {},
-    businessPartner: {
-      value: '',
-      uuid: ''
-    },
-    uuid: ''
-  },
-  findOrder: {},
-  newCustomer: {},
-  listOrder: {
-    ...withoutResponse,
-    isShowPopover: false
-  }
-}
+export const viewerSupportedFormats = [
+  'csv',
+  'html',
+  'pdf',
+  'ssv',
+  'txt',
+  'xls',
+  'xlsx'
+]
+
+export const reportFormatsList = [
+  'arxml',
+  'csv',
+  'pdf',
+  'ps',
+  'ssv',
+  'txt',
+  'xls',
+  'xlsx',
+  'xml'
+]

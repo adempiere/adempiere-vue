@@ -23,8 +23,7 @@ import { isHiddenField } from '@/utils/ADempiere/references'
  * @param {number} displayType
  * @param {boolean} isActive
  * @param {boolean} isDisplayed
- * @param {boolean} isMandatory
- * @param {boolean} isMandatoryFromLogic
+ * @param {boolean} isDisplayedFromLogic
  * @returns {boolean}
  */
 export function isDisplayedField({ displayType, isActive, isDisplayed, isDisplayedFromLogic }) {
@@ -34,11 +33,7 @@ export function isDisplayedField({ displayType, isActive, isDisplayed, isDisplay
   }
 
   // verify if field is active
-  if (!isActive) {
-    return false
-  }
-
-  return isDisplayed && isDisplayedFromLogic
+  return isActive && isDisplayed && isDisplayedFromLogic
 }
 
 /**

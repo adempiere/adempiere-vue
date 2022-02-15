@@ -148,6 +148,13 @@ export function getParentFields({
   reference,
   defaultValue
 }) {
+  const validationCode = []
+  //  Validate reference
+  if (!isEmptyValue(reference) && !isEmptyValue(reference.validationCode)) {
+    validationCode.push(
+      ...evaluator.parseDepends(reference.validationCode)
+    )
+  }
   const parentFields = Array.from(new Set([
     //  For Display logic
     ...evaluator.parseDepends(displayLogic),
@@ -156,12 +163,11 @@ export function getParentFields({
     //  For Read Only Logic
     ...evaluator.parseDepends(readOnlyLogic),
     //  For Default Value
-    ...evaluator.parseDepends(defaultValue)
+    ...evaluator.parseDepends(defaultValue),
+    //  For Validation Code
+    ...validationCode
   ]))
-  //  Validate reference
-  if (!isEmptyValue(reference)) {
-    parentFields.push(...evaluator.parseDepends(reference.validationCode))
-  }
+
   return parentFields
 }
 

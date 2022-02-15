@@ -20,11 +20,14 @@ import { request } from '@/utils/ADempiere/request'
 /**
  * Request Pending Documents List
  * @param {string} tableName
- * @param {string} processUuid
+ * @param {string} uuid report universally unique identifier
+ * @param {string} pageToken token of pagination to number page
+ * @param {number} pageSize limit of records to return
+ * @returns {promise}
  */
 export function requestListReportsViews({
   tableName,
-  processUuid,
+  uuid,
   pageToken,
   pageSize
 }) {
@@ -33,7 +36,7 @@ export function requestListReportsViews({
     method: 'get',
     params: {
       table_name: tableName,
-      process_uuid: processUuid,
+      process_uuid: uuid,
       page_token: pageToken,
       page_size: pageSize
     }
@@ -51,11 +54,19 @@ export function requestListReportsViews({
     })
 }
 
-// Get print formats from table name, report view uuid or process uuid
+/**
+ * Get print formats from table name, report view uuid or process uuid
+ * @param {string} reportViewUuid report view universally unique identifier
+ * @param {string} tableName
+ * @param {string} uuid report universally unique identifier
+ * @param {string} pageToken token of pagination to number page
+ * @param {number} pageSize limit of records to return
+ * @returns {promise}
+ */
 export function requestListPrintFormats({
   tableName,
   reportViewUuid,
-  processUuid,
+  uuid,
   pageToken,
   pageSize
 }) {
@@ -65,7 +76,7 @@ export function requestListPrintFormats({
     params: {
       table_name: tableName,
       report_view_uuid: reportViewUuid,
-      process_uuid: processUuid,
+      process_uuid: uuid,
       page_token: pageToken,
       page_size: pageSize
     }
@@ -77,7 +88,13 @@ export function requestListPrintFormats({
     })
 }
 
-// Get drill tables for a report
+/**
+ * Get drill tables for a report
+ * @param {string} tableName
+ * @param {string} pageToken token of pagination to number page
+ * @param {number} pageSize limit of records to return
+ * @returns {promise}
+ */
 export function requestListDrillTables({
   tableName,
   pageToken,

@@ -16,6 +16,7 @@
 
 // Get Instance for connection
 import { request } from '@/utils/ADempiere/request'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 /**
  * Object List from window
@@ -33,32 +34,36 @@ export function getEntities({
   columns = [],
   attributes = [],
   sorting = [],
+  filters,
   pageToken,
   pageSize
 }) {
-  const filters = conditions.map(condition => {
-    const { value, operator, columnName, valueTo, values } = condition
-    return {
-      column_name: columnName,
-      value,
-      operator,
-      value_to: valueTo,
-      values
-    }
-  })
-
-  let attributesValues
-  if (attributes) {
-    attributesValues = attributes.map(attributeValue => {
+  if (isEmptyValue(filters)) {
+    filters = conditions.map(condition => {
+      const { value, operator, columnName, valueTo, values } = condition
       return {
-        column_name: attributeValue.columnName,
-        value: attributeValue.value
+        column_name: columnName,
+        value,
+        operator,
+        value_to: valueTo,
+        values
       }
     })
   }
 
+  // context attributes
+  if (!isEmptyValue(attributes)) {
+    attributes.forEach(attributeValue => {
+      filters.push({
+        column_name: attributeValue.columnName,
+        operator: attributeValue.operator,
+        value: attributeValue.value
+      })
+    })
+  }
+
   let sortingDefinition
-  if (sorting) {
+  if (!isEmptyValue(sorting)) {
     sortingDefinition = sorting.map(sortValue => {
       return {
         column_name: sortValue.columnName,
@@ -77,7 +82,6 @@ export function getEntities({
       filters,
       columns,
       // replace sql values
-      context_attributes: attributesValues,
       sorting: sortingDefinition,
       // Page Data
       page_token: pageToken,

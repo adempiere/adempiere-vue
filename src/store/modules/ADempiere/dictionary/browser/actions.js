@@ -22,7 +22,7 @@ import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser
 // constants
 import {
   refreshBrowserSearh,
-  runProcessOrReport,
+  runProcess,
   sharedLink,
   zoomWindow
 } from '@/utils/ADempiere/constants/actionsMenuList'
@@ -82,7 +82,7 @@ export default {
     if (!isEmptyValue(browserDefinition.process)) {
       const { uuid, name, description } = browserDefinition.process
       const actionProcess = {
-        ...runProcessOrReport,
+        ...runProcess,
         uuid,
         name,
         description

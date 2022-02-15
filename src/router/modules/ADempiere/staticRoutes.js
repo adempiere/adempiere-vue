@@ -53,10 +53,10 @@ const staticRoutes = [
     path: '/report-viewer',
     component: Layout,
     hidden: true,
-    redirect: 'report-viewer/:processId/:instanceUuid/:fileName/:tableName?',
+    redirect: 'report-viewer/:reportUuid/:instanceUuid/:fileName/:tableName?',
     children: [
       {
-        path: ':processId/:instanceUuid/:fileName/:tableName?',
+        path: ':reportUuid/:instanceUuid/:fileName/:tableName?',
         component: () => import('@/views/ADempiere/ReportViewer'),
         name: 'Report Viewer',
         meta: {

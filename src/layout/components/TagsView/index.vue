@@ -103,9 +103,9 @@ export default {
     generateTitle, // generateTitle by vue-i18n
     isActive(route) {
       if (route.name === 'Report Viewer') {
-        const isSameProcess = route.params.processId === this.$route.params.processId
-        if (isSameProcess && route.params.tableName === this.$route.params.tableName) {
-          return isSameProcess
+        const isSameReport = route.params.reportUuid === this.$route.params.reportUuid
+        if (isSameReport && route.params.tableName === this.$route.params.tableName) {
+          return isSameReport
         }
         return route.path === this.$route.path
       }
@@ -156,7 +156,9 @@ export default {
       this.$nextTick(() => {
         for (const tag of tags) {
           if (this.$route.name === 'Report Viewer') {
-            if (this.$route.params && tag.to.params && tag.to.params.processId === this.$route.params.processId && tag.to.params.tableName === this.$route.params.tableName) {
+            if (this.$route.params && tag.to.params &&
+              tag.to.params.reportUuid === this.$route.params.reportUuid &&
+              tag.to.params.tableName === this.$route.params.tableName) {
               this.$refs.scrollPane.moveToTarget(tag)
             }
           }

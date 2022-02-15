@@ -1,5 +1,6 @@
 
 import actionMenu from './actionMenu'
+import extensionFile from './extensionFile'
 import fieldDisplayOptions from './fieldDisplayOptions'
 import fieldOptions from './fieldOptions'
 import recordManager from './recordManager'
@@ -7,6 +8,7 @@ import window from './window'
 
 export default {
   actionMenu,
+  extensionFile,
   fieldDisplayOptions,
   fieldOptions,
   recordManager,
@@ -64,7 +66,8 @@ export default {
     recordLocked: 'Este registro ha sido bloqueado',
     recordUnlocked: 'Este registro ha sido desbloqueado',
     noRoleAccess: 'Con su rol y configuración actuales, no puede ver esta información.',
-    errorPointOfSale: 'Sin punto de venta seleccionado'
+    errorPointOfSale: 'Sin punto de venta seleccionado',
+    emptyPos: 'Este Usuario no tiene Ningún Terminal de PDV Asignado'
   },
   navbar: {
     badge: {
@@ -499,7 +502,6 @@ export default {
           emptyPayment: 'Método de pago no soportado',
           emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
-          amountChange: 'Monto superior al cambio',
           amountLimitOrder: 'Monto Superior al Límite de la Orden',
           incompleteChange: 'Cambio Incompleto',
           fieldList: {

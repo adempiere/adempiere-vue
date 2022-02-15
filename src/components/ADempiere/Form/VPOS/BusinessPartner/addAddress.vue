@@ -145,8 +145,7 @@ export default {
       currentCustomer: {},
       isShippingAddress: false,
       isBillingAddress: false,
-      isCustomForm: true,
-      unsubscribe: () => {}
+      isCustomForm: true
     }
   },
   computed: {
@@ -229,9 +228,9 @@ export default {
       }
     }
   },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
+  // beforeDestroy() {
+  //   this.unsubscribe()
+  // },
   methods: {
     getCustomer() {
       this.$store.dispatch('changeCopyShippingAddress', false)
@@ -414,9 +413,10 @@ export default {
           }
         ]
       }
-      const newAddress = { uuid: customer.uuid, value: customer.value, taxId: customer.taxId, name: customer.name, addresses, posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid }
+      const newAddress = { uuid: customer.uuid, taxId: customer.taxId, name: customer.name, addresses, posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid }
       newAddress.uuid = this.isEmptyValue(customer.uuid) ? this.$store.getters.getValueOfField({ containerUuid: this.$route.meta.uuid, columnName: 'C_BPartner_ID_UUID' }) : customer.uuid
-      newAddress.value = this.isEmptyValue(customer.value) ? this.addressToUpdate.value : customer.value
+      newAddress.value = this.isEmptyValue(this.$store.getters.getNewCustomer.value) ? customer.value : this.$store.getters.getNewCustomer.value
+      newAddress.name = customer.name
       updateCustomer(newAddress)
         .then(response => {
           const orderUuid = this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid

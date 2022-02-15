@@ -105,8 +105,7 @@ export default defineComponent({
               callBack: () => {
                 root.$store.dispatch('getEntities', {
                   parentUuid: props.parentUuid,
-                  containerUuid: uuid,
-                  tableName
+                  containerUuid: uuid
                 })
               }
             },

@@ -88,9 +88,6 @@ export default {
   },
 
   computed: {
-    isPanelWindow() {
-      return this.metadata.panelType === 'window'
-    },
     isSelectMultiple() {
       return ['IN', 'NOT_IN'].includes(this.metadata.operator) && this.metadata.isAdvancedQuery
     },

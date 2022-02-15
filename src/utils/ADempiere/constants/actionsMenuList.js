@@ -211,15 +211,44 @@ export const recordAccess = {
   }
 }
 
-export const runProcessOrReport = {
-  name: language.t('actionMenu.runProcessOrReport'),
+export const runProcess = {
+  name: language.t('actionMenu.runProcess'),
   enabled: true,
   svg: false,
   icon: 'el-icon-setting',
-  actionName: 'runProcessOrReport',
+  actionName: 'runProcess',
   uuid: null,
-  runProcessOrReport: ({ root, containerUuid }) => {
+  runProcess: ({ root, containerUuid }) => {
     root.$store.dispatch('startProcess', {
+      containerUuid
+    })
+  }
+}
+
+export const runReport = {
+  name: language.t('actionMenu.generateReport'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-document',
+  actionName: 'runReport',
+  uuid: null,
+  runReport: ({ root, containerUuid }) => {
+    root.$store.dispatch('startReport', {
+      containerUuid
+    })
+  }
+}
+
+export const runReportAs = {
+  name: language.t('actionMenu.generateReportAs'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-document',
+  actionName: 'runReportAs',
+  uuid: null,
+  childs: [],
+  runReportAs: ({ root, containerUuid }) => {
+    root.$store.dispatch('startReport', {
       containerUuid
     })
   }

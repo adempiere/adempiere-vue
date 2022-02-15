@@ -40,20 +40,20 @@
     </el-header>
 
     <el-main>
-      <el-collapse
-        v-model="openedCriteria"
-        class="browser-collapse"
+      <collapse
+        :title="$t('views.searchCriteria')"
+        :container-uuid="browserUuid"
+        :panel-metadata="browserMetadata"
+        :container-manager="containerManager"
       >
-        <el-collapse-item :title="$t('views.searchCriteria')" name="opened-criteria">
-          <panel-definition
-            class="browser-query-criteria"
-            :container-uuid="browserUuid"
-            :panel-metadata="browserMetadata"
-            :container-manager="containerManager"
-          />
-        </el-collapse-item>
-      </el-collapse>
-
+        <panel-definition
+          class="browser-query-criteria"
+          :container-uuid="browserUuid"
+          :panel-metadata="browserMetadata"
+          :container-manager="containerManager"
+          :is-show-filter="false"
+        />
+      </collapse>
       <!-- result of records in the table -->
       <default-table
         class="browser-table-result"
@@ -62,7 +62,7 @@
         :panel-metadata="browserMetadata"
         :header="tableHeader"
         :data-table="recordsList"
-        :record-count="recordCount"
+        :is-show-search="false"
       />
     </el-main>
   </el-container>
@@ -79,6 +79,7 @@ import { computed, defineComponent, ref } from '@vue/composition-api'
 // componets and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
+import Collapse from '@/components/ADempiere/Collapse/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
@@ -96,6 +97,7 @@ export default defineComponent({
   components: {
     ActionMenu,
     DefaultTable,
+    Collapse,
     LoadingView,
     PanelDefinition,
     TitleAndHelp
@@ -263,6 +265,10 @@ export default defineComponent({
     const containerManagerTable = {
       ...containerManager,
 
+      actionPerformed({ field, value, valueTo, containerUuid }) {
+        // TODO: Logic to implement in table
+      },
+
       /**
        * Is displayed column in table multi record
        */
@@ -275,24 +281,36 @@ export default defineComponent({
         row
       }) {
         // read only with metadata
-        if (isReadOnlyColumn(field)) {
-          true
-        }
-
-        return false
+        return isReadOnlyColumn(field)
       },
 
       seekRecord: ({
         containerUuid,
         row
       }) => {
-        console.log(containerUuid, row)
+        // TODO: Logic to implement in table
       },
 
+      setRow: ({ containerUuid, rowIndex, row }) => {
+        return root.$store.commit('setBrowserRow', {
+          containerUuid,
+          rowIndex,
+          row
+        })
+      },
       getRow: ({ containerUuid, rowIndex }) => {
         return root.$store.getters.getBrowserRowData({
           containerUuid,
           rowIndex
+        })
+      },
+
+      setCell: ({ containerUuid, rowIndex, columnName, value }) => {
+        return root.$store.commit('setBrowserCell', {
+          containerUuid,
+          rowIndex,
+          columnName,
+          value
         })
       },
       getCell: ({ containerUuid, rowIndex, columnName }) => {
@@ -328,14 +346,28 @@ export default defineComponent({
       }
     }
 
-    const actionsManager = ref({
-      containerUuid: browserUuid,
+    const processName = computed(() => {
+      const browser = storedBrowser.value
+      if (!root.isEmptyValue(browser)) {
+        const process = storedBrowser.value.process
+        if (!root.isEmptyValue(process)) {
+          return process.name
+        }
+      }
 
-      defaultActionName: root.$t('actionMenu.runProcessOrReport'),
+      return root.$t('actionMenu.runProcess')
+    })
 
-      getActionList: () => root.$store.getters.getStoredActionsMenu({
-        containerUuid: browserUuid
-      })
+    const actionsManager = computed(() => {
+      return {
+        containerUuid: browserUuid,
+
+        defaultActionName: processName.value,
+
+        getActionList: () => root.$store.getters.getStoredActionsMenu({
+          containerUuid: browserUuid
+        })
+      }
     })
 
     const relationsManager = ref({
@@ -347,16 +379,6 @@ export default defineComponent({
       return root.$store.getters.getBrowserRecordsList({
         containerUuid: browserUuid
       })
-    })
-
-    const recordCount = computed(() => {
-      const data = root.$store.getters.getBrowserData({
-        containerUuid: browserUuid
-      })
-      if (data && data.recordCount) {
-        return data.recordCount
-      }
-      return 0
     })
 
     getBrowserDefinition()
@@ -373,7 +395,6 @@ export default defineComponent({
       openedCriteria,
       isShowContextMenu,
       tableHeader,
-      recordCount,
       recordsList
     }
   }
@@ -381,14 +402,24 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-/* removes the title link effect on collapse */
-.el-collapse-item__header:hover {
-  background-color: #fcfcfc;
-}
-
 .browser-view {
   .browser-collapse {
     margin-bottom: 10px;
+  }
+
+  /* removes the title link effect on collapse */
+  .el-collapse-item__header {
+    &:hover {
+      background-color: #fcfcfc;
+      color: #000;
+    }
+    &.focusing:focus:not(:hover) {
+      color: #000;
+    }
+
+    /* browser criteria title */
+    font-weight: bold;
+    font-size: 16px;
   }
 }
 </style>

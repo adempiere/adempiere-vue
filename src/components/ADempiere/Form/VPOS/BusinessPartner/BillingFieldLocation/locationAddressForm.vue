@@ -31,7 +31,11 @@
             <field-definition
               :parent-uuid="parentUuid"
               :container-uuid="containerUuid"
-              :container-manager="containerManagerLocation"
+              :container-manager="{
+                ...containerManager,
+                isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic},
+                isDisplayedField({ isDisplayed, isDisplayedFromLogic }) {return field.isDisplayed || field.isDisplayedFromLogic}
+              }"
               :metadata-field="field"
             />
           </el-col>
@@ -130,9 +134,9 @@ export default {
         return this.$store.getters.getFieldsListLocationBilling
       }
 
-      // return this.fieldsList
+      return this.fieldsList
 
-      return this.getterPanel.fieldsList
+      // return this.getterPanel.fieldsList
     },
     locationId() {
       return this.$store.getters.getValueOfField({

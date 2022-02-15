@@ -115,11 +115,9 @@
     </el-form>
     <el-dialog
       :title="$t('form.pos.order.BusinessPartnerCreate.address.editAddress')"
-      :visible.sync="isShowModal"
-      :show-close="true"
-      :append-to-body="true"
-      :modal-append-to-body="true"
+      :visible.sync="showAddressUpdate"
       :modal="false"
+      :before-close="handleClose"
     >
       <add-address
         :is-updated-address="showAddressUpdate"
@@ -201,8 +199,7 @@ export default {
         id: '',
         uuid: '',
         name: ''
-      },
-      unsubscribe: () => {}
+      }
     }
   },
   computed: {
@@ -289,11 +286,11 @@ export default {
       this.getCustomer()
     }
   },
-  beforeDestroy() {
-    this.unsubscribe()
-  },
   methods: {
     requestGetCountryDefinition,
+    handleClose() {
+      this.$store.commit('setShowAddNewAddress', false)
+    },
     closePanelAddress() {
       this.isShowModal = false
       this.showPanelAddress = false
@@ -565,6 +562,7 @@ export default {
     },
     openEditAddress(address) {
       this.showPanelAddress = true
+      this.isShowModal = true
       this.$store.commit('setShowAddressUpdate', true)
       this.$store.commit('setShowPanelAddress', true)
       this.addressUpdate = address

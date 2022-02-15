@@ -103,23 +103,25 @@ export default {
       if (!this.isEmptyValue(getRecordNotification.typeActivity) && getRecordNotification.typeActivity) {
         return ''
       }
-      if (val !== null) {
-        let options = {
-          name: 'ProcessActivity'
-        }
-        if (getRecordNotification && getRecordNotification.isReport && val.className !== 'procesActivity') {
-          options = {
-            name: 'Report Viewer',
-            params: {
-              processId: getRecordNotification.processId,
-              instanceUuid: getRecordNotification.instanceUuid,
-              fileName: getRecordNotification.download
-            }
+      if (this.isEmptyValue(val)) {
+        return
+      }
+
+      let options = {
+        name: 'ProcessActivity'
+      }
+      if (getRecordNotification && getRecordNotification.isReport && val.className !== 'procesActivity') {
+        options = {
+          name: 'Report Viewer',
+          params: {
+            reportUuid: getRecordNotification.reportUuid,
+            instanceUuid: getRecordNotification.instanceUuid,
+            fileName: getRecordNotification.download
           }
         }
-
-        this.$router.push(options, () => {})
       }
+
+      this.$router.push(options, () => {})
     },
     openProcess(index, rows) {
       this.$router.push({ name: '8e51c232-fb40-11e8-a479-7a0060f0aa01' }, () => {})

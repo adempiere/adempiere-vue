@@ -19,8 +19,8 @@
 <template>
   <el-container
     v-if="isLoadedMetadata"
-    key="process-loaded"
-    class="view-base process-view"
+    key="report-loaded"
+    class="view-base report-view"
     style="height: 84vh;"
   >
     <el-header
@@ -28,22 +28,22 @@
       style="height: 30px;"
     >
       <action-menu
-        :parent-uuid="processUuid"
+        :parent-uuid="reportUuid"
         :actions-manager="actionsManager"
         :relations-manager="relationsManager"
       />
     </el-header>
 
     <el-main>
-      <el-card class="content-collapse card-process">
+      <el-card class="content-collapse card-report">
         <title-and-help
-          :name="processMetadata.name"
-          :help="processMetadata.help"
+          :name="reportMetadata.name"
+          :help="reportMetadata.help"
         />
 
         <panel-definition
-          :container-uuid="processUuid"
-          :panel-metadata="processMetadata"
+          :container-uuid="reportUuid"
+          :panel-metadata="reportMetadata"
           :container-manager="containerManager"
         />
       </el-card>
@@ -65,8 +65,8 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
-import { convertProcess } from '@/utils/ADempiere/apiConverts/dictionary.js'
-import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
+import { convertProcess as convertReport } from '@/utils/ADempiere/apiConverts/dictionary.js'
+import { generateProcess as generateReport } from '@/utils/ADempiere/dictionary/process.js'
 
 // utils and helper methods
 import {
@@ -75,14 +75,8 @@ import {
   isReadOnlyField
 } from '@/utils/ADempiere/dictionary/process.js'
 
-// constants
-import {
-  runProcess,
-  sharedLink
-} from '@/utils/ADempiere/constants/actionsMenuList'
-
 export default defineComponent({
-  name: 'ProcessView',
+  name: 'ReportView',
 
   components: {
     ActionMenu,
@@ -101,25 +95,25 @@ export default defineComponent({
 
   setup(props, { root }) {
     const isLoadedMetadata = ref(false)
-    const processMetadata = ref({})
+    const reportMetadata = ref({})
 
-    let processUuid = root.$route.meta.uuid
+    let reportUuid = root.$route.meta.uuid
     // set uuid from test
     if (!root.isEmptyValue(props.uuid)) {
-      processUuid = props.uuid
+      reportUuid = props.uuid
     }
 
     const showContextMenu = computed(() => {
       return root.$store.state.settings.showContextMenu
     })
 
-    const storedProcess = computed(() => {
-      return root.$store.getters.getStoredProcess(processUuid)
+    const storedReport = computed(() => {
+      return root.$store.getters.getStoredReport(reportUuid)
     })
 
     const storedPrintFormatList = computed(() => {
       if (root.$route.meta.type === 'report') {
-        return root.$store.getters.getPrintFormatList(processUuid)
+        return root.$store.getters.getPrintFormatList(reportUuid)
       }
       return []
     })
@@ -129,11 +123,11 @@ export default defineComponent({
       value: true
     })
 
-    // get process/report from vuex store or request from server
-    const getProcess = async() => {
-      let process = storedProcess.value
-      if (process) {
-        processMetadata.value = process
+    // get report from vuex store or request from server
+    const getReport = async() => {
+      let report = storedReport.value
+      if (report) {
+        reportMetadata.value = report
         isLoadedMetadata.value = true
         return
       }
@@ -141,25 +135,25 @@ export default defineComponent({
       // metadata props use for test
       if (!root.isEmptyValue(props.metadata)) {
         // from server response
-        process = convertProcess(props.metadata)
+        report = convertReport(props.metadata)
         // add apps properties
-        process = generateProcess(process)
+        report = generateReport(report)
         // add into store
-        return root.$store.dispatch('addProcess', process)
-          .then(processResponse => {
+        return root.$store.dispatch('addReport', report)
+          .then(reportResponse => {
             // to obtain the load effect
             setTimeout(() => {
-              processMetadata.value = processResponse
+              reportMetadata.value = reportResponse
               isLoadedMetadata.value = true
             }, 1000)
           })
       }
 
-      root.$store.dispatch('getProcessDefinitionFromServer', {
-        uuid: processUuid
+      root.$store.dispatch('getReportDefinitionFromServer', {
+        uuid: reportUuid
       })
-        .then(processResponse => {
-          processMetadata.value = processResponse
+        .then(reportResponse => {
+          reportMetadata.value = reportResponse
         }).catch(error => {
           console.warn(error)
         }).finally(() => {
@@ -169,7 +163,7 @@ export default defineComponent({
 
     const containerManager = {
       actionPerformed: ({ field, value }) => {
-        // let action = 'processActionPerformed'
+        // let action = 'reportActionPerformed'
         // if (field.isReport) {
         //   action = 'reportActionPerformed'
         // }
@@ -180,7 +174,7 @@ export default defineComponent({
       },
 
       setDefaultValues: ({ containerUuid }) => {
-        root.$store.dispatch('setProcessDefaultValues', {
+        root.$store.dispatch('setReportDefaultValues', {
           containerUuid
         })
       },
@@ -196,24 +190,23 @@ export default defineComponent({
       isMandatoryField,
 
       changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
-        root.$store.dispatch('changeProcessFieldShowedFromUser', {
+        root.$store.dispatch('changeReportFieldShowedFromUser', {
           containerUuid,
           fieldsShowed
         })
       }
     }
 
-    getProcess()
+    getReport()
 
     const actionsManager = ref({
-      containerUuid: processUuid,
+      containerUuid: reportUuid,
 
-      defaultActionName: root.$t('actionMenu.runProcess'),
+      defaultActionName: root.$t('actionMenu.generateReport'),
 
-      getActionList: () => [
-        runProcess,
-        sharedLink
-      ]
+      getActionList: () => root.$store.getters.getStoredActionsMenu({
+        containerUuid: reportUuid
+      })
     })
 
     const relationsManager = ref({
@@ -221,25 +214,23 @@ export default defineComponent({
     })
 
     return {
-      processUuid,
+      reportUuid,
       isLoadedMetadata,
-      processMetadata,
+      reportMetadata,
       containerManager,
       actionsManager,
       relationsManager,
       // computeds
       showContextMenu,
-      storedPrintFormatList,
-      // methods
-      getProcess
+      storedPrintFormatList
     }
   }
 })
 </script>
 
 <style lang="scss">
-.process-view {
-  .card-process {
+.report-view {
+  .card-report {
     >.el-card__body {
       padding-top: 0px;
       padding-right: 20px;

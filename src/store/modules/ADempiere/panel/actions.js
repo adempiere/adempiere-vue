@@ -399,7 +399,8 @@ const actions = {
           // Change Dependents
           dispatch('changeDependentFieldsList', {
             field,
-            fieldsList
+            fieldsList,
+            containerManager
           })
         })
         .catch(error => {
@@ -410,19 +411,34 @@ const actions = {
   /**
    * Change dependent fields (default value, logics displayed, mandatory and read only)
    * @param {object} field, definition and attributes
+   * @param {array} fieldsList, list of fields
+   * @param {object} containerManager, logic implement by panel type
    * TODO: Not working with fields generated on lookupFactory
+   * TODO: Evaluated with reference (direct query) lookup item
    */
   changeDependentFieldsList({ commit, dispatch, getters }, {
     field,
-    fieldsList
+    fieldsList,
+    containerManager
   }) {
     if (isEmptyValue(field.dependentFieldsList)) {
       // breaks if there are no field dependencies
       return
     }
+
+    const { parentUuid, containerUuid } = field
     //  Get all fields
     if (isEmptyValue(fieldsList)) {
-      fieldsList = getters.getFieldsListFromPanel(field.containerUuid)
+      if (containerManager && containerManager.getFieldsList) {
+        fieldsList = containerManager.getFieldsList({
+          parentUuid,
+          containerUuid
+        })
+      } else {
+        // TODO: Legacy implementation
+        // @deprecated replace with container manager
+        fieldsList = getters.getFieldsListFromPanel(containerUuid)
+      }
     }
     const dependentsList = fieldsList.filter(fieldItem => {
       return field.dependentFieldsList.includes(fieldItem.columnName)
@@ -435,8 +451,8 @@ const actions = {
       if (!isEmptyValue(fieldDependent.displayLogic)) {
         isDisplayedFromLogic = evaluator.evaluateLogic({
           context: getContext,
-          parentUuid: field.parentUuid,
-          containerUuid: field.containerUuid,
+          parentUuid,
+          containerUuid,
           logic: fieldDependent.displayLogic
         })
       }
@@ -444,8 +460,8 @@ const actions = {
       if (!isEmptyValue(fieldDependent.mandatoryLogic)) {
         isMandatoryFromLogic = evaluator.evaluateLogic({
           context: getContext,
-          parentUuid: field.parentUuid,
-          containerUuid: field.containerUuid,
+          parentUuid,
+          containerUuid,
           logic: fieldDependent.mandatoryLogic
         })
       }
@@ -453,8 +469,8 @@ const actions = {
       if (!isEmptyValue(fieldDependent.readOnlyLogic)) {
         isReadOnlyFromLogic = evaluator.evaluateLogic({
           context: getContext,
-          parentUuid: field.parentUuid,
-          containerUuid: field.containerUuid,
+          parentUuid,
+          containerUuid,
           logic: fieldDependent.readOnlyLogic
         })
       }
@@ -463,29 +479,29 @@ const actions = {
         fieldDependent.defaultValue.includes('@') &&
         !fieldDependent.defaultValue.includes('@SQL=')) {
         defaultValue = parseContext({
-          parentUuid: field.parentUuid,
-          containerUuid: field.containerUuid,
+          parentUuid,
+          containerUuid,
           value: fieldDependent.defaultValue
         }).value
       }
       if (!isEmptyValue(fieldDependent.defaultValue) &&
         fieldDependent.defaultValue.includes('@SQL=')) {
         defaultValue = parseContext({
-          parentUuid: field.parentUuid,
-          containerUuid: field.containerUuid,
+          parentUuid,
+          containerUuid,
           isSQL: true,
           value: fieldDependent.defaultValue
         }).query
         if (defaultValue !== fieldDependent.parsedDefaultValue) {
           const newValue = await dispatch('getDefaultValue', {
-            parentUuid: field.parentUuid,
-            containerUuid: field.containerUuid,
+            parentUuid,
+            containerUuid,
             query: defaultValue
           })
           //  Update values for field
           commit('updateValueOfField', {
-            parentUuid: field.parentUuid,
-            containerUuid: field.containerUuid,
+            parentUuid,
+            containerUuid,
             columnName: fieldDependent.columnName,
             value: newValue
           })
@@ -501,6 +517,7 @@ const actions = {
       })
     })
   },
+
   getPanelAndFields({ dispatch }, {
     parentUuid,
     containerUuid,

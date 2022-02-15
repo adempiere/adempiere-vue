@@ -128,7 +128,7 @@ export default {
           options = {
             name: 'Report Viewer',
             params: {
-              processId: notification.processId,
+              reportUuid: notification.reportUuid,
               instanceUuid: notification.instanceUuid,
               fileName: notification.download
             }

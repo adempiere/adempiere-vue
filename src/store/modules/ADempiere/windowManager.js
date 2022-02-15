@@ -27,6 +27,7 @@ import {
 
 // constants
 import { ROW_ATTRIBUTES } from '@/utils/ADempiere/constants/table'
+import { OPERATOR_EQUAL } from '@/utils/ADempiere/dataUtils.js'
 
 // utils and helper methods
 import { getContext } from '@/utils/ADempiere/contextUtils.js'
@@ -92,6 +93,7 @@ const windowManager = {
     }, {
       parentUuid,
       containerUuid,
+      filters = [],
       pageNumber
     }) {
       let pageToken
@@ -113,6 +115,7 @@ const windowManager = {
           })
           contextAttriburesList.push({
             value,
+            operator: OPERATOR_EQUAL.operator,
             columnName
           })
         })
@@ -123,6 +126,7 @@ const windowManager = {
           windowUuid: parentUuid,
           tabUuid: containerUuid,
           attributes: contextAttriburesList,
+          filters,
           pageToken
         })
           .then(dataResponse => {

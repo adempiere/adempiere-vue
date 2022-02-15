@@ -28,8 +28,10 @@
 
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
+
 export default defineComponent({
   name: 'FileRender',
+
   props: {
     format: {
       type: String,
@@ -57,20 +59,22 @@ export default defineComponent({
       default: undefined
     }
   },
+
   setup(props) {
     const componentRender = computed(() => {
       let viewer
       switch (props.format) {
         case 'html':
-        case 'txt':
           viewer = () => import('@/components/ADempiere/FileRender/HtmlFile')
           break
         case 'pdf':
           viewer = () => import('@/components/ADempiere/FileRender/PdfFile')
           break
         case 'csv':
+        case 'ssv':
         case 'xls':
         case 'xlsx':
+        case 'txt':
           viewer = () => import('@/components/ADempiere/FileRender/ExcelFile')
           break
         default:
@@ -79,6 +83,7 @@ export default defineComponent({
       }
       return viewer
     })
+
     return {
       componentRender
     }

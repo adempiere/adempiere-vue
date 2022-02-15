@@ -20,32 +20,6 @@ import language from '@/lang'
 import { convertBooleanToTranslationLang } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
-export const reportFormatsList = [
-  'ps',
-  'xml',
-  'pdf',
-  'txt',
-  'ssv',
-  'csv',
-  'xls',
-  'xlsx',
-  'arxml'
-]
-export const excelFormatList = [
-  'csv',
-  'xls',
-  'xlsx'
-]
-
-export const viewerSupportedFormats = [
-  'csv',
-  'xls',
-  'xlsx',
-  'pdf',
-  'txt',
-  'html'
-]
-
 // export file with records
 export const supportedTypes = {
   xlsx: language.t('report.ExportXlsx'),

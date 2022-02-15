@@ -165,5 +165,8 @@ export default {
   },
   getShowList: (state) => {
     return state.listOrder.isShowPopover
+  },
+  getNewCustomer: (state) => {
+    return state.newCustomer
   }
 }

@@ -379,7 +379,7 @@ export default {
       processOrder({
         posUuid,
         orderUuid,
-        isOpenRefund: true,
+        isOpenRefund: !this.isEmptyValue(this.$store.getters.getListRefundReference),
         createPayments: !this.isEmptyValue(payments),
         payments: payments
       })
@@ -549,7 +549,7 @@ export default {
         // user session
         this.$store.dispatch('createOrder', {
           posUuid,
-          customerUuid,
+          customerUuid: this.isEmptyValue(this.$store.getters.getNewCustomer) ? customerUuid : this.$store.getters.getNewCustomer.uuid,
           salesRepresentativeUuid: this.currentPointOfSales.salesRepresentative.uuid,
           priceListUuid: this.currentPointOfSales.priceList.uuid,
           warehouseUuid: this.currentPointOfSales.warehouse.uuid,

@@ -1,5 +1,6 @@
 
 import actionMenu from './actionMenu'
+import extensionFile from './extensionFile'
 import fieldDisplayOptions from './fieldDisplayOptions'
 import fieldOptions from './fieldOptions'
 import recordManager from './recordManager'
@@ -7,6 +8,7 @@ import window from './window'
 
 export default {
   actionMenu,
+  extensionFile,
   fieldDisplayOptions,
   fieldOptions,
   recordManager,
@@ -64,7 +66,8 @@ export default {
     recordLocked: 'This record has been locked',
     recordUnlocked: 'This record has been unlocked',
     noRoleAccess: 'With your current role and settings, you cannot view this information.',
-    errorPointOfSale: 'No point of sale selected'
+    errorPointOfSale: 'No point of sale selected',
+    emptyPos: 'This User has no Assigned POS Terminal'
   },
   navbar: {
     badge: {
@@ -524,7 +527,6 @@ export default {
           emptyPayment: 'Unsupported payment method',
           emptyListPayment: 'You do not have any payment method associated with this option',
           addPayment: 'You must add a change type to complete the operation',
-          amountChange: 'Amount greater than change',
           amountLimitOrder: 'Amount greater than the limit of the Order',
           incompleteChange: 'Incomplete Change',
           fieldList: {

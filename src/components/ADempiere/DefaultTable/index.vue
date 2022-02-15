@@ -19,23 +19,20 @@
 <template>
   <el-main class="default-table">
     <el-row>
-      <el-col :span="23">
+      <el-col v-if="isShowSearch" :span="24">
         <el-input
           v-model="valueToSearch"
           clearable
           size="mini"
           class="input-search"
+          @change="filterRecord"
+          @input="handleChangeSearch"
         >
           <i
             slot="prefix"
             class="el-icon-search el-input__icon"
           />
         </el-input>
-      </el-col>
-      <el-col :span="1">
-        <columns-display-option
-          :option="currentOption"
-        />
       </el-col>
     </el-row>
 
@@ -51,6 +48,7 @@
       :element-loading-text="$t('notifications.loading')"
       element-loading-background="rgba(255, 255, 255, 0.8)"
       @row-click="handleRowClick"
+      @row-dblclick="handleRowDblClick"
       @select="handleSelection"
       @select-all="handleSelectionAll"
     >
@@ -70,7 +68,7 @@
           :column-key="fieldAttributes.columnName"
           :prop="fieldAttributes.columnName"
           sortable
-          min-width="200"
+          min-width="210"
           :fixed="fieldAttributes.isFixedTableColumn"
         >
           <template slot-scope="scope">
@@ -85,13 +83,23 @@
           </template>
         </el-table-column>
       </template>
+      <el-table-column
+        fixed="right"
+        width="50"
+      >
+        <template slot="header">
+          <columns-display-option
+            :option="currentOption"
+          />
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- pagination table, set custom or use default change page method -->
     <custom-pagination
-      :total="recordCount"
+      :total="recordsLength"
       :current-page="1"
-      :selection="0"
+      :selection="selectionsLength"
       :handle-change-page="handleChangePage"
     />
   </el-main>
@@ -146,12 +154,12 @@ export default defineComponent({
       required: true,
       default: () => []
     },
-    recordCount: {
-      type: Number,
-      default: 0
-    },
     // Show check column from selection row
     isTableSelection: {
+      type: Boolean,
+      default: true
+    },
+    isShowSearch: {
       type: Boolean,
       default: true
     }
@@ -179,6 +187,29 @@ export default defineComponent({
       })
     })
 
+    const sizeOption = computed(() => {
+      if (props.isShowSearch) {
+        return 1
+      }
+      return 24
+    })
+
+    const styleOption = computed(() => {
+      if (props.isShowSearch) {
+        return ''
+      }
+      return 'text-align: end; padding-right: 5px;'
+    })
+
+    const selectionsLength = computed(() => {
+      return props.containerManager.getSelection({
+        containerUuid: props.containerUuid
+      }).length
+    })
+    const recordsLength = computed(() => {
+      return props.dataTable.length
+    })
+
     /**
      * Selection columns to be taken into account during the search
      */
@@ -186,7 +217,7 @@ export default defineComponent({
       const displayColumnsName = []
       const columnsName = props.header
         .filter(fieldItem => {
-          return fieldItem.isSelectionColumn
+          return fieldItem.isSelectionColumn && fieldItem.valueType === 'STRING'
         }).map(fieldItem => {
           if (isLookup(fieldItem.diplayType)) {
             displayColumnsName.push(fieldItem.displayColumnName)
@@ -204,9 +235,21 @@ export default defineComponent({
         tableName: props.panelMetadata.tableName
       })
 
+      /*
       if (!row.isEditRow) {
         row.isEditRow = true
       }
+      if (!row.isSelectedRow) {
+        row.isEditRow = false
+      }
+      */
+    }
+
+    /**
+     * To confirm edit record row
+     */
+    function handleRowDblClick(row, column, event) {
+      row.isEditRow = false
     }
 
     function headerLabel(field) {
@@ -235,31 +278,47 @@ export default defineComponent({
         pageNumber
       })
     }
+    const timeOut = ref(() => {})
+    function handleChangeSearch(value) {
+      clearTimeout(timeOut.value)
+      timeOut.value = setTimeout(() => {
+        // get records
+        this.filterRecord(value)
+      }, 1000)
+    }
 
     // get table data
     const recordsWithFilter = computed(() => {
-      if (!root.isEmptyValue(valueToSearch.value)) {
-        return props.dataTable.filter(row => {
-          return selectionColumns.value.some(columnName => {
-            const value = !root.isEmptyValue(row[columnName]) ? row[columnName].toString() : ''
-            const search = valueToSearch.value
-            if (value) {
-              return value
-                .trim()
-                .toLowerCase()
-                .includes(
-                  search
-                    .trim()
-                    .toLowerCase()
-                )
-            }
-          })
-        })
-      }
       return props.dataTable
     })
 
+    let isLoadFilter = ref(false)
+    function filterRecord(selections) {
+      isLoadFilter = true
+      const params = []
+      selectionColumns.value.forEach(filter => {
+        params.push({
+          column_name: filter,
+          operator: 'LIKE',
+          value: '%' + selections + '%'
+        })
+      })
+      root.$store.dispatch('getEntities', {
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        filters: params
+      })
+        .then(() => {
+          isLoadFilter = false
+          clearTimeout(timeOut.value)
+          return
+        })
+    }
+
     function handleSelection(selections, rowSelected) {
+      rowSelected.isSelectedRow = !rowSelected.isSelectedRow
+      rowSelected.isEditRow = rowSelected.isSelectedRow // edit record if is selected
+
       props.containerManager.setSelection({
         containerUuid: props.containerUuid,
         recordsSelected: selections
@@ -300,15 +359,23 @@ export default defineComponent({
     return {
       // data
       valueToSearch,
+      isLoadFilter,
       // computeds
       headerList,
+      sizeOption,
+      styleOption,
       recordsWithFilter,
       currentOption,
       keyColumn,
+      recordsLength,
+      selectionsLength,
       // methods
+      filterRecord,
+      handleChangeSearch,
       headerLabel,
       handleChangePage,
       handleRowClick,
+      handleRowDblClick,
       handleSelection,
       handleSelectionAll,
       isDisplayed

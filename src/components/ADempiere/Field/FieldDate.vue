@@ -226,6 +226,24 @@ export default {
         return value
       },
       set(value) {
+        const { columnName, containerUuid, inTable } = this.metadata
+
+        // table records values
+        if (inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.setCell) {
+            if (typeof value !== 'object' && value !== undefined) {
+              value = new Date(value)
+            }
+            return this.containerManager.setCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName,
+              value
+            })
+          }
+        }
+
         let startValue, endValue
         startValue = value
 
@@ -246,8 +264,8 @@ export default {
 
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
-          containerUuid: this.metadata.containerUuid,
-          columnName: this.metadata.columnName,
+          containerUuid,
+          columnName,
           value: startValue
         })
 
@@ -256,7 +274,7 @@ export default {
         }
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
-          containerUuid: this.metadata.containerUuid,
+          containerUuid,
           columnName: this.metadata.columnNameTo,
           value: endValue
         })

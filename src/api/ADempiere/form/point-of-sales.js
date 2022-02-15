@@ -1005,7 +1005,6 @@ export function listCustomerBankAccounts({
 export function daleteCustomerBankAccounts({
   customerBankAccountUuid
 }) {
-  console.log({ customerBankAccountUuid })
   return request({
     url: `${config.pointOfSales.endpoint}/delete-bank-account`,
     method: 'post',

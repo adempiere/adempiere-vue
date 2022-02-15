@@ -216,7 +216,6 @@ export default {
       return {
         ...this.field,
         inTable: this.inTable,
-        isPanelWindow: this.isPanelWindow,
         isAdvancedQuery: this.isAdvancedQuery,
         // DOM properties
         required: this.isMandatoryField,
@@ -230,9 +229,12 @@ export default {
 
     isDisplayedField() {
       // validate with container manager
-      return this.containerManager.isDisplayedField(this.field) &&
-        (this.isMandatoryField || this.field.isShowedFromUser || this.inTable)
+      return this.inTable || (
+        this.containerManager.isDisplayedField(this.field) &&
+        (this.isMandatoryField || this.field.isShowedFromUser)
+      )
     },
+
     /**
      * Idicate if field is read only
      */
@@ -262,10 +264,6 @@ export default {
     isMandatoryField() {
       // validate with container manager
       return this.containerManager.isMandatoryField(this.field)
-    },
-
-    isPanelWindow() {
-      return this.field.panelType === 'window'
     },
 
     recordUuid() {

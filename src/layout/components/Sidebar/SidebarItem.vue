@@ -133,12 +133,15 @@ export default {
         } = view.meta
 
         if (panelType !== 'window') {
-          this.$store.dispatch(`set${capitalize(panelType)}DefaultValues`, {
-            parentUuid,
-            containerUuid,
-            panelType,
-            isNewRecord: false
-          })
+          const setDefaul = this.$store._actions[`set${capitalize(panelType)}DefaultValues`]
+          if (setDefaul) {
+            this.$store.dispatch(`set${capitalize(panelType)}DefaultValues`, {
+              parentUuid,
+              containerUuid,
+              panelType,
+              isNewRecord: false
+            })
+          }
         }
       }
     },

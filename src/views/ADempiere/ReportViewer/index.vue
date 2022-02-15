@@ -16,6 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div v-if="isLoading" key="report-viewer-loaded" style="min-height: inherit;">
     <!-- TODO: Add action menu -->
@@ -25,26 +26,30 @@
         <div class="content">
           <title-and-help
             style="margin: 0 !important;"
-            :name="processMetadata.name"
-            :help="processMetadata.help"
+            :name="storedReportDefinition.name"
+            :help="storedReportDefinition.help"
           />
+
           <file-render
             :format="reportFormat"
             :content="reportContent"
-            :src="url"
-            :mime-type="getterCachedReport.output.mimeType"
-            :name="getterCachedReport.name"
-            :stream="getterCachedReport.output.outputStream"
+            :src="link.url"
+            :mime-type="getStoredProcessOutput.mimeType"
+            :name="getStoredProcessOutput.name"
+            :stream="getStoredProcessOutput.outputStream"
           />
-        </div></el-col>
+        </div>
+      </el-col>
     </el-row>
 
+    <!--
     <modal-dialog
-      :metadata="processMetadata"
-      :parent-uuid="reportResult.processUuid"
+      :metadata="storedReportDefinition"
+      :parent-uuid="$route.params.reportUuid"
       :report-export-type="reportFormat"
       :panel-type="panelType"
     />
+    -->
   </div>
 
   <loading-view
@@ -54,108 +59,113 @@
 </template>
 
 <script>
+import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
+
 // components and mixins
-import FileRender from '@/components/ADempiere/FileRender'
+import FileRender from '@/components/ADempiere/FileRender/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
-import ModalDialog from '@/components/ADempiere/Dialog/index.vue'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+// import ModalDialog from '@/components/ADempiere/Dialog/index.vue'
+import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
 // utils and helper methods
 import { showNotification } from '@/utils/ADempiere/notification'
 
-export default {
+export default defineComponent({
   name: 'ReportViewer',
 
   components: {
     FileRender,
     LoadingView,
-    ModalDialog,
+    // ModalDialog,
     TitleAndHelp
   },
 
-  data() {
-    return {
-      panelType: 'process',
-      processMetadata: {},
-      reportFormat: '',
-      reportContent: '',
-      isLoading: false,
-      reportResult: {}
-    }
-  },
+  setup(props, { root }) {
+    const isLoading = ref(false)
+    const reportFormat = ref('html')
+    const reportContent = ref('')
+    const reportResult = ref({})
 
-  computed: {
     // TODO: Add get metadata from server to open report view from link
-    showContextMenu() {
-      return this.$store.state.settings.showContextMenu
-    },
-    getterProcess() {
-      return this.$store.getters.getProcessById(this.$route.params.processId)
-    },
-    url() {
-      return this.$store.getters.getProcessResult.url
-    },
-    getterCachedReport() {
-      return this.$store.getters.getCachedReport(this.$route.params.instanceUuid)
-    }
-  },
+    const showContextMenu = computed(() => {
+      return root.$store.state.settings.showContextMenu
+    })
 
-  created() {
-    this.processMetadata = this.getterProcess
-  },
+    const storedReportDefinition = computed(() => {
+      return root.$store.getters.getStoredReport(root.$route.params.reportUuid)
+    })
 
-  mounted() {
-    this.getCachedReport()
-    this.$route.meta.reportFormat = this.reportFormat
-  },
+    const getStoredProcessOutput = computed(() => {
+      return root.$store.getters.getReportOutput(root.$route.params.instanceUuid)
+    })
 
-  methods: {
-    showNotification,
-    displayReport(reportResult) {
+    const link = computed(() => {
+      return getStoredProcessOutput.value.link
+    })
+
+    function displayReport(reportResult) {
       if (!reportResult.isError) {
         const { output } = reportResult
-        this.reportFormat = this.isEmptyValue(output.reportType)
+        reportFormat.value = root.isEmptyValue(output.reportType)
           ? reportResult.reportType
           : output.reportType
-        this.reportContent = this.isEmptyValue(output.output)
+
+        reportContent.value = root.isEmptyValue(output.output)
           ? reportResult.output
           : output.output
 
-        this.isLoading = true
+        isLoading.value = true
       }
-    },
-    getCachedReport() {
-      this.reportResult = this.getterCachedReport
-      if (this.reportResult === undefined) {
+    }
+
+    function getCachedReport() {
+      reportResult.value = getStoredProcessOutput.value
+      if (reportResult.value === undefined) {
         const pageSize = undefined
         const pageToken = undefined
-        this.$store.dispatch('getSessionProcessFromServer', {
+        root.$store.dispatch('getSessionProcessFromServer', {
           pageSize,
           pageToken
         })
-          .then(response => {
-            this.reportResult = this.getterCachedReport
-            if (this.reportResult === undefined) {
-              this.showNotification({
+          .then(() => {
+            reportResult.value = getStoredProcessOutput.value
+            if (root.isEmptyValue(reportResult.value)) {
+              showNotification({
                 type: 'error',
                 title: 'error',
                 message: 'requestError'
               })
 
-              this.$store.dispatch('tagsView/delView', this.$route)
+              root.$store.dispatch('tagsView/delView', root.$route)
                 .then(() => {
-                  this.$router.push('/', () => {})
+                  root.$router.push('/', () => {})
                 })
               return
             }
-            this.displayReport(this.reportResult)
+            displayReport(reportResult.value)
           })
       } else {
-        this.displayReport(this.reportResult)
+        displayReport(reportResult.value)
       }
     }
+
+    onMounted(() => {
+      getCachedReport()
+      root.$route.meta.reportFormat = reportFormat.value
+    })
+
+    return {
+      isLoading,
+      reportFormat,
+      reportContent,
+      // computeds
+      link,
+      showContextMenu,
+      storedReportDefinition,
+      getStoredProcessOutput
+    }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

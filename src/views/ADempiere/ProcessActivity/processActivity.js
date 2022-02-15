@@ -45,35 +45,16 @@ export default defineComponent({
     // all process
     const getRunProcessAll = computed(() => {
       const processAll = [].concat(
+        getterAllSessionProcess.value,
         getterAllInExecution.value,
-        getterAllFinishProcess.value,
-        getterAllSessionProcess.value
+        getterAllFinishProcess.value
       )
       const processAllReturned = []
-
       processAll.forEach(element => {
-        const processMetadataReturned = {}
-        let infoMetadata = getProcessMetadata(element.processUuid)
-        if (!infoMetadata) {
-          infoMetadata = {}
+        // let processMetadataReturned = {}
+        if (element !== undefined) {
+          processAllReturned.push(element)
         }
-
-        Object.assign(processMetadataReturned, element, infoMetadata)
-        processMetadataReturned.parametersList = element.parametersList
-        const indexRepeat = processAllReturned.findIndex(item => {
-          return item.instanceUuid === element.instanceUuid && !root.isEmptyValue(element.instanceUuid)
-        })
-
-        if (indexRepeat > -1) {
-          // update attributes in exists process to return
-          // Object.assign(processAllReturned[indexRepeat], processMetadataReturned)
-          const other = Object.assign(processMetadataReturned, processAllReturned[indexRepeat])
-          processAllReturned[indexRepeat] = other
-          return
-        }
-
-        // add new process to show
-        processAllReturned.push(processMetadataReturned)
       })
 
       return processAllReturned.sort((a, b) => {
@@ -81,7 +62,6 @@ export default defineComponent({
         return new Date(b.lastRun) - new Date(a.lastRun)
       })
     })
-
     const getProcessLog = computed(() => {
       return getRunProcessAll.value.filter(element => {
         const { isError, isProcessing } = element
@@ -105,16 +85,12 @@ export default defineComponent({
         })
     })
 
-    const getProcessMetadata = (uuid) => {
-      return root.$store.getters.getProcess(uuid)
-    }
-
     function handleCommand(activity) {
       if (activity.command === 'seeReport') {
         root.$router.push({
           name: 'Report Viewer',
           params: {
-            processId: activity.processId,
+            reportUuid: activity.uuid,
             instanceUuid: activity.instanceUuid,
             fileName: activity.output.fileName
           }

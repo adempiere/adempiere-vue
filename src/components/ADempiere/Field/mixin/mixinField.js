@@ -82,10 +82,25 @@ export default {
         })
       },
       set(value) {
+        const { columnName, containerUuid, inTable } = this.metadata
+
+        // table records values
+        if (inTable) {
+          // implement container manager row
+          if (this.containerManager && this.containerManager.setCell) {
+            return this.containerManager.setCell({
+              containerUuid,
+              rowIndex: this.metadata.rowIndex,
+              columnName,
+              value
+            })
+          }
+        }
+
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
-          containerUuid: this.metadata.containerUuid,
-          columnName: this.metadata.columnName,
+          containerUuid,
+          columnName,
           value
         })
       }

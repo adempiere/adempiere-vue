@@ -1,6 +1,6 @@
 // ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
 // Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
-// Contributor(s): Elsio Sanchez esanchez@erpya.com www.erpya.com
+// Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,34 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import Vue from 'vue'
+
 /**
- * Order State
+ * Report Mutations
+ * All related to global store of Dictionary Window
  */
-const withoutResponse = {
-  isLoaded: false,
-  isReload: true,
-  recordCount: 0,
-  nextPageToken: undefined
-}
 export default {
-  order: {
-    documentType: {},
-    documentStatus: {
-      value: ''
-    },
-    totalLines: 0,
-    grandTotal: 0,
-    salesRepresentative: {},
-    businessPartner: {
-      value: '',
-      uuid: ''
-    },
-    uuid: ''
+  addReportToList(state, report) {
+    Vue.set(state.storedReports, report.uuid, report)
   },
-  findOrder: {},
-  newCustomer: {},
-  listOrder: {
-    ...withoutResponse,
-    isShowPopover: false
+
+  /**
+   * Change report field attribute
+   * @param {object} field
+   * @param {string} attributeName
+   * @param {mixed} attributeValue
+   */
+  changeReportFieldAttribute(state, payload) {
+    const { attributeName, attributeValue } = payload
+
+    payload.field[attributeName] = attributeValue
   }
 }

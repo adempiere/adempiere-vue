@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// import language from '@/lang'
+import language from '@/lang'
 
 const fieldBase = {
   tableName: 'C_Location',
@@ -47,7 +47,7 @@ export default [
       size: 24,
       sequenceFields: 'R',
       index: 3,
-      isMandatory: false
+      isMandatory: true
     }
   },
   {
@@ -70,6 +70,7 @@ export default [
     overwriteDefinition: {
       isCustomField: true,
       isUpdateable: true,
+      isMandatory: true,
       size: 24,
       sequenceFields: 'A1',
       index: 5
@@ -83,6 +84,7 @@ export default [
       isCustomField: true,
       isUpdateable: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A2',
       index: 6
     }
@@ -95,6 +97,7 @@ export default [
       isCustomField: true,
       isUpdateable: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A3',
       index: 7
     }
@@ -107,6 +110,7 @@ export default [
       isCustomField: true,
       isUpdateable: true,
       size: 24,
+      isMandatory: false,
       sequenceFields: 'A4',
       index: 8
     }
@@ -122,8 +126,7 @@ export default [
       sequenceFields: 'P',
       index: 9
     }
-  }
-  /*,
+  },
   {
     elementColumnName: 'Name',
     isFromDictionary: true,
@@ -134,8 +137,8 @@ export default [
       size: 24,
       name: language.t('components.contextMenuReferences'),
       sequence: 1,
+      sequenceFields: 'P',
       isMandatory: true
     }
   }
-  */
 ]
