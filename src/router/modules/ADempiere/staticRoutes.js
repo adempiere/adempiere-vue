@@ -16,6 +16,7 @@
 
 /* Layout  */
 import Layout from '@/layout'
+import language from '@/lang'
 
 const staticRoutes = [
   {
@@ -60,7 +61,7 @@ const staticRoutes = [
         component: () => import('@/views/ADempiere/ReportViewer'),
         name: 'Report Viewer',
         meta: {
-          title: 'ReportViewer',
+          title: language.t('route.reportViewer'),
           reportFormat: ''
         }
       }

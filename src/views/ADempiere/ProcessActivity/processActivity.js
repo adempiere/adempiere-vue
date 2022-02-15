@@ -92,7 +92,8 @@ export default defineComponent({
           params: {
             reportUuid: activity.uuid,
             instanceUuid: activity.instanceUuid,
-            fileName: activity.output.fileName
+            fileName: activity.output.fileName,
+            name: activity.output.name
           }
         }, () => {})
       } else if (activity.command === 'zoomIn') {

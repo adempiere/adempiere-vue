@@ -1077,6 +1077,7 @@ export default {
           instanceUuid: processOutput.instanceUuid,
           fileName: isEmptyValue(processOutput.output.fileName) ? processOutput.fileName : processOutput.output.fileName,
           menuParentUuid,
+          name: processOutput.output.name,
           tableName
         }
       }, () => {})

@@ -137,6 +137,7 @@ const reportManager = {
                   instanceUuid,
                   fileName: output.fileName,
                   // menuParentUuid,
+                  name: output.name,
                   tableName: output.tableName
                 }
               }, () => {})

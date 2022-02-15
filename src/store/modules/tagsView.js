@@ -11,18 +11,19 @@ const mutations = {
       if (state.visitedViews.some(v =>
         v.params &&
         v.params.reportUuid === view.params.reportUuid &&
-        v.params.tableName === view.params.tableName
+        v.params.tableName === view.params.tableName &&
+        v.params.name === view.params.name
       )) return
       state.visitedViews.push(
         Object.assign({}, view, {
-          title: view.meta.title || 'no-name'
+          title: view.meta.title + ':_' + view.params.name
         })
       )
     } else {
       if (state.visitedViews.some(v => v.name === view.name)) return
       state.visitedViews.push(
         Object.assign({}, view, {
-          title: view.meta.title || 'no-name'
+          title: view.meta.title
         })
       )
     }
@@ -87,6 +88,7 @@ const actions = {
     dispatch('addCachedView', view)
   },
   addVisitedView({ commit }, view) {
+    console.log({ view })
     commit('ADD_VISITED_VIEW', view)
   },
   addCachedView({ commit }, view) {
