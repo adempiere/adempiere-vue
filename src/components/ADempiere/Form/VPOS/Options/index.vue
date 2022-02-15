@@ -345,6 +345,18 @@
               </p>
             </el-card>
           </el-col>
+          <el-col v-if="isAllowsAllocateSeller" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <p
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.unassignSeller')) : unassignSeller()"
+              >
+                <i class="el-icon-sold-out" />
+                <br>
+                {{ $t('form.pos.optionsPoinSales.cashManagement.unassignSeller') }}
+              </p>
+            </el-card>
+          </el-col>
         </el-row>
       </el-collapse-item>
 
@@ -406,6 +418,16 @@
       :title="$t('form.pos.optionsPoinSales.cashManagement.assignSeller')"
       :visible.sync="showAssignSeller"
       :is-loaded-panel="showAssignSeller"
+      width="60%"
+      center
+      class="dialogo-seller"
+    >
+      <assign-seller />
+    </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.unassignSeller')"
+      :visible.sync="showUnassignSeller"
+      :is-loaded-panel="showUnassignSeller"
       width="60%"
       center
       class="dialogo-seller"
@@ -556,6 +578,14 @@ export default {
         this.$store.commit('setShowAssignSeller', value)
       }
     },
+    showUnassignSeller: {
+      get() {
+        return this.$store.getters.getShowUnassignSeller
+      },
+      set(value) {
+        this.$store.commit('setShowUnassignSeller', value)
+      }
+    },
     adviserPin() {
       return this.$store.getters.posAttributes.currentPointOfSales.isPosRequiredPin
     },
@@ -691,6 +721,9 @@ export default {
     assignSeller() {
       this.$store.commit('setShowAssignSeller', true)
     },
+    unassignSeller() {
+      this.$store.commit('setShowUnassignSeller', true)
+    },
     openListOrdes() {
       this.showFieldListOrder = true
     },
@@ -783,6 +816,9 @@ export default {
           break
         case this.$t('form.pos.optionsPoinSales.cashManagement.assignSeller'):
           this.assignSeller()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.unassignSeller'):
+          this.unassignSeller()
           break
       }
     },

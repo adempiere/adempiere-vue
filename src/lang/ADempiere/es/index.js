@@ -387,10 +387,13 @@ export default {
           cashOpening: 'Apertura de Caja',
           cashOpenBox: 'Caja Aperturada',
           cashwithdrawal: 'Retiro de Efectivo',
+          transfer: 'Transferencia',
+          moneyIncome: 'Ingreso de Dinero',
           successfulCashWithdrawal: 'Retiro de caja exitoso',
           cashCloseBox: 'Caja Cerrada',
           closeBox: 'Cierre de Caja',
-          assignSeller: 'Asignar vendedor'
+          assignSeller: 'Asignar vendedor',
+          unassignSeller: 'Desasignar vendedor'
         },
         generalOptions: {
           title: 'Opciones Generales',

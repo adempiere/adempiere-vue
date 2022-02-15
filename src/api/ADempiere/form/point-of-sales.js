@@ -1355,6 +1355,22 @@ export function allocateSeller({
       return response
     })
 }
+export function deallocate({
+  posUuid,
+  salesRepresentativeUuid
+}) {
+  return request({
+    url: `${config.pointOfSales.endpoint}/deallocate-seller`,
+    method: 'post',
+    data: {
+      pos_uuid: posUuid,
+      sales_representative_uuid: salesRepresentativeUuid
+    }
+  })
+    .then(response => {
+      return response
+    })
+}
 export function releaseOrder({
   posUuid,
   salesRepresentativeUuid,

@@ -71,9 +71,10 @@
 <script>
 import formMixin from '@/components/ADempiere/Form/formMixin'
 import fieldsListAssignSeller from './fieldsList.js'
-import { availableSellers } from '@/api/ADempiere/form/point-of-sales'
 import {
-  allocateSeller
+  allocateSeller,
+  availableSellers,
+  deallocate
 } from '@/api/ADempiere/form/point-of-sales.js'
 import { getImagePath } from '@/utils/ADempiere/resource.js'
 
@@ -152,6 +153,9 @@ export default {
         })
       }
       return []
+    },
+    showUnassignSeller() {
+      return this.$store.getters.getShowUnassignSeller
     }
   },
   watch: {
@@ -178,12 +182,44 @@ export default {
 
       return uri
     },
+    selectSeller() {
+      if (this.showUnassignSeller) {
+        this.unassignSeller()
+        return
+      }
+      this.assignSeller()
+    },
+    unassignSeller() {
+      deallocate({
+        posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
+        salesRepresentativeUuid: this.salesRepresentative.uuid
+      })
+        .then(response => {
+          this.$message({
+            message: response,
+            isShowClose: true,
+            type: 'success'
+          })
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+        })
+        .finally(() => {
+          this.close()
+        })
+    },
     close() {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
         columnName: 'SalesRep_ID',
         value: undefined
       })
+      this.$store.commit('setShowUnassignSeller', false)
       this.$store.commit('setShowAssignSeller', false)
       this.salesRepresentative = ''
     },
