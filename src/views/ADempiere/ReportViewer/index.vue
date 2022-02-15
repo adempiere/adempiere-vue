@@ -23,6 +23,12 @@
 
     <el-row type="flex" style="min-height: inherit;">
       <el-col :span="24">
+        <action-menu
+          :parent-uuid="$route.params.reportUuid"
+          :actions-manager="actionsManager"
+          :relations-manager="relationsManager"
+        />
+        <br>
         <div class="content">
           <title-and-help
             style="margin: 0 !important;"
@@ -62,6 +68,7 @@
 import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
 
 // components and mixins
+import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import FileRender from '@/components/ADempiere/FileRender/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 // import ModalDialog from '@/components/ADempiere/Dialog/index.vue'
@@ -70,12 +77,19 @@ import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 // utils and helper methods
 import { showNotification } from '@/utils/ADempiere/notification'
 
+// constants
+import {
+  runProcess,
+  sharedLink
+} from '@/utils/ADempiere/constants/actionsMenuList'
+
 export default defineComponent({
   name: 'ReportViewer',
 
   components: {
     FileRender,
     LoadingView,
+    ActionMenu,
     // ModalDialog,
     TitleAndHelp
   },
@@ -148,7 +162,20 @@ export default defineComponent({
         displayReport(reportResult.value)
       }
     }
+    const actionsManager = ref({
+      containerUuid: root.$route.params.reportUuid,
 
+      defaultActionName: root.$t('actionMenu.runProcess'),
+
+      getActionList: () => [
+        runProcess,
+        sharedLink
+      ]
+    })
+
+    const relationsManager = ref({
+      menuParentUuid: root.$route.meta.parentUuid
+    })
     onMounted(() => {
       getCachedReport()
       root.$route.meta.reportFormat = reportFormat.value
@@ -158,6 +185,8 @@ export default defineComponent({
       isLoading,
       reportFormat,
       reportContent,
+      actionsManager,
+      relationsManager,
       // computeds
       link,
       showContextMenu,
