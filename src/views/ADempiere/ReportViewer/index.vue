@@ -33,10 +33,10 @@
           <file-render
             :format="reportFormat"
             :content="reportContent"
-            :src="link.url"
-            :mime-type="getStoredProcessOutput.mimeType"
-            :name="getStoredProcessOutput.name"
-            :stream="getStoredProcessOutput.outputStream"
+            :src="link.href"
+            :mime-type="getStoredReportOutput.mimeType"
+            :name="getStoredReportOutput.name"
+            :stream="getStoredReportOutput.outputStream"
           />
         </div>
       </el-col>
@@ -68,6 +68,7 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
 // utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 import { showNotification } from '@/utils/ADempiere/notification'
 
 export default defineComponent({
@@ -86,31 +87,26 @@ export default defineComponent({
     const reportContent = ref('')
     const reportResult = ref({})
 
-    // TODO: Add get metadata from server to open report view from link
-    const showContextMenu = computed(() => {
-      return root.$store.state.settings.showContextMenu
-    })
-
     const storedReportDefinition = computed(() => {
       return root.$store.getters.getStoredReport(root.$route.params.reportUuid)
     })
 
-    const getStoredProcessOutput = computed(() => {
+    const getStoredReportOutput = computed(() => {
       return root.$store.getters.getReportOutput(root.$route.params.instanceUuid)
     })
 
     const link = computed(() => {
-      return getStoredProcessOutput.value.link
+      return getStoredReportOutput.value.link
     })
 
     function displayReport(reportResult) {
       if (!reportResult.isError) {
         const { output } = reportResult
-        reportFormat.value = root.isEmptyValue(output.reportType)
+        reportFormat.value = isEmptyValue(output.reportType)
           ? reportResult.reportType
           : output.reportType
 
-        reportContent.value = root.isEmptyValue(output.output)
+        reportContent.value = isEmptyValue(output.output)
           ? reportResult.output
           : output.output
 
@@ -119,7 +115,7 @@ export default defineComponent({
     }
 
     function getCachedReport() {
-      reportResult.value = getStoredProcessOutput.value
+      reportResult.value = getStoredReportOutput.value
       if (reportResult.value === undefined) {
         const pageSize = undefined
         const pageToken = undefined
@@ -128,8 +124,8 @@ export default defineComponent({
           pageToken
         })
           .then(() => {
-            reportResult.value = getStoredProcessOutput.value
-            if (root.isEmptyValue(reportResult.value)) {
+            reportResult.value = getStoredReportOutput.value
+            if (isEmptyValue(reportResult.value)) {
               showNotification({
                 type: 'error',
                 title: 'error',
@@ -160,9 +156,8 @@ export default defineComponent({
       reportContent,
       // computeds
       link,
-      showContextMenu,
       storedReportDefinition,
-      getStoredProcessOutput
+      getStoredReportOutput
     }
   }
 })
