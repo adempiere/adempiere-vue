@@ -847,6 +847,8 @@ export default {
           .then(response => {
             this.$store.dispatch('refundReference', {
               ...refund,
+              sourceAmount: (this.currentPointOfSales.currentOrder.priceList.currency.uuid !== currencySelected.uuid) ? refund.amount / this.dayRate.multiplyRate : refund.amount,
+              isReceipt: false,
               customerBankAccountUuid: response.customerBankAccountUuid,
               currencyUuid: this.isEmptyValue(currencySelected) ? this.defaultReferenceCurrency : currencySelected.uuid,
               tenderTypeCode: payment.tender_type,
@@ -868,6 +870,8 @@ export default {
       }
       this.$store.dispatch('refundReference', {
         ...refund,
+        sourceAmount: (this.currentPointOfSales.currentOrder.priceList.currency.uuid !== currencySelected.uuid) ? refund.amount / this.dayRate.multiplyRate : refund.amount,
+        isReceipt: false,
         customerBankAccountUuid: this.currentBankAccount,
         currencyUuid: this.isEmptyValue(currencySelected) ? this.defaultReferenceCurrency : currencySelected.uuid,
         tenderTypeCode: payment.tender_type,

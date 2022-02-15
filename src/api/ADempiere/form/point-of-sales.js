@@ -1051,16 +1051,21 @@ export function RefundReferenceRequest({
   paymentMethodUuid,
   paymentAccountDate,
   customerBankAccountUuid,
+  customerUuid,
+  isReceipt,
+  sourceAmount,
   orderUuid,
   salesRepresentativeUuid
 }) {
   return request({
-    url: `${config.pointOfSales.endpoint}/create-refund-reference`,
+    url: `${config.pointOfSales.endpoint}/create-payment-reference`,
     method: 'post',
     data: {
       pos_uuid: posUuid,
       description,
       amount,
+      is_receipt: isReceipt,
+      source_amount: sourceAmount,
       payment_date: date,
       tender_type_code: tenderTypeCode,
       currency_uuid: currencyUuid,
@@ -1069,6 +1074,7 @@ export function RefundReferenceRequest({
       payment_account_date: paymentAccountDate,
       customer_bank_account_uuid: customerBankAccountUuid,
       order_uuid: orderUuid,
+      customer_uuid: customerUuid,
       sales_representative_uuid: salesRepresentativeUuid
     }
   })
@@ -1082,7 +1088,7 @@ export function listRefundReference({
   orderUuid
 }) {
   return request({
-    url: `${config.pointOfSales.endpoint}/refund-references`,
+    url: `${config.pointOfSales.endpoint}/payment-references`,
     method: 'get',
     params: {
       pos_uuid: posUuid,
@@ -1098,7 +1104,7 @@ export function deleteRefundReference({
   uuid
 }) {
   return request({
-    url: `${config.pointOfSales.endpoint}/delete-refund-reference`,
+    url: `${config.pointOfSales.endpoint}/delete-payment-reference`,
     method: 'post',
     data: {
       uuid
