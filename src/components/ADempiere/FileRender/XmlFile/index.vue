@@ -15,7 +15,7 @@
 -->
 
 <template>
-  <div class="container p-5">
+  <div class="xml-content">
     <download-file
       :format="format"
       :name="name"
@@ -94,9 +94,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.pdf-content {
+.xml-content {
   width: 100%;
-  height: 90%;
+  height: inherit;
   padding-right: 10px;
 }
 </style>
