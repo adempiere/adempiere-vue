@@ -115,12 +115,11 @@ export function clientDateTime(date = null, type = '') {
 
   const currentDate = date.getFullYear() +
     '-' + zeroPad(date.getMonth() + 1) +
-    '-' + zeroPad(date.getDate())
+    '-' + zeroPad(date.getDate() + 1)
 
   const currentTime = date.getHours() +
     ':' + date.getMinutes() +
     ':' + date.getSeconds()
-
   const currentDateTime = {
     date: currentDate,
     time: currentTime

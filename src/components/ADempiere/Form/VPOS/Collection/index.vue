@@ -201,7 +201,7 @@ import overdrawnInvoice from './overdrawnInvoice'
 
 // utils and helper methods
 import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
-
+import { clientDateTime } from '@/utils/ADempiere/formatValue/dateFormat.js'
 // api request methods
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
@@ -687,7 +687,7 @@ export default {
           conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
           currencyFromUuid: this.currentPointOfSales.priceList.currency.uuid,
           currencyToUuid: this.selectCurrentFieldCurrency.uuid,
-          conversionDate: value
+          conversionDate: clientDateTime(value, 'd')
         })
       }
     },

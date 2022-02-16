@@ -261,12 +261,11 @@ export default {
           startValue = new Date(startValue)
           endValue = new Date(endValue)
         }
-
         this.$store.commit('updateValueOfField', {
           parentUuid: this.metadata.parentUuid,
           containerUuid,
           columnName,
-          value: startValue
+          value: value
         })
 
         if (!this.metadata.isRange) {
