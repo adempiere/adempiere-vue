@@ -54,6 +54,7 @@ export const undoChange = {
  */
 export const sharedLink = {
   name: language.t('actionMenu.shareLink'),
+  description: language.t('actionMenu.shareLinkDescription'),
   enabled: true,
   svg: false,
   icon: 'el-icon-share',
@@ -227,6 +228,7 @@ export const runProcess = {
 
 export const runReport = {
   name: language.t('actionMenu.generateReport'),
+  description: language.t('actionMenu.generateDefaultReport'),
   enabled: true,
   svg: false,
   icon: 'el-icon-document',
@@ -241,6 +243,7 @@ export const runReport = {
 
 export const runReportAs = {
   name: language.t('actionMenu.generateReportAs'),
+  description: language.t('actionMenu.generateReportAsOtherFormat'),
   enabled: true,
   svg: false,
   icon: 'el-icon-document',

@@ -20,13 +20,16 @@ const actionMenu = {
   deleteRecord: 'Eliminar Registro',
   createNewRecord: 'Nuevo Registro',
   shareLink: 'Compartir Enlace',
+  shareLinkDescription: 'Compartir ruta actual en el porta-papeles',
   withoutActions: 'Sin Actiones',
   zoomWindow: 'Acercar Ventana',
   // process
   runProcess: 'Ejecutar',
   // report
   generateReport: 'Generar',
+  generateDefaultReport: 'Generar con extensión de archivo por defecto',
   generateReportAs: 'Generar Como',
+  generateReportAsOtherFormat: 'Cambiar extensión del archivo para generar',
   // relations
   relations: 'Relaciones',
   withoutRelations: 'Sin Relaciones',

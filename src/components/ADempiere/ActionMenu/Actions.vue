@@ -58,14 +58,20 @@
 
             <!-- for print format -->
             <el-dropdown v-if="!isEmptyValue(action.childs)">
-              <span class="contents">
+              <span>
                 <b class="label">
                   {{ action.name }}
                 </b>
+                <i class="el-icon-arrow-down" style="float: right;" />
+                <p class="description">
+                  <template v-if="isEmptyValue(action.description)">
+                    {{ $t('data.noDescription') }}
+                  </template>
+                  <template v-else>
+                    {{ action.description }}
+                  </template>
+                </p>
               </span>
-              <p class="description">
-                {{ $t('data.noDescription') }}
-              </p>
 
               <el-dropdown-menu
                 slot="dropdown"

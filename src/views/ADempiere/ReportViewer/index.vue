@@ -78,12 +78,6 @@ import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 import { showNotification } from '@/utils/ADempiere/notification'
 
-// constants
-import {
-  runProcess,
-  sharedLink
-} from '@/utils/ADempiere/constants/actionsMenuList'
-
 export default defineComponent({
   name: 'ReportViewer',
 
@@ -161,12 +155,11 @@ export default defineComponent({
     const actionsManager = ref({
       containerUuid: root.$route.params.reportUuid,
 
-      defaultActionName: root.$t('actionMenu.runProcess'),
+      defaultActionName: root.$t('actionMenu.generateReport'),
 
-      getActionList: () => [
-        runProcess,
-        sharedLink
-      ]
+      getActionList: () => root.$store.getters.getStoredActionsMenu({
+        containerUuid: root.$route.params.reportUuid
+      })
     })
 
     const relationsManager = ref({

@@ -100,11 +100,10 @@ const reportManager = {
             type: 'info'
           })
         }
-        const reportType = reportFormat
 
         requestRunReport({
           uuid: containerUuid,
-          reportType,
+          reportType: reportFormat,
           parametersList
         })
           .then(runReportRepsonse => {
@@ -122,7 +121,7 @@ const reportManager = {
               })
 
               // donwloaded not support render report
-              if (!viewerSupportedFormats.includes(reportType)) {
+              if (!viewerSupportedFormats.includes(reportFormat)) {
                 link.click()
               }
 
@@ -140,6 +139,78 @@ const reportManager = {
                   tableName: output.tableName
                 }
               }, () => {})
+            }
+
+            commit('setReportOutput', {
+              ...output,
+              instanceUuid,
+              reportUuid: containerUuid,
+              link,
+              url: link.href,
+              download: link.download
+            })
+
+            resolve(runReportRepsonse)
+          })
+          .catch(error => {
+            console.warn(`Error getting print formats: ${error.message}. Code: ${error.code}.`)
+          })
+          .finally(() => {
+            // close runing report notification
+            if (!isEmptyValue(reportingNotification)) {
+              setTimeout(() => {
+                reportingNotification.close()
+              }, 1000)
+            }
+          })
+      })
+    },
+
+    downloadReport({ commit, rootGetters }, {
+      containerUuid,
+      reportFormat = 'html'
+    }) {
+      return new Promise(resolve => {
+        const reportDefinition = rootGetters.getStoredReport(containerUuid)
+
+        const parametersList = rootGetters.getReportParameters({
+          containerUuid
+        })
+
+        let reportingNotification = {
+          close: () => false
+        }
+        const isSession = !isEmptyValue(getToken())
+        if (isSession) {
+          reportingNotification = showNotification({
+            title: language.t('notifications.processing'),
+            message: reportDefinition.name,
+            summary: reportDefinition.description,
+            type: 'info'
+          })
+        }
+
+        requestRunReport({
+          uuid: containerUuid,
+          reportType: reportFormat,
+          parametersList
+        })
+          .then(runReportRepsonse => {
+            const { instanceUuid, output } = runReportRepsonse
+
+            let link = {
+              href: undefined,
+              download: undefined
+            }
+            if (output && output.outputStream) {
+              link = buildLinkHref({
+                fileName: output.fileName,
+                outputStream: output.outputStream,
+                type: output.mimeType
+              })
+
+              // donwloaded not support render report
+              link.click()
             }
 
             commit('setReportOutput', {

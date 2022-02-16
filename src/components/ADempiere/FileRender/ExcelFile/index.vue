@@ -18,15 +18,12 @@
   <div class="content-excel">
     <el-container class="sub-content-excel">
       <el-main style="padding: 0;">
-        <el-button
-          style="margin:0 0 10px 20px;"
-          type="primary"
-          size="mini"
-          icon="el-icon-download"
-          @click="handleDownload"
-        >
-          {{ $t('components.contextMenuDownload') }}
-        </el-button>
+        <download-file
+          :format="format"
+          :name="name"
+          :mime-type="mimeType"
+          :stream="stream"
+        />
 
         <el-table
           :data="excelData.results"
@@ -56,22 +53,26 @@ import { defineComponent, ref } from '@vue/composition-api'
 
 // components and mixins
 import XLSX from 'xlsx'
+import DownloadFile from '@/components/ADempiere/FileRender/downloadFile.vue'
 
 // utils and helper methods
-import { exportFileFromJson } from '@/utils/ADempiere/exportUtil.js'
-import { buildLinkHref, buildBlobAndValues } from '@/utils/ADempiere/resource'
+import { buildBlobAndValues } from '@/utils/ADempiere/resource'
 
 export default defineComponent({
   name: 'ExcelFile',
 
+  components: {
+    DownloadFile
+  },
+
   props: {
-    mimeType: {
-      type: String,
-      default: undefined
-    },
     format: {
       type: String,
       default: 'xlsx'
+    },
+    mimeType: {
+      type: String,
+      default: undefined
     },
     name: {
       type: String,
@@ -85,35 +86,6 @@ export default defineComponent({
 
   setup(props) {
     const excelData = ref({})
-
-    function downloadWithLink() {
-      buildLinkHref({
-        fileName: `${props.name}.${props.format}`,
-        mimeType: props.mimeType,
-        outputStream: props.stream,
-        isDownload: true
-      })
-    }
-
-    function handleDownload() {
-      if (props.format === 'ssv') {
-        downloadWithLink()
-        return
-      }
-
-      const header = excelData.value.header
-      const data = excelData.value.results
-      return new Promise((resolve) => {
-        const file = exportFileFromJson({
-          header,
-          data,
-          isFormat: false,
-          fileName: props.name,
-          exportType: props.format
-        })
-        resolve(file)
-      })
-    }
 
     function getHeaderRow(sheet) {
       const headers = []
@@ -165,9 +137,7 @@ export default defineComponent({
     generateReaderData()
 
     return {
-      excelData,
-      // methods
-      handleDownload
+      excelData
     }
   }
 

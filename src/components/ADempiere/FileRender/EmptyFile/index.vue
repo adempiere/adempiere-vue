@@ -15,14 +15,47 @@
 -->
 
 <template>
-  <div class="empty-content" />
+  <div class="empty-content">
+    <download-file
+      :format="format"
+      :name="name"
+      :mime-type="mimeType"
+      :stream="stream"
+    />
+  </div>
 </template>
 
 <script>
 import { defineComponent } from '@vue/composition-api'
 
+// components and mixins
+import DownloadFile from '@/components/ADempiere/FileRender/downloadFile.vue'
+
 export default defineComponent({
-  name: 'Empty-File'
+  name: 'Empty-File',
+
+  components: {
+    DownloadFile
+  },
+
+  props: {
+    format: {
+      type: String,
+      default: ''
+    },
+    mimeType: {
+      type: String,
+      default: undefined
+    },
+    name: {
+      type: String,
+      default: undefined
+    },
+    stream: {
+      type: [Object, Array],
+      required: true
+    }
+  }
 })
 </script>
 

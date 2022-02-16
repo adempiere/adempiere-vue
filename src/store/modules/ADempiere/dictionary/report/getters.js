@@ -39,6 +39,14 @@ export default {
     return undefined
   },
 
+  getStoredReportExportTypes: (state, getters) => (reportUuid) => {
+    const report = getters.getStoredReport(reportUuid)
+    if (!isEmptyValue(report)) {
+      return report.reportExportTypes
+    }
+    return []
+  },
+
   /**
    * Getter converter params with value format
    * @param {String} containerUuid

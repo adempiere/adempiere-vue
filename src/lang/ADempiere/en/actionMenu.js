@@ -20,13 +20,16 @@ const actionMenu = {
   deleteRecord: 'Delete Record',
   createNewRecord: 'New Record',
   shareLink: 'Share Link',
+  shareLinkDescription: 'Share current route in the clipboard',
   withoutActions: 'Without Actions',
   zoomWindow: 'Zoom Window',
   // process
   runProcess: 'Run',
   // report
   generateReport: 'Generate',
+  generateDefaultReport: 'Generate with default file extension',
   generateReportAs: 'Generate As',
+  generateReportAsOtherFormat: 'Change file extesion to generate',
   // relations
   relations: 'Relations',
   withoutRelations: 'Without Relations',
