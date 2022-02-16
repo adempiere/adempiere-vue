@@ -339,7 +339,8 @@
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.assignSeller')) : assignSeller()"
               >
-                <i class="el-icon-sold-out" />
+                <svg-icon icon-class="peoples" />
+                <i class="el-icon-bottom-right" />
                 <br>
                 {{ $t('form.pos.optionsPoinSales.cashManagement.assignSeller') }}
               </p>
@@ -351,9 +352,34 @@
                 style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
                 @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.unassignSeller')) : unassignSeller()"
               >
-                <i class="el-icon-sold-out" />
+                <svg-icon icon-class="peoples" />
+                <i class="el-icon-top-right" />
                 <br>
                 {{ $t('form.pos.optionsPoinSales.cashManagement.unassignSeller') }}
+              </p>
+            </el-card>
+          </el-col>
+          <el-col v-if="isAllowsAllocateSeller" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <p
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.transfer')) : transfer()"
+              >
+                <i class="el-icon-sort" />
+                <br>
+                {{ $t('form.pos.optionsPoinSales.cashManagement.transfer') }}
+              </p>
+            </el-card>
+          </el-col>
+          <el-col v-if="isAllowsAllocateSeller" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <p
+                style="cursor: pointer; text-align: center !important; color: black;min-height: 50px;"
+                @click="adviserPin ? validateOption($t('form.pos.optionsPoinSales.cashManagement.moneyIncome')) : moneyIncome()"
+              >
+                <i class="el-icon-money" />
+                <br>
+                {{ $t('form.pos.optionsPoinSales.cashManagement.moneyIncome') }}
               </p>
             </el-card>
           </el-col>
@@ -433,6 +459,26 @@
       class="dialogo-seller"
     >
       <assign-seller />
+    </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.transfer')"
+      :visible.sync="showTransfer"
+      :is-loaded-panel="showTransfer"
+      width="60%"
+      center
+      class="dialogo-seller"
+    >
+      <cash-withdrawal />
+    </el-dialog>
+    <el-dialog
+      :title="$t('form.pos.optionsPoinSales.cashManagement.moneyIncome')"
+      :visible.sync="showMoneyIncome"
+      :is-loaded-panel="showMoneyIncome"
+      width="60%"
+      center
+      class="dialogo-seller"
+    >
+      <cash-opening />
     </el-dialog>
   </div>
 </template>
@@ -586,6 +632,22 @@ export default {
         this.$store.commit('setShowUnassignSeller', value)
       }
     },
+    showTransfer: {
+      get() {
+        return this.$store.getters.getShowTransfer
+      },
+      set(value) {
+        this.$store.commit('setShowTransfer', value)
+      }
+    },
+    showMoneyIncome: {
+      get() {
+        return this.$store.getters.getShowMoneyIncome
+      },
+      set(value) {
+        this.$store.commit('setShowMoneyIncome', value)
+      }
+    },
     adviserPin() {
       return this.$store.getters.posAttributes.currentPointOfSales.isPosRequiredPin
     },
@@ -724,6 +786,12 @@ export default {
     unassignSeller() {
       this.$store.commit('setShowUnassignSeller', true)
     },
+    moneyIncome() {
+      this.$store.commit('setShowMoneyIncome', true)
+    },
+    transfer() {
+      this.$store.commit('setShowTransfer', true)
+    },
     openListOrdes() {
       this.showFieldListOrder = true
     },
@@ -819,6 +887,12 @@ export default {
           break
         case this.$t('form.pos.optionsPoinSales.cashManagement.unassignSeller'):
           this.unassignSeller()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.moneyIncome'):
+          this.moneyIncome()
+          break
+        case this.$t('form.pos.optionsPoinSales.cashManagement.transfer'):
+          this.transfer()
           break
       }
     },

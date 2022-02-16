@@ -88,7 +88,6 @@ const actions = {
     dispatch('addCachedView', view)
   },
   addVisitedView({ commit }, view) {
-    console.log({ view })
     commit('ADD_VISITED_VIEW', view)
   },
   addCachedView({ commit }, view) {

@@ -40,6 +40,8 @@ const initStateUtils = {
   showAssignSeller: false,
   showUnassignSeller: false,
   showPanelAddress: false,
+  showTransfer: false,
+  showMoneyIncome: false,
   quickSearchOrder: {}
 }
 
@@ -163,6 +165,12 @@ export default {
     },
     setShowPanelAddress(state, showPanelAddress) {
       state.showPanelAddress = showPanelAddress
+    },
+    setShowTransfer(state, showTransfer) {
+      state.showTransfer = showTransfer
+    },
+    setShowMoneyIncome(state, showMoneyIncome) {
+      state.showMoneyIncome = showMoneyIncome
     }
   },
   actions: {
@@ -363,6 +371,12 @@ export default {
     },
     getShowUnassignSeller: (state) => {
       return state.showUnassignSeller
+    },
+    getShowTransfer: (state) => {
+      return state.showTransfer
+    },
+    getShowMoneyIncome: (state) => {
+      return state.showMoneyIncome
     },
     getQuickSearchOrder: (state) => {
       return state.quickSearchOrder
