@@ -17,7 +17,7 @@
 -->
 <template>
   <el-container style="background: white; height: 100% !important;">
-    <el-main style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; overflow: auto; padding-left: 0px;">
+    <el-main v-if="!isEmptyValue(isAddTypePay)" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; overflow: auto; padding-left: 0px;">
       <el-row :gutter="24">
         <template v-for="(value, key) in isAddTypePay">
           <el-col v-if="!value.isRefund" :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
@@ -87,10 +87,10 @@
     </el-main>
     <el-divider v-if="!isRefundReference && !isEmptyValue(listRefund)" content-position="center" style="padding: 10px;"><h2> {{ $t('form.pos.collect.refund') }} / Otros </h2></el-divider>
     <el-footer v-if="!isRefundReference && !isEmptyValue(listRefund)" style="height: 50%;padding: 0px;overflow: auto;">
-      <el-row :gutter="24">
+      <el-row v-if="!isEmptyValue(listRefund)" :gutter="24">
         <template v-for="(value, key) in listRefund">
           <el-col :key="key" :span="size" style="padding-left: 5px; padding-right: 5px;">
-            <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
+            <el-card :body-style="{ padding: '0px' }" style="max-height: 250px;">
               <el-row>
                 <el-col :span="6" style="padding: 10px">
                   <el-image style="width: 100px; height: 100px" :src="imageCard(value)" fit="contain" />
@@ -119,7 +119,9 @@
                       >
                         {{ value.documentNo }}
                       </el-button>
-
+                      <p v-if="!isEmptyValue(value.description)">
+                        {{ value.description }}
+                      </p>
                       <el-button
                         v-if="!isEmptyValue(value.paymentDate)"
                         type="text"
@@ -318,7 +320,7 @@ export default {
     labelTenderType(tenderType) {
       const currentTenderType = this.availablePaymentMethods.find(label => {
         const params = !this.isEmptyValue(tenderType.is_paid) ? tenderType.payment_method_uuid : tenderType.paymentMethodUuid
-        if (label.uuid === params) {
+        if (label.uuid === params || label.tender_type === tenderType.tender_type_code) {
           return label
         }
       })

@@ -237,7 +237,6 @@
                 </el-button>
                 <el-button
                   v-show="allowsCollectOrder"
-                  :disabled="validateOpenAmount"
                   type="success"
                   icon="el-icon-bank-card"
                   @click="openCollectionPanel"
