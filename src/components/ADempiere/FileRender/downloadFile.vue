@@ -15,7 +15,6 @@
 -->
 
 <template>
-  <!-- actions or process on container -->
   <el-dropdown
     style="margin:0 0 10px 20px;"
     :hide-on-click="true"

@@ -12578,7 +12578,15 @@ vue-workflow-chart@^0.4.5:
   dependencies:
     dagre "^0.8.4"
 
-vue@2.6.14, vue@^2.5.13:
+vue-xml-viewer@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/vue-xml-viewer/-/vue-xml-viewer-0.1.4.tgz#58a5c0b76d3391dc6174a2d730da6f393e25085e"
+  integrity sha512-Vum/s+Jq8r5Dm6k4uk5NUdhWFhgSLjlM2JPGWr5+PNaLS0w7K8WpUPMG82eBT605BQNUzFL5JKBCJrAQo0DhjA==
+  dependencies:
+    core-js "^3.6.5"
+    vue "^2.6.11"
+
+vue@2.6.14, vue@^2.5.13, vue@^2.6.11:
   version "2.6.14"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.14.tgz#e51aa5250250d569a3fbad3a8a5a687d6036e235"
   integrity sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==

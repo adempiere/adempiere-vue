@@ -210,7 +210,7 @@ const reportManager = {
                 type: output.mimeType
               })
 
-              // donwloaded not support render report
+              // donwload report file
               link.click()
             }
 

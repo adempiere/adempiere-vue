@@ -24,7 +24,8 @@ export const viewerSupportedFormats = [
   'ssv',
   'txt',
   'xls',
-  'xlsx'
+  'xlsx',
+  'xml'
 ]
 
 export const reportFormatsList = [

@@ -45,7 +45,6 @@ export default defineComponent({
       type: [Object, Array, String],
       default: ''
     },
-    // excel file
     name: {
       type: String,
       default: undefined
@@ -76,6 +75,9 @@ export default defineComponent({
         case 'xlsx':
         case 'txt':
           viewer = () => import('@/components/ADempiere/FileRender/ExcelFile')
+          break
+        case 'xml':
+          viewer = () => import('@/components/ADempiere/FileRender/XmlFile')
           break
         default:
           viewer = () => import('@/components/ADempiere/FileRender/EmptyFile')

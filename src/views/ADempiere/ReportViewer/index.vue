@@ -19,8 +19,6 @@
 
 <template>
   <div v-if="isLoading" key="report-viewer-loaded" style="min-height: inherit;">
-    <!-- TODO: Add action menu -->
-
     <el-row type="flex" style="min-height: inherit;">
       <el-col :span="24">
         <action-menu
