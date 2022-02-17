@@ -252,6 +252,10 @@ export default {
         }
       }
     },
+    shortkeyAction: {
+      type: Boolean,
+      default: false
+    },
     containerManager: {
       type: Object,
       default: () => ({
@@ -574,6 +578,11 @@ export default {
   },
 
   watch: {
+    shortkeyAction(value) {
+      if (value && !this.validateCash) {
+        this.cashWithdrawal()
+      }
+    },
     pending(value) {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,

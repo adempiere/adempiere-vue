@@ -417,68 +417,20 @@
       </span>
     </el-dialog>
     <el-dialog
-      :title="$t('form.pos.optionsPoinSales.cashManagement.cashOpening')"
-      :visible.sync="showCashOpen"
-      width="60%"
-      center
-    >
-      <cash-opening />
-    </el-dialog>
-    <el-dialog
-      :title="$t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal')"
-      :visible.sync="showCashWithdrawl"
-      width="60%"
-      center
-    >
-      <cash-withdrawal />
-    </el-dialog>
-    <el-dialog
-      :title="$t('form.pos.optionsPoinSales.cashManagement.closeBox')"
-      :visible.sync="showCashSummaryMovements"
-      width="60%"
-      center
-    >
-      <cash-summary-movements />
-    </el-dialog>
-    <el-dialog
-      :title="$t('form.pos.optionsPoinSales.cashManagement.assignSeller')"
-      :visible.sync="showAssignSeller"
-      :is-loaded-panel="showAssignSeller"
-      width="60%"
+      v-shortkey="isComputedRender ? {close: ['esc'], enter: ['enter']} : {}"
+      :title="$t(isLabelPanel)"
+      :visible.sync="isComputedRender"
+      :is-loaded-panel="isComputedRender"
+      close-on-press-escape
+      width="70%"
       center
       class="dialogo-seller"
+      @shortkey.native="cashManagementModal"
     >
-      <assign-seller />
-    </el-dialog>
-    <el-dialog
-      :title="$t('form.pos.optionsPoinSales.cashManagement.unassignSeller')"
-      :visible.sync="showUnassignSeller"
-      :is-loaded-panel="showUnassignSeller"
-      width="60%"
-      center
-      class="dialogo-seller"
-    >
-      <assign-seller />
-    </el-dialog>
-    <el-dialog
-      :title="$t('form.pos.optionsPoinSales.cashManagement.transfer')"
-      :visible.sync="showTransfer"
-      :is-loaded-panel="showTransfer"
-      width="60%"
-      center
-      class="dialogo-seller"
-    >
-      <cash-withdrawal />
-    </el-dialog>
-    <el-dialog
-      :title="$t('form.pos.optionsPoinSales.cashManagement.moneyIncome')"
-      :visible.sync="showMoneyIncome"
-      :is-loaded-panel="showMoneyIncome"
-      width="60%"
-      center
-      class="dialogo-seller"
-    >
-      <cash-opening />
+      <component
+        :is="isComponentRender"
+        :shortkey-action="isAction"
+      />
     </el-dialog>
   </div>
 </template>
@@ -538,6 +490,7 @@ export default {
       activeName: '',
       processPos: '',
       pin: '',
+      isAction: false,
       attributePin: {},
       validatePin: true,
       visible: false,
@@ -552,6 +505,102 @@ export default {
   },
 
   computed: {
+    isComputedRender: {
+      get() {
+        return this.$store.getters[this.isOpenPanel.getters]
+      },
+      set(value) {
+        this.$store.commit(this.isOpenPanel.commit, value)
+      }
+    },
+    isOpenPanel() {
+      const isOpen = {}
+      switch (true) {
+        case this.showCashOpen:
+          isOpen.getters = 'getShowCashOpen'
+          isOpen.commit = 'setshowCashOpen'
+          break
+        case this.showCashWithdrawl:
+          isOpen.getters = 'getShowCashWithdrawl'
+          isOpen.commit = 'setShowCashWithdrawl'
+          break
+        case this.showCashSummaryMovements:
+          isOpen.getters = 'getShowCashSummaryMovements'
+          isOpen.commit = 'setShowCashSummaryMovements'
+          break
+        case this.showAssignSeller:
+          isOpen.getters = 'getShowAssignSeller'
+          isOpen.commit = 'setShowAssignSeller'
+          break
+        case this.showUnassignSeller:
+          isOpen.getters = 'getShowUnassignSeller'
+          isOpen.commit = 'setShowUnassignSeller'
+          break
+        case this.showTransfer:
+          isOpen.getters = 'getShowTransfer'
+          isOpen.commit = 'setShowTransfer'
+          break
+        case this.showMoneyIncome:
+          isOpen.getters = 'getShowMoneyIncome'
+          isOpen.commit = 'setShowMoneyIncome'
+          break
+      }
+      return isOpen
+    },
+    isLabelPanel() {
+      let isLabel
+      const baseTag = 'form.pos.optionsPoinSales.cashManagement.'
+      switch (true) {
+        case this.showCashOpen:
+          isLabel = baseTag + 'cashOpening'
+          break
+        case this.showCashWithdrawl:
+          isLabel = baseTag + 'cashwithdrawal'
+          break
+        case this.showCashSummaryMovements:
+          isLabel = baseTag + 'closeBox'
+          break
+        case this.showAssignSeller:
+          isLabel = baseTag + 'assignSeller'
+          break
+        case this.showUnassignSeller:
+          isLabel = baseTag + 'unassignSeller'
+          break
+        case this.showTransfer:
+          isLabel = baseTag + 'transfer'
+          break
+        case this.showMoneyIncome:
+          isLabel = baseTag + 'moneyIncome'
+          break
+        default:
+          isLabel = ''
+          break
+      }
+      return isLabel
+    },
+    isComponentRender() {
+      let component
+      switch (true) {
+        case this.showCashOpen:
+        case this.showMoneyIncome:
+          component = () => import('@/components/ADempiere/Form/VPOS/Options/CashOpening')
+          this.clearField('Cash-Opening')
+          break
+        case this.showCashWithdrawl:
+        case this.showTransfer:
+          component = () => import('@/components/ADempiere/Form/VPOS/Options/Cashwithdrawal')
+          this.clearField('Cash-Withdrawal')
+          break
+        case this.showCashSummaryMovements:
+          component = () => import('@/components/ADempiere/Form/VPOS/Options/CashSummaryMovements')
+          break
+        case this.showAssignSeller:
+        case this.showUnassignSeller:
+          component = () => import('@/components/ADempiere/Form/VPOS/Options/AssignSeller')
+          break
+      }
+      return component
+    },
     isAllowsCashOpening() {
       return this.currentPointOfSales.isAllowsCashOpening
     },
@@ -592,61 +641,26 @@ export default {
         }
       }
     },
-    showCashWithdrawl: {
-      get() {
-        return this.$store.getters.getShowCashWithdrawl
-      },
-      set(value) {
-        this.$store.commit('setShowCashWithdrawl', value)
-      }
+    showCashWithdrawl() {
+      return this.$store.getters.getShowCashWithdrawl
     },
-    showCashOpen: {
-      get() {
-        return this.$store.getters.getShowCashOpen
-      },
-      set(value) {
-        this.$store.commit('setshowCashOpen', value)
-      }
+    showCashOpen() {
+      return this.$store.getters.getShowCashOpen
     },
-    showCashSummaryMovements: {
-      get() {
-        return this.$store.getters.getShowCashSummaryMovements
-      },
-      set(value) {
-        this.$store.commit('setShowCashSummaryMovements', value)
-      }
+    showCashSummaryMovements() {
+      return this.$store.getters.getShowCashSummaryMovements
     },
-    showAssignSeller: {
-      get() {
-        return this.$store.getters.getShowAssignSeller
-      },
-      set(value) {
-        this.$store.commit('setShowAssignSeller', value)
-      }
+    showAssignSeller() {
+      return this.$store.getters.getShowAssignSeller
     },
-    showUnassignSeller: {
-      get() {
-        return this.$store.getters.getShowUnassignSeller
-      },
-      set(value) {
-        this.$store.commit('setShowUnassignSeller', value)
-      }
+    showUnassignSeller() {
+      return this.$store.getters.getShowUnassignSeller
     },
-    showTransfer: {
-      get() {
-        return this.$store.getters.getShowTransfer
-      },
-      set(value) {
-        this.$store.commit('setShowTransfer', value)
-      }
+    showTransfer() {
+      return this.$store.getters.getShowTransfer
     },
-    showMoneyIncome: {
-      get() {
-        return this.$store.getters.getShowMoneyIncome
-      },
-      set(value) {
-        this.$store.commit('setShowMoneyIncome', value)
-      }
+    showMoneyIncome() {
+      return this.$store.getters.getShowMoneyIncome
     },
     adviserPin() {
       return this.$store.getters.posAttributes.currentPointOfSales.isPosRequiredPin
@@ -715,9 +729,6 @@ export default {
   },
 
   watch: {
-    // popoverConfirmDelivery(value) {
-    //   this.showConfirmDelivery = value
-    // },
     visible(value) {
       if (value && !this.isEmptyValue(this.$refs)) {
         setTimeout(() => {
@@ -728,6 +739,21 @@ export default {
   },
 
   methods: {
+    clearField(containerUuid) {
+      this.$store.commit('updateValuesOfContainer', {
+        containerUuid,
+        attributes: [{
+          columnName: 'PayAmt',
+          value: 0
+        }, {
+          columnName: 'CollectingAgent_ID',
+          value: undefined
+        }, {
+          columnName: 'Description',
+          value: undefined
+        }]
+      })
+    },
     openDelivery() {
       if (!this.isProcessed) {
         return
@@ -762,6 +788,19 @@ export default {
           case 'close':
             this.closePin()
             break
+        }
+      }
+    },
+    cashManagementModal(event) {
+      if (this.isComputedRender) {
+        switch (event.srcKey) {
+          case 'close':
+            this.$store.commit(this.isOpenPanel.commit, false)
+            break
+          case 'enter': {
+            this.isAction = true
+            break
+          }
         }
       }
     },

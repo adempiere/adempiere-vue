@@ -242,8 +242,12 @@ export default {
       required: false
     },
     amount: {
-      type: Object,
+      type: Boolean,
       default: undefined
+    },
+    shortkeyAction: {
+      type: Boolean,
+      default: false
     },
     metadata: {
       type: Object,
@@ -576,6 +580,11 @@ export default {
   },
 
   watch: {
+    shortkeyAction(value) {
+      if (value && !this.validateCash) {
+        this.cashOpening()
+      }
+    },
     pending(value) {
       this.$store.commit('updateValueOfField', {
         containerUuid: this.containerUuid,
@@ -857,7 +866,9 @@ export default {
     },
     sendPayment(payment) {
       createPayment(payment)
-        .then(response => {})
+        .then(response => {
+          this.clearField()
+        })
         .catch(error => {
           this.$message({
             message: error.message,
@@ -867,7 +878,6 @@ export default {
           console.warn(`Error: ${error.message}. Code: ${error.code}.`)
         })
         .finally(() => {
-          this.clearField()
           this.listPaymentOpen()
         })
     },

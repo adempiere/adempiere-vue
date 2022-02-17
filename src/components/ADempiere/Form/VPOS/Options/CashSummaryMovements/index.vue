@@ -86,6 +86,10 @@ export default {
       type: Object,
       default: undefined
     },
+    shortkeyAction: {
+      type: Boolean,
+      default: false
+    },
     metadata: {
       type: Object,
       default: () => {

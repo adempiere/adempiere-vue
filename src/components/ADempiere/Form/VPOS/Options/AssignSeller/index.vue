@@ -58,6 +58,7 @@
         :disabled="validateSeller"
         @click="assignSeller()"
       />
+      {{ validateSeller }}
       <el-button
         style="float: right;"
         type="danger"
@@ -91,6 +92,10 @@ export default {
     amount: {
       type: Object,
       default: undefined
+    },
+    shortkeyAction: {
+      type: Boolean,
+      default: false
     },
     metadata: {
       type: Object,
@@ -159,6 +164,11 @@ export default {
     }
   },
   watch: {
+    shortkeyAction(value) {
+      if (value && !this.validateSeller) {
+        this.assignSeller()
+      }
+    },
     showAssignSeller(value) {
       if (value) {
         this.listAvailableSellers()
