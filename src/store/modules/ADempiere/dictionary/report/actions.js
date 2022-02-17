@@ -94,6 +94,8 @@ export default {
     const actionsList = []
     actionsList.push(runReport)
 
+    // destruct to avoid deleting the reference to the original variable and to avoid mutating
+    const actionExportType = { ...runReportAs }
     const runTypeChilds = []
     if (!isEmptyValue(reportDefinition.reportExportTypes)) {
       reportDefinition.reportExportTypes.forEach(reportType => {
@@ -114,12 +116,14 @@ export default {
         })
       })
 
-      runReportAs.childs = runTypeChilds
+      actionExportType.childs = runTypeChilds
     } else {
-      runReportAs.enabled = false
+      actionExportType.enabled = false
     }
-    actionsList.push(runReportAs)
+    actionsList.push(actionExportType)
 
+    // destruct to avoid deleting the reference to the original variable and to avoid mutating
+    const actionPrintFormat = { ...runReportAsPrintFormat }
     const printFormats = rootGetters.getPrintFormatList(containerUuid)
     if (!isEmptyValue(printFormats)) {
       const printFormatChilds = []
@@ -140,11 +144,11 @@ export default {
         })
       })
 
-      runReportAsPrintFormat.childs = printFormatChilds
+      actionPrintFormat.childs = printFormatChilds
     } else {
-      runReportAsPrintFormat.enabled = false
+      actionPrintFormat.enabled = false
     }
-    actionsList.push(runReportAsPrintFormat)
+    actionsList.push(actionPrintFormat)
 
     // action shared link
     actionsList.push(sharedLink)
