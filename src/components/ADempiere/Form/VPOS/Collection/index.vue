@@ -677,6 +677,9 @@ export default {
         return convert.divideRate
       }
       return 1
+    },
+    showCollection() {
+      return this.$store.getters.getShowCollectionPos
     }
   },
 
@@ -690,6 +693,11 @@ export default {
           conversionDate: clientDateTime(value, 'd')
         })
       }
+    },
+    showCollection(value) {
+      this.defaultValueCurrency()
+      this.currentFieldPaymentMethods = this.defaulValuePaymentMethods.uuid
+      this.cancel()
     },
     pending(value) {
       this.$store.commit('updateValueOfField', {
