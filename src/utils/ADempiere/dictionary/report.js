@@ -88,3 +88,19 @@ export const runReportAsPrintFormat = {
     })
   }
 }
+
+export const runReportAsView = {
+  name: language.t('actionMenu.reportViews'),
+  description: language.t('actionMenu.generateWithReportView'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-data-analysis',
+  actionName: 'runReportAsView',
+  uuid: null,
+  childs: [],
+  runReportAsView: ({ root, containerUuid }) => {
+    root.$store.dispatch('startReport', {
+      containerUuid
+    })
+  }
+}

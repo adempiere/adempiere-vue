@@ -80,7 +80,8 @@ const reportManager = {
     startReport({ commit, dispatch, rootGetters }, {
       containerUuid,
       reportFormat = 'html',
-      printFormatUuid
+      printFormatUuid,
+      reportViewUuid
     }) {
       return new Promise(resolve => {
         const reportDefinition = rootGetters.getStoredReport(containerUuid)
@@ -105,8 +106,9 @@ const reportManager = {
         requestRunReport({
           uuid: containerUuid,
           reportType: reportFormat,
+          parametersList,
           printFormatUuid,
-          parametersList
+          reportViewUuid
         })
           .then(runReportRepsonse => {
             const { instanceUuid, output } = runReportRepsonse
@@ -253,12 +255,13 @@ const reportManager = {
     }) {
       return new Promise(resolve => {
         requestListPrintFormats({ uuid })
-          .then(printFormatResponse => {
-            const printFormatList = printFormatResponse.records
-              .map(printFormatItem => {
-                dispatch('getReportViewsFromServer', {
+          .then(async printFormatResponse => {
+            const printFormatList = await Promise.all(
+              printFormatResponse.records.map(async printFormatItem => {
+                await dispatch('getReportViewsFromServer', {
                   uuid,
                   id,
+                  // TODO: Verify if table name is required
                   tableName: printFormatItem.tableName
                 })
                 dispatch('getDrillTablesFromServer', {
@@ -269,12 +272,11 @@ const reportManager = {
 
                 return {
                   ...printFormatItem,
-                  // type: 'updateReport',
-                  // option: 'printFormat',
                   reportUuid: uuid,
                   reportId: id
                 }
               })
+            )
 
             commit('setPrintFormatsList', {
               containerUuid: uuid,
@@ -303,21 +305,20 @@ const reportManager = {
       return new Promise(resolve => {
         requestListReportsViews({ uuid, tableName })
           .then(reportViewResponse => {
-            const reportViewList = reportViewResponse.reportViewsList.map(reportViewItem => {
+            const reportViewsList = reportViewResponse.reportViewsList.map(reportViewItem => {
               return {
                 ...reportViewItem,
-                // type: 'updateReport',
-                // option: 'reportView',
                 reportUuid: uuid,
                 reportId: id
               }
             })
+
             commit('setReportViewsList', {
               containerUuid: uuid,
-              viewList: reportViewList
+              reportViewsList
             })
 
-            resolve(reportViewList)
+            resolve(reportViewsList)
           })
           .catch(error => {
             console.warn(`Error getting report views: ${error.message}. Code: ${error.code}.`)

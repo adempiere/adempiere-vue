@@ -23,7 +23,8 @@ import { requestProcessMetadata as requestReportMetadata } from '@/api/ADempiere
 import {
   runReport,
   runReportAs,
-  runReportAsPrintFormat
+  runReportAsPrintFormat,
+  runReportAsView
 } from '@/utils/ADempiere/dictionary/report.js'
 import {
   sharedLink
@@ -149,6 +150,34 @@ export default {
       actionPrintFormat.enabled = false
     }
     actionsList.push(actionPrintFormat)
+
+    // destruct to avoid deleting the reference to the original variable and to avoid mutating
+    const actionView = { ...runReportAsView }
+    const reportsView = rootGetters.getReportViewList(containerUuid)
+    if (!isEmptyValue(reportsView)) {
+      const printFormatChilds = []
+      reportsView.forEach(reportView => {
+        printFormatChilds.push({
+          ...reportView,
+          icon: 'el-icon-document',
+          enabled: true,
+          svg: false,
+          actionName: 'runReportAs',
+          uuid: null,
+          runReportAs: ({ root, containerUuid }) => {
+            root.$store.dispatch('startReport', {
+              containerUuid,
+              reportViewUuid: reportView.reportViewUuid
+            })
+          }
+        })
+      })
+
+      actionView.childs = printFormatChilds
+    } else {
+      actionView.enabled = false
+    }
+    actionsList.push(actionView)
 
     // action shared link
     actionsList.push(sharedLink)

@@ -32,6 +32,8 @@ const actionMenu = {
   generateReportAsOtherFormat: 'Cambiar extensión del archivo para generar',
   printFormats: 'Formatos de Impresión',
   generateReportWithPrintFormat: 'Cambiar formato de impresión para generar',
+  reportViews: 'Vistas de Reporte',
+  generateWithReportView: 'Cambiar vista de reporte para generar',
   // relations
   relations: 'Relaciones',
   withoutRelations: 'Sin Relaciones',

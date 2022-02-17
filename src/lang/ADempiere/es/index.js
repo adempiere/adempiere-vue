@@ -195,7 +195,6 @@ export default {
     unsupportedHeadline: 'Esta vista no está disponible actualmente',
     unsupportedInfo: 'Verifique que la vista sea compatible con esta versión, o haga clic en el botón a continuación para volver a la página de inicio.',
     unsupportedButton: 'Volver al Panel de control',
-    reportView: 'Vistas de Reporte',
     drillTable: 'Entrar en Detalle'
   },
   report: {

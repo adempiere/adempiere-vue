@@ -197,6 +197,12 @@ export default defineComponent({
       }
     }
 
+    const actionsList = computed(() => {
+      return root.$store.getters.getStoredActionsMenu({
+        containerUuid: reportUuid
+      })
+    })
+
     getReport()
 
     const actionsManager = ref({
@@ -204,9 +210,7 @@ export default defineComponent({
 
       defaultActionName: root.$t('actionMenu.generateReport'),
 
-      getActionList: () => root.$store.getters.getStoredActionsMenu({
-        containerUuid: reportUuid
-      })
+      getActionList: () => actionsList.value
     })
 
     const relationsManager = ref({

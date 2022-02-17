@@ -195,7 +195,6 @@ export default {
     unsupportedHeadline: 'This view is currently unavailable',
     unsupportedInfo: 'Please check that the view is supported in this version, or click the button below to return to the homepage.',
     unsupportedButton: 'Back to dashboard',
-    reportView: 'Report Views',
     drillTable: 'Drill Down'
   },
   report: {
