@@ -876,38 +876,38 @@ export default {
         containerUuid,
         columnName: 'PayAmt'
       })
-      const paymentDate = this.$store.getters.getValueOfField({
-        containerUuid,
-        columnName: 'DateTrx'
-      })
       const tenderTypeCode = this.currentAvailablePaymentMethods.tender_type
       const paymentMethodUuid = this.currentAvailablePaymentMethods.uuid
       const referenceNo = this.$store.getters.getValueOfField({
         containerUuid,
         columnName: 'ReferenceNo'
       })
+      const values = this.$store.getters.getValuesView({
+        containerUuid,
+        format: 'object'
+      })
+      const params = { referenceNo: values.DocumentNo, description: values.Description, paymentDate: values.DateTrx }
       if (this.sendToServer) {
         this.$store.dispatch('setPaymentBox', {
+          ...params,
           posUuid,
           orderUuid,
           bankUuid,
           referenceNo,
           amount: this.round(this.amontSend, this.standardPrecision),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
-          paymentDate,
           tenderTypeCode,
           paymentMethodUuid,
           currencyUuid: this.dayRate.currencyTo.uuid
         })
       } else {
         this.$store.dispatch('createPayments', {
+          ...params,
           posUuid,
           orderUuid,
           bankUuid,
-          referenceNo,
           amount: this.round(this.amontSend, this.standardPrecision),
           convertedAmount: this.amontSend * this.dayRate.divideRate,
-          paymentDate,
           paymentMethodUuid,
           tenderTypeCode,
           currencyUuid: this.dayRate.currencyTo.uuid
