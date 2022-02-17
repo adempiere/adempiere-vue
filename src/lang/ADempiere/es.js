@@ -1,18 +1,4 @@
-
-import actionMenu from './actionMenu'
-import extensionFile from './extensionFile'
-import fieldDisplayOptions from './fieldDisplayOptions'
-import fieldOptions from './fieldOptions'
-import recordManager from './recordManager'
-import window from './window'
-
 export default {
-  actionMenu,
-  extensionFile,
-  fieldDisplayOptions,
-  fieldOptions,
-  recordManager,
-
   language: 'Idioma',
   route: {
     dashboard: 'Panel de control',
@@ -66,8 +52,7 @@ export default {
     recordLocked: 'Este registro ha sido bloqueado',
     recordUnlocked: 'Este registro ha sido desbloqueado',
     noRoleAccess: 'Con su rol y configuración actuales, no puede ver esta información.',
-    errorPointOfSale: 'Sin punto de venta seleccionado',
-    emptyPos: 'Este Usuario no tiene Ningún Terminal de PDV Asignado'
+    errorPointOfSale: 'Sin punto de venta seleccionado'
   },
   navbar: {
     badge: {
@@ -150,11 +135,16 @@ export default {
     binaryButton: 'Subir archivo',
     binaryTip: 'Solo archivos con un tamaño menor a 500kb',
     imageError: 'La imagen excede los 2MB y no cumple con los formato validos!',
+    contextMenuRelations: 'Relaciones',
     contextMenuActions: 'Acciones',
     contextMenuReferences: 'Referencias',
     withOutReferences: 'Sin referencias para el registro',
     contextMenuDownload: 'Descargar',
+    contextMenuShareLink: 'Compartir Link',
+    contextMenuRefresh: 'Actualizar',
+    contextMennuExport: 'Exportar Smart Browser',
     contextMenuPrintFormatSetup: 'Configurar Formato de Impresión',
+    RunProcess: 'Ejecutar',
     ChangeParameters: 'Cambiar Parametros',
     RunProcessAs: 'Ejecutar como',
     ExportTo: 'Exportar a',
@@ -168,7 +158,26 @@ export default {
     resetAllFilters: 'Reiniciar todos los filtros',
     switchActiveText: 'Si',
     switchInactiveText: 'No',
-    contextFieldTitle: 'Información de Contexto'
+    contextFieldTitle: 'Información de Contexto',
+    preference: {
+      title: 'Valor de Preferencia',
+      attribute: 'Atributo',
+      code: 'Codigo',
+      yes: 'Si',
+      no: 'No',
+      defaultMessage: 'Aplica para Esta ',
+      defaultMessageUser: 'Aplica para Este ',
+      preferenceIsOk: 'Preferencia guardada',
+      preferenceRemoved: 'Preferencia Eliminada',
+      for: 'Para ',
+      clientAndOrganization: 'esta Compañía y Organización',
+      allOrganizationOfClient: 'todas las Organizaciones de esta Compañía',
+      entireSystem: 'todo el Sistema',
+      thisUser: ', este Usuario',
+      allUsers: ', todos los Usuarios',
+      thisWindow: ' y esta Ventana',
+      allWindows: ' y todas las Ventanas'
+    }
   },
   grid: {
     recordAccess: {
@@ -228,9 +237,7 @@ export default {
       deleteSelection: 'Eliminar Registros Seleccionados',
       advancedQuery: 'Consulta Avanzada',
       exportZip: 'Exportar Zip',
-      showAllColumns: 'Mostrar todas las Columnas',
       showOnlyMandatoryColumns: 'Mostrar Solo Columnas Obligatorias',
-      showTableColumnsOnly: 'Mostrar Solo Columnas de la Tabla',
       showAllAvailableColumns: 'Mostrar Todas Columnas Disponibles',
       exportRecordTable: 'Exportar Registros Seleccionados',
       showTotal: 'Mostrar Totales',
@@ -277,12 +284,35 @@ export default {
     changeLanguage: 'Cambiar idioma',
     changeLanguagePlaceholder: 'Elija un idioma'
   },
-  window,
+  window: {
+    newRecord: 'Nuevo Registro',
+    deleteRecord: 'Eliminar Registro',
+    undoNew: 'Descartar Nuevo Registro',
+    containerInfo: {
+      attachment: 'Anexo',
+      notes: 'Listado de Notas',
+      changeLog: 'Actividad',
+      workflowLog: 'Histórico de Flujo de Trabajo',
+      changeDetail: 'Detalle del cambio',
+      logWorkflow: {
+        message: 'Mensaje',
+        responsible: 'Responsable',
+        workflowName: 'Nombre de estado del flujo de trabajo',
+        timeElapsed: 'Tiempo transcurrido',
+        addNote: 'Agregar Nota'
+      }
+    },
+    documentStatus: 'Estatus del Documento',
+    callout: {
+      error: 'Error En Callout'
+    }
+  },
   field: {
     field: 'Campo',
     info: 'Información',
     calculator: 'Calculadora',
     preference: 'Preferencia',
+    codeTranslation: 'Traduccion de ',
     logsField: 'Bitácora de Cambios',
     contextInfo: 'Información del Contexto',
     logsFieldEmpty: 'El campo no tiene cambios aún',
@@ -298,6 +328,7 @@ export default {
     deleteRecordSuccessful: 'Registro eliminado exitosamente',
     deleteRecordError: 'Error al eliminar el regitro',
     exportRecord: 'Exportar Registro',
+    lockRecord: 'Registro Bloqueado',
     noDescription: 'Sin Descripción',
     addDescription: 'Agregue una Descripción',
     recordAccess: {
@@ -324,7 +355,8 @@ export default {
     },
     addNote: 'Agregar Nota',
     emptyNote: 'Este registro no posee ninguna nota',
-    descriptionNote: 'Agregar Nota o Comentario al Registro'
+    descriptionNote: 'Agregar Nota o Comentario al Registro',
+    unlockRecord: 'Desbloquear Registro'
   },
   sequence: {
     available: 'Disponibles',
@@ -360,14 +392,9 @@ export default {
     pos: {
       title: 'Punto de Venta',
       priceList: 'Lista de Precio',
-      releaseOrder: 'Liberar',
-      applyDiscountOnOrder: 'Apply Discount on Order',
-      discountRate: '% Discount',
+      discountList: 'Lista de Descuento',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
-        emptyAvailablePaymentMethods: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso',
-        emptyAvailablePaymentMethodsRefudn: 'Éste Terminal no tiene Método de Pago configurado para permitir Reembolso Pendiente',
-        emptyListCashSummary: 'No hay moviemineto en caja',
         salesOrder: {
           title: 'Orden de Venta',
           newOrder: 'Nueva Orden',
@@ -382,20 +409,13 @@ export default {
           copyOrder: 'Copiar Orden',
           createNewReturnOrder: 'Crear una nueva orden de devolución',
           confirmDelivery: 'Confirmar Entrega',
-          emptyProductDelivery: 'Producto no se Encuentra en la Orden'
+          emptyProductDelivery: 'Producto no disponible para entregar'
         },
         cashManagement: {
           title: 'Gestión de Caja',
           cashOpening: 'Apertura de Caja',
-          cashOpenBox: 'Caja Aperturada',
           cashwithdrawal: 'Retiro de Efectivo',
-          transfer: 'Transferencia',
-          moneyIncome: 'Ingreso de Dinero',
-          successfulCashWithdrawal: 'Retiro de caja exitoso',
-          cashCloseBox: 'Caja Cerrada',
-          closeBox: 'Cierre de Caja',
-          assignSeller: 'Asignar vendedor',
-          unassignSeller: 'Desasignar vendedor'
+          closeBox: 'Cierre de Caja'
         },
         generalOptions: {
           title: 'Opciones Generales',
@@ -408,10 +428,6 @@ export default {
           dateFrom: 'Fecha Desde'
         }
       },
-      generalNotifications: {
-        orderReleased: 'Orden Liberada: ',
-        selectedOrder: 'Orden Seleccionada: '
-      },
       tableProduct: {
         product: 'Producto',
         quantity: 'Cantidad',
@@ -419,8 +435,8 @@ export default {
         editQuantities: 'Editar Cantidades',
         pin: 'Ingrese Pin',
         remove: 'Eliminar',
-        taxAmount: 'Impuesto',
-        taxRate: '% Imp',
+        displayTaxAmount: 'Impuesto',
+        displayTaxIMP: '%Imp',
         displayDiscuentAmount: 'Descuento',
         empty: 'Ingrese el nombre del producto, código o UPC'
       },
@@ -430,7 +446,7 @@ export default {
         date: 'Fecha',
         subTotal: 'Sub-Total',
         type: 'Tipo',
-        discount: '% Dcto',
+        discount: '%Dcto',
         tax: 'Impuesto',
         total: 'Total',
         itemQuantity: 'Cantidad de Artículos',
@@ -438,33 +454,14 @@ export default {
         pointSale: 'Punto de Venta',
         collect: 'Cobrar',
         collections: 'Cobros',
-        campaign: 'Campaña',
-        noCampaignSelected: 'Sin Campaña seleccionada',
         BusinessPartnerCreate: {
-          phone: 'Telefono',
           businessPartner: 'Socio de Negocios',
           successfullyCreated: 'Socio de Negocio Creado Exitosamente',
           customerData: 'Datos del Cliente',
-          addBillingAddress: 'Agregar Dirección de Facturación',
           billingAddress: 'Dirección de Facturación',
-          shippingAddress: 'Dirección de Envío',
+          shippingAddress: 'Dirección de Envió',
           withoutSetting: 'Sin Establecer',
-          taxId: 'Identificación Fiscal',
-          address: {
-            edit: 'Editar',
-            selectAddress: 'Seleccionar Dirección',
-            saveAddress: 'Dirección guardada',
-            addNewAddress: 'Agregar Nueva Dirección',
-            editAddress: 'Editar Dirección',
-            billingAddress: 'Dirección de Facturación',
-            shippingAddress: 'Dirección de Envió',
-            managementDescription: 'Descripción de la Dirección',
-            addressType: 'Tipo de Dirección',
-            region: 'Región',
-            city: 'Ciudad',
-            address: 'Dirección',
-            postCode: 'Código Postal'
-          }
+          taxId: 'Identificación Fiscal'
         }
       },
       collect: {
@@ -507,8 +504,6 @@ export default {
           emptyPayment: 'Método de pago no soportado',
           emptyListPayment: 'No posee ningún método de pago asociado en esta opción',
           addPayment: 'Debe agregar un tipo de vuelto para completar la operación',
-          amountLimitOrder: 'Monto Superior al Límite de la Orden',
-          incompleteChange: 'Cambio Incompleto',
           fieldList: {
             code: 'Cedula',
             name: 'Nombre del Titular',
@@ -518,10 +513,10 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'Producto no Disponible'
+        noProducto: 'No hay producto disponible Regresar al Principio'
       },
       pinMessage: {
-        pin: 'Ingrese Pin para ',
+        pin: 'Ingrese pin para ',
         documentType: 'cambiar tipo de documento',
         warehouse: 'cambiar almacén',
         price: 'cambiar precio',
@@ -540,12 +535,8 @@ export default {
     },
     byInvoice: {
       title: 'Pedidos Vendedor de Pasillo por Facturar',
-      searchCompleteOrders: 'Sólo Completas',
       label: 'Por Facturar',
-      toDeliver: 'Por Entregar',
-      toCollect: 'Por Cobrar',
       salesRepresentative: 'Agente Comercial',
-      onlyAllocated: 'Solo asignado al punto de venta actual',
       businessPartner: 'Socio de Negocio',
       copyShippingAddress: 'Copiar dirección para el envío',
       documentNo: 'Nro. Documento',

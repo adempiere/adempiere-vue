@@ -1,18 +1,4 @@
-
-import actionMenu from './actionMenu'
-import extensionFile from './extensionFile'
-import fieldDisplayOptions from './fieldDisplayOptions'
-import fieldOptions from './fieldOptions'
-import recordManager from './recordManager'
-import window from './window'
-
 export default {
-  actionMenu,
-  extensionFile,
-  fieldDisplayOptions,
-  fieldOptions,
-  recordManager,
-
   language: 'Language',
   route: {
     dashboard: 'Dashboard',
@@ -66,13 +52,11 @@ export default {
     recordLocked: 'This record has been locked',
     recordUnlocked: 'This record has been unlocked',
     noRoleAccess: 'With your current role and settings, you cannot view this information.',
-    errorPointOfSale: 'No point of sale selected',
-    emptyPos: 'This User has no Assigned POS Terminal'
+    errorPointOfSale: 'No point of sale selected'
   },
   navbar: {
     badge: {
       Notifications: 'Notifications',
-      activity: 'Worflow for Approval',
       link: 'Go to Procces Logs'
     },
     dashboard: 'Dashboard',
@@ -150,13 +134,18 @@ export default {
     binaryButton: 'Upload file',
     binaryTip: 'Only files with a size smaller than 500kb',
     imageError: 'The image exceeds 2MB and does not comply with the valid formats!',
+    contextMenuRelations: 'Relations',
     contextMenuActions: 'Actions',
     contextMenuReferences: 'References',
     withOutReferences: 'Without references for record',
+    RunProcess: 'Run',
     ChangeParameters: 'Change Parameters',
     RunProcessAs: 'Run As',
     ExportTo: 'Export to',
     contextMenuDownload: 'Download',
+    contextMenuShareLink: 'Share Link',
+    contextMenuRefresh: 'Refresh',
+    contextMennuExport: 'Export Smart Browser',
     contextMenuPrintFormatSetup: 'Print Format Setup',
     dateStartPlaceholder: 'Start date',
     dateEndPlaceholder: 'End date',
@@ -168,7 +157,26 @@ export default {
     resetAllFilters: 'Reset all filters',
     switchActiveText: 'Yes',
     switchInactiveText: 'Not',
-    contextFieldTitle: 'Context Information'
+    contextFieldTitle: 'Context Information',
+    preference: {
+      title: 'Preference Value',
+      attribute: 'Attribute',
+      code: 'Code',
+      yes: 'Yes',
+      no: 'No',
+      defaultMessage: 'Applies for this ',
+      defaultMessageUser: 'Applies for this ',
+      preferenceIsOk: 'The preference is saved',
+      preferenceRemoved: 'Preference Removed',
+      for: 'For ',
+      clientAndOrganization: 'this Client and Organization',
+      allOrganizationOfClient: 'all Organizations of this Client',
+      entireSystem: 'entire System',
+      thisUser: ', this User',
+      allUsers: ', all Users',
+      thisWindow: ' and this Window',
+      allWindows: ' and all Windows'
+    }
   },
   grid: {
     recordAccess: {
@@ -213,12 +221,12 @@ export default {
       zoomIn: 'Zoom in',
       Description: 'Description',
       actions: 'Action',
-      complete: 'Complete',
-      error: 'Error',
       status: 'Status',
       Logs: 'Summary',
       summary: 'Summary',
       Help: 'Help',
+      complete: 'Complete',
+      error: 'Error',
       FileName: 'FileName',
       Output: 'Output'
     },
@@ -228,9 +236,7 @@ export default {
       deleteSelection: 'Delete Selected Records',
       advancedQuery: 'Advanced Query',
       exportZip: 'Export Zip',
-      showAllColumns: 'Show All Columns',
       showOnlyMandatoryColumns: 'Show Only Mandatory Columns',
-      showTableColumnsOnly: 'Show Table Columns Only',
       showAllAvailableColumns: 'Show All Available Columns',
       exportRecordTable: 'Export Selected Records',
       showTotal: 'Show Totals',
@@ -302,7 +308,29 @@ export default {
     changeLanguage: 'Change language',
     changeLanguagePlaceholder: 'Choose a language'
   },
-  window,
+  window: {
+    newRecord: 'New Record',
+    deleteRecord: 'Delete Record',
+    undoNew: 'Undo New Record',
+    containerInfo: {
+      attachment: 'Attachment',
+      notes: 'Notes List',
+      changeLog: 'ACtivity',
+      workflowLog: 'Workflow Log',
+      changeDetail: 'Change detail',
+      logWorkflow: {
+        message: 'Message',
+        responsible: 'Responsible',
+        workflowName: 'Name of Workflow Status',
+        timeElapsed: 'Time Elapsed',
+        addNote: 'Add Note'
+      }
+    },
+    documentStatus: 'Document Status',
+    callout: {
+      error: 'Error In Callout'
+    }
+  },
   field: {
     field: 'Field',
     info: 'Information',
@@ -311,6 +339,7 @@ export default {
     logsField: 'Field Change Log',
     logsFieldEmpty: 'The field is still unchanged',
     contextInfo: 'Context Info',
+    codeTranslation: 'Translation Of ',
     container: {
       help: 'Help',
       description: 'Description'
@@ -323,6 +352,7 @@ export default {
     deleteRecordSuccessful: 'Record deleted successfully',
     deleteRecordError: 'Error deleting record',
     exportRecord: 'Export Record',
+    lockRecord: 'Lock Record',
     noDescription: 'No Description',
     addDescription: 'Add Description',
     recordAccess: {
@@ -349,7 +379,8 @@ export default {
     },
     addNote: 'Add Note',
     emptyNote: 'Este registro no posee ninguna nota',
-    descriptionNote: 'Add Note or Comment to Record'
+    descriptionNote: 'Add Note or Comment to Record',
+    unlockRecord: 'Unlock Record'
   },
   sequence: {
     available: 'Available',
@@ -385,14 +416,8 @@ export default {
     pos: {
       title: 'POS',
       priceList: 'Price List',
-      releaseOrder: 'Release It',
-      applyDiscountOnOrder: 'Apply Discount on Order',
-      discountRate: '% Descuento',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',
-        emptyAvailablePaymentMethodsRefudn: 'This Terminal does not have a Payment Method configured to allow Pending Refund',
-        emptyAvailablePaymentMethods: 'This Terminal does not have a Payment Method configured to allow Refund',
-        emptyListCashSummary: 'There is no cash movement',
         salesOrder: {
           title: 'Sale Order',
           newOrder: 'New Order',
@@ -406,21 +431,14 @@ export default {
           orderRemoved: 'Order Deleted',
           copyOrder: 'Copy Order',
           createNewReturnOrder: 'Create a new return order',
-          confirmDelivery: 'Confirm Delivery',
-          emptyProductDelivery: 'Product not in Order'
+          confirmDelivery: 'Confirmar Entrega',
+          emptyProductDelivery: 'Product not available for delivery'
         },
         cashManagement: {
           title: 'Cash Management',
           cashOpening: 'Cash Opening',
-          closeBox: 'Close the box',
-          assignSeller: 'Assign seller',
-          unassignSeller: 'Unassign Seller',
-          transfer: 'Transfer',
-          moneyIncome: 'Money Income',
-          cashOpenBox: 'Cashbox Opened',
-          cashwithdrawal: 'Cash Withdrawal',
-          successfulCashWithdrawal: 'Cash withdrawal successful',
-          cashCloseBox: 'Cashbox Closed'
+          cashwithdrawal: 'Cash withdrawa',
+          closeBox: 'Close the box'
         },
         generalOptions: {
           title: 'General Options',
@@ -433,10 +451,6 @@ export default {
           dateFrom: 'Date From'
         }
       },
-      generalNotifications: {
-        orderReleased: 'Order was released: ',
-        selectedOrder: 'Selected Order: '
-      },
       tableProduct: {
         product: 'Product',
         quantity: 'Quantity',
@@ -444,8 +458,8 @@ export default {
         editQuantities: 'Edit Quantities',
         pin: 'Insert Pin',
         remove: 'Remove',
-        taxAmount: 'Tax',
-        taxRate: '% Imp',
+        displayTaxAmount: 'Tax',
+        displayTaxIMP: '%Imp',
         displayDiscountAmount: 'Discount',
         empty: 'Enter the product name, code or UPC'
       },
@@ -455,7 +469,7 @@ export default {
         date: 'Date',
         subTotal: 'Sub-Total',
         type: 'Type',
-        discount: '% Dcto',
+        discount: '%Dcto',
         tax: 'Tax',
         total: 'Total',
         itemQuantity: 'Item Quantity',
@@ -463,33 +477,14 @@ export default {
         pointSale: 'Point of Sale',
         collect: 'Collect',
         collections: 'Cobros',
-        campaign: 'Campaign',
-        noCampaignSelected: 'No Campaign selected',
         BusinessPartnerCreate: {
-          phone: 'Phone',
           businessPartner: 'Business Partner',
-          successfullyCreated: 'Business Partner Successfully Created',
+          successfullyCreated: 'Socio de Negocio Creado Exitosamente',
           customerData: 'Customer Data',
-          addBillingAddress: 'Add Billing Address',
           billingAddress: 'Billing Address',
           shippingAddress: 'Shipping Address',
-          withoutSetting: 'Sin Establecer',
-          taxId: 'Tax Identification',
-          address: {
-            edit: 'Edit',
-            selectAddress: 'Select Address',
-            saveAddress: 'Save Address',
-            addNewAddress: 'Add New Address',
-            editAddress: 'Edit Address',
-            billingAddress: 'Billing Address',
-            shippingAddress: 'Shipping Address',
-            managementDescription: 'Address Description',
-            addressType: 'Address Type',
-            region: 'Region',
-            city: 'City',
-            address: 'Address',
-            postCode: 'Post Code'
-          }
+          withoutSetting: 'Without Setting',
+          taxId: 'Tax Identification'
         }
       },
       collect: {
@@ -532,8 +527,6 @@ export default {
           emptyPayment: 'Unsupported payment method',
           emptyListPayment: 'You do not have any payment method associated with this option',
           addPayment: 'You must add a change type to complete the operation',
-          amountLimitOrder: 'Amount greater than the limit of the Order',
-          incompleteChange: 'Incomplete Change',
           fieldList: {
             code: 'Cedula',
             name: 'Holder Name',
@@ -543,10 +536,10 @@ export default {
         }
       },
       keyLayout: {
-        noProducto: 'Product not Avilable'
+        noProducto: 'No product available. Back to top'
       },
       pinMessage: {
-        pin: 'Enter Pin for ',
+        pin: 'Enter pin for ',
         documentType: 'change document type',
         warehouse: 'change warehouse',
         price: 'change price',
@@ -565,12 +558,8 @@ export default {
     },
     byInvoice: {
       title: 'Aisle Vendor Orders to be Invoiced',
-      searchCompleteOrders: 'Search complete orders',
       label: 'To be invoiced',
-      toDeliver: 'To be delivered',
-      toCollect: 'Receivable',
       salesRepresentative: 'Sales Agent',
-      onlyAllocated: 'Only allocated to current point of sales',
       businessPartner: 'Business Partner',
       copyShippingAddress: 'Copy shipping address',
       documentNo: 'Document No.',

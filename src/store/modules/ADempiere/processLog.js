@@ -57,7 +57,6 @@ const processLog = {
       pageToken,
       pageSize
     }) {
-      console.log({ rootGetters, getters })
       // process Activity
       return requestListProcessesLogs({ pageToken, pageSize })
         .then(processActivityResponse => {
@@ -68,7 +67,6 @@ const processLog = {
             processList: responseList,
             nextPageToken: processActivityResponse.nextPageToken
           }
-          console.log({ processResponseList })
           commit('setSessionProcess', processResponseList)
 
           return processResponseList

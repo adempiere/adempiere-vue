@@ -15,11 +15,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
-
+import LoadingView from '@/components/ADempiere/LoadingView'
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 export default defineComponent({
   name: 'ProcessActivity',
+
+  components: {
+    LoadingView
+  },
 
   setup(props, { root }) {
     const processActivity = ref([])
@@ -53,7 +57,24 @@ export default defineComponent({
       processAll.forEach(element => {
         // let processMetadataReturned = {}
         if (element !== undefined) {
-          processAllReturned.push(element)
+          const processMetadataReturned = {}
+          let infoMetadata = !root.isEmptyValue(element.output) ? findStoredReportUuid(element.uuid) : getProcessMetadata(element.uuid)
+          if (!infoMetadata) {
+            infoMetadata = {}
+          }
+
+          Object.assign(processMetadataReturned, element, infoMetadata)
+          processMetadataReturned.parametersList = element.parametersList
+          const indexRepeat = processAllReturned.findIndex(item => {
+            return item.instanceUuid === element.instanceUuid && !root.isEmptyValue(element.instanceUuid)
+          })
+          if (indexRepeat > -1) {
+            // update attributes in exists process to return
+            // Object.assign(processAllReturned[indexRepeat], processMetadataReturned)
+            const other = Object.assign(processMetadataReturned, processAllReturned[indexRepeat])
+            processAllReturned[indexRepeat] = other
+          }
+          processAllReturned.push(processMetadataReturned)
         }
       })
 
@@ -70,11 +91,34 @@ export default defineComponent({
         }
       })
     })
-
+    const getProcessLogSuccess = computed(() => {
+      return getProcessLog.value.filter(element => {
+        const { isError, output, isReport, isProcessing } = element
+        if ((!isError && !isProcessing) || (isError && !isProcessing && isReport && !root.isEmptyValue(output.output))) {
+          return element
+        }
+      })
+    })
+    const getProcessLogError = computed(() => {
+      return getProcessLog.value.filter(element => {
+        const { isError, output, isReport, isProcessing } = element
+        if ((isError && !isProcessing) || (isError && !isProcessing && isReport && root.isEmptyValue(output.output))) {
+          return element
+        }
+      })
+    })
+    const getProcessLogProcessing = computed(() => {
+      return getProcessLog.value.filter(element => {
+        const { isProcessing } = element
+        if (isProcessing) {
+          return element
+        }
+      })
+    })
     const language = computed(() => {
       return root.$store.getters.language
     })
-
+    const isLoadProcess = ref(true)
     onMounted(() => {
       root.$store.dispatch('getSessionProcessFromServer', {
         pageToken: pageToken.value,
@@ -83,8 +127,16 @@ export default defineComponent({
         .then(response => {
           pageToken.value = response.nextPageToken
         })
+        .finally(() => {
+          isLoadProcess.value = false
+        })
     })
-
+    const getProcessMetadata = (uuid) => {
+      return root.$store.getters.getStoredProcess(uuid)
+    }
+    const findStoredReportUuid = (uuid) => {
+      return root.$store.getters.getStoredReport(uuid)
+    }
     function handleCommand(activity) {
       if (activity.command === 'seeReport') {
         root.$router.push({
@@ -107,7 +159,7 @@ export default defineComponent({
       }
     }
 
-    const checkStatus = ({ isError, isProcessing, isReport }) => {
+    const checkStatus = ({ isError, isProcessing, output, isReport }) => {
       const status = {
         text: root.$t('notifications.completed'),
         type: 'success',
@@ -140,24 +192,48 @@ export default defineComponent({
       }
       return title
     }
+    const findTranslation = (title) => {
+      const hasKey = root.$te('views.' + title)
+      if (hasKey) {
+        // $t : this method from vue-i18n, inject in @/lang/index.js
+        const translatedTitle = root.$t('views.' + title)
+        return translatedTitle
+      }
+      return title
+    }
 
     const translateDate = (value) => {
       return root.$d(new Date(value), 'long', language.value)
+    }
+    const currentKey = ref(0)
+    const showkey = (value) => {
+      if (value === currentKey.value) {
+        currentKey.value = 999
+      } else {
+        currentKey.value = value
+      }
     }
 
     return {
       processActivity,
       recordCount,
       pageToken,
+      isLoadProcess,
+      currentKey,
       pageSize,
       // computeds
       getRunProcessAll,
       getProcessLog,
+      getProcessLogSuccess,
+      getProcessLogError,
+      getProcessLogProcessing,
       language,
       // methods
+      showkey,
       handleCommand,
       checkStatus,
       generateTitle,
+      findTranslation,
       translateDate
     }
   }

@@ -17,156 +17,373 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <div v-if="!isEmptyValue(getProcessLog)" key="with-process" class="app-container">
-    <el-timeline>
-      <el-timeline-item
-        v-for="(activity, index) in getProcessLog"
-        :key="index"
-        :timestamp="translateDate(activity.lastRun)"
-        placement="top"
-        type="primary"
-        size="large"
-        :color="checkStatus(activity).color"
-      >
-        <el-card>
-          <div slot="header" class="clearfix">
-            <span>
-              <b> {{ activity.name }} </b>
-            </span>
+  <div v-if="!isLoadProcess">
+    <div v-if="!isEmptyValue(getProcessLog)" key="with-process" class="app-container">
+      <el-tabs type="border-card">
+        <el-tab-pane>
+          <span slot="label">
+            <el-badge :value="getProcessLogSuccess.length" type="success" class="item" style="color: #67C23A">
+              {{ generateTitle('complete') }}
+            </el-badge>
+          </span>
+          <h1 v-if="isEmptyValue(getProcessLogSuccess)" class="text-center">
+            {{ $t('views.noProcess') }}
+          </h1>
+          <el-timeline style="padding: 0px">
+            <el-timeline-item
+              v-for="(activity, index) in getProcessLogSuccess"
+              :key="index"
+              placement="top"
+              type="primary"
+              size="large"
+              :color="checkStatus(activity).color"
+            >
+              <el-card>
+                <div slot="header" class="clearfix" style="display: flex;">
+                  <div class="header-panel" @click="showkey(index)">
+                    <el-popover
+                      placement="right"
+                      trigger="hover"
+                      style="width: 100%;"
+                    >
+                      <p>
+                        <b style="font-size: 16px;">
+                          {{ generateTitle('Description') }}
+                        </b>
+                      </p>
+                      <span>
+                        <b> {{ activity.description }} </b>
+                      </span>
 
-            <div class="actions">
-              <el-dropdown @command="handleCommand">
-                <span class="el-dropdown-link">
-                  {{ $t('components.contextMenuActions') }}
-                  <i class="el-icon-arrow-down el-icon--right" />
-                </span>
+                      <span v-if="activity.isReport">
+                        {{ activity.output.description }}
+                      </span>
+                      <el-button slot="reference" type="text" style="color: rgb(96, 98, 102)">
+                        <b> {{ activity.name }} </b>
+                      </el-button>
+                      <!-- <b slot="reference" @click="showkey(index)"> {{ activity.name }} </b> -->
+                    </el-popover>
+                  </div>
 
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-if="activity.isReport"
-                    :command="{ ...activity, command: 'seeReport' }"
-                  >
-                    {{ $t('views.seeReport') }}
-                  </el-dropdown-item>
+                  <div class="actions">
+                    <el-dropdown @command="handleCommand">
+                      <span class="el-dropdown-link">
+                        {{ $t('components.contextMenuActions') }}
+                        <i class="el-icon-arrow-down el-icon--right" />
+                      </span>
 
-                  <el-dropdown-item :command="{ ...activity, command: 'zoomIn' }">
-                    {{ $t('table.ProcessActivity.zoomIn') }}
-                  </el-dropdown-item>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item
+                          v-if="activity.isReport"
+                          :command="{ ...activity, command: 'seeReport' }"
+                        >
+                          {{ $t('views.seeReport') }}
+                        </el-dropdown-item>
 
-                  <!-- TODO: add more actions -->
-                </el-dropdown-menu>
-              </el-dropdown>
-            </div>
-          </div>
+                        <el-dropdown-item :command="{ ...activity, command: 'zoomIn' }">
+                          {{ $t('table.ProcessActivity.zoomIn') }}
+                        </el-dropdown-item>
 
-          <el-form label-position="top">
-            <el-form-item v-if="activity.description" :label="generateTitle('Description')">
-              <span>
-                <b> {{ activity.description }} </b>
-              </span>
-
-              <span v-if="activity.isReport">
-                {{ activity.output.description }}
-              </span>
-            </el-form-item>
-
-            <el-form-item :label="generateTitle('Status')">
-              <!-- show only when it is error -->
-              <el-popover
-                v-if="activity.isError && !activity.isReport"
-                :key="index + 'is-error'"
-                placement="right"
-                title="Error"
-                width="700"
-                trigger="hover"
-              >
-                <div v-if="!isEmptyValue(activity.summary)" key="withSummary">
-                  {{ activity.summary }}
+                        <!-- TODO: add more actions -->
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                  </div>
                 </div>
-                <div v-else key="withoutSummary">
-                  {{ $t('route.withoutLog') }}
+                <el-collapse-transition>
+                  <div v-show="(currentKey === index)">
+                    <el-form label-position="top" style="padding-left: 1%;" :inline="true">
+                      <el-form-item :label="$t('table.ProcessActivity.Logs')" style="margin-bottom: 0;">
+
+                        <span v-if="activity.isReport && !isEmptyValue(activity.summary)">
+                          <ul>
+                            <li @click="handleCommand({ ...activity, command: 'zoomIn' })">
+                              {{ activity.summary }}
+                            </li>
+                            <el-scrollbar wrap-class="popover-scroll">
+                              <li v-for="(logItem, key) in activity.logsList" :key="key" @click="zoomIn(activity)">
+                                {{ logItem.log }}
+                              </li>
+                            </el-scrollbar>
+                          </ul>
+                          <!-- {{ activity.output.description }}-->
+                        </span>
+                        <div v-if="isEmptyValue(activity.summary)" key="withSummary">
+                          {{ $t('route.withoutLog') }}
+                        </div>
+                        <ul v-else>
+                          <li @click="handleCommand({ ...activity, command: 'zoomIn' })">
+                            {{ activity.summary }}
+                          </li>
+                          <el-scrollbar wrap-class="popover-scroll">
+                            <li v-for="(logItem, key) in activity.logsList" :key="key" @click="zoomIn(activity)">
+                              {{ logItem.log }}
+                            </li>
+                          </el-scrollbar>
+                        </ul>
+                      </el-form-item>
+
+                      <!-- <el-form-item :label="generateTitle('Status')">
+                        show only when it is error -->
+                      <el-form-item v-if="!isEmptyValue(activity.panelType)" style="float: right;padding-top: 3%">
+                        <el-tag type="success">
+                          {{ findTranslation(activity.panelType) }}
+                        </el-tag>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                </el-collapse-transition>
+                <p style="padding-left: 1%;color: cadetblue;margin: 0px;"> # {{ translateDate(activity.lastRun) }} </p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </el-tab-pane>
+        <el-tab-pane>
+          <span slot="label">
+            <el-badge :value="getProcessLogError.length" class="item" type="danger" style="color: #F56C6C">
+              {{ generateTitle('error') }}
+            </el-badge>
+          </span>
+          <h1 v-if="isEmptyValue(getProcessLogError)" class="text-center">
+            {{ $t('views.noProcess') }}
+          </h1>
+          <el-timeline v-else style="padding: 0px">
+            <el-timeline-item
+              v-for="(activity, index) in getProcessLogError"
+              :key="index"
+              placement="top"
+              type="primary"
+              size="large"
+              :color="checkStatus(activity).color"
+            >
+              <el-card>
+                <div slot="header" class="clearfix" style="display: flex;">
+                  <div class="header-panel" @click="showkey(index)">
+                    <el-popover
+                      placement="right"
+                      trigger="hover"
+                      style="width: 100%;"
+                    >
+                      <p>
+                        <b style="font-size: 16px;">
+                          {{ generateTitle('Description') }}
+                        </b>
+                      </p>
+                      <span>
+                        <b> {{ activity.description }} </b>
+                      </span>
+
+                      <span v-if="activity.isReport">
+                        {{ activity.output.description }}
+                      </span>
+                      <el-button slot="reference" type="text" style="color: rgb(96, 98, 102)">
+                        <b> {{ activity.name }} </b>
+                      </el-button>
+                      <!-- <b slot="reference" @click="showkey(index)"> {{ activity.name }} </b> -->
+                    </el-popover>
+                  </div>
+
+                  <div class="actions">
+                    <el-dropdown @command="handleCommand">
+                      <span class="el-dropdown-link">
+                        {{ $t('components.contextMenuActions') }}
+                        <i class="el-icon-arrow-down el-icon--right" />
+                      </span>
+
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item
+                          v-if="activity.isReport"
+                          :command="{ ...activity, command: 'seeReport' }"
+                        >
+                          {{ $t('views.seeReport') }}
+                        </el-dropdown-item>
+
+                        <el-dropdown-item :command="{ ...activity, command: 'zoomIn' }">
+                          {{ $t('table.ProcessActivity.zoomIn') }}
+                        </el-dropdown-item>
+
+                        <!-- TODO: add more actions -->
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                  </div>
                 </div>
+                <el-collapse-transition>
+                  <div v-show="(currentKey === index)">
+                    <el-form label-position="top" style="padding-left: 1%;" :inline="true">
+                      <el-form-item :label="$t('table.ProcessActivity.Logs')" style="margin-bottom: 0;">
 
-                <el-tag slot="reference" :type="checkStatus(activity).type">
-                  {{ checkStatus(activity).text }}
-                </el-tag>
-              </el-popover>
+                        <span v-if="activity.isReport && !isEmptyValue(activity.summary)">
+                          <ul>
+                            <li @click="handleCommand({ ...activity, command: 'zoomIn' })">
+                              {{ activity.summary }}
+                            </li>
+                            <el-scrollbar wrap-class="popover-scroll">
+                              <li v-for="(logItem, key) in activity.logsList" :key="key" @click="zoomIn(activity)">
+                                {{ logItem.log }}
+                              </li>
+                            </el-scrollbar>
+                          </ul>
+                          <!-- {{ activity.output.description }}-->
+                        </span>
+                        <div v-if="isEmptyValue(activity.summary)" key="withSummary">
+                          {{ $t('route.withoutLog') }}
+                        </div>
+                        <ul v-else>
+                          <li @click="handleCommand({ ...activity, command: 'zoomIn' })">
+                            {{ activity.summary }}
+                          </li>
+                          <el-scrollbar wrap-class="popover-scroll">
+                            <li v-for="(logItem, key) in activity.logsList" :key="key" @click="zoomIn(activity)">
+                              {{ logItem.log }}
+                            </li>
+                          </el-scrollbar>
+                        </ul>
+                      </el-form-item>
 
-              <!-- show only when bring logs -->
-              <el-popover
-                v-else-if="!isEmptyValue(activity.logsList) || !isEmptyValue(activity.summary)"
-                :key="index + 'is-summary'"
-                placement="right"
-                :title="$t('table.ProcessActivity.Logs')"
-                width="500"
-                trigger="hover"
-              >
-                <ul>
-                  <li @click="handleCommand({ ...activity, command: 'zoomIn' })">
-                    {{ activity.summary }}
-                  </li>
-                  <el-scrollbar wrap-class="popover-scroll">
-                    <li v-for="(logItem, key) in activity.logsList" :key="key" @click="zoomIn(activity)">
-                      {{ logItem.log }}
-                    </li>
-                  </el-scrollbar>
-                </ul>
+                      <!-- <el-form-item :label="generateTitle('Status')">
+                        show only when it is error -->
+                      <el-form-item v-if="!isEmptyValue(activity.panelType)" style="float: right;padding-top: 3%">
+                        <el-tag type="danger">
+                          {{ findTranslation(activity.panelType) }}
+                        </el-tag>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                </el-collapse-transition>
+                <p style="padding-left: 1%;color: cadetblue;margin: 0px;"> # {{ translateDate(activity.lastRun) }} </p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </el-tab-pane>
+        <el-tab-pane>
+          <span slot="label">
+            <el-badge :value="getProcessLogProcessing.length" class="item" type="info" style="color: #909399">
+              Procesando
+            </el-badge>
+          </span>
+          <h1 v-if="isEmptyValue(getProcessLogProcessing)" class="text-center">
+            {{ $t('views.noProcess') }}
+          </h1>
+          <el-timeline v-else style="padding: 0px">
+            <el-timeline-item
+              v-for="(activity, index) in getProcessLogProcessing"
+              :key="index"
+              placement="top"
+              type="primary"
+              size="large"
+              :color="checkStatus(activity).color"
+            >
+              <el-card>
+                <div slot="header" class="clearfix" style="display: flex;">
+                  <div class="header-panel" @click="showkey(index)">
+                    <el-popover
+                      placement="right"
+                      trigger="hover"
+                      style="width: 100%;"
+                    >
+                      <p>
+                        <b style="font-size: 16px;">
+                          {{ generateTitle('Description') }}
+                        </b>
+                      </p>
+                      <span>
+                        <b> {{ activity.description }} </b>
+                      </span>
 
-                <el-tag slot="reference" :type="checkStatus(activity).type">
-                  {{ checkStatus(activity).text }}
-                </el-tag>
-              </el-popover>
+                      <span v-if="activity.isReport">
+                        {{ activity.output.description }}
+                      </span>
+                      <el-button slot="reference" type="text" style="color: #909399">
+                        <b> {{ activity.name }} </b>
+                      </el-button>
+                      <!-- <b slot="reference" @click="showkey(index)"> {{ activity.name }} </b> -->
+                    </el-popover>
+                  </div>
 
-              <!-- show only when bring output -->
-              <el-popover
-                v-else-if="activity.isReport"
-                :key="index + 'is-output'"
-                placement="right"
-                :title="$t('table.ProcessActivity.Output')"
-                width="700"
-                trigger="hover"
-              >
-                <div v-if="!activity.isError" key="withOutput">
-                  <span>
-                    {{ $t('table.ProcessActivity.Name') }}: {{ activity.output.name }}
-                  </span><br>
-                  <span>
-                    {{ $t('table.ProcessActivity.Description') }}: {{ activity.output.description }}
-                  </span><br>
-                  <span>
-                    {{ $t('table.ProcessActivity.FileName') }}: {{ activity.output.fileName }}
-                  </span><br>
-                  <a type="text" :href="activity.url" :download="activity.download">
-                    {{ $t('components.contextMenuDownload') }}
-                    <i class="el-icon-download" />
-                  </a>
+                  <div class="actions">
+                    <el-dropdown @command="handleCommand">
+                      <span class="el-dropdown-link">
+                        {{ $t('components.contextMenuActions') }}
+                        <i class="el-icon-arrow-down el-icon--right" />
+                      </span>
+
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item
+                          v-if="activity.isReport"
+                          :command="{ ...activity, command: 'seeReport' }"
+                        >
+                          {{ $t('views.seeReport') }}
+                        </el-dropdown-item>
+
+                        <el-dropdown-item :command="{ ...activity, command: 'zoomIn' }">
+                          {{ $t('table.ProcessActivity.zoomIn') }}
+                        </el-dropdown-item>
+
+                        <!-- TODO: add more actions -->
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                  </div>
                 </div>
+                <el-collapse-transition>
+                  <div v-show="(currentKey === index)">
+                    <el-form label-position="top" style="padding-left: 1%;" :inline="true">
+                      <el-form-item :label="$t('table.ProcessActivity.Logs')" style="margin-bottom: 0;">
 
-                <div v-else key="withError">
-                  <template v-if="!isEmptyValue(activity.summary)">
-                    {{ activity.summary }}
-                  </template>
-                  <template v-else>
-                    {{ $t('route.withoutLog') }}
-                  </template>
-                </div>
+                        <span v-if="activity.isReport && !isEmptyValue(activity.summary)">
+                          <ul>
+                            <li @click="handleCommand({ ...activity, command: 'zoomIn' })">
+                              {{ activity.summary }}
+                            </li>
+                            <el-scrollbar wrap-class="popover-scroll">
+                              <li v-for="(logItem, key) in activity.logsList" :key="key" @click="zoomIn(activity)">
+                                {{ logItem.log }}
+                              </li>
+                            </el-scrollbar>
+                          </ul>
+                          <!-- {{ activity.output.description }}-->
+                        </span>
+                        <div v-if="isEmptyValue(activity.summary)" key="withSummary">
+                          {{ $t('route.withoutLog') }}
+                        </div>
+                        <ul v-else>
+                          <li @click="handleCommand({ ...activity, command: 'zoomIn' })">
+                            {{ activity.summary }}
+                          </li>
+                          <el-scrollbar wrap-class="popover-scroll">
+                            <li v-for="(logItem, key) in activity.logsList" :key="key" @click="zoomIn(activity)">
+                              {{ logItem.log }}
+                            </li>
+                          </el-scrollbar>
+                        </ul>
+                      </el-form-item>
 
-                <el-tag slot="reference" :type="checkStatus(activity).type">
-                  {{ checkStatus(activity).text }}
-                </el-tag>
-              </el-popover>
-            </el-form-item>
-          </el-form>
-        </el-card>
-      </el-timeline-item>
-    </el-timeline>
+                      <!-- <el-form-item :label="generateTitle('Status')">
+                        show only when it is error -->
+                      <el-form-item v-if="!isEmptyValue(activity.panelType)" style="float: right;padding-top: 3%">
+                        <el-tag type="info">
+                          {{ findTranslation(activity.panelType) }}
+                        </el-tag>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                </el-collapse-transition>
+                <p style="padding-left: 1%;color: cadetblue;margin: 0px;"> # {{ translateDate(activity.lastRun) }} </p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+
+    <div v-else key="without-process">
+      <h1 class="text-center">
+        {{ $t('views.noProcess') }}
+      </h1>
+    </div>
   </div>
-
-  <div v-else key="without-process">
-    <h1 class="text-center">
-      {{ $t('views.noProcess') }}
-    </h1>
-  </div>
+  <loading-view
+    v-else
+    key="window-loading"
+  />
 </template>
 
 <script src="./processActivity.js">
@@ -175,7 +392,15 @@
 <style lang="scss" scoped src="./processActivityStyle.scss">
 </style>
 <style>
+  .el-form-item--medium .el-form-item__label {
+    line-height: 36px;
+    padding: 0px;
+  }
   .popover-scroll {
     max-height: 200px !important;
+  }
+  .el-card__body {
+    padding-top: 1%;
+    padding-bottom: 1%;
   }
 </style>
