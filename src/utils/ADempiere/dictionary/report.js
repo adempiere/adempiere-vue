@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import language from '@/lang'
+
 /**
  * Suppoerted render files
  */
@@ -39,3 +41,50 @@ export const reportFormatsList = [
   'xlsx',
   'xml'
 ]
+
+export const runReport = {
+  name: language.t('actionMenu.generateReport'),
+  description: language.t('actionMenu.generateDefaultReport'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-document',
+  actionName: 'runReport',
+  uuid: null,
+  runReport: ({ root, containerUuid }) => {
+    root.$store.dispatch('startReport', {
+      containerUuid
+    })
+  }
+}
+
+export const runReportAs = {
+  name: language.t('actionMenu.generateReportAs'),
+  description: language.t('actionMenu.generateReportAsOtherFormat'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-document',
+  actionName: 'runReportAs',
+  uuid: null,
+  childs: [],
+  runReportAs: ({ root, containerUuid }) => {
+    root.$store.dispatch('startReport', {
+      containerUuid
+    })
+  }
+}
+
+export const runReportAsPrintFormat = {
+  name: language.t('actionMenu.printFormats'),
+  description: language.t('actionMenu.generateReportWithPrintFormat'),
+  enabled: true,
+  svg: false,
+  icon: 'el-icon-printer',
+  actionName: 'runReportAsPrintFormat',
+  uuid: null,
+  childs: [],
+  runReportAsPrintFormat: ({ root, containerUuid }) => {
+    root.$store.dispatch('startReport', {
+      containerUuid
+    })
+  }
+}

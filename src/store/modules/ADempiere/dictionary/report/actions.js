@@ -23,8 +23,11 @@ import { requestProcessMetadata as requestReportMetadata } from '@/api/ADempiere
 import {
   runReport,
   runReportAs,
+  runReportAsPrintFormat
+} from '@/utils/ADempiere/dictionary/report.js'
+import {
   sharedLink
-} from '@/utils/ADempiere/constants/actionsMenuList'
+} from '@/utils/ADempiere/constants/actionsMenuList.js'
 
 // utils and helper methods
 import { generateProcess as generateReport } from '@/utils/ADempiere/dictionary/process.js'
@@ -50,7 +53,7 @@ export default {
       requestReportMetadata({
         uuid
       })
-        .then(reportResponse => {
+        .then(async reportResponse => {
           const { processDefinition: reportDefinition } = generateReport({
             processToGenerate: reportResponse
           })
@@ -61,15 +64,17 @@ export default {
           })
 
           dispatch('addReportToList', reportDefinition)
-          dispatch('setReportActionsMenu', {
-            containerUuid: uuid
-          })
-          resolve(reportDefinition)
 
-          dispatch('getListPrintFormats', {
+          await dispatch('getListPrintFormats', {
             uuid,
             id: reportDefinition.id
           })
+
+          dispatch('setReportActionsMenu', {
+            containerUuid: uuid
+          })
+
+          resolve(reportDefinition)
         })
         .catch(error => {
           reject(error)
@@ -81,7 +86,7 @@ export default {
    * Set actions menu to report
    * @param {string} containerUuid
    */
-  setReportActionsMenu({ commit, getters }, {
+  setReportActionsMenu({ commit, getters, rootGetters }, {
     containerUuid
   }) {
     const reportDefinition = getters.getStoredReport(containerUuid)
@@ -89,8 +94,8 @@ export default {
     const actionsList = []
     actionsList.push(runReport)
 
+    const runTypeChilds = []
     if (!isEmptyValue(reportDefinition.reportExportTypes)) {
-      const runTypeChilds = []
       reportDefinition.reportExportTypes.forEach(reportType => {
         // push values
         runTypeChilds.push({
@@ -110,8 +115,36 @@ export default {
       })
 
       runReportAs.childs = runTypeChilds
-      actionsList.push(runReportAs)
+    } else {
+      runReportAs.enabled = false
     }
+    actionsList.push(runReportAs)
+
+    const printFormats = rootGetters.getPrintFormatList(containerUuid)
+    if (!isEmptyValue(printFormats)) {
+      const printFormatChilds = []
+      printFormats.forEach(printFormat => {
+        printFormatChilds.push({
+          ...printFormat,
+          icon: 'el-icon-document',
+          enabled: true,
+          svg: false,
+          actionName: 'runReportAs',
+          uuid: null,
+          runReportAs: ({ root, containerUuid }) => {
+            root.$store.dispatch('startReport', {
+              containerUuid,
+              printFormatUuid: printFormat.printFormatUuid
+            })
+          }
+        })
+      })
+
+      runReportAsPrintFormat.childs = printFormatChilds
+    } else {
+      runReportAsPrintFormat.enabled = false
+    }
+    actionsList.push(runReportAsPrintFormat)
 
     // action shared link
     actionsList.push(sharedLink)

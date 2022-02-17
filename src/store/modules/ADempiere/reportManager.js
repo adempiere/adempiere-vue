@@ -79,7 +79,8 @@ const reportManager = {
   actions: {
     startReport({ commit, dispatch, rootGetters }, {
       containerUuid,
-      reportFormat = 'html'
+      reportFormat = 'html',
+      printFormatUuid
     }) {
       return new Promise(resolve => {
         const reportDefinition = rootGetters.getStoredReport(containerUuid)
@@ -104,6 +105,7 @@ const reportManager = {
         requestRunReport({
           uuid: containerUuid,
           reportType: reportFormat,
+          printFormatUuid,
           parametersList
         })
           .then(runReportRepsonse => {

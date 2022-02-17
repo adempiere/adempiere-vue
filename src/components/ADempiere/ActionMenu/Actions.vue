@@ -49,6 +49,7 @@
           v-for="(action, index) in actionsList"
           :key="index"
           :command="action"
+          :disabled="!action.enabled"
           :divided="true"
         >
           <div class="contents">

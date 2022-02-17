@@ -226,37 +226,6 @@ export const runProcess = {
   }
 }
 
-export const runReport = {
-  name: language.t('actionMenu.generateReport'),
-  description: language.t('actionMenu.generateDefaultReport'),
-  enabled: true,
-  svg: false,
-  icon: 'el-icon-document',
-  actionName: 'runReport',
-  uuid: null,
-  runReport: ({ root, containerUuid }) => {
-    root.$store.dispatch('startReport', {
-      containerUuid
-    })
-  }
-}
-
-export const runReportAs = {
-  name: language.t('actionMenu.generateReportAs'),
-  description: language.t('actionMenu.generateReportAsOtherFormat'),
-  enabled: true,
-  svg: false,
-  icon: 'el-icon-document',
-  actionName: 'runReportAs',
-  uuid: null,
-  childs: [],
-  runReportAs: ({ root, containerUuid }) => {
-    root.$store.dispatch('startReport', {
-      containerUuid
-    })
-  }
-}
-
 export const windowActions = [
   createNewRecord,
   refreshRecords,

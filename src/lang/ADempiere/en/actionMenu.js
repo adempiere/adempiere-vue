@@ -30,6 +30,8 @@ const actionMenu = {
   generateDefaultReport: 'Generate with default file extension',
   generateReportAs: 'Generate As',
   generateReportAsOtherFormat: 'Change file extesion to generate',
+  printFormats: 'Print Formats',
+  generateReportWithPrintFormat: 'Change print format to generate',
   // relations
   relations: 'Relations',
   withoutRelations: 'Without Relations',

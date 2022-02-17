@@ -23,10 +23,6 @@ import { isNumberField } from '@/utils/ADempiere/references.js'
  * Dictionary Report Getters
  */
 export default {
-  getStoredReports: (state) => {
-    return state.storedReports
-  },
-
   getStoredReport: (state) => (reportUuid) => {
     return state.storedReports[reportUuid]
   },

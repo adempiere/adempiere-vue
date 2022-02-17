@@ -463,7 +463,7 @@ export default {
 
               // Print formats to context menu
               const printFormatList = {
-                name: language.t('views.printFormat'),
+                name: language.t('actionMenu.printFormats'),
                 type: 'summary',
                 action: '',
                 childs: [],
