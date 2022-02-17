@@ -9,8 +9,7 @@ on:
     branches:
       - develop
       - master
-      - window-redefinition
-      - redefinition
+      - test/**
     paths-ignore:
       - 'docs/**'
 

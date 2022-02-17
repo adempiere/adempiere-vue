@@ -29,7 +29,7 @@
     "vuepress": "0.14.9"
   },
   "dependencies": {
-    "axios": ">=0.21.1",
+    "axios": "0.26.0",
     "blockadblock": "3.2.1",
     "sweetalert2": "9.17.2",
     "webpack-dev-middleware": "3.6.0"

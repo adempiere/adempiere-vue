@@ -1,12 +1,14 @@
 {
-    "presets": ["@vue/cli-plugin-babel/preset"],
-    "plugins": [],
-    "env": {
-        "development": {
-            "plugins": ["dynamic-import-node"]
-        },
-      "test": {
-        "plugins": ["require-context-hook"]
-      }
+  "presets": [
+    ["@vue/app", { useBuiltIns: "entry" }]
+  ],
+  "plugins": [],
+  "env": {
+    "development": {
+      "plugins": ["dynamic-import-node"]
+    },
+    "test": {
+      "plugins": ["require-context-hook"]
     }
   }
+}
