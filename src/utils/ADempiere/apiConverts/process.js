@@ -20,7 +20,7 @@ import { convertReportOutput } from './report.js'
 
 export function convertProcessLog(processLog) {
   const convertedProcessLog = camelizeObjectKeys(processLog)
-  convertedProcessLog.parameters = []
+  convertedProcessLog.parameters = isEmptyValue(processLog.parameters) ? {} : processLog.parameters
   convertedProcessLog.output = isEmptyValue(processLog.output) ? {} : convertReportOutput(processLog.output)
   return convertedProcessLog
 }

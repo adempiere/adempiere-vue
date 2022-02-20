@@ -65,9 +65,6 @@ const reportManager = {
     setDrillTablesList(state, { containerUuid, drillTablesList }) {
       Vue.set(state.drillTablesList, containerUuid, drillTablesList)
     },
-    setNewReportOutput(state, reportOutput) {
-      state.reportOutput = reportOutput
-    },
     setReportOutput(state, reportOutput) {
       Vue.set(state.reportsOutput, reportOutput.instanceUuid, reportOutput)
     },
@@ -380,7 +377,7 @@ const reportManager = {
       isSummary,
       reportName,
       reportType,
-      option
+      parametersList = []
     }) {
       return new Promise(resolve => {
         if (isEmptyValue(printFormatUuid)) {
@@ -390,9 +387,12 @@ const reportManager = {
           }
         }
 
-        const parametersList = rootGetters.getParametersToServer({
-          containerUuid: uuid
-        })
+        if (isEmptyValue(parametersList)) {
+          parametersList = rootGetters.getParametersToServer({
+            containerUuid: uuid
+          })
+        }
+
         requestGetReportOutput({
           parametersList,
           printFormatUuid,
@@ -403,16 +403,31 @@ const reportManager = {
           tableName
         })
           .then(response => {
+            let link = {
+              href: undefined,
+              download: undefined
+            }
+            if (response && response.outputStream) {
+              link = buildLinkHref({
+                fileName: response.fileName,
+                outputStream: response.outputStream,
+                type: response.mimeType
+              })
+            }
+
             const reportOutput = {
               ...response,
-              processId: id,
-              processUuid: uuid,
+              reportId: id,
+              reportUuid: uuid,
               isError: false,
               instanceUuid,
               isReport: true,
-              option
+              link,
+              url: link.href,
+              download: link.download
             }
-            commit('setNewReportOutput', reportOutput)
+
+            commit('setReportOutput', reportOutput)
 
             resolve(reportOutput)
           })

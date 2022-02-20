@@ -130,12 +130,19 @@ export function requestGetReportOutput({
   isSummary,
   reportName,
   reportType,
-  parametersList,
+  parametersList = [],
   // query criteria
   query,
   whereClause,
   orderByClause
 }) {
+  const filters = parametersList.map(parameter => {
+    return {
+      column_name: parameter.columnName,
+      value: parameter.value
+    }
+  })
+
   return request({
     url: '/user-interface/process/report-output',
     method: 'get',
@@ -148,7 +155,7 @@ export function requestGetReportOutput({
       report_name: reportName,
       report_type: reportType,
       // DSL Query
-      filters: parametersList,
+      filters,
       // Custom Query
       query,
       where_clause: whereClause,

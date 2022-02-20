@@ -22,7 +22,6 @@
     <el-row type="flex" style="min-height: inherit;">
       <el-col :span="24">
         <action-menu
-          :parent-uuid="$route.params.reportUuid"
           :actions-manager="actionsManager"
           :relations-manager="relationsManager"
         />
@@ -73,8 +72,9 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
 // utils and helper methods
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
-import { showNotification } from '@/utils/ADempiere/notification'
+import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { showNotification } from '@/utils/ADempiere/notification.js'
 
 export default defineComponent({
   name: 'ReportViewer',
@@ -91,7 +91,6 @@ export default defineComponent({
     const isLoading = ref(false)
     const reportFormat = ref('html')
     const reportContent = ref('')
-    const reportResult = ref({})
 
     const storedReportDefinition = computed(() => {
       return root.$store.getters.getStoredReport(root.$route.params.reportUuid)
@@ -105,33 +104,39 @@ export default defineComponent({
       return getStoredReportOutput.value.link
     })
 
-    function displayReport(reportResult) {
-      if (!reportResult.isError) {
-        const { output } = reportResult
-        reportFormat.value = isEmptyValue(output.reportType)
-          ? reportResult.reportType
-          : output.reportType
+    function displayReport(reportOutput) {
+      if (!reportOutput.isError) {
+        const { output, reportType } = reportOutput
 
-        reportContent.value = isEmptyValue(output.output)
-          ? reportResult.output
-          : output.output
+        reportFormat.value = reportType
+        reportContent.value = output
 
         isLoading.value = true
       }
+
+      // update name in tag view
+      root.$store.dispatch('tagsView/updateVisitedView', {
+        ...root.$route,
+        title: `${root.$t('route.reportViewer')}: ${reportOutput.name}`
+      })
     }
 
     function getCachedReport() {
-      reportResult.value = getStoredReportOutput.value
-      if (reportResult.value === undefined) {
+      if (isEmptyValue(getStoredReportOutput.value)) {
         const pageSize = undefined
         const pageToken = undefined
         root.$store.dispatch('getSessionProcessFromServer', {
           pageSize,
           pageToken
         })
-          .then(() => {
-            reportResult.value = getStoredReportOutput.value
-            if (isEmptyValue(reportResult.value)) {
+          .then(runsList => {
+            const fileName = root.$route.params.fileName
+            const instanceUuid = root.$route.params.instanceUuid
+            const currentReportLog = runsList.find(runReport => {
+              return runReport.uuid === root.$route.params.reportUuid
+            })
+
+            if (isEmptyValue(currentReportLog)) {
               showNotification({
                 type: 'error',
                 title: 'error',
@@ -140,16 +145,43 @@ export default defineComponent({
 
               root.$store.dispatch('tagsView/delView', root.$route)
                 .then(() => {
-                  root.$router.push('/', () => {})
+                  this.$router.push('/', () => {})
                 })
               return
             }
-            displayReport(reportResult.value)
+
+            const { output } = currentReportLog
+
+            if (isEmptyValue(output.outputStream)) {
+              const storedReportOutput = root.$store.getters.getReportOutput(instanceUuid)
+              if (isEmptyValue(storedReportOutput)) {
+                const { parameters } = currentReportLog
+                const parametersList = convertObjectToKeyValue({
+                  object: parameters
+                })
+
+                const reportType = fileName.split('.').pop()
+                root.$store.dispatch('getReportOutputFromServer', {
+                  uuid: root.$route.params.reportUuid,
+                  reportType,
+                  reportName: fileName,
+                  tableName: root.$route.params.tableName,
+                  parametersList,
+                  instanceUuid
+                }).then(reportOutput => {
+                  displayReport(reportOutput)
+                })
+              } else {
+                // add output to list
+                // currentReportLog.output = storedReportOutput
+              }
+            }
           })
       } else {
-        displayReport(reportResult.value)
+        displayReport(getStoredReportOutput.value)
       }
     }
+
     const actionsManager = ref({
       containerUuid: root.$route.params.reportUuid,
 
@@ -163,6 +195,7 @@ export default defineComponent({
     const relationsManager = ref({
       menuParentUuid: root.$route.meta.parentUuid
     })
+
     onMounted(() => {
       getCachedReport()
       root.$route.meta.reportFormat = reportFormat.value

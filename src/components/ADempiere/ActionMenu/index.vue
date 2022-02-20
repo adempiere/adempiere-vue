@@ -52,10 +52,6 @@ export default defineComponent({
   },
 
   props: {
-    parentUuid: {
-      type: String,
-      default: undefined
-    },
     actionsManager: {
       type: Object,
       required: true
