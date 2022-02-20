@@ -24,7 +24,6 @@ import {
 
 // utils and helper methods
 import { showNotification } from '@/utils/ADempiere/notification.js'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
  * Process Vuex Module
@@ -67,34 +66,7 @@ const processLog = {
       return new Promise(resolve => {
         requestListProcessesLogs({ pageToken, pageSize })
           .then(async processActivityResponse => {
-            const processLogsList = await Promise.all(
-              processActivityResponse.processLogsList.map(async processLog => {
-                const { output } = processLog
-                // with output is report
-                if (!isEmptyValue(output)) {
-                  const { uuid } = processLog
-                  const reportMetadata = rootGetters.getStoredReport(uuid)
-
-                  // if no exists metadata into store
-                  if (isEmptyValue(reportMetadata)) {
-                    // if no request dictionary metadata in progess
-                    if (isEmptyValue(getters.getInRequestMetadata(uuid))) {
-                      commit('addInRequestMetadata', uuid)
-
-                      // await definition, report views, print formats and drill tables
-                      await dispatch('getReportDefinitionFromServer', {
-                        uuid
-                      })
-                        .finally(() => {
-                          commit('deleteInRequestMetadata', uuid)
-                        })
-                    }
-                  }
-                }
-
-                return processLog
-              })
-            )
+            const { processLogsList } = processActivityResponse
 
             commit('setSessionProcess', processLogsList)
 

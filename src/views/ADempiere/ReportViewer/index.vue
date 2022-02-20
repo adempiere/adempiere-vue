@@ -88,12 +88,13 @@ export default defineComponent({
   },
 
   setup(props, { root }) {
+    const reportUuid = root.$route.params.reportUuid
     const isLoading = ref(false)
     const reportFormat = ref('html')
     const reportContent = ref('')
 
     const storedReportDefinition = computed(() => {
-      return root.$store.getters.getStoredReport(root.$route.params.reportUuid)
+      return root.$store.getters.getStoredReport(reportUuid)
     })
 
     const getStoredReportOutput = computed(() => {
@@ -121,6 +122,20 @@ export default defineComponent({
       })
     }
 
+    // get report from vuex store or request from server
+    function getReport() {
+      if (!isEmptyValue(storedReportDefinition.value)) {
+        getCachedReport()
+        return
+      }
+
+      root.$store.dispatch('getReportDefinitionFromServer', {
+        uuid: reportUuid
+      }).then(() => {
+        getCachedReport()
+      })
+    }
+
     function getCachedReport() {
       if (isEmptyValue(getStoredReportOutput.value)) {
         const pageSize = undefined
@@ -133,7 +148,7 @@ export default defineComponent({
             const fileName = root.$route.params.fileName
             const instanceUuid = root.$route.params.instanceUuid
             const currentReportLog = runsList.find(runReport => {
-              return runReport.uuid === root.$route.params.reportUuid
+              return runReport.uuid === reportUuid
             })
 
             if (isEmptyValue(currentReportLog)) {
@@ -162,7 +177,7 @@ export default defineComponent({
 
                 const reportType = fileName.split('.').pop()
                 root.$store.dispatch('getReportOutputFromServer', {
-                  uuid: root.$route.params.reportUuid,
+                  uuid: reportUuid,
                   reportType,
                   reportName: fileName,
                   tableName: root.$route.params.tableName,
@@ -183,12 +198,12 @@ export default defineComponent({
     }
 
     const actionsManager = ref({
-      containerUuid: root.$route.params.reportUuid,
+      containerUuid: reportUuid,
 
       defaultActionName: root.$t('actionMenu.generateReport'),
 
       getActionList: () => root.$store.getters.getStoredActionsMenu({
-        containerUuid: root.$route.params.reportUuid
+        containerUuid: reportUuid
       })
     })
 
@@ -197,7 +212,7 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      getCachedReport()
+      getReport()
       root.$route.meta.reportFormat = reportFormat.value
     })
 
