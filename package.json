@@ -31,7 +31,7 @@
     "test:ci": "yarn lint && yarn test:unit"
   },
   "dependencies": {
-    "@toast-ui/vue-editor": "2.5.4",
+    "@toast-ui/vue-editor": "3.0.0",
     "@vue/composition-api": "1.4.6",
     "axios": "0.26.0",
     "babel-plugin-require-context-hook": "^1.0.0",
