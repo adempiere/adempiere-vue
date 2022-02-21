@@ -145,6 +145,7 @@ export function createCustomer({
   description,
   addresses,
   phone,
+  additionalAttribute,
   posUuid
 }) {
   return request({
@@ -158,6 +159,7 @@ export function createCustomer({
       description,
       phone,
       addresses,
+      additional_attribute: additionalAttribute,
       pos_uuid: posUuid
     }
   })

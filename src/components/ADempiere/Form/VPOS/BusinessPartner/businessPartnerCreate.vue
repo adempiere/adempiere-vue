@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <el-container style="max-height: 350px; border: 1px solid #eee; border: 0px">
+  <el-container style="max-height: 450px; border: 1px solid #eee; border: 0px">
     <el-main
       v-shortkey="popoverCreateBusinessParnet ? {close: ['esc'], enter: ['enter']} : {}"
       style="height: -webkit-fill-available;overflow: hidden;"
@@ -30,7 +30,7 @@
       >
         <el-row :gutter="24">
           <el-col :span="24">
-            <el-card class="box-card" shadow="never" style="height: 230px;">
+            <el-card class="box-card" shadow="never">
               <div slot="header" class="clearfix">
                 <span>
                   {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
@@ -315,6 +315,22 @@ export default {
         })
         values.value = values.taxId
       }
+      values.additionalAttribute = [
+        {
+          key: 'IsTaxpayer',
+          value: this.$store.getters.getValueOfField({
+            containerUuid: 'Business-Partner-Create',
+            columnName: 'IsTaxpayer'
+          })
+        },
+        {
+          key: 'PersonType',
+          value: this.$store.getters.getValueOfField({
+            containerUuid: 'Business-Partner-Create',
+            columnName: 'PersonType'
+          })
+        }
+      ]
       values.addresses = [this.billingAddress, this.shippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: this.containerUuid,
@@ -322,8 +338,19 @@ export default {
       })
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
+        const { value, taxId, duns, naics, name, lastName, description, addresses, additionalAttribute, phone, posUuid } = values
         createCustomer(
-          values
+          value,
+          taxId,
+          duns,
+          naics,
+          name,
+          lastName,
+          description,
+          addresses,
+          additionalAttribute,
+          phone,
+          posUuid
         )
           .then(responseBPartner => {
             this.$store.commit('customer', responseBPartner)

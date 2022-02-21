@@ -583,14 +583,41 @@ export default {
       }
       values.addresses = [this.billingAddress, this.shippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
-        containerUuid: this.containerUuid,
+        containerUuid: 'Business-Partner-Create',
         formatReturn: 'name'
       })
+      values.additionalAttribute = [
+        {
+          key: 'IsTaxpayer',
+          value: this.$store.getters.getValueOfField({
+            containerUuid: 'Business-Partner-Create',
+            columnName: 'IsTaxpayer'
+          })
+        },
+        {
+          key: 'PersonType',
+          value: this.$store.getters.getValueOfField({
+            containerUuid: 'Business-Partner-Create',
+            columnName: 'PersonType'
+          })
+        }
+      ]
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
-        createCustomer(
-          values
-        )
+        const { value, taxId, duns, naics, name, lastName, description, addresses, phone, posUuid, additionalAttribute } = values
+        createCustomer({
+          value,
+          taxId,
+          duns,
+          naics,
+          name,
+          lastName,
+          description,
+          additionalAttribute,
+          addresses,
+          phone,
+          posUuid
+        })
           .then(responseBPartner => {
             this.$store.commit('customer', responseBPartner)
             // TODO: Add new record into vuex store.
@@ -651,6 +678,8 @@ export default {
           case 'EMail':
             valuesToSend['email'] = value
             break
+          case 'PersonType':
+            valuesToSend['email'] = value
         }
       })
       valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
