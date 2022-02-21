@@ -29,7 +29,7 @@
     >
       <el-row :gutter="24">
         <el-col :span="24">
-          <el-card class="box-card" shadow="never" style="height: 230px;">
+          <el-card class="box-card" shadow="never">
             <div slot="header" class="clearfix">
               <span>
                 {{ $t('form.pos.order.BusinessPartnerCreate.customerData') }}
@@ -327,6 +327,22 @@ export default {
         columnName: 'C_BPartner_ID_UUID' // this.parentMetadata.columnName
       })
       values.taxId = values.value
+      values.additionalAttributes = [
+        {
+          key: 'IsTaxpayer',
+          value: this.$store.getters.getValueOfField({
+            containerUuid: 'Business-Partner-Create',
+            columnName: 'IsTaxpayer'
+          })
+        },
+        {
+          key: 'PersonType',
+          value: this.$store.getters.getValueOfField({
+            containerUuid: 'Business-Partner-Create',
+            columnName: 'PersonType'
+          })
+        }
+      ]
       values.posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
       updateCustomer(values)
         .then(response => {

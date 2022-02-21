@@ -179,6 +179,7 @@ export function updateCustomer({
   name,
   lastName,
   description,
+  additionalAttributes,
   addresses,
   phone,
   posUuid
@@ -191,6 +192,7 @@ export function updateCustomer({
       value,
       tax_id: taxId,
       name,
+      additional_attributes: additionalAttributes,
       last_name: lastName,
       description,
       phone,
