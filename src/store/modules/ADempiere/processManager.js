@@ -70,6 +70,17 @@ const processManager = {
 
         let isProcessedError = false
         let summary = ''
+
+        // close current page
+        const currentRoute = router.app._route
+        const tabViewsVisited = rootGetters.visitedViews
+        dispatch('tagsView/delView', currentRoute)
+        // go to back page
+        const oldRouter = tabViewsVisited[tabViewsVisited.length - 1]
+        router.push({
+          path: oldRouter.path
+        }, () => {})
+
         requestRunProcess({
           uuid: containerUuid,
           parametersList
@@ -85,13 +96,6 @@ const processManager = {
             console.warn(`Error getting print formats: ${error.message}. Code: ${error.code}.`)
           })
           .finally(() => {
-            const currentRoute = router.app._route
-            // close view if is process or report panel
-            router.push({
-              path: '/dashboard'
-            }, () => {})
-            dispatch('tagsView/delView', currentRoute)
-
             dispatch('finishProcess', {
               summary,
               name: processDefinition.name,

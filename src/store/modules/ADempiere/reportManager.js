@@ -100,6 +100,16 @@ const reportManager = {
           })
         }
 
+        // close current page
+        const currentRoute = router.app._route
+        const tabViewsVisited = rootGetters.visitedViews
+        dispatch('tagsView/delView', currentRoute)
+        // go to back page
+        const oldRouter = tabViewsVisited[tabViewsVisited.length - 1]
+        router.push({
+          path: oldRouter.path
+        }, () => {})
+
         requestRunReport({
           uuid: containerUuid,
           reportType: reportFormat,
@@ -125,10 +135,6 @@ const reportManager = {
               if (!viewerSupportedFormats.includes(reportFormat)) {
                 link.click()
               }
-
-              const currentRoute = router.app._route
-              // close view if is report panel
-              dispatch('tagsView/delView', currentRoute)
 
               router.push({
                 name: 'Report Viewer',
