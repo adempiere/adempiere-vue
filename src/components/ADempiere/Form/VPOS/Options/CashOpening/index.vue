@@ -918,6 +918,11 @@ export default {
         containerUuid: 'Cash-Opening',
         format: 'object'
       })
+      this.$store.commit('setshowCashOpen', false)
+      this.$message({
+        message: 'Acción a realizar',
+        showClose: true
+      })
       cashOpening({
         posUuid: this.currentPointOfSales.uuid,
         collectingAgentUuid: attribute.CollectingAgent_ID_UUID,
@@ -930,17 +935,16 @@ export default {
             showClose: true,
             message: this.$t('form.pos.optionsPoinSales.cashManagement.cashOpenBox')
           })
+          this.close()
         })
         .catch(error => {
+          this.$store.commit('setshowCashOpen', true)
           this.$message({
             message: error.message,
             isShowClose: true,
             type: 'error'
           })
           console.warn(`Error: ${error.message}. Code: ${error.code}.`)
-        })
-        .finally(() => {
-          this.close()
         })
     },
     currencyPayment(payment) {

@@ -59,6 +59,7 @@ export default {
     errorChangeRole: 'The role has not been changed',
     copySuccessful: 'Copied',
     copyUnsuccessful: 'Error, unable to copy',
+    actionToTake: 'Action to Take',
     mandatoryFieldMissing: 'Missing fill in the fields ',
     updateFields: 'The record is updated with the field ',
     updateSuccessfully: 'Successfully made changes',

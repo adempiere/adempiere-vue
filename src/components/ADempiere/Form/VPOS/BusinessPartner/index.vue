@@ -605,6 +605,12 @@ export default {
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
         const { value, taxId, duns, naics, name, lastName, description, addresses, phone, posUuid, additionalAttributes } = values
+        this.$message({
+          message: this.$t('notifications.actionToTake'),
+          showClose: true
+        })
+        // actionToTake
+        this.$store.commit('popoverCreateBusinessPartner', false)
         createCustomer({
           value,
           taxId,
@@ -625,12 +631,13 @@ export default {
             this.clearValues()
             this.$message({
               type: 'success',
-              message: this.$t('form.pos.order.BusinessPartnerCreate.businessPartner'),
+              message: this.$t('form.pos.order.BusinessPartnerCreate.successfullyCreated'),
               duration: 1500,
               showClose: true
             })
           })
           .catch(error => {
+            this.$store.commit('popoverCreateBusinessPartner', true)
             this.showsPopovers.isShowCreate = true
             this.$message({
               type: 'warning',

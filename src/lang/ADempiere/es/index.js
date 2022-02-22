@@ -59,6 +59,7 @@ export default {
     errorChangeRole: 'El rol no se ha cambiado',
     copySuccessful: 'Copiado',
     copyUnsuccessful: 'Error, no se puede copiar',
+    actionToTake: 'Acción a realizar',
     mandatoryFieldMissing: 'Falta completar los campos ',
     updateFields: 'Se actualiza el registro con el campo ',
     updateSuccessfully: 'Cambios realizados exitosamente',
