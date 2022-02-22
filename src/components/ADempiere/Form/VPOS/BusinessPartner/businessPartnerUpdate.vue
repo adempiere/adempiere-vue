@@ -448,7 +448,6 @@ export default {
       return value
     },
     loadDataCustomer(customer, containerUuid) {
-      console.log(customer)
       this.$store.commit('updateValuesOfContainer', {
         containerUuid,
         attributes: [{
