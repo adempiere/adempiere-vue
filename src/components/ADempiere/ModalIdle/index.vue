@@ -54,13 +54,19 @@ export default {
   computed: {
     isSession() {
       return this.$store.getters['user/getIsSession']
+    },
+    userTimeout() {
+      if (!this.isEmptyValue(this.$store.getters['user/userInfo']) && this.$store.getters['user/userInfo'].connection_timeout > 0) {
+        return this.$store.getters['user/userInfo'].connection_timeout
+      }
+      return 0
     }
   },
   created() {
     setInterval(() => {
       this.time -= 1000
       if (!this.$store.state.idleVue.isIdle) clearInterval()
-      if (this.time < 1 && this.isSession) {
+      if (this.time < 1 && this.isSession && this.userTimeout > 0) {
         clearInterval()
         this.logout()
       }
