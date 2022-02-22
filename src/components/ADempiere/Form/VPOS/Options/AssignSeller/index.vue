@@ -58,6 +58,7 @@
         :disabled="validateSeller"
         @click="assignSeller()"
       />
+      {{ validateSeller }}
       <el-button
         style="float: right;"
         type="danger"
@@ -199,11 +200,6 @@ export default {
       this.assignSeller()
     },
     unassignSeller() {
-      this.$message({
-        message: 'Acción a realizar',
-        showClose: true
-      })
-      this.$store.commit('setShowUnassignSeller', false)
       deallocate({
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         salesRepresentativeUuid: this.salesRepresentative.uuid
@@ -214,16 +210,17 @@ export default {
             isShowClose: true,
             type: 'success'
           })
-          this.close()
         })
         .catch(error => {
-          this.$store.commit('setShowAssignSeller', true)
           this.$message({
             message: error.message,
             isShowClose: true,
             type: 'error'
           })
           console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+        })
+        .finally(() => {
+          this.close()
         })
     },
     close() {
@@ -264,11 +261,6 @@ export default {
       this.listAvailableSellers()
     },
     assignSeller() {
-      this.$message({
-        message: 'Acción a realizar',
-        showClose: true
-      })
-      this.$store.commit('setShowAssignSeller', false)
       allocateSeller({
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         salesRepresentativeUuid: this.salesRepresentative.uuid
@@ -281,7 +273,6 @@ export default {
           })
         })
         .catch(error => {
-          this.$store.commit('setShowAssignSeller', true)
           this.$message({
             message: error.message,
             isShowClose: true,

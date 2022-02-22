@@ -916,11 +916,6 @@ export default {
         containerUuid: 'Cash-Withdrawal',
         format: 'object'
       })
-      this.$store.commit('setShowCashWithdrawl', false)
-      this.$message({
-        message: 'Acción a realizar',
-        showClose: true
-      })
       cashWithdrawal({
         posUuid: this.currentPointOfSales.uuid,
         collectingAgentUuid: attribute.CollectingAgent_ID_UUID,
@@ -933,16 +928,17 @@ export default {
             showClose: true,
             message: this.$t('form.pos.optionsPoinSales.cashManagement.cashwithdrawal')
           })
-          this.close()
         })
         .catch(error => {
-          this.$store.commit('setShowCashWithdrawl', true)
           this.$message({
             message: error.message,
             isShowClose: true,
             type: 'error'
           })
           console.warn(`Error: ${error.message}. Code: ${error.code}.`)
+        })
+        .finally(() => {
+          this.close()
         })
     },
     currencyPayment(payment) {

@@ -344,26 +344,9 @@ export default {
         }
       ]
       values.posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
-      this.$message({
-        message: 'Acción a realizar',
-        showClose: true
-      })
-      this.$store.dispatch('changeShowUpdateCustomer', false)
       updateCustomer(values)
         .then(response => {
-          this.$message({
-            type: 'success',
-            message: 'Socio de Negocio Actualizado',
-            showClose: true
-          })
-        })
-        .catch(error => {
-          this.$message({
-            type: 'error',
-            message: error.message,
-            showClose: true
-          })
-          this.$store.dispatch('changeShowUpdateCustomer', true)
+          this.$store.dispatch('changeShowUpdateCustomer', false)
         })
     },
     getCustomer() {
