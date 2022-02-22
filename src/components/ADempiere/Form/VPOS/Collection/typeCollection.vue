@@ -463,6 +463,9 @@ export default {
     },
     deleteCollect(key) {
       const paymentUuid = key.uuid
+      if (!this.isEmptyValue(key.is_automatic) && key.is_automatic) {
+        return
+      }
       const deletetPayments = !this.isEmptyValue(key.is_paid) ? 'deleteRefundReferences' : 'deletetPayments'
       this.$store.dispatch(deletetPayments, {
         posUuid: this.currentPointOfSales.uuid,
