@@ -448,6 +448,7 @@ export default {
       return value
     },
     loadDataCustomer(customer, containerUuid) {
+      console.log(customer)
       this.$store.commit('updateValuesOfContainer', {
         containerUuid,
         attributes: [{
@@ -468,6 +469,12 @@ export default {
         }, {
           columnName: 'TaxID',
           value: customer.value
+        }, {
+          columnName: 'PersonType_ID',
+          value: this.isEmptyValue(customer.additionalAttributes) ? '' : customer.additionalAttributes.PersonType
+        }, {
+          columnName: 'IsTaxpayer',
+          value: this.isEmptyValue(customer.additionalAttributes) ? false : customer.additionalAttributes.IsTaxpayer
         }]
       })
     },

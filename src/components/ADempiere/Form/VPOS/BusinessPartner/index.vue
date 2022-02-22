@@ -686,7 +686,7 @@ export default {
             valuesToSend['email'] = value
             break
           case 'PersonType':
-            valuesToSend['email'] = value
+            valuesToSend['PersonType'] = value
         }
       })
       valuesToSend['posUuid'] = this.$store.getters.posAttributes.currentPointOfSales.uuid
