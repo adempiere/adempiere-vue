@@ -895,6 +895,25 @@ export default {
         format: 'object'
       })
       const params = { referenceNo: values.DocumentNo, description: values.Description, paymentDate: values.DateTrx }
+      if (this.currentAvailablePaymentMethods.is_payment_reference) {
+        this.$store.dispatch('refundReference', {
+          ...params,
+          posUuid,
+          orderUuid,
+          customerBankAccountUuid: this.currentOrder.customer.uuid,
+          isReceipt: true,
+          bankUuid,
+          amount: this.round(this.amontSend, this.standardPrecision),
+          sourceAmount: this.amontSend * this.dayRate.divideRate,
+          paymentMethodUuid,
+          tenderTypeCode,
+          customerUuid: this.currentOrder.customer.uuid,
+          salesRepresentativeUuid: this.currentOrder.salesRepresentative.uuid,
+          currencyUuid: this.dayRate.currencyTo.uuid
+        })
+        this.addCollect()
+        return
+      }
       if (this.sendToServer) {
         this.$store.dispatch('setPaymentBox', {
           ...params,
