@@ -605,6 +605,11 @@ export default {
       if (this.isEmptyValue(emptyMandatoryFields)) {
         this.isLoadingRecord = true
         const { value, taxId, duns, naics, name, lastName, description, addresses, phone, posUuid, additionalAttributes } = values
+        this.$message({
+          message: 'Acción a realizar',
+          showClose: true
+        })
+        this.$store.commit('popoverCreateBusinessPartner', false)
         createCustomer({
           value,
           taxId,
@@ -631,6 +636,7 @@ export default {
             })
           })
           .catch(error => {
+            this.$store.commit('popoverCreateBusinessPartner', true)
             this.showsPopovers.isShowCreate = true
             this.$message({
               type: 'warning',

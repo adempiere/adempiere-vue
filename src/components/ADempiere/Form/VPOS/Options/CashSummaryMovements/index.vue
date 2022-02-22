@@ -130,6 +130,11 @@ export default {
       this.$store.commit('setShowCashSummaryMovements', false)
     },
     cashClose() {
+      this.$store.commit('setShowCashSummaryMovements', false)
+      this.$message({
+        message: 'Acción a realizar',
+        showClose: true
+      })
       cashClosing({
         posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
         id: this.listCashSummary.id,
@@ -141,9 +146,9 @@ export default {
             isShowClose: true,
             type: 'success'
           })
-          this.$store.commit('setShowCashSummaryMovements', false)
         })
         .catch(error => {
+          this.$store.commit('setShowCashSummaryMovements', true)
           this.$message({
             message: error.message,
             isShowClose: true,
