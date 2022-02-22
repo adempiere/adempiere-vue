@@ -1472,6 +1472,7 @@ export default {
           this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
         })
         .catch(error => {
+          this.$store.commit('dialogoInvoce', { show: true })
           this.$message({
             type: 'error',
             message: error.message,
