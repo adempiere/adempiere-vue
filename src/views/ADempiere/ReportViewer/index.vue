@@ -151,6 +151,7 @@ export default defineComponent({
               return runReport.uuid === reportUuid
             })
 
+            // empty report log
             if (isEmptyValue(currentReportLog)) {
               showNotification({
                 type: 'error',
@@ -160,13 +161,13 @@ export default defineComponent({
 
               root.$store.dispatch('tagsView/delView', root.$route)
                 .then(() => {
-                  this.$router.push('/', () => {})
+                  root.$router.push('/', () => {})
                 })
               return
             }
 
             const { output } = currentReportLog
-
+            // empty output in report log
             if (isEmptyValue(output.outputStream)) {
               const storedReportOutput = root.$store.getters.getReportOutput(instanceUuid)
               if (isEmptyValue(storedReportOutput)) {
