@@ -104,9 +104,6 @@ export default [
   },
   // IsTaxpayer
   {
-    elementColumnName: 'IsTaxpayer',
-    columnName: 'IsTaxpayer',
-    tableName: 'C_BPartner',
     fieldUuid: '06d18869-f3af-4021-bddb-bb63a9a1f3ad',
     uuid: '06d18869-f3af-4021-bddb-bb63a9a1f3ad',
     isFromDictionary: true,
@@ -120,9 +117,6 @@ export default [
   },
   // PersonType
   {
-    elementColumnName: 'PersonType',
-    columnName: 'PersonType',
-    tableName: 'C_BPartner',
     fieldUuid: 'e699d070-8e2e-11e9-a13e-6ba4b8556bd1',
     uuid: 'e699d070-8e2e-11e9-a13e-6ba4b8556bd1',
     isFromDictionary: true,
