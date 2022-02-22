@@ -1103,6 +1103,7 @@ export default {
         message: this.$t('notifications.processing'),
         showClose: true
       })
+      this.$store.commit('setShowPOSCollection', false)
       processOrder({
         posUuid,
         orderUuid,
@@ -1112,13 +1113,26 @@ export default {
       })
         .then(response => {
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
-          this.$store.dispatch('reloadOrder', response.uuid)
+            .then(() => {
+              this.$store.dispatch('setCurrentPOS', this.currentPointOfSales)
+                .then(() => {
+                  this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
+                })
+            })
+            .catch((error) => {
+              this.$message({
+                type: 'info',
+                message: 'Error no se a podido conectar con la impresora' + error.message,
+                showClose: true
+              })
+              this.$store.dispatch('reloadOrder', response.uuid)
+            })
+          // this.$store.dispatch('reloadOrder', response.uuid)
           this.$message({
             type: 'success',
             message: this.$t('notifications.completed'),
             showClose: true
           })
-          this.newOrderAfterPrintTicket()
         })
         .catch(error => {
           this.$message({

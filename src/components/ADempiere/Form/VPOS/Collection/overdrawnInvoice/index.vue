@@ -1461,15 +1461,25 @@ export default {
       })
         .then(response => {
           this.$store.dispatch('printTicket', { posUuid, orderUuid })
-          this.$store.dispatch('reloadOrder', response.uuid)
+            .then(() => {
+              this.$store.dispatch('setCurrentPOS', this.currentPointOfSales)
+                .then(() => {
+                  this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
+                })
+            })
+            .catch((error) => {
+              this.$message({
+                type: 'info',
+                message: 'Error no se a podido conectar con la impresora' + error.message,
+                showClose: true
+              })
+              this.$store.dispatch('reloadOrder', response.uuid)
+            })
           this.$message({
             type: 'success',
             message: this.$t('notifications.completed'),
             showClose: true
           })
-          this.clearOrder()
-          this.createOrder({ withLine: false, newOrder: true, customer: this.currentPointOfSales.templateCustomer.uuid })
-          this.$store.dispatch('listPayments', { posUuid: this.currentPointOfSales.uuid, orderUuid: this.currentOrder.uuid })
         })
         .catch(error => {
           this.$message({
