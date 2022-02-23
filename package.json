@@ -72,7 +72,7 @@
     "vue-xml-viewer": "0.1.4",
     "vuedraggable": "2.24.3",
     "vuex": "3.6.2",
-    "xlsx": "0.17.5"
+    "xlsx": "0.18.0"
   },
   "devDependencies": {
     "@babel/core": "7.12.13",
