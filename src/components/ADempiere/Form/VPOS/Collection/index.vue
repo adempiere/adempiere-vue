@@ -334,9 +334,6 @@ export default {
       return payment
     },
     validatePaymentBeforeProcessing() {
-      if (this.isEmptyValue(this.listPayments)) {
-        return true
-      }
       return this.validateOpenAmount
     },
     validateOpenAmount() {
