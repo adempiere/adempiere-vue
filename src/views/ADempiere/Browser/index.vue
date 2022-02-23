@@ -40,10 +40,10 @@
     </el-header>
 
     <el-main>
-      <collapse
+      <!-- query criteria -->
+      <collapse-criteria
         :title="$t('views.searchCriteria')"
         :container-uuid="browserUuid"
-        :panel-metadata="browserMetadata"
         :container-manager="containerManager"
       >
         <panel-definition
@@ -53,7 +53,8 @@
           :container-manager="containerManager"
           :is-show-filter="false"
         />
-      </collapse>
+      </collapse-criteria>
+
       <!-- result of records in the table -->
       <default-table
         class="browser-table-result"
@@ -79,7 +80,7 @@ import { computed, defineComponent, ref } from '@vue/composition-api'
 // componets and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
-import Collapse from '@/components/ADempiere/Collapse/index.vue'
+import CollapseCriteria from '@/components/ADempiere/CollapseCriteria/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
@@ -96,8 +97,8 @@ export default defineComponent({
 
   components: {
     ActionMenu,
+    CollapseCriteria,
     DefaultTable,
-    Collapse,
     LoadingView,
     PanelDefinition,
     TitleAndHelp
@@ -223,6 +224,13 @@ export default defineComponent({
     }
 
     const containerManager = {
+      getPanel({ containerUuid }) {
+        return root.$store.getters.getStoredBrowser(containerUuid)
+      },
+      getFieldsList({ containerUuid }) {
+        return root.$store.getters.getStoredFieldsFromBrowser(containerUuid)
+      },
+
       actionPerformed({ field, value, valueTo, containerUuid }) {
         return root.$store.dispatch('browserActionPerformed', {
           containerUuid,
@@ -255,10 +263,6 @@ export default defineComponent({
           containerUuid,
           fieldsShowed
         })
-      },
-
-      getFieldsList({ containerUuid }) {
-        return root.$store.getters.getStoredFieldsFromBrowser(containerUuid)
       }
     }
 

@@ -83,6 +83,13 @@ export default defineComponent({
 
   setup(props, { root }) {
     let containerManagerWindow = {
+      getPanel({ parentUuid, containerUuid }) {
+        return root.$store.getters.getStoredTab(parentUuid, containerUuid)
+      },
+      getFieldsList: ({ parentUuid, containerUuid }) => {
+        return root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
+      },
+
       actionPerformed: function(eventInfo) {
         console.log('actionPerformed: ', eventInfo)
         return new Promise()
@@ -103,10 +110,6 @@ export default defineComponent({
       seekTab: function(eventInfo) {
         console.log('seekTab: ', eventInfo)
         return new Promise()
-      },
-
-      getFieldsList: ({ parentUuid, containerUuid }) => {
-        return root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
       },
 
       isDisplayedField,

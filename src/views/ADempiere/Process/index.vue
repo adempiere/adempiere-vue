@@ -168,6 +168,13 @@ export default defineComponent({
     }
 
     const containerManager = {
+      getPanel({ containerUuid }) {
+        return root.$store.getters.getStoredProcess(containerUuid)
+      },
+      getFieldsList({ containerUuid }) {
+        return root.$store.getters.getStoredFieldsFromProcess(containerUuid)
+      },
+
       actionPerformed: ({ field, value }) => {
         // let action = 'processActionPerformed'
         // if (field.isReport) {

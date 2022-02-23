@@ -162,6 +162,13 @@ export default defineComponent({
     }
 
     const containerManager = {
+      getPanel({ containerUuid }) {
+        return root.$store.getters.getStoredReport(containerUuid)
+      },
+      getFieldsList({ containerUuid }) {
+        return root.$store.getters.getStoredFieldsFromReport(containerUuid)
+      },
+
       actionPerformed: ({ field, value }) => {
         // let action = 'reportActionPerformed'
         // if (field.isReport) {

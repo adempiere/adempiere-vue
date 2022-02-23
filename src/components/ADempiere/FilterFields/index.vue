@@ -56,6 +56,7 @@
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
 
+// components and mixins
 import FieldsDisplayOption from './fieldsDisplayOptions.vue'
 
 export default defineComponent({
@@ -222,9 +223,14 @@ export default defineComponent({
 <style lang="scss" scoped>
 .form-filter-fields {
   .el-form-item {
+    display: flex;
     margin-bottom: 0px !important;
     margin-left: 0px !important;
     margin-right: 0px !important;
+
+    >.el-form-item__content {
+      display: contents !important;
+    }
   }
 }
 
@@ -233,6 +239,13 @@ export default defineComponent({
 }
 </style>
 <style lang="scss">
+.form-filter-fields {
+  .el-form-item {
+    >.el-form-item__content {
+      display: contents !important;
+    }
+  }
+}
 /*
 .form-filter-fields {
   .el-tag--small {

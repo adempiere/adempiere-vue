@@ -19,9 +19,10 @@
 <template>
   <el-main class="default-table" style="border-top: 1px solid #dde6fa;padding-bottom: 1%;padding-top: 1%;border-bottom: 1px solid #dde6fa">
     <el-divider class="divider" />
+
     <el-row style="display: flex;">
       <el-col :span="19" style="display: grid;">
-        <div class="title" @click="handlePanel(isShowPanel)">
+        <div class="title" @click="handlePanel(isCollapse)">
           <b class="label">
             {{ title }}
           </b>
@@ -31,19 +32,21 @@
         <filter-fields
           :parent-uuid="parentUuid"
           :container-uuid="containerUuid"
-          :fields-list="panelMetadata.fieldsList"
+          :fields-list="fieldsList"
           :filter-manager="containerManager.changeFieldShowedFromUser"
           :showed-manager="containerManager.isDisplayedField"
         />
       </el-col>
       <el-col :span="1" style="text-align: center;">
-        <el-button type="text" :icon="icon" class="change-icon" @click="handlePanel(isShowPanel)" />
+        <el-button type="text" :icon="icon" class="change-icon" @click="handlePanel(isCollapse)" />
       </el-col>
     </el-row>
+
     <transition name="el-zoom-in-top">
-      <div v-show="isShowPanel" class="transition-box">
+      <div v-show="isCollapse" class="transition-box">
         <el-row>
           <el-col :span="24">
+            <!-- component -->
             <slot />
           </el-col>
         </el-row>
@@ -54,11 +57,13 @@
 </template>
 
 <script>
-import { defineComponent, computed, ref } from '@vue/composition-api'
-import FilterFields from '@/components/ADempiere/FilterFields'
+import { defineComponent, computed } from '@vue/composition-api'
+
+// components and mixins
+import FilterFields from '@/components/ADempiere/FilterFields/index.vue'
 
 export default defineComponent({
-  name: 'Collapse',
+  name: 'CollapseCriteria',
 
   components: {
     FilterFields
@@ -77,34 +82,67 @@ export default defineComponent({
       type: String,
       required: true
     },
+    showedAttribute: {
+      type: String,
+      default: 'isShowedCriteria'
+    },
     containerManager: {
       type: Object,
       required: true
-    },
-    panelMetadata: {
-      type: Object,
-      required: false
     }
   },
 
-  setup(props, { root, refs }) {
-    const isShowPanel = ref(false)
+  setup(props, { root }) {
+    const storedPanel = computed(() => {
+      return props.containerManager.getPanel({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid
+      })
+    })
+
+    const fieldsList = computed(() => {
+      return props.containerManager.getFieldsList({
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid
+      })
+    })
+
+    const isCollapse = computed({
+      get() {
+        const panel = storedPanel.value
+        if (!root.isEmptyValue(panel)) {
+          if (panel[props.showedAttribute]) {
+            // open criteria
+            return true
+          }
+        }
+        // by default criteria if closed
+        return false
+      },
+      set(isShowed) {
+        root.$store.commit('changeBrowserAttribute', {
+          uuid: props.containerUuid,
+          attributeName: props.showedAttribute,
+          attributeValue: isShowed
+        })
+      }
+    })
 
     const icon = computed(() => {
-      if (isShowPanel.value) {
+      if (isCollapse.value) {
         return 'el-icon-arrow-down'
       }
       return 'el-icon-arrow-right'
     })
 
     function handlePanel(show) {
-      isShowPanel.value = !show
+      isCollapse.value = !show
     }
 
     return {
-      // data
-      isShowPanel,
       // computeds
+      fieldsList,
+      isCollapse,
       icon,
       // methods
       handlePanel
