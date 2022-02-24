@@ -33,6 +33,7 @@
       </div>
 
       <action-menu
+        :container-manager="containerManager"
         :container-uuid="browserUuid"
         :actions-manager="actionsManager"
         :relations-manager="relationsManager"
@@ -76,6 +77,8 @@
 
 <script>
 import { computed, defineComponent, ref } from '@vue/composition-api'
+import lang from '@/lang'
+import store from '@/store'
 
 // componets and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
@@ -123,18 +126,18 @@ export default defineComponent({
     }
 
     const storedBrowser = computed(() => {
-      return root.$store.getters.getStoredBrowser(browserUuid)
+      return store.getters.getStoredBrowser(browserUuid)
     })
 
     // TODO: Handle per individual smart browser
     // by default enable context menu and title
-    root.$store.dispatch('settings/changeSetting', {
+    store.dispatch('settings/changeSetting', {
       key: 'showContextMenu',
       value: true
     })
 
     const isShowContextMenu = computed(() => {
-      return root.$store.state.settings.showContextMenu
+      return store.state.settings.showContextMenu
     })
 
     const isReadyToSearch = computed(() => {
@@ -142,7 +145,7 @@ export default defineComponent({
         return false
       }
       return root.isEmptyValue(
-        root.$store.getters.getBrowserFieldsEmptyMandatory({
+        store.getters.getBrowserFieldsEmptyMandatory({
           containerUuid: browserUuid
         })
       )
@@ -167,7 +170,7 @@ export default defineComponent({
           showCriteria = true
         }
 
-        root.$store.commit('changeBrowserAttribute', {
+        store.commit('changeBrowserAttribute', {
           uuid: browserUuid,
           attributeName: 'isShowedCriteria',
           attributeValue: showCriteria
@@ -187,7 +190,7 @@ export default defineComponent({
         return
       }
 
-      root.$store.dispatch('getBrowserDefinitionFromServer', browserUuid)
+      store.dispatch('getBrowserDefinitionFromServer', browserUuid)
         .then(browserResponse => {
           browserMetadata.value = browserResponse
 
@@ -204,12 +207,12 @@ export default defineComponent({
       // }
       if (isReadyToSearch.value) {
         // first search by default
-        root.$store.dispatch('getBrowserSearch', {
+        store.dispatch('getBrowserSearch', {
           containerUuid: browserUuid
         })
 
         // hide showed criteria
-        root.$store.commit('changeBrowserAttribute', {
+        store.commit('changeBrowserAttribute', {
           uuid: browserUuid,
           attributeName: 'isShowedCriteria',
           attributeValue: false
@@ -218,21 +221,21 @@ export default defineComponent({
       }
 
       // set empty values into container data
-      root.$store.commit('setBrowserData', {
+      store.commit('setBrowserData', {
         containerUuid: browserUuid
       })
     }
 
     const containerManager = {
       getPanel({ containerUuid }) {
-        return root.$store.getters.getStoredBrowser(containerUuid)
+        return store.getters.getStoredBrowser(containerUuid)
       },
       getFieldsList({ containerUuid }) {
-        return root.$store.getters.getStoredFieldsFromBrowser(containerUuid)
+        return store.getters.getStoredFieldsFromBrowser(containerUuid)
       },
 
       actionPerformed({ field, value, valueTo, containerUuid }) {
-        return root.$store.dispatch('browserActionPerformed', {
+        return store.dispatch('browserActionPerformed', {
           containerUuid,
           field,
           value,
@@ -241,7 +244,7 @@ export default defineComponent({
       },
 
       setDefaultValues: ({ parentUuid, containerUuid }) => {
-        root.$store.dispatch('setBrowserDefaultValues', {
+        store.dispatch('setBrowserDefaultValues', {
           parentUuid,
           containerUuid
         })
@@ -259,9 +262,26 @@ export default defineComponent({
       },
 
       changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
-        root.$store.dispatch('changeBrowserFieldShowedFromUser', {
+        store.dispatch('changeBrowserFieldShowedFromUser', {
           containerUuid,
           fieldsShowed
+        })
+      },
+
+      setSelection: ({
+        containerUuid,
+        recordsSelected
+      }) => {
+        store.commit('setBrowserSelectionsList', {
+          containerUuid,
+          selectionsList: recordsSelected
+        })
+      },
+      getSelection: ({
+        containerUuid
+      }) => {
+        return store.getters.getBrowserSelectionsList({
+          containerUuid
         })
       }
     }
@@ -296,21 +316,21 @@ export default defineComponent({
       },
 
       setRow: ({ containerUuid, rowIndex, row }) => {
-        return root.$store.commit('setBrowserRow', {
+        return store.commit('setBrowserRow', {
           containerUuid,
           rowIndex,
           row
         })
       },
       getRow: ({ containerUuid, rowIndex }) => {
-        return root.$store.getters.getBrowserRowData({
+        return store.getters.getBrowserRowData({
           containerUuid,
           rowIndex
         })
       },
 
       setCell: ({ containerUuid, rowIndex, columnName, value }) => {
-        return root.$store.commit('setBrowserCell', {
+        return store.commit('setBrowserCell', {
           containerUuid,
           rowIndex,
           columnName,
@@ -318,7 +338,7 @@ export default defineComponent({
         })
       },
       getCell: ({ containerUuid, rowIndex, columnName }) => {
-        return root.$store.getters.getBrowserCellData({
+        return store.getters.getBrowserCellData({
           containerUuid,
           rowIndex,
           columnName
@@ -326,26 +346,9 @@ export default defineComponent({
       },
 
       setPage: ({ containerUuid, pageNumber }) => {
-        root.$store.commit('getBrowserSearch', {
+        store.commit('getBrowserSearch', {
           containerUuid,
           pageNumber
-        })
-      },
-
-      setSelection: ({
-        containerUuid,
-        recordsSelected
-      }) => {
-        root.$store.commit('setBrowserSelectionsList', {
-          containerUuid,
-          selectionsList: recordsSelected
-        })
-      },
-      getSelection: ({
-        containerUuid
-      }) => {
-        return root.$store.getters.getBrowserSelectionsList({
-          containerUuid
         })
       }
     }
@@ -359,7 +362,7 @@ export default defineComponent({
         }
       }
 
-      return root.$t('actionMenu.runProcess')
+      return lang.t('actionMenu.runProcess')
     })
 
     const actionsManager = computed(() => {
@@ -368,7 +371,7 @@ export default defineComponent({
 
         defaultActionName: processName.value,
 
-        getActionList: () => root.$store.getters.getStoredActionsMenu({
+        getActionList: () => store.getters.getStoredActionsMenu({
           containerUuid: browserUuid
         })
       }
@@ -380,7 +383,7 @@ export default defineComponent({
 
     // get records list
     const recordsList = computed(() => {
-      return root.$store.getters.getBrowserRecordsList({
+      return store.getters.getBrowserRecordsList({
         containerUuid: browserUuid
       })
     })

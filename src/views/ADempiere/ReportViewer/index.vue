@@ -22,6 +22,9 @@
     <el-row type="flex" style="min-height: inherit;">
       <el-col :span="24">
         <action-menu
+          :container-manager="containerManager"
+          :parent-uuid="reportUuid"
+          :container-uuid="reportUuid"
           :actions-manager="actionsManager"
           :relations-manager="relationsManager"
         />
@@ -63,11 +66,15 @@
 
 <script>
 import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
+import lang from '@/lang'
+import router from '@/router'
+import store from '@/store'
 
 // components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import FileRender from '@/components/ADempiere/FileRender/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import mixinReport from '@/views/ADempiere/Report/mixinReport.js'
 // import ModalDialog from '@/components/ADempiere/Dialog/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
@@ -89,16 +96,13 @@ export default defineComponent({
 
   setup(props, { root }) {
     const reportUuid = root.$route.params.reportUuid
+    const { containerManager, actionsManager, storedReportDefinition } = mixinReport(reportUuid)
     const isLoading = ref(false)
     const reportFormat = ref('html')
     const reportContent = ref('')
 
-    const storedReportDefinition = computed(() => {
-      return root.$store.getters.getStoredReport(reportUuid)
-    })
-
     const getStoredReportOutput = computed(() => {
-      return root.$store.getters.getReportOutput(root.$route.params.instanceUuid)
+      return store.getters.getReportOutput(root.$route.params.instanceUuid)
     })
 
     const link = computed(() => {
@@ -116,9 +120,9 @@ export default defineComponent({
       }
 
       // update name in tag view
-      root.$store.dispatch('tagsView/updateVisitedView', {
+      store.dispatch('tagsView/updateVisitedView', {
         ...root.$route,
-        title: `${root.$t('route.reportViewer')}: ${reportOutput.name}`
+        title: `${lang.t('route.reportViewer')}: ${reportOutput.name}`
       })
     }
 
@@ -129,7 +133,7 @@ export default defineComponent({
         return
       }
 
-      root.$store.dispatch('getReportDefinitionFromServer', {
+      store.dispatch('getReportDefinitionFromServer', {
         uuid: reportUuid
       }).then(() => {
         getCachedReport()
@@ -140,7 +144,7 @@ export default defineComponent({
       if (isEmptyValue(getStoredReportOutput.value)) {
         const pageSize = undefined
         const pageToken = undefined
-        root.$store.dispatch('getSessionProcessFromServer', {
+        store.dispatch('getSessionProcessFromServer', {
           pageSize,
           pageToken
         })
@@ -159,9 +163,9 @@ export default defineComponent({
                 message: 'requestError'
               })
 
-              root.$store.dispatch('tagsView/delView', root.$route)
+              store.dispatch('tagsView/delView', root.$route)
                 .then(() => {
-                  root.$router.push('/', () => {})
+                  router.push('/', () => {})
                 })
               return
             }
@@ -169,7 +173,7 @@ export default defineComponent({
             const { output } = currentReportLog
             // empty output in report log
             if (isEmptyValue(output.outputStream)) {
-              const storedReportOutput = root.$store.getters.getReportOutput(instanceUuid)
+              const storedReportOutput = store.getters.getReportOutput(instanceUuid)
               if (isEmptyValue(storedReportOutput)) {
                 const { parameters } = currentReportLog
                 const parametersList = convertObjectToKeyValue({
@@ -177,7 +181,7 @@ export default defineComponent({
                 })
 
                 const reportType = fileName.split('.').pop()
-                root.$store.dispatch('getReportOutputFromServer', {
+                store.dispatch('getReportOutputFromServer', {
                   uuid: reportUuid,
                   reportType,
                   reportName: fileName,
@@ -198,16 +202,6 @@ export default defineComponent({
       }
     }
 
-    const actionsManager = ref({
-      containerUuid: reportUuid,
-
-      defaultActionName: root.$t('actionMenu.generateReport'),
-
-      getActionList: () => root.$store.getters.getStoredActionsMenu({
-        containerUuid: reportUuid
-      })
-    })
-
     const relationsManager = ref({
       menuParentUuid: root.$route.meta.parentUuid
     })
@@ -218,12 +212,14 @@ export default defineComponent({
     })
 
     return {
+      reportUuid,
       isLoading,
       reportFormat,
       reportContent,
       actionsManager,
       relationsManager,
       // computeds
+      containerManager,
       link,
       storedReportDefinition,
       getStoredReportOutput

@@ -25,13 +25,13 @@
     split-button
     type="primary"
     trigger="click"
-    class="menu-actions"
+    class="action-container"
     @command="runAction"
     @click="runDefaultAction"
   >
     {{ defaultActionName }}
 
-    <el-dropdown-menu slot="dropdown">
+    <el-dropdown-menu slot="dropdown" class="action-dropdown-menu">
       <el-dropdown-item
         v-if="isEmptyValue(actionsList)"
         key="withoutActions"
@@ -49,12 +49,17 @@
           v-for="(action, index) in actionsList"
           :key="index"
           :command="action"
-          :disabled="!action.enabled"
+          :disabled="!action.enabled({
+            root: $root,
+            parentUuid,
+            containerUuid,
+            containerManager
+          })"
           :divided="true"
         >
           <div class="contents">
             <div class="auxiliary-menu-icon">
-              <i :class="action.icon" />
+              <i :class="action.icon" style="font-size: 18" />
             </div>
 
             <!-- for print format -->
@@ -134,6 +139,18 @@ export default defineComponent({
   name: 'MenuActions',
 
   props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
+    containerUuid: {
+      type: String,
+      required: true
+    },
+    containerManager: {
+      type: Object,
+      required: true
+    },
     actionsManager: {
       type: Object,
       default: () => {},
@@ -212,6 +229,7 @@ export default defineComponent({
         parentUuid,
         containerUuid,
         tableName,
+        containerManager: props.containerManager,
         recordUuid: recordUuid.value,
         uuid: action.uuid
       })
@@ -231,24 +249,33 @@ export default defineComponent({
 <style scoped lang="scss" src="./common-style.scss">
 </style>
 <style scoped lang="scss">
-.menu-actions {
+.action-container {
   .el-button-group {
     display: inline-flex;
   }
 }
 
-.el-dropdown-menu.el-dropdown-menu--medium {
+.action-dropdown-menu {
+  .auxiliary-menu-icon {
+    margin-right: 4px !important;
+
+    >i {
+      font-size: 18px;
+    }
+  }
+
   // height, and font size of the prefix icons of menu items
   .el-dropdown-menu__item {
     line-height: 17px;
     padding: 0 17px;
+    padding-left: 10px !important;
     display: grid;
     font-size: 14px;
 
     // additional space on top of the first item in the list
-    &:first-child {
-      margin-top: 10px;
-    }
+    // &:first-child {
+    //   margin-top: 10px;
+    // }
     // additional space on bottom of the last item in the list
     &:last-child {
       margin-bottom: 10px;
@@ -257,7 +284,7 @@ export default defineComponent({
 }
 </style>
 <style lang="scss">
-.menu-actions {
+.action-container {
   .el-button-group {
     // light blue style of the first section of the menu button
     // >.el-button::first-child {

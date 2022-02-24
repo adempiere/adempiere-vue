@@ -21,16 +21,17 @@ import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser
 
 // constants
 import {
-  refreshBrowserSearh,
-  runProcess,
-  sharedLink,
-  zoomWindow
+  sharedLink
 } from '@/utils/ADempiere/constants/actionsMenuList'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { generatePanelAndFields } from '@/utils/ADempiere/dictionary/panel.js'
-import { isDisplayedField, isMandatoryField } from '@/utils/ADempiere/dictionary/browser.js'
+import {
+  isDisplayedField, isMandatoryField,
+  refreshBrowserSearh, runProcessOfBrowser,
+  zoomWindow
+} from '@/utils/ADempiere/dictionary/browser.js'
 
 export default {
   getBrowserDefinitionFromServer({ commit, dispatch }, uuid) {
@@ -82,7 +83,7 @@ export default {
     if (!isEmptyValue(browserDefinition.process)) {
       const { uuid, name, description } = browserDefinition.process
       const actionProcess = {
-        ...runProcess,
+        ...runProcessOfBrowser,
         uuid,
         name,
         description
@@ -94,18 +95,19 @@ export default {
     // action refresh browser search
     actionsList.push(refreshBrowserSearh)
 
-    // add action zoom window
+    // destruct to avoid deleting the reference to the original variable and to avoid mutating
+    let actionZoomWindow = { ...zoomWindow }
     if (!isEmptyValue(browserDefinition.window)) {
       const { uuid, name, description } = browserDefinition.window
-      const zoomAction = {
-        ...zoomWindow,
+      actionZoomWindow = {
+        ...actionZoomWindow,
         uuid,
         name: `${zoomWindow.name}: ${name}`,
         description
       }
-
-      actionsList.push(zoomAction)
     }
+    // add action zoom window
+    actionsList.push(actionZoomWindow)
 
     // action shared link
     actionsList.push(sharedLink)

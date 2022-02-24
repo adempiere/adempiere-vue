@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import lang from '@/lang'
+import store from '@/store'
+
 import { generateField } from '@/utils/ADempiere/dictionaryUtils'
 import { sortFields } from '@/utils/ADempiere/dictionary/panel'
 import { isHiddenField } from '@/utils/ADempiere/references'
@@ -118,5 +121,21 @@ export function generateProcess({
 
   return {
     processDefinition
+  }
+}
+
+export const runProcess = {
+  name: lang.t('actionMenu.runProcess'),
+  enabled: () => {
+    return true
+  },
+  svg: false,
+  icon: 'el-icon-setting',
+  actionName: 'runProcess',
+  uuid: null,
+  runProcess: ({ containerUuid }) => {
+    store.dispatch('startProcess', {
+      containerUuid
+    })
   }
 }

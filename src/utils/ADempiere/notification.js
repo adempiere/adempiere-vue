@@ -36,7 +36,7 @@ export function hasTranslation(text) {
  * @param {string} name
  * @param {array} logs
  */
-export function showNotification({ type = 'success', title, message, summary, name, logs = [], isRedirect = true }) {
+export function showNotification({ type = 'success', title, message = '', summary, name, logs = [], isRedirect = true }) {
   title = hasTranslation(title)
   if (message) {
     message = hasTranslation(message)

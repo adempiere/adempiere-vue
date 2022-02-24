@@ -28,7 +28,9 @@
       style="height: 30px;"
     >
       <action-menu
+        :container-manager="containerManager"
         :parent-uuid="reportUuid"
+        :container-uuid="reportUuid"
         :actions-manager="actionsManager"
         :relations-manager="relationsManager"
       />
@@ -58,6 +60,8 @@
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
+import lang from '@/lang'
+import store from '@/store'
 
 // components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
@@ -104,21 +108,14 @@ export default defineComponent({
     }
 
     const showContextMenu = computed(() => {
-      return root.$store.state.settings.showContextMenu
+      return store.state.settings.showContextMenu
     })
 
     const storedReport = computed(() => {
-      return root.$store.getters.getStoredReport(reportUuid)
+      return store.getters.getStoredReport(reportUuid)
     })
 
-    const storedPrintFormatList = computed(() => {
-      if (root.$route.meta.type === 'report') {
-        return root.$store.getters.getPrintFormatList(reportUuid)
-      }
-      return []
-    })
-
-    root.$store.dispatch('settings/changeSetting', {
+    store.dispatch('settings/changeSetting', {
       key: 'showContextMenu',
       value: true
     })
@@ -139,7 +136,7 @@ export default defineComponent({
         // add apps properties
         report = generateReport(report)
         // add into store
-        return root.$store.dispatch('addReport', report)
+        return store.dispatch('addReport', report)
           .then(reportResponse => {
             // to obtain the load effect
             setTimeout(() => {
@@ -149,7 +146,7 @@ export default defineComponent({
           })
       }
 
-      root.$store.dispatch('getReportDefinitionFromServer', {
+      store.dispatch('getReportDefinitionFromServer', {
         uuid: reportUuid
       })
         .then(reportResponse => {
@@ -163,10 +160,10 @@ export default defineComponent({
 
     const containerManager = {
       getPanel({ containerUuid }) {
-        return root.$store.getters.getStoredReport(containerUuid)
+        return store.getters.getStoredReport(containerUuid)
       },
       getFieldsList({ containerUuid }) {
-        return root.$store.getters.getStoredFieldsFromReport(containerUuid)
+        return store.getters.getStoredFieldsFromReport(containerUuid)
       },
 
       actionPerformed: ({ field, value }) => {
@@ -174,14 +171,14 @@ export default defineComponent({
         // if (field.isReport) {
         //   action = 'reportActionPerformed'
         // }
-        // root.$store.dispatch(action, {
+        // store.dispatch(action, {
         //   field,
         //   value
         // })
       },
 
       setDefaultValues: ({ containerUuid }) => {
-        root.$store.dispatch('setReportDefaultValues', {
+        store.dispatch('setReportDefaultValues', {
           containerUuid
         })
       },
@@ -197,7 +194,7 @@ export default defineComponent({
       isMandatoryField,
 
       changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
-        root.$store.dispatch('changeReportFieldShowedFromUser', {
+        store.dispatch('changeReportFieldShowedFromUser', {
           containerUuid,
           fieldsShowed
         })
@@ -205,7 +202,7 @@ export default defineComponent({
     }
 
     const actionsList = computed(() => {
-      return root.$store.getters.getStoredActionsMenu({
+      return store.getters.getStoredActionsMenu({
         containerUuid: reportUuid
       })
     })
@@ -215,7 +212,7 @@ export default defineComponent({
     const actionsManager = ref({
       containerUuid: reportUuid,
 
-      defaultActionName: root.$t('actionMenu.generateReport'),
+      defaultActionName: lang.t('actionMenu.generateReport'),
 
       getActionList: () => actionsList.value
     })
@@ -232,8 +229,7 @@ export default defineComponent({
       actionsManager,
       relationsManager,
       // computeds
-      showContextMenu,
-      storedPrintFormatList
+      showContextMenu
     }
   }
 })

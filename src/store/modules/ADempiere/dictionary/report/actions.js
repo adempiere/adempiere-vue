@@ -21,18 +21,19 @@ import { requestProcessMetadata as requestReportMetadata } from '@/api/ADempiere
 
 // constants
 import {
-  runReport,
-  runReportAs,
-  runReportAsPrintFormat,
-  runReportAsView
-} from '@/utils/ADempiere/dictionary/report.js'
-import {
   sharedLink
 } from '@/utils/ADempiere/constants/actionsMenuList.js'
 
 // utils and helper methods
+import {
+  runReport,
+  runReportAs,
+  changeParameters,
+  runReportAsPrintFormat,
+  runReportAsView
+} from '@/utils/ADempiere/dictionary/report.js'
 import { generateProcess as generateReport } from '@/utils/ADempiere/dictionary/process.js'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 export default {
   addReportToList({ commit }, reportResponse) {
@@ -118,10 +119,11 @@ export default {
       })
 
       actionExportType.childs = runTypeChilds
-    } else {
-      actionExportType.enabled = false
     }
     actionsList.push(actionExportType)
+
+    // change parameters to report viewer
+    actionsList.push(changeParameters)
 
     // destruct to avoid deleting the reference to the original variable and to avoid mutating
     const actionPrintFormat = { ...runReportAsPrintFormat }
@@ -146,8 +148,6 @@ export default {
       })
 
       actionPrintFormat.childs = printFormatChilds
-    } else {
-      actionPrintFormat.enabled = false
     }
     actionsList.push(actionPrintFormat)
 
@@ -174,8 +174,6 @@ export default {
       })
 
       actionView.childs = printFormatChilds
-    } else {
-      actionView.enabled = false
     }
     actionsList.push(actionView)
 

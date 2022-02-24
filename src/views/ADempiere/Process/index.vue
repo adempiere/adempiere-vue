@@ -29,6 +29,8 @@
     >
       <action-menu
         :parent-uuid="processUuid"
+        :container-uuid="processUuid"
+        :container-manager="containerManager"
         :actions-manager="actionsManager"
         :relations-manager="relationsManager"
       />
@@ -58,6 +60,8 @@
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
+import store from '@/store'
+import lang from '@/lang'
 
 // components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
@@ -74,12 +78,7 @@ import {
   isMandatoryField,
   isReadOnlyField
 } from '@/utils/ADempiere/dictionary/process.js'
-
-// constants
-import {
-  runProcess,
-  sharedLink
-} from '@/utils/ADempiere/constants/actionsMenuList'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 export default defineComponent({
   name: 'ProcessView',
@@ -105,26 +104,19 @@ export default defineComponent({
 
     let processUuid = root.$route.meta.uuid
     // set uuid from test
-    if (!root.isEmptyValue(props.uuid)) {
+    if (!isEmptyValue(props.uuid)) {
       processUuid = props.uuid
     }
 
     const showContextMenu = computed(() => {
-      return root.$store.state.settings.showContextMenu
+      return store.state.settings.showContextMenu
     })
 
     const storedProcess = computed(() => {
-      return root.$store.getters.getStoredProcess(processUuid)
+      return store.getters.getStoredProcess(processUuid)
     })
 
-    const storedPrintFormatList = computed(() => {
-      if (root.$route.meta.type === 'report') {
-        return root.$store.getters.getPrintFormatList(processUuid)
-      }
-      return []
-    })
-
-    root.$store.dispatch('settings/changeSetting', {
+    store.dispatch('settings/changeSetting', {
       key: 'showContextMenu',
       value: true
     })
@@ -139,13 +131,13 @@ export default defineComponent({
       }
 
       // metadata props use for test
-      if (!root.isEmptyValue(props.metadata)) {
+      if (!isEmptyValue(props.metadata)) {
         // from server response
         process = convertProcess(props.metadata)
         // add apps properties
         process = generateProcess(process)
         // add into store
-        return root.$store.dispatch('addProcess', process)
+        return store.dispatch('addProcess', process)
           .then(processResponse => {
             // to obtain the load effect
             setTimeout(() => {
@@ -155,7 +147,7 @@ export default defineComponent({
           })
       }
 
-      root.$store.dispatch('getProcessDefinitionFromServer', {
+      store.dispatch('getProcessDefinitionFromServer', {
         uuid: processUuid
       })
         .then(processResponse => {
@@ -169,10 +161,10 @@ export default defineComponent({
 
     const containerManager = {
       getPanel({ containerUuid }) {
-        return root.$store.getters.getStoredProcess(containerUuid)
+        return store.getters.getStoredProcess(containerUuid)
       },
       getFieldsList({ containerUuid }) {
-        return root.$store.getters.getStoredFieldsFromProcess(containerUuid)
+        return store.getters.getStoredFieldsFromProcess(containerUuid)
       },
 
       actionPerformed: ({ field, value }) => {
@@ -180,14 +172,14 @@ export default defineComponent({
         // if (field.isReport) {
         //   action = 'reportActionPerformed'
         // }
-        // root.$store.dispatch(action, {
+        // store.dispatch(action, {
         //   field,
         //   value
         // })
       },
 
       setDefaultValues: ({ containerUuid }) => {
-        root.$store.dispatch('setProcessDefaultValues', {
+        store.dispatch('setProcessDefaultValues', {
           containerUuid
         })
       },
@@ -203,7 +195,7 @@ export default defineComponent({
       isMandatoryField,
 
       changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
-        root.$store.dispatch('changeProcessFieldShowedFromUser', {
+        store.dispatch('changeProcessFieldShowedFromUser', {
           containerUuid,
           fieldsShowed
         })
@@ -215,12 +207,13 @@ export default defineComponent({
     const actionsManager = ref({
       containerUuid: processUuid,
 
-      defaultActionName: root.$t('actionMenu.runProcess'),
+      defaultActionName: lang.t('actionMenu.runProcess'),
 
-      getActionList: () => [
-        runProcess,
-        sharedLink
-      ]
+      getActionList: () => {
+        return store.getters.getStoredActionsMenu({
+          containerUuid: processUuid
+        })
+      }
     })
 
     const relationsManager = ref({
@@ -236,7 +229,6 @@ export default defineComponent({
       relationsManager,
       // computeds
       showContextMenu,
-      storedPrintFormatList,
       // methods
       getProcess
     }

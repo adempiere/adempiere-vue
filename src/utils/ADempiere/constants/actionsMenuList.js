@@ -16,7 +16,7 @@
 
 import language from '@/lang'
 import { showMessage } from '@/utils/ADempiere/notification.js'
-import { copyToClipboard, zoomIn } from '@/utils/ADempiere/coreUtils.js'
+import { copyToClipboard } from '@/utils/ADempiere/coreUtils.js'
 
 /**
  * Create new record
@@ -55,7 +55,10 @@ export const undoChange = {
 export const sharedLink = {
   name: language.t('actionMenu.shareLink'),
   description: language.t('actionMenu.shareLinkDescription'),
-  enabled: true,
+  // enabled: true,
+  enabled: () => {
+    return true
+  },
   svg: false,
   icon: 'el-icon-share',
   actionName: 'sharedLink',
@@ -121,25 +124,6 @@ export const deleteRecord = {
   }
 }
 
-/**
- * Zoom in on the window associated with the smart browser
- * @param {string} uuid of window
- */
-export const zoomWindow = {
-  name: language.t('actionMenu.zoomWindow'),
-  enabled: true,
-  svg: false,
-  icon: 'el-icon-zoom-in',
-  type: 'zoom',
-  actionName: 'zoomWindow',
-  uuid: null,
-  zoomWindow: ({ uuid }) => {
-    zoomIn({
-      uuid
-    })
-  }
-}
-
 export const refreshRecords = {
   name: language.t('actionMenu.refreshRecords'),
   enabled: true,
@@ -150,31 +134,6 @@ export const refreshRecords = {
     // used to window
     root.$store.dispatch('getEntities', {
       parentUuid,
-      containerUuid
-    })
-  }
-}
-
-export const refreshBrowserSearh = {
-  name: language.t('actionMenu.refreshRecords'),
-  enabled: true,
-  svg: false,
-  icon: 'el-icon-refresh',
-  actionName: 'refreshRecords',
-  refreshRecords: ({ root, containerUuid }) => {
-    const fieldsEmpty = root.$store.getters.getBrowserFieldsEmptyMandatory({
-      containerUuid
-    })
-    if (!root.isEmptyValue(fieldsEmpty)) {
-      root.$message({
-        message: language.t('notifications.mandatoryFieldMissing') + fieldsEmpty,
-        type: 'info'
-      })
-      return
-    }
-
-    // used to browser
-    root.$store.dispatch('getBrowserSearch', {
       containerUuid
     })
   }
@@ -209,20 +168,6 @@ export const recordAccess = {
   icon: 'el-icon-c-scale-to-original',
   actionName: 'recordAccess',
   recordAccess: ({ root, parentUuid, containerUuid, tableName }) => {
-  }
-}
-
-export const runProcess = {
-  name: language.t('actionMenu.runProcess'),
-  enabled: true,
-  svg: false,
-  icon: 'el-icon-setting',
-  actionName: 'runProcess',
-  uuid: null,
-  runProcess: ({ root, containerUuid }) => {
-    root.$store.dispatch('startProcess', {
-      containerUuid
-    })
   }
 }
 

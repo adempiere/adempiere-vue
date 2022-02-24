@@ -19,6 +19,9 @@
 <template>
   <div class="auxiliary-menu auxiliary-menu-mobile">
     <menu-actions
+      :container-manager="containerManager"
+      :parent-uuid="parentUuid"
+      :container-uuid="containerUuid"
       :size="size"
       :actions-manager="actionsManager"
     />
@@ -52,6 +55,18 @@ export default defineComponent({
   },
 
   props: {
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
+    containerUuid: {
+      type: String,
+      required: true
+    },
+    containerManager: {
+      type: Object,
+      required: true
+    },
     actionsManager: {
       type: Object,
       required: true

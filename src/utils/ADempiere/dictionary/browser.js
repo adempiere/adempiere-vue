@@ -14,7 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import language from '@/lang'
+import store from '@/store'
+
+// utils and helpers methods
 import { isHiddenField } from '@/utils/ADempiere/references'
+import { showMessage, showNotification } from '@/utils/ADempiere/notification.js'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 /**
  * Is displayed field in panel query criteria
@@ -64,4 +71,86 @@ export function isMandatoryColumn({ isMandatory, isMandatoryFromLogic }) {
  */
 export function isReadOnlyColumn({ isReadOnly }) {
   return isReadOnly
+}
+
+export const refreshBrowserSearh = {
+  name: language.t('actionMenu.refreshRecords'),
+  enabled: () => {
+    return true
+  },
+  svg: false,
+  icon: 'el-icon-refresh',
+  actionName: 'refreshRecords',
+  refreshRecords: ({ root, containerUuid }) => {
+    const fieldsEmpty = store.getters.getBrowserFieldsEmptyMandatory({
+      containerUuid
+    })
+    if (!root.isEmptyValue(fieldsEmpty)) {
+      showMessage({
+        message: language.t('notifications.mandatoryFieldMissing') + fieldsEmpty,
+        type: 'info'
+      })
+      return
+    }
+
+    // used to browser
+    store.dispatch('getBrowserSearch', {
+      containerUuid
+    })
+  }
+}
+
+export const runProcessOfBrowser = {
+  name: language.t('actionMenu.runProcess'),
+  enabled: ({ containerUuid, containerManager }) => {
+    const selection = containerManager.getSelection({
+      containerUuid
+    })
+
+    return !isEmptyValue(selection)
+  },
+  svg: false,
+  icon: 'el-icon-setting',
+  actionName: 'runProcessOfBrowser',
+  uuid: null,
+  runProcessOfBrowser: ({ root, containerUuid, containerManager }) => {
+    const selection = containerManager.getSelection({
+      containerUuid
+    })
+    if (isEmptyValue(selection)) {
+      showNotification({
+        title: language.t('data.selectionRequired'),
+        type: 'warning'
+      })
+      return
+    }
+    store.dispatch('startProcessOfBrowser', {
+      containerUuid
+    })
+  }
+}
+
+/**
+ * Zoom in on the window associated with the smart browser
+ * @param {string} uuid of window
+ */
+export const zoomWindow = {
+  name: language.t('actionMenu.zoomWindow'),
+  enabled: ({ containerUuid }) => {
+    const browser = store.getters.getStoredBrowser(containerUuid)
+    if (!isEmptyValue(browser)) {
+      return !isEmptyValue(browser.window)
+    }
+    return false
+  },
+  svg: false,
+  icon: 'el-icon-zoom-in',
+  type: 'zoom',
+  actionName: 'zoomWindow',
+  uuid: null,
+  zoomWindow: ({ uuid }) => {
+    zoomIn({
+      uuid
+    })
+  }
 }

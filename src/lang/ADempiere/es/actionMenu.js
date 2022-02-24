@@ -30,6 +30,7 @@ const actionMenu = {
   generateDefaultReport: 'Generar con extensión de archivo por defecto',
   generateReportAs: 'Generar Como',
   generateReportAsOtherFormat: 'Cambiar extensión del archivo para generar',
+  changeParameters: 'Cambiar Parametros',
   printFormats: 'Formatos de Impresión',
   generateReportWithPrintFormat: 'Cambiar formato de impresión para generar',
   reportViews: 'Vistas de Reporte',

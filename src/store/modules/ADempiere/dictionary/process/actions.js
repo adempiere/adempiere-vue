@@ -19,14 +19,23 @@ import router from '@/router'
 // api request methods
 import { requestProcessMetadata } from '@/api/ADempiere/dictionary/process.js'
 
+// constants
+import {
+  sharedLink
+} from '@/utils/ADempiere/constants/actionsMenuList.js'
+
 // utils and helper methods
-import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
+import { generateProcess, runProcess } from '@/utils/ADempiere/dictionary/process.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
 
 export default {
-  addProcessToList({ commit }, processResponse) {
+  addProcessToList({ commit, dispatch }, processResponse) {
     return new Promise(resolve => {
       commit('addProcessToList', processResponse)
+
+      dispatch('seProcessActionsMenu', {
+        containerUuid: processResponse.uuid
+      })
 
       resolve(processResponse)
     })
@@ -59,6 +68,33 @@ export default {
         .catch(error => {
           reject(error)
         })
+    })
+  },
+
+  /**
+   * Set actions menu to process
+   * @param {string} containerUuid
+   */
+  seProcessActionsMenu({ commit, getters }, {
+    containerUuid
+  }) {
+    const processDefinition = getters.getStoredProcess(containerUuid)
+
+    const actionsList = []
+
+    // execute process action
+    const actionExecute = {
+      ...runProcess,
+      description: processDefinition.description
+    }
+    actionsList.push(actionExecute)
+
+    // action shared link
+    actionsList.push(sharedLink)
+
+    commit('setActionMenu', {
+      containerUuid,
+      actionsList
     })
   },
 

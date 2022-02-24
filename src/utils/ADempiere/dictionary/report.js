@@ -15,6 +15,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import language from '@/lang'
+import store from '@/store'
+
+// utils and helpers methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
  * Suppoerted render files
@@ -45,13 +49,16 @@ export const reportFormatsList = [
 export const runReport = {
   name: language.t('actionMenu.generateReport'),
   description: language.t('actionMenu.generateDefaultReport'),
-  enabled: true,
+  enabled: () => {
+    // always active
+    return true
+  },
   svg: false,
   icon: 'el-icon-document',
   actionName: 'runReport',
   uuid: null,
-  runReport: ({ root, containerUuid }) => {
-    root.$store.dispatch('startReport', {
+  runReport: ({ containerUuid }) => {
+    store.dispatch('startReport', {
       containerUuid
     })
   }
@@ -60,14 +67,16 @@ export const runReport = {
 export const runReportAs = {
   name: language.t('actionMenu.generateReportAs'),
   description: language.t('actionMenu.generateReportAsOtherFormat'),
-  enabled: true,
+  enabled: ({ containerUuid }) => {
+    return !isEmptyValue(store.getters.getStoredReportExportTypes(containerUuid))
+  },
   svg: false,
   icon: 'el-icon-document',
   actionName: 'runReportAs',
   uuid: null,
   childs: [],
-  runReportAs: ({ root, containerUuid }) => {
-    root.$store.dispatch('startReport', {
+  runReportAs: ({ containerUuid }) => {
+    store.dispatch('startReport', {
       containerUuid
     })
   }
@@ -76,14 +85,16 @@ export const runReportAs = {
 export const runReportAsPrintFormat = {
   name: language.t('actionMenu.printFormats'),
   description: language.t('actionMenu.generateReportWithPrintFormat'),
-  enabled: true,
+  enabled: ({ containerUuid }) => {
+    return !isEmptyValue(store.getters.getPrintFormatList(containerUuid))
+  },
   svg: false,
   icon: 'el-icon-printer',
   actionName: 'runReportAsPrintFormat',
   uuid: null,
   childs: [],
-  runReportAsPrintFormat: ({ root, containerUuid }) => {
-    root.$store.dispatch('startReport', {
+  runReportAsPrintFormat: ({ containerUuid }) => {
+    store.dispatch('startReport', {
       containerUuid
     })
   }
@@ -92,14 +103,41 @@ export const runReportAsPrintFormat = {
 export const runReportAsView = {
   name: language.t('actionMenu.reportViews'),
   description: language.t('actionMenu.generateWithReportView'),
-  enabled: true,
+  enabled: ({ containerUuid }) => {
+    return !isEmptyValue(store.getters.getReportViewList(containerUuid))
+  },
   svg: false,
   icon: 'el-icon-data-analysis',
   actionName: 'runReportAsView',
   uuid: null,
   childs: [],
-  runReportAsView: ({ root, containerUuid }) => {
-    root.$store.dispatch('startReport', {
+  runReportAsView: ({ containerUuid }) => {
+    store.dispatch('startReport', {
+      containerUuid
+    })
+  }
+}
+
+/**
+ * Only used with report viewer
+ */
+export const changeParameters = {
+  name: language.t('actionMenu.changeParameters'),
+  description: language.t('actionMenu.changeParameters'),
+  // enabled: true,
+  enabled: ({ root }) => {
+    if (root.$route.name === 'Report Viewer') {
+      return true
+    }
+    return false
+  },
+  svg: false,
+  icon: 'el-icon-set-up',
+  actionName: 'runReportAsView',
+  uuid: null,
+  childs: [],
+  runReportAsView: ({ containerUuid }) => {
+    store.dispatch('startReport', {
       containerUuid
     })
   }
