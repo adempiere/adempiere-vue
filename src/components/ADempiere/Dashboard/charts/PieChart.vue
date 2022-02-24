@@ -120,6 +120,7 @@ export default {
 
       this.chart.setOption({
         tooltip: {
+          backgroundColor: '#FFF',
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },

@@ -165,6 +165,7 @@ export default {
           containLabel: true
         },
         tooltip: {
+          backgroundColor: '#FFF',
           trigger: 'axis',
           axisPointer: {
             type: 'cross'

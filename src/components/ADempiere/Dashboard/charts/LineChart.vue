@@ -159,9 +159,23 @@ export default {
         tooltip: {
           trigger: 'axis',
           axisPointer: {
-            type: 'cross'
+            type: 'cross',
+            labelTextColor: '#5eff00',
+            bodyColor: '#5eff00'
           },
-          padding: [5, 10]
+          backgroundColor: '#FFF',
+          labelTextColor: {
+            labelTextColor: '#5eff00',
+            bodyColor: '#5eff00'
+          },
+          // color: '#ff0000',
+          // textColor: '#ff0000',
+          // padding: [5, 10]
+          // labelTextColor() {
+          //   return '#5eff00'
+          // },
+          // labelTextColor: '#5eff00',
+          bodyColor: '#5eff00'
         },
         yAxis: {
           axisTick: {

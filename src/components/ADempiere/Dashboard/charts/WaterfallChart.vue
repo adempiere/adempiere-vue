@@ -112,6 +112,7 @@ export default {
       }
       this.chart.setOption({
         tooltip: {
+          backgroundColor: '#FFF',
           trigger: 'axis',
           axisPointer: {
             type: 'shadow'
