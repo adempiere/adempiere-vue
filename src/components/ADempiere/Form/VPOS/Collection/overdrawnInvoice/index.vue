@@ -427,6 +427,7 @@ export default {
       currentPaymentType: '',
       visiblePin: false,
       pinPostPayment: '',
+      emptyConversion: [],
       refundOptionVAlidate: {},
       currentBankAccount: ''
     }
@@ -708,8 +709,11 @@ export default {
       const clear = false
       this.clearAccountData(clear)
       this.currentFieldPaymentMethods = this.isEmptyValue(this.searchPaymentMethods) ? '' : this.searchPaymentMethods[0].uuid
+      const validateExistingConversion = this.emptyConversion.find(value => value.currency === this.selectionTypeRefund.refund_reference_currency)
       if (this.isEmptyValue(value) && !this.isEmptyValue(this.selectionTypeRefund) && this.showDialogo && !this.isEmptyValue(this.selectionTypeRefund.refund_reference_currency)) {
-        this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
+        if (!this.isEmptyValue(validateExistingConversion)) {
+          this.findRefundCurrencyConversion(this.selectionTypeRefund.refund_reference_currency)
+        }
       }
     },
     currentBusinessPartner(customerUuid) {
@@ -1505,6 +1509,12 @@ export default {
           currencyToUuid: currency.uuid,
           conversionDate: this.formatDateToSend(this.currentPointOfSales.currentOrder.dateOrdered)
         })
+          .then(response => {
+            this.emptyConversion.push({
+              ...response,
+              currency
+            })
+          })
       }
     }
   }
