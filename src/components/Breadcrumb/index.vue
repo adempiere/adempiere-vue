@@ -12,7 +12,7 @@
         </el-breadcrumb-item>
         <el-breadcrumb-item key="1">
           <el-popover placement="bottom" trigger="hover" class="breadcrumb-popover">
-            <el-dropdown-item v-for="(item, index) in dropdownList" :key="index" @click.native="handleLink(item)">
+            <el-dropdown-item v-for="(item, index) in dropdownList" :key="index" @click.native="handleLink(item, index)">
               {{ generateTitle(item.meta.title) }}
             </el-dropdown-item>
             <i slot="reference" class="el-icon-more" />
@@ -93,8 +93,8 @@ export default {
       const toPath = compile(path)
       return toPath(params)
     },
-    handleLink(item) {
-      if (this.$route.name !== item.name && !this.isEmptyValue(item.meta.alwaysShow)) {
+    handleLink(item, index) {
+      if (this.$route.name !== item.name && index > 0 || index === undefined && item.path === '/dashboard') {
         this.$router.push({
           name: item.name,
           params: {
