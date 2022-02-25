@@ -177,6 +177,16 @@
                       :span="8"
                     >
                       <field-definition
+                        v-if="isShowFieldBankAccount"
+                        :metadata-field="fieldsList[3]"
+                        :container-uuid="'Cash-Opening'"
+                        :container-manager="containerManager"
+                      />
+                    </el-col>
+                    <el-col
+                      :span="8"
+                    >
+                      <field-definition
                         :metadata-field="fieldsList[2]"
                         :container-uuid="'Cash-Withdrawal'"
                         :container-manager="containerManager"
@@ -243,6 +253,10 @@ export default {
       type: Object,
       default: undefined
     },
+    labelPanel: {
+      type: String,
+      default: ''
+    },
     metadata: {
       type: Object,
       default: () => {
@@ -251,6 +265,10 @@ export default {
           containerUuid: 'Cash-Withdrawal'
         }
       }
+    },
+    currentPanel: {
+      type: Object,
+      default: () => {}
     },
     shortkeyAction: {
       type: Boolean,
@@ -289,6 +307,10 @@ export default {
   },
 
   computed: {
+    isShowFieldBankAccount() {
+      const base = 'form.pos.optionsPoinSales.cashManagement.'
+      return this.$t(base + 'transfer') === this.$t(this.labelPanel) || this.$t(base + 'moneyIncome') === this.$t(this.labelPanel)
+    },
     listCurrency() {
       return this.$store.getters.getCurrenciesList
     },
@@ -916,11 +938,12 @@ export default {
         containerUuid: 'Cash-Withdrawal',
         format: 'object'
       })
-      this.$store.commit('setShowCashWithdrawl', false)
+      this.$store.commit(this.currentPanel.commit, false)
       this.$message({
         message: 'Acción a realizar',
         showClose: true
       })
+      console.log({ attribute })
       cashWithdrawal({
         posUuid: this.currentPointOfSales.uuid,
         collectingAgentUuid: attribute.CollectingAgent_ID_UUID,
@@ -936,7 +959,7 @@ export default {
           this.close()
         })
         .catch(error => {
-          this.$store.commit('setShowCashWithdrawl', true)
+          this.$store.commit(this.currentPanel.commit, true)
           this.$message({
             message: error.message,
             isShowClose: true,
@@ -1021,7 +1044,7 @@ export default {
     },
     close() {
       this.clearField()
-      this.$store.commit('setShowCashWithdrawl', false)
+      this.$store.commit(this.currentPanel.commit, false)
     }
   }
 }

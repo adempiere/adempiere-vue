@@ -78,6 +78,7 @@ export default {
     posUuid,
     customerUuid,
     documentTypeUuid,
+    discountAmount,
     campaignUuid
   }) {
     const isCompleted = rootGetters.posAttributes.currentPointOfSales.currentOrder.isProcessed
@@ -89,6 +90,7 @@ export default {
       orderUuid,
       posUuid,
       documentTypeUuid,
+      discountAmount,
       customerUuid,
       priceListUuid: currentPriceList.uuid,
       warehouseUuid: currentWarehouse.uuid,

@@ -111,6 +111,7 @@ export function updateOrder({
   documentTypeUuid,
   description,
   priceListUuid,
+  discountAmount,
   warehouseUuid,
   campaignUuid
 }) {
@@ -125,6 +126,7 @@ export function updateOrder({
       description,
       price_list_uuid: priceListUuid,
       warehouse_uuid: warehouseUuid,
+      discount_rate: discountAmount,
       campaign_uuid: campaignUuid
     }
   })

@@ -55,5 +55,14 @@ export default [
       handleContentSelection: true,
       size: 24
     }
+  },
+  {
+    fieldUuid: '8db541f0-fb40-11e8-a479-7a0060f0aa01',
+    uuid: '8db541f0-fb40-11e8-a479-7a0060f0aa01',
+    isFromDictionary: true,
+    overwriteDefinition: {
+      isCustomField: true,
+      size: 24
+    }
   }
 ]

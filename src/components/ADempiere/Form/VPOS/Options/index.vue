@@ -247,30 +247,30 @@
               </el-popover>
             </el-card>
           </el-col>
-          <el-col v-if="isDisplayCount" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
                 v-model="showCount"
                 width="350"
-                :title="$t('form.pos.discountRate')"
+                :title="$t('form.pos.applyDiscountOnOrder')"
                 placement="top"
               >
                 <div style="padding: 20px;">
-                  <el-input-number v-model="count" :min="0" :controls="false" :max="100" style="width: auto;" />
-                  <div style="text-align: right; margin: 0">
-                    <el-button
-                      type="danger"
-                      class="custom-button-create-bp"
-                      icon="el-icon-close"
-                      @click="showCount = false"
-                    />
-                    <el-button
-                      type="primary"
-                      class="custom-button-create-bp"
-                      icon="el-icon-check"
-                      @click="addCount(count)"
-                    />
-                  </div>
+                  <el-input-number v-model="discountAmount" :min="0" :controls="false" :max="100" style="width: auto;" />
+                </div>
+                <div style="text-align: right; margin: 0">
+                  <el-button
+                    type="danger"
+                    class="custom-button-create-bp"
+                    icon="el-icon-close"
+                    @click="showCount = false"
+                  />
+                  <el-button
+                    type="primary"
+                    class="custom-button-create-bp"
+                    icon="el-icon-check"
+                    @click="addCount(discountAmount)"
+                  />
                 </div>
                 <el-button
                   slot="reference"
@@ -430,6 +430,8 @@
       <component
         :is="isComponentRender"
         :shortkey-action="isAction"
+        :label-panel="isLabelPanel"
+        :current-panel="isOpenPanel"
       />
     </el-dialog>
   </div>
@@ -495,7 +497,7 @@ export default {
       validatePin: true,
       visible: false,
       showCount: false,
-      count: 0,
+      discountAmount: 0,
       visibleReverse: false,
       isLoadingReverse: false,
       showFieldListOrder: false,
@@ -1086,12 +1088,25 @@ export default {
           this.newOrder()
         })
     },
-    addCount(count) {
+    addCount(discountAmount) {
+      this.$message({
+        message: 'Acción a realizar',
+        showClose: true
+      })
       this.$store.dispatch('updateOrder', {
         orderUuid: this.currentOrder.uuid,
         posUuid: this.currentPointOfSales.uuid,
-        count
+        discountAmount,
+        isDiscountOrder: true
       })
+        .then(response => {
+          console.log({ response })
+          this.$message({
+            type: 'success',
+            showClose: true,
+            message: 'ok'
+          })
+        })
       this.showCount = false
     },
     seeOrderList() {
