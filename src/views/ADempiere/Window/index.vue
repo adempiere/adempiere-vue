@@ -37,6 +37,7 @@
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
+import store from '@/store'
 
 // components and mixins
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
@@ -45,6 +46,7 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import { READ_ONLY_FORM_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'
 
 // utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { convertWindow } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import {
   generateWindow,
@@ -84,10 +86,10 @@ export default defineComponent({
   setup(props, { root }) {
     let containerManagerWindow = {
       getPanel({ parentUuid, containerUuid }) {
-        return root.$store.getters.getStoredTab(parentUuid, containerUuid)
+        return store.getters.getStoredTab(parentUuid, containerUuid)
       },
       getFieldsList: ({ parentUuid, containerUuid }) => {
-        return root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
+        return store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
       },
 
       actionPerformed: function(eventInfo) {
@@ -96,7 +98,7 @@ export default defineComponent({
       },
 
       setDefaultValues: ({ parentUuid, containerUuid }) => {
-        root.$store.dispatch('setTabDefaultValues', {
+        store.dispatch('setTabDefaultValues', {
           parentUuid,
           containerUuid
         })
@@ -126,7 +128,7 @@ export default defineComponent({
       }) {
         if (isWithRecord) {
           // evaluate client id context with record
-          const preferenceClientId = root.$store.getters.getPreferenceClientId
+          const preferenceClientId = store.getters.getPreferenceClientId
           if (preferenceClientId !== clientId) {
             return true
           }
@@ -163,13 +165,13 @@ export default defineComponent({
         }
 
         // not updateable and record saved
-        const isWithRecord = !root.isEmptyValue(row.UUID)
+        const isWithRecord = !isEmptyValue(row.UUID)
         if (!field.isUpdateable && isWithRecord) {
           return true
         }
 
         // evaluate client id context with record
-        const preferenceClientId = root.$store.getters.getPreferenceClientId
+        const preferenceClientId = store.getters.getPreferenceClientId
         if (preferenceClientId !== parseInt(row.AD_Client_ID, 10) && isWithRecord) {
           return true
         }
@@ -196,7 +198,7 @@ export default defineComponent({
       isMandatoryColumn,
 
       getRow: ({ containerUuid, rowIndex, rowUuid }) => {
-        return root.$store.getters.getTabRowData({
+        return store.getters.getTabRowData({
           containerUuid,
           rowIndex,
           rowUuid
@@ -204,7 +206,7 @@ export default defineComponent({
       },
 
       getCell: ({ containerUuid, rowIndex, rowUuid, columnName }) => {
-        return root.$store.getters.getTabCellData({
+        return store.getters.getTabCellData({
           containerUuid,
           rowIndex,
           rowUuid,
@@ -216,7 +218,7 @@ export default defineComponent({
         containerUuid,
         recordsSelected
       }) => {
-        root.$store.commit('setTabSelectionsList', {
+        store.commit('setTabSelectionsList', {
           containerUuid,
           selectionsList: recordsSelected
         })
@@ -224,13 +226,13 @@ export default defineComponent({
       getSelection: ({
         containerUuid
       }) => {
-        return root.$store.getters.getTabSelectionsList({
+        return store.getters.getTabSelectionsList({
           containerUuid
         })
       },
 
       changeFieldShowedFromUser({ parentUuid, containerUuid, fieldsShowed }) {
-        root.$store.dispatch('changeTabFieldShowedFromUser', {
+        store.dispatch('changeTabFieldShowedFromUser', {
           parentUuid,
           containerUuid,
           fieldsShowed
@@ -239,7 +241,7 @@ export default defineComponent({
 
     }
 
-    if (!root.isEmptyValue(props.containerManager)) {
+    if (!isEmptyValue(props.containerManager)) {
       containerManagerWindow = {
         ...containerManagerWindow,
         // overwirte methods
@@ -252,12 +254,12 @@ export default defineComponent({
 
     let windowUuid = root.$route.meta.uuid
     // set uuid from test
-    if (!root.isEmptyValue(props.uuid)) {
+    if (!isEmptyValue(props.uuid)) {
       windowUuid = props.uuid
     }
 
     const storedWindow = computed(() => {
-      return root.$store.getters.getStoredWindow(windowUuid)
+      return store.getters.getStoredWindow(windowUuid)
     })
 
     function setLoadWindow(window) {
@@ -268,18 +270,18 @@ export default defineComponent({
     // get window from vuex store or request from server
     function getWindow() {
       let window = storedWindow.value
-      if (!root.isEmptyValue(window)) {
+      if (!isEmptyValue(window)) {
         setLoadWindow(window)
         return
       }
       // metadata props use for test
-      if (!root.isEmptyValue(props.metadata)) {
+      if (!isEmptyValue(props.metadata)) {
         // from server response
         window = convertWindow(props.metadata)
         // add apps properties
         window = generateWindow(window)
         // add into store
-        return root.$store.dispatch('addWindow', window)
+        return store.dispatch('addWindow', window)
           .then(windowResponse => {
             // to obtain the load effect
             setTimeout(() => {
@@ -287,7 +289,7 @@ export default defineComponent({
             }, 1000)
           })
       }
-      root.$store.dispatch('getWindowDefinitionFromServer', {
+      store.dispatch('getWindowDefinitionFromServer', {
         uuid: windowUuid
       })
         .then(windowResponse => {

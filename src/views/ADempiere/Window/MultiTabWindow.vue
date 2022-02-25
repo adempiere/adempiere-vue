@@ -21,6 +21,8 @@
     <!-- // TODO: Add header window component for auxiliary menu and worflow status -->
     <action-menu
       :parent-uuid="windowMetadata.uuid"
+      :container-uuid="currentTabUuid"
+      :container-manager="containerManager"
       :references-manager="referencesManager"
       :actions-manager="actionsManager"
       :relations-manager="relationsManager"
@@ -44,6 +46,9 @@
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
+import lang from '@/lang'
+import router from '@/router'
+import store from '@/store'
 
 // components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
@@ -51,7 +56,7 @@ import TabManager from '@/components/ADempiere/TabManager/index.vue'
 
 // utils and helpers methods
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
-import { createNewRecord, deleteRecord, sharedLink, refreshRecords } from '@/utils/ADempiere/constants/actionsMenuList'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 export default defineComponent({
   name: 'MultiTabWindow',
@@ -74,37 +79,37 @@ export default defineComponent({
 
   setup(props, { root }) {
     const isWithChildsTab = computed(() => {
-      return !root.isEmptyValue(props.windowMetadata.tabsListChild)
+      return !isEmptyValue(props.windowMetadata.tabsListChild)
     })
 
     const containerManager = {
       ...props.windowManager,
 
       actionPerformed: ({ field, value }) => {
-        return root.$store.dispatch('actionPerformed', {
+        return store.dispatch('actionPerformed', {
           field,
           value
         })
           .then(response => {
             if (response.type === 'createEntity') {
-              root.$router.push({
+              router.push({
                 name: root.$route.name,
                 query: {
                   ...root.$route.query,
                   action: response.uuid
                 },
                 params: {
-                  ...root.$router.params,
+                  ...root.$route.params,
                   recordId: response.id
                 }
               }, () => {})
             }
 
             const { parentUuid, containerUuid } = field
-            const tab = root.$store.getters.getStoredTab(parentUuid, containerUuid)
+            const tab = store.getters.getStoredTab(parentUuid, containerUuid)
 
             // set response values
-            root.$store.dispatch('updateValuesOfContainer', {
+            store.dispatch('updateValuesOfContainer', {
               parentUuid,
               containerUuid,
               isOverWriteParent: tab.isParentTab,
@@ -114,31 +119,31 @@ export default defineComponent({
       },
 
       seekRecord: ({ row, tableName, parentUuid, containerUuid }) => {
-        if (root.isEmptyValue(row)) {
-          root.$store.dispatch('setTabDefaultValues', {
+        if (isEmptyValue(row)) {
+          store.dispatch('setTabDefaultValues', {
             parentUuid,
             containerUuid
           })
           return
         }
-        const tab = root.$store.getters.getStoredTab(parentUuid, containerUuid)
+        const tab = store.getters.getStoredTab(parentUuid, containerUuid)
         if (tab.isParentTab) {
-          root.$router.push({
+          router.push({
             name: root.$route.name,
             query: {
               ...root.$route.query,
               action: row.UUID
             },
             params: {
-              ...root.$router.params,
+              ...root.$route.params,
               tableName,
               recordId: row[`${tableName}_ID`]
             }
           }, () => {})
         }
 
-        const fieldsList = root.$store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
-        const defaultValues = root.$store.getters.getParsedDefaultValues({
+        const fieldsList = store.getters.getStoredFieldsFromTab(parentUuid, containerUuid)
+        const defaultValues = store.getters.getParsedDefaultValues({
           parentUuid,
           containerUuid,
           isSOTrxMenu: root.$route.meta.isSalesTransaction,
@@ -150,7 +155,7 @@ export default defineComponent({
           object: Object.assign(defaultValues, row)
         })
 
-        root.$store.dispatch('notifyPanelChange', {
+        store.dispatch('notifyPanelChange', {
           parentUuid,
           containerUuid,
           attributes,
@@ -160,7 +165,7 @@ export default defineComponent({
         // active logics with set records values
         fieldsList.forEach(field => {
           // change Dependents
-          root.$store.dispatch('changeDependentFieldsList', {
+          store.dispatch('changeDependentFieldsList', {
             field,
             fieldsList
           })
@@ -178,7 +183,7 @@ export default defineComponent({
         containerUuid,
         pageNumber = 0
       }) => {
-        root.$store.dispatch('getEntities', {
+        store.dispatch('getEntities', {
           parentUuid,
           containerUuid,
           pageNumber
@@ -190,14 +195,13 @@ export default defineComponent({
       parentUuid: props.windowMetadata.uuid,
       containerUuid: props.windowMetadata.currentTabUuid,
 
-      defaultActionName: root.$t('actionMenu.createNewRecord'),
+      defaultActionName: lang.t('actionMenu.createNewRecord'),
 
-      getActionList: () => [
-        createNewRecord,
-        refreshRecords,
-        deleteRecord,
-        sharedLink
-      ]
+      getActionList: () => {
+        return store.getters.getStoredActionsMenu({
+          containerUuid: props.windowMetadata.currentTabUuid
+        })
+      }
     })
 
     const referencesManager = ref({
@@ -205,7 +209,7 @@ export default defineComponent({
         const tabUuid = props.windowMetadata.currentTabUuid
         const windowUuid = props.windowMetadata.uuid
 
-        return root.$store.getters.getTableName(windowUuid, tabUuid)
+        return store.getters.getTableName(windowUuid, tabUuid)
       }
     })
 
@@ -214,6 +218,7 @@ export default defineComponent({
     })
 
     return {
+      currentTabUuid: props.windowMetadata.currentTabUuid,
       actionsManager,
       referencesManager,
       relationsManager,

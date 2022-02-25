@@ -21,12 +21,28 @@ import { requestWindowMetadata } from '@/api/ADempiere/dictionary/window.js'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { generateWindow } from '@/utils/ADempiere/dictionary/window.js'
+import {
+  generateWindow,
+  createNewRecord,
+  deleteRecord,
+  runProcessOfWindow,
+  refreshRecords
+} from '@/utils/ADempiere/dictionary/window.js'
+import {
+  sharedLink
+} from '@/utils/ADempiere/constants/actionsMenuList.js'
 
 export default {
-  addWindow({ commit }, windowResponse) {
+  addWindow({ commit, dispatch }, windowResponse) {
     return new Promise(resolve => {
       commit('addWindowToList', windowResponse)
+
+      windowResponse.tabsList.forEach(tab => {
+        dispatch('setTabActionsMenu', {
+          parentUuid: windowResponse.uuid,
+          containerUuid: tab.uuid
+        })
+      })
 
       resolve(windowResponse)
     })
@@ -45,6 +61,39 @@ export default {
 
           resolve(window)
         })
+    })
+  },
+
+  setTabActionsMenu({ commit, getters }, {
+    parentUuid,
+    containerUuid
+  }) {
+    const tabDefinition = getters.getStoredTab(parentUuid, containerUuid)
+
+    const actionsList = []
+
+    actionsList.push(createNewRecord)
+
+    if (!isEmptyValue(tabDefinition.processes)) {
+      tabDefinition.processes.forEach(process => {
+        const { uuid, name, description } = process
+
+        actionsList.push({
+          ...runProcessOfWindow,
+          uuid,
+          name,
+          description
+        })
+      })
+    }
+
+    actionsList.push(deleteRecord)
+    actionsList.push(refreshRecords)
+    actionsList.push(sharedLink)
+
+    commit('setActionMenu', {
+      containerUuid: tabDefinition.uuid,
+      actionsList
     })
   },
 

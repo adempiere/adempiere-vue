@@ -31,7 +31,6 @@ import { defineComponent } from '@vue/composition-api'
 import WindowView from '@/views/ADempiere/Window'
 import multiTabMetadata from './multiTabWindow.json'
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
-import { createNewRecord, deleteRecord, sharedLink, refreshRecords } from '@/utils/ADempiere/constants/actionsMenuList'
 
 export default defineComponent({
   name: 'TestWindow',
@@ -97,24 +96,7 @@ export default defineComponent({
 
       // current tab properties
       actionsManager: {
-        actionsList: ({ tableName, uuid }) => {
-          const actionsList = [
-            createNewRecord,
-            {
-              ...refreshRecords,
-              callBack: () => {
-                root.$store.dispatch('getEntities', {
-                  parentUuid: props.parentUuid,
-                  containerUuid: uuid
-                })
-              }
-            },
-            deleteRecord,
-            sharedLink
-          ]
-
-          return actionsList
-        }
+        actionsList: ({ tableName, uuid }) => []
       }
     }
 

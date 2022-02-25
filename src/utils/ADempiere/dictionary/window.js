@@ -14,10 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import lang from '@/lang'
+import store from '@/store'
+
 // utils and helpers methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { generatePanelAndFields } from '@/utils/ADempiere/dictionary/panel.js'
 import { isHiddenField } from '@/utils/ADempiere/references.js'
+import { showMessage } from '@/utils/ADempiere/notification.js'
 
 /**
  * Is displayed field in panel single record
@@ -70,6 +74,163 @@ export function isMandatoryColumn({ isMandatory, isMandatoryFromLogic }) {
 
 export function isReadOnlyColumn({ isReadOnly }) {
   return isReadOnly
+}
+
+/**
+ * Create new record
+ */
+export const createNewRecord = {
+  sequence: 0,
+  name: lang.t('actionMenu.createNewRecord'),
+  type: 'setDefaultValues',
+  enabled: ({ parentUuid, containerUuid }) => {
+    return !isEmptyValue(
+      store.getters.getUuidOfContainer(containerUuid)
+    )
+  },
+  svg: false,
+  icon: 'el-icon-circle-plus-outline',
+  actionName: 'createNewRecord',
+  createNewRecord: ({ parentUuid, containerUuid }) => {
+    store.dispatch('setTabDefaultValues', {
+      parentUuid,
+      containerUuid
+    })
+  }
+}
+
+export const undoChange = {
+  sequence: 0,
+  name: lang.t('actionMenu.createNewRecord'),
+  type: 'undoModifyData',
+  enabled: ({ parentUuid, containerUuid }) => {
+    return isEmptyValue(
+      store.getters.getUuidOfContainer(containerUuid)
+    )
+  },
+  svg: false,
+  icon: 'el-icon-circle-plus-outline',
+  actionName: 'undoChange',
+  undoChange: ({ parentUuid, containerUuid }) => {
+  }
+}
+
+/**
+ * Delete record (entity) with record
+ */
+export const deleteRecord = {
+  name: lang.t('actionMenu.deleteRecord'),
+  enabled: ({ parentUuid, containerUuid }) => {
+    return !isEmptyValue(
+      store.getters.getUuidOfContainer(containerUuid)
+    )
+  },
+  svg: false,
+  icon: 'el-icon-delete',
+  type: 'deleteEntity',
+  actionName: 'deleteRecord',
+  deleteRecord: ({ parentUuid, containerUuid, recordId, recordUuid }) => {
+    store.dispatch('deleteEntity', {
+      parentUuid,
+      containerUuid,
+      recordId,
+      recordUuid
+    })
+      .then(() => {
+        showMessage({
+          message: lang.t('recordManager.deleteRecordSuccessful'),
+          type: 'success'
+        })
+      })
+      .catch(error => {
+        showMessage({
+          message: lang.t('recordManager.deleteRecordError'),
+          type: 'error'
+        })
+        console.warn(`Delete Entity - Error ${error.message}, Code: ${error.code}.`)
+      })
+  }
+}
+
+export const runProcessOfWindow = {
+  name: lang.t('actionMenu.runProcess'),
+  enabled: ({ parentUuid, containerUuid }) => {
+    return !isEmptyValue(
+      store.getters.getUuidOfContainer(containerUuid)
+    )
+  },
+  svg: false,
+  icon: 'el-icon-setting',
+  actionName: 'runProcessOfWindow',
+  uuid: null,
+  runProcessOfWindow: ({ parentUuid, containerUuid, uuid }) => {
+    store.dispatch('startProcessOfWindow', {
+      parentUuid,
+      containerUuid,
+      uuid
+    })
+  }
+}
+
+export const refreshRecords = {
+  name: lang.t('actionMenu.refreshRecords'),
+  enabled: () => {
+    return true
+  },
+  svg: false,
+  icon: 'el-icon-refresh',
+  actionName: 'refreshRecords',
+  refreshRecords: ({ parentUuid, containerUuid }) => {
+    // used to window
+    store.dispatch('getEntities', {
+      parentUuid,
+      containerUuid
+    })
+  }
+}
+
+export const lockRecord = {
+  name: lang.t('actionMenu.refreshRecords'),
+  type: 'lockRecord',
+  enabled: ({ parentUuid, containerUuid }) => {
+    return !isEmptyValue(
+      store.getters.getUuidOfContainer(containerUuid)
+    )
+  },
+  svg: false,
+  icon: 'el-icon-lock',
+  actionName: 'lockRecord',
+  lockRecord: ({ parentUuid, containerUuid, tableName }) => {
+  }
+}
+
+export const unlockRecord = {
+  name: lang.t('actionMenu.refreshRecords'),
+  type: 'unlockRecord',
+  enabled: ({ parentUuid, containerUuid }) => {
+    return !isEmptyValue(
+      store.getters.getUuidOfContainer(containerUuid)
+    )
+  },
+  svg: false,
+  icon: 'el-icon-unlock',
+  actionName: 'unlockRecord',
+  unlockRecord: ({ parentUuid, containerUuid, tableName }) => {
+  }
+}
+
+export const recordAccess = {
+  name: lang.t('actionMenu.refreshRecords'),
+  enabled: ({ parentUuid, containerUuid }) => {
+    return !isEmptyValue(
+      store.getters.getUuidOfContainer(containerUuid)
+    )
+  },
+  svg: false,
+  icon: 'el-icon-c-scale-to-original',
+  actionName: 'recordAccess',
+  recordAccess: ({ parentUuid, containerUuid, tableName }) => {
+  }
 }
 
 /**
