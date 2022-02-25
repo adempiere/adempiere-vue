@@ -16,18 +16,19 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <div v-loading.fullscreen.lock="isIdle" />
+  <div v-if="userTimeout > 0" v-loading.fullscreen.lock="isIdle" />
 </template>
 
 <script>
-import { config } from '@/utils/ADempiere/config'
 import Vue from 'vue'
 import IdleVue from 'idle-vue'
 import store from '../../../store'
+
+const connectionTimeout = (store.getters['user/userInfo'].connection_timeout > 0) ? store.getters['user/userInfo'].connection_timeout : 1000
 Vue.use(IdleVue, {
   eventEmitter: new Vue(),
   store,
-  idleTime: `${config.session.timeout}`,
+  idleTime: `${connectionTimeout}`,
   startAtIdle: false
 })
 export default {
@@ -64,9 +65,9 @@ export default {
   },
   created() {
     setInterval(() => {
-      this.time -= 1000
+      this.time -= this.userTimeout
       if (!this.$store.state.idleVue.isIdle) clearInterval()
-      if (this.time < 1 && this.isSession && this.userTimeout > 0) {
+      if (this.time < 1 && this.isSession) {
         clearInterval()
         this.logout()
       }
