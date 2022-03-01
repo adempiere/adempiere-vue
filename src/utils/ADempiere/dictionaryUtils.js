@@ -166,9 +166,6 @@ export function generateField({
     size: componentReference.size || DEFAULT_SIZE,
     displayColumnName: `DisplayColumn_${columnName}`, // key to display column
     // value attributes
-    value: String(parsedDefaultValue).trim() === '' ? undefined : parsedDefaultValue,
-    oldValue: parsedDefaultValue,
-    valueTo: parsedDefaultValueTo,
     parsedDefaultValue,
     parsedDefaultValueTo,
     // logics to app (isDisplayedFromLogic, isMandatoryFromLogic, isReadOnlyFromLogic)

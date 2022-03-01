@@ -122,7 +122,7 @@ import fieldsListOrders from './fieldsListOrders.js'
 // components and mixins
 import FindOrders from './FindOrders'
 import FieldDefinition from '@/components/ADempiere/Field'
-import CustomPagination from '@/components/ADempiere/Pagination'
+import CustomPagination from '@/components/ADempiere/DefaultTable/CustomPagination.vue'
 import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 // api request methods

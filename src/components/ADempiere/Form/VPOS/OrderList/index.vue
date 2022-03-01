@@ -260,7 +260,7 @@ import fieldsListOrders from './fieldsListOrders.js'
 
 // components and mixins
 import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
-import CustomPagination from '@/components/ADempiere/Pagination'
+import CustomPagination from '@/components/ADempiere/DefaultTable/CustomPagination.vue'
 import FieldDefinition from '@/components/ADempiere/Field/index.vue'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 
