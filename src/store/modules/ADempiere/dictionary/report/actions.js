@@ -77,6 +77,19 @@ export default {
           })
 
           resolve(reportDefinition)
+
+          dispatch('setModalDialog', {
+            containerUuid: uuid,
+            title: reportDefinition.name,
+            doneMethod: () => {
+              dispatch('startReport', {
+                containerUuid: uuid
+              })
+            },
+            // TODO: Change to string and import dynamic in component
+            componentPath: () => import('@/components/ADempiere/PanelDefinition/index.vue'),
+            isShowed: false
+          })
         })
         .catch(error => {
           reject(error)

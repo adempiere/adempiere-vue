@@ -48,14 +48,10 @@
       </el-col>
     </el-row>
 
-    <!--
     <modal-dialog
-      :metadata="storedReportDefinition"
-      :parent-uuid="$route.params.reportUuid"
-      :report-export-type="reportFormat"
-      :panel-type="panelType"
+      :container-manager="containerManager"
+      :container-uuid="reportUuid"
     />
-    -->
   </div>
 
   <loading-view
@@ -75,7 +71,7 @@ import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import FileRender from '@/components/ADempiere/FileRender/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import mixinReport from '@/views/ADempiere/Report/mixinReport.js'
-// import ModalDialog from '@/components/ADempiere/Dialog/index.vue'
+import ModalDialog from '@/components/ADempiere/ModalDialog/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
 // utils and helper methods
@@ -90,7 +86,7 @@ export default defineComponent({
     FileRender,
     LoadingView,
     ActionMenu,
-    // ModalDialog,
+    ModalDialog,
     TitleAndHelp
   },
 

@@ -133,12 +133,13 @@ export const changeParameters = {
   },
   svg: false,
   icon: 'el-icon-set-up',
-  actionName: 'runReportAsView',
+  actionName: 'changeParameters',
   uuid: null,
   childs: [],
-  runReportAsView: ({ containerUuid }) => {
-    store.dispatch('startReport', {
-      containerUuid
+  changeParameters: ({ containerUuid }) => {
+    store.commit('setShowedModalDialog', {
+      containerUuid,
+      isShowed: true
     })
   }
 }

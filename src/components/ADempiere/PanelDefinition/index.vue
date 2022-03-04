@@ -46,10 +46,6 @@ export default defineComponent({
       type: Object,
       required: true
     },
-    panelMetadata: {
-      type: Object,
-      required: false
-    },
     isShowFilter: {
       type: Boolean,
       default: true
@@ -75,6 +71,12 @@ export default defineComponent({
      * the fields it contains
      */
     const getPanel = () => {
+      if (props.containerManager && props.containerManager.getPanel) {
+        metadata.value = props.containerManager.getPanel({
+          containerUuid: props.containerUuid
+        })
+        return
+      }
       // generated panel properties
       // set panel genereated
       metadata.value = props.panelMetadata
