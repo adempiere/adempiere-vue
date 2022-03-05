@@ -35,6 +35,8 @@ const actionMenu = {
   generateReportWithPrintFormat: 'Cambiar formato de impresión para generar',
   reportViews: 'Vistas de Reporte',
   generateWithReportView: 'Cambiar vista de reporte para generar',
+  // browser
+  exportSelectedRecords: 'Exportar Registros Seleccionados',
   // relations
   relations: 'Relaciones',
   withoutRelations: 'Sin Relaciones',

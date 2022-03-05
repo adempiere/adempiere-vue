@@ -21,6 +21,7 @@ import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser
 
 // constants
 import {
+  exportRecordsSelected,
   sharedLink
 } from '@/utils/ADempiere/constants/actionsMenuList'
 
@@ -91,6 +92,9 @@ export default {
 
       actionsList.push(actionProcess)
     }
+
+    // export selected records
+    actionsList.push(exportRecordsSelected)
 
     // action refresh browser search
     actionsList.push(refreshBrowserSearh)

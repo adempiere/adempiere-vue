@@ -196,14 +196,6 @@ export default {
     printFormat: 'Formatos de Impresión',
     drillTable: 'Entrar en Detalle'
   },
-  report: {
-    ExportXlsx: '(xlsx) Extencion de Archivo Excel',
-    ExportXls: '(xls) Archivo Excel',
-    ExporXml: '(xml) Archivo Lenguaje de marcas Extensible',
-    ExporCsv: '(csv) Archivo Separado por Coma',
-    ExportTxt: '(txt) Archivo de Texto Delimitado por Tabuladores',
-    ExportHtml: '(html) Lenguaje de Marcas de Hipertexto'
-  },
   table: {
     ProcessActivity: {
       Name: 'Nombre',

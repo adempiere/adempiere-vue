@@ -15,7 +15,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import language from '@/lang'
+import store from '@/store'
+import router from '@/router'
+
+// utils and helpers methods
+import { clientDateTime } from '@/utils/ADempiere/formatValue/dateFormat.js'
 import { copyToClipboard } from '@/utils/ADempiere/coreUtils.js'
+import { exportFileFromJson, supportedTypes } from '@/utils/ADempiere/exportUtil.js'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
  * Shared url link
@@ -31,14 +38,14 @@ export const sharedLink = {
   icon: 'el-icon-share',
   actionName: 'sharedLink',
   sharedLink: ({ root, parentUuid, containerUuid }) => {
-    const viewValues = root.$store.getters.getValuesViewType({
+    const viewValues = store.getters.getValuesViewType({
       parentUuid,
       containerUuid
     })
 
     const pairsValues = Array.from(viewValues.values())
 
-    root.$router.push({
+    router.push({
       name: root.$route.name,
       params: {
         ...root.$route.params
@@ -57,4 +64,82 @@ export const sharedLink = {
       isShowMessage: true
     })
   }
+}
+
+export const exportRecords = ({ parentUuid, containerUuid, containerManager, formatToExport = 'json' }) => {
+  const selection = containerManager.getSelection({
+    containerUuid
+  })
+
+  const fieldsListAvailable = containerManager.getFieldsList({
+    containerUuid
+  }).filter(fieldItem => {
+    const isDisplayed = fieldItem.isDisplayed || fieldItem.isDisplayedFromLogic
+    if (fieldItem.isActive && isDisplayed && !fieldItem.isKey) {
+      return fieldItem
+    }
+  })
+
+  const columnsAvalable = fieldsListAvailable.map(fieldItem => {
+    if (fieldItem.componentPath === 'FieldSelect') {
+      return fieldItem.displayColumnName
+    }
+    return fieldItem.columnName
+  })
+
+  const headerList = fieldsListAvailable.map(fieldItem => {
+    return fieldItem.name
+  })
+
+  // filter only showed columns
+  const data = selection.map(row => {
+    const newRow = {}
+    columnsAvalable.forEach(column => {
+      newRow[column] = row[column]
+    })
+    return newRow
+  })
+
+  const title = containerManager.getPanel({
+    parentUuid,
+    containerUuid
+  }).name
+
+  exportFileFromJson({
+    header: headerList,
+    data,
+    fileName: `${title} ${clientDateTime()}`,
+    exportType: formatToExport
+  })
+}
+
+export const exportRecordsSelected = {
+  name: language.t('actionMenu.exportSelectedRecords'),
+  enabled: ({ containerUuid, containerManager }) => {
+    const selection = containerManager.getSelection({
+      containerUuid
+    })
+
+    return !isEmptyValue(selection)
+  },
+  svg: false,
+  icon: 'el-icon-download',
+  actionName: 'exportRecordsSelected',
+  exportRecordsSelected: exportRecords,
+  // generate export formats
+  childs: Object.keys(supportedTypes).map(format => {
+    return {
+      name: supportedTypes[format],
+      enabled: ({ containerUuid, containerManager }) => {
+        return true
+      },
+      svg: false,
+      icon: 'el-icon-download',
+      actionName: 'exportRecordsSelected',
+      exportRecordsSelected: ({ root, containerUuid, containerManager }) => {
+        // change default format to current format
+        exportRecords({ root, containerUuid, containerManager, formatToExport: format })
+      }
+    }
+  })
 }

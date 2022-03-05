@@ -196,14 +196,6 @@ export default {
     printFormat: 'Print Formats',
     drillTable: 'Drill Down'
   },
-  report: {
-    ExportXlsx: '(xlsx) Excel File Extension',
-    ExportXls: '(xls) Excel File',
-    ExporXml: '(xml) Extensible Markup Language File',
-    ExporCsv: '(csv) Archivo separado por coma',
-    ExportTxt: '(txt) Tab Delimited Text File',
-    ExportHtml: '(html) Hypertext Markup Language'
-  },
   table: {
     ProcessActivity: {
       Name: 'Name',

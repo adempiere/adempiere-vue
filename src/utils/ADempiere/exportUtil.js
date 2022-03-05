@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// utils and helper methods
 import { export_json_to_excel } from '@/vendor/Export2Excel'
 import { export_txt_to_zip } from '@/vendor/Export2Zip'
 import language from '@/lang'
@@ -22,12 +23,14 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 // export file with records
 export const supportedTypes = {
-  xlsx: language.t('report.ExportXlsx'),
-  xls: language.t('report.ExportXls'),
-  xml: language.t('report.ExporXml'),
-  csv: language.t('report.ExporCsv'),
-  txt: language.t('report.ExportTxt'),
-  html: language.t('report.ExportHtml')
+  csv: language.t('extensionFile.csv'),
+  html: language.t('extensionFile.html'),
+  json: language.t('extensionFile.json'),
+  ods: language.t('extensionFile.ods'),
+  rtf: language.t('extensionFile.rtf'),
+  txt: language.t('extensionFile.txt'),
+  xls: language.t('extensionFile.xls'),
+  xlsx: language.t('extensionFile.xlsx')
 }
 
 /**
@@ -37,7 +40,6 @@ export const supportedTypes = {
  * @returns array
  */
 export function cellFromJson({
-  header,
   data,
   isFormat = false
 }) {
@@ -46,13 +48,17 @@ export function cellFromJson({
     // return Object.values(row)
 
     // loop header convert as value
-    return header.map(column => {
+    Object.keys(row).forEach(column => {
+      const currentValue = row[column]
       // translate boolean
       if (isFormat && typeof row[column] === 'boolean') {
-        return convertBooleanToTranslationLang(row[column])
+        row[column] = convertBooleanToTranslationLang(currentValue)
       }
-      return row[column]
+
+      row[column] = currentValue
     })
+
+    return row
   })
 }
 
@@ -60,8 +66,8 @@ export function cellFromJson({
  * Export data from json
  * @param {array} header
  * @param {array} data array of object (json format)
- * @param {string} exportType, supportedTypes array
- * @param {string} fileName .xlsx file name
+ * @param {string} exportType, supportedTypes json, xlsx, xlsm, xlsb, xls, xla, biff8, biff5, biff2, xlml, ods, fods, csv, txt, sylk, html, dif, rtf, prn, eth
+ * @param {string} fileName .json file name
  */
 export function exportFileFromJson({
   header,
@@ -70,15 +76,39 @@ export function exportFileFromJson({
   exportType,
   fileName = 'xlsx'
 }) {
-  data = cellFromJson({
-    header,
-    isFormat,
-    data
+  let newData = data
+  if (isFormat) {
+    newData = cellFromJson({
+      isFormat,
+      data
+    })
+  }
+
+  if (exportType === 'json') {
+    const dataValues = JSON.stringify(data)
+
+    const blobFile = new Blob(
+      [dataValues],
+      { type: 'text/plain' }
+    )
+
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blobFile)
+    link.download = `${fileName}.json`
+    link.click()
+
+    return
+  }
+
+  // flat array
+  const newData2 = newData.map(row => {
+    return Object.values(row)
   })
+
   // TODO: Convert header ascii values
   export_json_to_excel({
     header,
-    data,
+    data: newData2,
     filename: fileName,
     bookType: exportType
   })

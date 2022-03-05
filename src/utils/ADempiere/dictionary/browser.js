@@ -81,11 +81,11 @@ export const refreshBrowserSearh = {
   svg: false,
   icon: 'el-icon-refresh',
   actionName: 'refreshRecords',
-  refreshRecords: ({ root, containerUuid }) => {
+  refreshRecords: ({ containerUuid }) => {
     const fieldsEmpty = store.getters.getBrowserFieldsEmptyMandatory({
       containerUuid
     })
-    if (!root.isEmptyValue(fieldsEmpty)) {
+    if (!isEmptyValue(fieldsEmpty)) {
       showMessage({
         message: language.t('notifications.mandatoryFieldMissing') + fieldsEmpty,
         type: 'info'
@@ -113,7 +113,7 @@ export const runProcessOfBrowser = {
   icon: 'el-icon-setting',
   actionName: 'runProcessOfBrowser',
   uuid: null,
-  runProcessOfBrowser: ({ root, containerUuid, containerManager }) => {
+  runProcessOfBrowser: ({ containerUuid, containerManager }) => {
     const selection = containerManager.getSelection({
       containerUuid
     })
