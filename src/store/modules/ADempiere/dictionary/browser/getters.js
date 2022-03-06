@@ -23,10 +23,6 @@ import { isNumberField } from '@/utils/ADempiere/references'
  * Dictionary Browser Getters
  */
 export default {
-  getStoredBrowsers: (state) => {
-    return state.storedBrowsers
-  },
-
   getStoredBrowser: (state) => (browserUuid) => {
     return state.storedBrowsers[browserUuid]
   },
@@ -37,6 +33,12 @@ export default {
       return browser.fieldsList
     }
     return undefined
+  },
+
+  getProcessOfBrowser: (state, getters, rootState, rootGetters) => (browserUuid) => {
+    const { process } = getters.getStoredBrowser(browserUuid)
+
+    return process
   },
 
   /**

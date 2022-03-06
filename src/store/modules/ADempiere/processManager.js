@@ -113,6 +113,87 @@ const processManager = {
       })
     },
 
+    /**
+     * Start run process of browser
+     * @param {string} parentUuid, browser calling this process
+     * @param {string} containerUuid, process associated of browser
+     * @returns
+     */
+    startProcessOfBrowser({ dispatch, rootGetters }, {
+      parentUuid,
+      containerUuid
+    }) {
+      return new Promise(resolve => {
+        const browserDefinition = rootGetters.getStoredBrowser(parentUuid)
+        const { process: processDefinition } = browserDefinition
+
+        const parametersList = rootGetters.getProcessParameters({
+          containerUuid
+        })
+
+        const selectionsList = rootGetters.getBrowserSelectionToServer({
+          containerUuid: parentUuid
+        })
+
+        const isSession = !isEmptyValue(getToken())
+        let procesingNotification = {
+          close: () => false
+        }
+        if (isSession) {
+          procesingNotification = showNotification({
+            title: language.t('notifications.processing'),
+            message: processDefinition.name,
+            summary: processDefinition.description,
+            type: 'info'
+          })
+        }
+
+        let isProcessedError = false
+        let summary = ''
+
+        // close current page
+        const currentRoute = router.app._route
+        const tabViewsVisited = rootGetters.visitedViews
+        dispatch('tagsView/delView', currentRoute)
+        // go to back page
+        const oldRouter = tabViewsVisited[tabViewsVisited.length - 1]
+        router.push({
+          path: oldRouter.path
+        }, () => {})
+
+        requestRunProcess({
+          uuid: containerUuid,
+          parametersList,
+          selectionsList
+        })
+          .then(runProcessRepsonse => {
+            isProcessedError = runProcessRepsonse.isError
+            summary = runProcessRepsonse.summary
+
+            resolve(runProcessRepsonse)
+          })
+          .catch(error => {
+            isProcessedError = true
+            console.warn(`Error getting print formats: ${error.message}. Code: ${error.code}.`)
+          })
+          .finally(() => {
+            dispatch('finishProcess', {
+              summary,
+              name: processDefinition.name,
+              isError: isProcessedError
+            })
+              .then(() => {
+                // close runing process notification
+                if (!isEmptyValue(procesingNotification)) {
+                  setTimeout(() => {
+                    procesingNotification.close()
+                  }, 1000)
+                }
+              })
+          })
+      })
+    },
+
     finishProcess({ commit }, {
       name,
       summary,

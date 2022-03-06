@@ -23,10 +23,6 @@ import { isNumberField } from '@/utils/ADempiere/references'
  * Dictionary Process Getters
  */
 export default {
-  getStoredProcesses: (state) => {
-    return state.storedProcesses
-  },
-
   getStoredProcess: (state) => (processUuid) => {
     return state.storedProcesses[processUuid]
   },

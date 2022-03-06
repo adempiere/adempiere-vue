@@ -67,6 +67,13 @@
         :is-show-search="false"
       />
     </el-main>
+
+    <modal-dialog
+      v-if="!isEmptyValue(processUuid)"
+      :container-manager="containerManagerProcess"
+      :parent-uuid="browserUuid"
+      :container-uuid="processUuid"
+    />
   </el-container>
 
   <loading-view
@@ -85,8 +92,10 @@ import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
 import CollapseCriteria from '@/components/ADempiere/CollapseCriteria/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+import mixinProcess from '@/views/ADempiere/Process/mixinProcess.js'
+import ModalDialog from '@/components/ADempiere/ModalDialog/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
+import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
 
 // utils and helper methods
 import {
@@ -94,6 +103,7 @@ import {
   isMandatoryField, isMandatoryColumn,
   isReadOnlyField, isReadOnlyColumn
 } from '@/utils/ADempiere/dictionary/browser.js'
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 export default defineComponent({
   name: 'BrowserView',
@@ -103,6 +113,7 @@ export default defineComponent({
     CollapseCriteria,
     DefaultTable,
     LoadingView,
+    ModalDialog,
     PanelDefinition,
     TitleAndHelp
   },
@@ -118,6 +129,7 @@ export default defineComponent({
   setup(props, { root }) {
     const isLoadedMetadata = ref(false)
     const browserMetadata = ref({})
+    const containerManagerProcess = ref({})
 
     let browserUuid = root.$route.meta.uuid
     // set uuid from test
@@ -127,6 +139,17 @@ export default defineComponent({
 
     const storedBrowser = computed(() => {
       return store.getters.getStoredBrowser(browserUuid)
+    })
+
+    /**
+     * Process associated
+     */
+    const processUuid = computed(() => {
+      const browser = storedBrowser.value
+      if (isEmptyValue(browser) || isEmptyValue(browser.process)) {
+        return undefined
+      }
+      return browser.process.uuid
     })
 
     // TODO: Handle per individual smart browser
@@ -182,21 +205,26 @@ export default defineComponent({
       return storedBrowser.value.fieldsList
     })
 
+    function generateBrowser(browser) {
+      browserMetadata.value = browser
+      isLoadedMetadata.value = true
+
+      const { containerManager: containerManagerByProcess } = mixinProcess(processUuid)
+      containerManagerProcess.value = containerManagerByProcess
+    }
+
     function getBrowserDefinition() {
       const browser = storedBrowser.value
       if (browser) {
-        browserMetadata.value = browser
-        isLoadedMetadata.value = true
+        generateBrowser(browser)
         return
       }
 
       store.dispatch('getBrowserDefinitionFromServer', browserUuid)
         .then(browserResponse => {
-          browserMetadata.value = browserResponse
+          generateBrowser(browserResponse)
 
           defaultSearch()
-        }).finally(() => {
-          isLoadedMetadata.value = true
         })
     }
 
@@ -395,12 +423,14 @@ export default defineComponent({
       browserUuid,
       browserMetadata,
       containerManager,
+      containerManagerProcess,
       containerManagerTable,
       actionsManager,
       relationsManager,
       // computed
-      openedCriteria,
       isShowContextMenu,
+      openedCriteria,
+      processUuid,
       tableHeader,
       recordsList
     }

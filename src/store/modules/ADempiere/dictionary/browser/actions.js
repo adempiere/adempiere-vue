@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import router from '@/router'
+import store from '@/store'
 
 // api request methods
 import { requestBrowserMetadata } from '@/api/ADempiere/dictionary/smart-browser.js'
@@ -64,6 +65,32 @@ export default {
           })
 
           resolve(browserDefinition)
+
+          const { process } = browserDefinition
+          if (!isEmptyValue(process)) {
+            // get browser definition
+            /**
+             * TODO: Move to action only open process associated.
+             * Does load fields if move to action browsers.
+             */
+            store.dispatch('getProcessDefinitionFromServer', {
+              uuid: process.uuid
+            })
+
+            dispatch('setModalDialog', {
+              containerUuid: process.uuid,
+              title: process.name,
+              doneMethod: () => {
+                store.dispatch('startProcessOfBrowser', {
+                  parentUuid: browserDefinition.uuid,
+                  containerUuid: process.uuid
+                })
+              },
+              // TODO: Change to string and import dynamic in component
+              componentPath: () => import('@/components/ADempiere/PanelDefinition/index.vue'),
+              isShowed: false
+            })
+          }
         })
     })
   },
@@ -120,6 +147,7 @@ export default {
 
   /**
    * Set default values to panel
+   * TODO: Add dispatch default values to process associated
    * @param {string}  containerUuid
    * @param {array} fieldsList
    */

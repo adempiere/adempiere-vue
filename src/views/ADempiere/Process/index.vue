@@ -61,11 +61,11 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 import store from '@/store'
-import lang from '@/lang'
 
 // components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import mixinProcess from '@/views/ADempiere/Process/mixinProcess.js'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
@@ -73,11 +73,6 @@ import { convertProcess } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import { generateProcess } from '@/utils/ADempiere/dictionary/process.js'
 
 // utils and helper methods
-import {
-  isDisplayedField,
-  isMandatoryField,
-  isReadOnlyField
-} from '@/utils/ADempiere/dictionary/process.js'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 export default defineComponent({
@@ -108,12 +103,10 @@ export default defineComponent({
       processUuid = props.uuid
     }
 
+    const { actionsManager, containerManager, relationsManager, storedProcessDefinition } = mixinProcess(processUuid)
+
     const showContextMenu = computed(() => {
       return store.state.settings.showContextMenu
-    })
-
-    const storedProcess = computed(() => {
-      return store.getters.getStoredProcess(processUuid)
     })
 
     store.dispatch('settings/changeSetting', {
@@ -123,7 +116,7 @@ export default defineComponent({
 
     // get process/report from vuex store or request from server
     const getProcess = async() => {
-      let process = storedProcess.value
+      let process = storedProcessDefinition.value
       if (process) {
         processMetadata.value = process
         isLoadedMetadata.value = true
@@ -159,78 +152,20 @@ export default defineComponent({
         })
     }
 
-    const containerManager = {
-      getPanel({ containerUuid }) {
-        return store.getters.getStoredProcess(containerUuid)
-      },
-      getFieldsList({ containerUuid }) {
-        return store.getters.getStoredFieldsFromProcess(containerUuid)
-      },
-
-      actionPerformed: ({ field, value }) => {
-        // let action = 'processActionPerformed'
-        // if (field.isReport) {
-        //   action = 'reportActionPerformed'
-        // }
-        // store.dispatch(action, {
-        //   field,
-        //   value
-        // })
-      },
-
-      setDefaultValues: ({ containerUuid }) => {
-        store.dispatch('setProcessDefaultValues', {
-          containerUuid
-        })
-      },
-
-      isDisplayedField,
-
-      isReadOnlyField({
-        field
-      }) {
-        return isReadOnlyField(field)
-      },
-
-      isMandatoryField,
-
-      changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
-        store.dispatch('changeProcessFieldShowedFromUser', {
-          containerUuid,
-          fieldsShowed
-        })
-      }
-    }
-
     getProcess()
-
-    const actionsManager = ref({
-      containerUuid: processUuid,
-
-      defaultActionName: lang.t('actionMenu.runProcess'),
-
-      getActionList: () => {
-        return store.getters.getStoredActionsMenu({
-          containerUuid: processUuid
-        })
-      }
-    })
-
-    const relationsManager = ref({
-      menuParentUuid: root.$route.meta.parentUuid
-    })
 
     return {
       processUuid,
       isLoadedMetadata,
       processMetadata,
-      containerManager,
-      actionsManager,
-      relationsManager,
       // computeds
       showContextMenu,
       // methods
-      getProcess
+      getProcess,
+      // common mixin
+      actionsManager,
+      containerManager,
+      relationsManager
     }
   }
 })
