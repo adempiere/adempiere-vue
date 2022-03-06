@@ -119,7 +119,7 @@ const processManager = {
      * @param {string} containerUuid, process associated of browser
      * @returns
      */
-    startProcessOfBrowser({ dispatch, rootGetters }, {
+    startProcessOfBrowser({ commit, dispatch, rootGetters }, {
       parentUuid,
       containerUuid
     }) {
@@ -150,7 +150,7 @@ const processManager = {
 
         let isProcessedError = false
         let summary = ''
-
+        /*
         // close current page
         const currentRoute = router.app._route
         const tabViewsVisited = rootGetters.visitedViews
@@ -160,10 +160,12 @@ const processManager = {
         router.push({
           path: oldRouter.path
         }, () => {})
-
+        */
         requestRunProcess({
           uuid: containerUuid,
           parametersList,
+          // TODO: Add support to tableSelectedId
+          tableSelectedId: null,
           selectionsList
         })
           .then(runProcessRepsonse => {
@@ -177,6 +179,13 @@ const processManager = {
             console.warn(`Error getting print formats: ${error.message}. Code: ${error.code}.`)
           })
           .finally(() => {
+            commit('clearBrowserData', {
+              containerUuid: parentUuid
+            })
+            dispatch('setBrowserDefaultValues', {
+              containerUuid: parentUuid
+            })
+
             dispatch('finishProcess', {
               summary,
               name: processDefinition.name,

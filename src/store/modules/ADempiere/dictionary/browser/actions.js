@@ -147,7 +147,6 @@ export default {
 
   /**
    * Set default values to panel
-   * TODO: Add dispatch default values to process associated
    * @param {string}  containerUuid
    * @param {array} fieldsList
    */
@@ -156,8 +155,10 @@ export default {
     fieldsList = []
   }) {
     return new Promise(resolve => {
+      const browserDefinition = getters.getStoredBrowser(containerUuid)
+
       if (isEmptyValue(fieldsList)) {
-        fieldsList = getters.getStoredFieldsFromProcess(containerUuid)
+        fieldsList = browserDefinition.fieldsList
       }
 
       const currentRoute = router.app._route
@@ -174,6 +175,13 @@ export default {
       })
 
       resolve(defaultAttributes)
+
+      if (!isEmptyValue(browserDefinition.process)) {
+        // clear values to process associated
+        dispatch('setProcessDefaultValues', {
+          containerUuid: browserDefinition.process.uuid
+        })
+      }
     })
   },
 

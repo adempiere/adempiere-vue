@@ -60,6 +60,10 @@ const browserControl = {
       Vue.set(state.browserData, containerUuid, dataBrowser)
     },
 
+    clearBrowserData(state, { containerUuid }) {
+      Vue.set(state.browserData, containerUuid, undefined)
+    },
+
     setBrowserSelectionsList(state, {
       containerUuid,
       selectionsList
