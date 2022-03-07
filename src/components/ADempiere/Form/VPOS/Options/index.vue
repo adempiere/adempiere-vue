@@ -287,7 +287,7 @@
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
-                v-model="showCount"
+                v-model="showSalesDiscount"
                 width="350"
                 :title="$t('form.pos.salesDiscountOff')"
                 placement="top"
@@ -300,7 +300,7 @@
                     type="danger"
                     class="custom-button-create-bp"
                     icon="el-icon-close"
-                    @click="showCount = false"
+                    @click="showSalesDiscount = false"
                   />
                   <el-button
                     type="primary"
@@ -538,6 +538,7 @@ export default {
       validatePin: true,
       visible: false,
       showCount: false,
+      showSalesDiscount: false,
       visibleReverse: false,
       isLoadingReverse: false,
       showFieldListOrder: false,
@@ -720,13 +721,13 @@ export default {
     discountAmount() {
       return this.$store.getters.getValueOfField({
         containerUuid: 'Discount-Order',
-        columnName: 'QtyEntered'
+        columnName: 'Discount'
       })
     },
     discountRateOff() {
       return this.$store.getters.getValueOfField({
         containerUuid: 'Sales-Discount-Off',
-        columnName: 'QtyEntered'
+        columnName: 'Discount'
       })
     },
     currentPointOfSales() {
@@ -1152,11 +1153,15 @@ export default {
         isDiscountOrder: true
       })
         .then(response => {
-          console.log({ response })
           this.$message({
             type: 'success',
             showClose: true,
             message: 'ok'
+          })
+          this.$store.commit('updateValueOfField', {
+            containerUuid: 'Discount-Order',
+            columnName: 'Discount',
+            value: ''
           })
         })
       this.showCount = false
@@ -1186,7 +1191,12 @@ export default {
       //       message: 'ok'
       //     })
       //   })
-      this.showCount = false
+      this.$store.commit('updateValueOfField', {
+        containerUuid: 'Sales-Discount-Off',
+        columnName: 'Discount',
+        value: ''
+      })
+      this.showSalesDiscount = false
     },
     seeOrderList() {
       if (this.ordersList.recordCount <= 0) {

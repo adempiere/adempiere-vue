@@ -16,8 +16,8 @@
 
 export default [
   {
-    elementColumnName: 'QtyEntered',
-    columnName: 'QtyEntered',
+    elementColumnName: 'Discount',
+    columnName: 'Discount',
     isFromDictionary: true,
     overwriteDefinition: {
       size: 24,
