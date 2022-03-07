@@ -256,7 +256,7 @@
                 placement="top"
               >
                 <div style="padding: 20px;">
-                  <el-input-number v-model="discountAmount" :min="0" :controls="false" :max="100" style="width: auto;" />
+                  <discount-order />
                 </div>
                 <div style="text-align: right; margin: 0">
                   <el-button
@@ -445,6 +445,7 @@ import orderLineMixin from '@/components/ADempiere/Form/VPOS/Order/orderLineMixi
 import CashOpening from './CashOpening'
 import CashSummaryMovements from './CashSummaryMovements'
 import CashWithdrawal from './Cashwithdrawal'
+import DiscountOrder from './DiscountOrder'
 import AssignSeller from './AssignSeller'
 import ModalDialog from '@/components/ADempiere/Dialog'
 import GeneralOptions from '@/components/ADempiere/Form/VPOS/Options/generalOptions.vue'
@@ -473,6 +474,7 @@ export default {
     ConfirmDelivery,
     GeneralOptions,
     ModalDialog,
+    DiscountOrder,
     OrdersList
   },
 
@@ -497,7 +499,6 @@ export default {
       validatePin: true,
       visible: false,
       showCount: false,
-      discountAmount: 0,
       visibleReverse: false,
       isLoadingReverse: false,
       showFieldListOrder: false,
@@ -676,6 +677,12 @@ export default {
     size() {
       const size = this.$store.getters.getWidthLeft
       return 24 / size
+    },
+    discountAmount() {
+      return this.$store.getters.getValueOfField({
+        containerUuid: 'Discount-Order',
+        columnName: 'QtyEntered'
+      })
     },
     currentPointOfSales() {
       return this.$store.getters.posAttributes.currentPointOfSales
