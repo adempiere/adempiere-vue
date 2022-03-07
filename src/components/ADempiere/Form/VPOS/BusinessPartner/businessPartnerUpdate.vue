@@ -45,7 +45,10 @@
                   isReadOnly: validateCustomerTemplate
                 }"
                 :container-uuid="'Business-Partner-Update'"
-                :container-manager="containerManager"
+                :container-manager="{
+                  ...containerManager,
+                  isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic}
+                }"
               />
             </div>
           </el-card>

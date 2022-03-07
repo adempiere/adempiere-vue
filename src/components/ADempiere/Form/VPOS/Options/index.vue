@@ -1171,26 +1171,19 @@ export default {
         message: 'Acción a realizar',
         showClose: true
       })
-      console.log('SalesDiscountOff', {
+      this.$store.dispatch('updateOrder', {
         orderUuid: this.currentOrder.uuid,
         posUuid: this.currentPointOfSales.uuid,
         discountRateOff,
         isDiscountOrder: true
       })
-      // this.$store.dispatch('updateOrder', {
-      //   orderUuid: this.currentOrder.uuid,
-      //   posUuid: this.currentPointOfSales.uuid,
-      //   discountAmount,
-      //   isDiscountOrder: true
-      // })
-      //   .then(response => {
-      //     console.log({ response })
-      //     this.$message({
-      //       type: 'success',
-      //       showClose: true,
-      //       message: 'ok'
-      //     })
-      //   })
+        .then(response => {
+          this.$message({
+            type: 'success',
+            showClose: true,
+            message: 'ok'
+          })
+        })
       this.$store.commit('updateValueOfField', {
         containerUuid: 'Sales-Discount-Off',
         columnName: 'Discount',

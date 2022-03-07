@@ -15,7 +15,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // List of fields to send for create new
-import language from '@/lang'
 
 export default [
   {
@@ -45,7 +44,7 @@ export default [
       tabindex: 0,
       sequence: 0,
       size: 8,
-      isMandatory: false
+      isMandatory: true
     }
   },
   {
@@ -96,7 +95,6 @@ export default [
     tableName: 'AD_user',
     isFromDictionary: true,
     overwriteDefinition: {
-      name: language.t('form.pos.order.BusinessPartnerCreate.phone'),
       isCustomField: true,
       isMandatory: true,
       size: 8
@@ -104,6 +102,9 @@ export default [
   },
   // IsTaxpayer
   {
+    elementColumnName: 'IsTaxpayer',
+    columnName: 'IsTaxpayer',
+    tableName: 'C_BPartner',
     fieldUuid: '06d18869-f3af-4021-bddb-bb63a9a1f3ad',
     uuid: '06d18869-f3af-4021-bddb-bb63a9a1f3ad',
     isFromDictionary: true,
@@ -117,6 +118,9 @@ export default [
   },
   // PersonType
   {
+    elementColumnName: 'PersonType',
+    columnName: 'PersonType',
+    tableName: 'C_BPartner',
     fieldUuid: 'e699d070-8e2e-11e9-a13e-6ba4b8556bd1',
     uuid: 'e699d070-8e2e-11e9-a13e-6ba4b8556bd1',
     isFromDictionary: true,

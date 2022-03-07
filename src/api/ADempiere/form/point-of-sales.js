@@ -112,6 +112,7 @@ export function updateOrder({
   description,
   priceListUuid,
   discountAmount,
+  discountRateOff,
   warehouseUuid,
   campaignUuid
 }) {
@@ -127,7 +128,8 @@ export function updateOrder({
       price_list_uuid: priceListUuid,
       warehouse_uuid: warehouseUuid,
       discount_rate: discountAmount,
-      campaign_uuid: campaignUuid
+      campaign_uuid: campaignUuid,
+      discount_rate_off: discountRateOff
     }
   })
     .then(updateOrderResponse => {
