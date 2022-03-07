@@ -109,7 +109,7 @@
           </el-dropdown-item>
           <el-dropdown-item>
             <el-popover
-              v-if="!isEmptyValue(currentOrder)"
+              v-if="!isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid)"
               v-model="showUpdate"
               placement="left-start"
               width="950"
@@ -133,7 +133,7 @@
               </el-button>
             </el-popover>
           </el-dropdown-item>
-          <el-dropdown-item v-show="!isEmptyValue(currentOrder)">
+          <el-dropdown-item v-show="!isEmptyValue(this.$store.getters.posAttributes.currentPointOfSales.currentOrder.uuid)">
             <el-popover
               v-model="showAddNewAddress"
               placement="left-start"
@@ -537,6 +537,9 @@ export default {
           columnName: 'Name',
           value: undefined
         }, {
+          columnName: 'Name2',
+          value: undefined
+        }, {
           columnName: 'Value',
           value: undefined
         }, {
@@ -544,6 +547,15 @@ export default {
           value: undefined
         }, {
           columnName: 'Phone',
+          value: undefined
+        }, {
+          columnName: 'EMail',
+          value: undefined
+        }, {
+          columnName: 'IsTaxpayer',
+          value: undefined
+        }, {
+          columnName: 'PersonType',
           value: undefined
         }]
       })
