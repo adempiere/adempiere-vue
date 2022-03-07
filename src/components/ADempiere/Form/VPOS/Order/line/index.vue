@@ -32,7 +32,7 @@
               :ref="field.columnName"
               :metadata-field="{
                 ...field,
-                labelCurrency: currencyPointOfSales,
+                labelCurrency: currencyPointOfSales.iSOCode,
               }"
               :container-uuid="'line'"
               :container-manager="containerManager"
@@ -154,7 +154,7 @@ export default {
       if (!this.isEmptyValue(this.currentPointOfSales)) {
         return this.currentPointOfSales.priceList.currency
       }
-      return {}
+      return ''
     },
     isDisplayTaxAmount() {
       return this.currentPointOfSales.isDisplayTaxAmount

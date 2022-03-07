@@ -472,6 +472,9 @@ export default {
           columnName: 'PersonType_ID',
           value: this.isEmptyValue(customer.additionalAttributes) ? '' : customer.additionalAttributes.PersonType
         }, {
+          columnName: 'PersonType',
+          value: this.isEmptyValue(customer.additionalAttributes) ? '' : customer.additionalAttributes.PersonType
+        }, {
           columnName: 'IsTaxpayer',
           value: this.isEmptyValue(customer.additionalAttributes) ? false : customer.additionalAttributes.IsTaxpayer
         }]
