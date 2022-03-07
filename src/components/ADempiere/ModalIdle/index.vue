@@ -16,7 +16,7 @@
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
 <template>
-  <div v-if="userTimeout > 0" v-loading.fullscreen.lock="isIdle" />
+  <div v-if="userTimeout === 0" v-loading.fullscreen.lock="isIdle" />
 </template>
 
 <script>
@@ -24,7 +24,7 @@ import Vue from 'vue'
 import IdleVue from 'idle-vue'
 import store from '../../../store'
 
-const connectionTimeout = (store.getters['user/userInfo'].connection_timeout > 0) ? store.getters['user/userInfo'].connection_timeout : 1000
+const connectionTimeout = (store.getters['user/userInfo'].connection_timeout > 0) ? store.getters['user/userInfo'].connection_timeout : 86400000
 Vue.use(IdleVue, {
   eventEmitter: new Vue(),
   store,

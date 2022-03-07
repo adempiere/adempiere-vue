@@ -23,7 +23,7 @@
     >
       <field-definition
         :metadata-field="fieldsList[0]"
-        :container-uuid="'Discount-Order'"
+        :container-uuid="'Sales-Discount-Off'"
         :container-manager="containerManager"
       />
     </el-form>
@@ -38,7 +38,7 @@ import formMixin from '@/components/ADempiere/Form/formMixin'
 import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 
 export default {
-  name: 'DiscountOrder',
+  name: 'SalesDiscountOff',
   mixins: [
     formMixin,
     posMixin
@@ -48,8 +48,8 @@ export default {
       type: Object,
       default: () => {
         return {
-          uuid: 'Discount-Order',
-          containerUuid: 'Discount-Order'
+          uuid: 'Sales-Discount-Off',
+          containerUuid: 'Sales-Discount-Off'
         }
       }
     },

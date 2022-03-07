@@ -284,6 +284,43 @@
               </el-popover>
             </el-card>
           </el-col>
+          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+            <el-card shadow="hover" style="height: 100px">
+              <el-popover
+                v-model="showCount"
+                width="350"
+                :title="$t('form.pos.salesDiscountOff')"
+                placement="top"
+              >
+                <div style="padding: 20px;">
+                  <sales-discount-off />
+                </div>
+                <div style="text-align: right; margin: 0">
+                  <el-button
+                    type="danger"
+                    class="custom-button-create-bp"
+                    icon="el-icon-close"
+                    @click="showCount = false"
+                  />
+                  <el-button
+                    type="primary"
+                    class="custom-button-create-bp"
+                    icon="el-icon-check"
+                    @click="SalesDiscount(discountRateOff)"
+                  />
+                </div>
+                <el-button
+                  slot="reference"
+                  type="text"
+                  style="min-height: 50px;width: -webkit-fill-available;white-space: normal;"
+                >
+                  <i class="el-icon-document-remove" />
+                  <br>
+                  {{ $t('form.pos.salesDiscountOff') }}
+                </el-button>
+              </el-popover>
+            </el-card>
+          </el-col>
         </el-row>
       </el-collapse-item>
 
@@ -447,6 +484,7 @@ import CashSummaryMovements from './CashSummaryMovements'
 import CashWithdrawal from './Cashwithdrawal'
 import DiscountOrder from './DiscountOrder'
 import AssignSeller from './AssignSeller'
+import SalesDiscountOff from './SalesDiscountOff'
 import ModalDialog from '@/components/ADempiere/Dialog'
 import GeneralOptions from '@/components/ADempiere/Form/VPOS/Options/generalOptions.vue'
 
@@ -474,6 +512,7 @@ export default {
     ConfirmDelivery,
     GeneralOptions,
     ModalDialog,
+    SalesDiscountOff,
     DiscountOrder,
     OrdersList
   },
@@ -681,6 +720,12 @@ export default {
     discountAmount() {
       return this.$store.getters.getValueOfField({
         containerUuid: 'Discount-Order',
+        columnName: 'QtyEntered'
+      })
+    },
+    discountRateOff() {
+      return this.$store.getters.getValueOfField({
+        containerUuid: 'Sales-Discount-Off',
         columnName: 'QtyEntered'
       })
     },
@@ -1114,6 +1159,33 @@ export default {
             message: 'ok'
           })
         })
+      this.showCount = false
+    },
+    SalesDiscount(discountRateOff) {
+      this.$message({
+        message: 'Acción a realizar',
+        showClose: true
+      })
+      console.log('SalesDiscountOff', {
+        orderUuid: this.currentOrder.uuid,
+        posUuid: this.currentPointOfSales.uuid,
+        discountRateOff,
+        isDiscountOrder: true
+      })
+      // this.$store.dispatch('updateOrder', {
+      //   orderUuid: this.currentOrder.uuid,
+      //   posUuid: this.currentPointOfSales.uuid,
+      //   discountAmount,
+      //   isDiscountOrder: true
+      // })
+      //   .then(response => {
+      //     console.log({ response })
+      //     this.$message({
+      //       type: 'success',
+      //       showClose: true,
+      //       message: 'ok'
+      //     })
+      //   })
       this.showCount = false
     },
     seeOrderList() {
