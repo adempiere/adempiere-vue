@@ -331,14 +331,14 @@ export default {
         {
           key: 'IsTaxpayer',
           value: this.$store.getters.getValueOfField({
-            containerUuid: 'Business-Partner-Create',
+            containerUuid: 'Business-Partner-Update',
             columnName: 'IsTaxpayer'
           })
         },
         {
           key: 'PersonType',
           value: this.$store.getters.getValueOfField({
-            containerUuid: 'Business-Partner-Create',
+            containerUuid: 'Business-Partner-Update',
             columnName: 'PersonType'
           })
         }
