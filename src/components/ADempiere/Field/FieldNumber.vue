@@ -57,6 +57,7 @@
       :disabled="isDisabled"
       :class="cssClassStyle"
       readonly
+      autofocus
       style="text-align-last: end !important"
       @focus="customFocusGained"
     />
@@ -171,7 +172,8 @@ export default {
       this.isFocus = true
       // this.focusGained(event)
       this.$nextTick(() => {
-        this.$refs[this.metadata.columnName].focus()
+        // this.$refs[this.metadata.columnName].focus()
+        this.$refs[this.metadata.columnName].select()
       })
     },
     select() {

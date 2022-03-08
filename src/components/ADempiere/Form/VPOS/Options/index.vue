@@ -151,7 +151,7 @@
                   element-loading-background="rgba(255, 255, 255, 0.8)"
                   class="view-loading"
                 />
-                <el-button slot="reference" type="text" style="min-height: 50px;width: -webkit-fill-available;white-space: normal;">
+                <el-button slot="reference" type="text" :style="blockOption + 'min-height: 50px;width: -webkit-fill-available;white-space: normal;'">
                   <i class="el-icon-error" />
                   <br>
                   {{ $t('form.pos.optionsPoinSales.salesOrder.cancelSaleTransaction') }}
@@ -185,6 +185,7 @@
               </p>
             </el-card>
           </el-col>
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
@@ -197,6 +198,7 @@
               </p>
             </el-card>
           </el-col>
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
@@ -209,6 +211,7 @@
               </p>
             </el-card>
           </el-col>
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <p
@@ -221,6 +224,7 @@
               </p>
             </el-card>
           </el-col>
+
           <el-col v-if="allowsConfirmShipment" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
@@ -237,7 +241,7 @@
                 />
                 <div
                   slot="reference"
-                  :style="blockOption"
+                  :style="blockOption + 'min-height: 50px;width: -webkit-fill-available;white-space: normal;'"
                   @click="openDelivery()"
                 >
                   <svg-icon icon-class="shopping" />
@@ -247,6 +251,7 @@
               </el-popover>
             </el-card>
           </el-col>
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
@@ -256,7 +261,11 @@
                 placement="top"
               >
                 <div style="padding: 20px;">
-                  <discount-order />
+                  <discount-order
+                    ref="applyDiscountOnOrder"
+                    v-shortkey="showCount ? {close: ['esc'], enter: ['enter']} : {}"
+                    @shortkey.native="theActionDiscount"
+                  />
                 </div>
                 <div style="text-align: right; margin: 0">
                   <el-button
@@ -275,7 +284,8 @@
                 <el-button
                   slot="reference"
                   type="text"
-                  style="min-height: 50px;width: -webkit-fill-available;white-space: normal;"
+                  :disabled="blockOptionIsProcess"
+                  :style="blockOption + 'min-height: 50px;width: -webkit-fill-available;white-space: normal;'"
                 >
                   <i class="el-icon-document-remove" />
                   <br>
@@ -284,8 +294,9 @@
               </el-popover>
             </el-card>
           </el-col>
+
           <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
-            <el-card shadow="hover" style="height: 100px">
+            <el-card shadow="hover">
               <el-popover
                 v-model="showSalesDiscount"
                 width="350"
@@ -293,7 +304,11 @@
                 placement="top"
               >
                 <div style="padding: 20px;">
-                  <sales-discount-off />
+                  <sales-discount-off
+                    ref="salesDiscountOff"
+                    v-shortkey="showSalesDiscount ? {close: ['esc'], enter: ['enter']} : {}"
+                    @shortkey.native="theActionSalesDiscountOff"
+                  />
                 </div>
                 <div style="text-align: right; margin: 0">
                   <el-button
@@ -312,7 +327,8 @@
                 <el-button
                   slot="reference"
                   type="text"
-                  style="min-height: 50px;width: -webkit-fill-available;white-space: normal;"
+                  :disabled="blockOptionIsProcess"
+                  :style="blockOption + 'min-height: 50px;width: -webkit-fill-available;white-space: normal;'"
                 >
                   <i class="el-icon-document-remove" />
                   <br>
@@ -714,6 +730,12 @@ export default {
       }
       return 'cursor: not-allowed; text-align: center !important; color: gray;min-height: 50px;'
     },
+    blockOptionIsProcess() {
+      if (!this.isEmptyValue(this.currentOrder.uuid)) {
+        return this.currentOrder.isProcessed
+      }
+      return true
+    },
     size() {
       const size = this.$store.getters.getWidthLeft
       return 24 / size
@@ -790,6 +812,20 @@ export default {
           this.focusPin()
         }, 300)
       }
+    },
+    showCount(value) {
+      if (value && !this.isEmptyValue(this.$refs)) {
+        setTimeout(() => {
+          this.focusDiscount(value, 'applyDiscountOnOrder')
+        }, 300)
+      }
+    },
+    showSalesDiscount(value) {
+      if (value && !this.isEmptyValue(this.$refs)) {
+        setTimeout(() => {
+          this.focusDiscount(value, 'salesDiscountOff')
+        }, 300)
+      }
     }
   },
 
@@ -842,6 +878,44 @@ export default {
             break
           case 'close':
             this.closePin()
+            break
+        }
+      }
+    },
+    focusDiscount(value, ref) {
+      this.$refs[ref].$children[0].$children[0].$children[0].$children[0].$children[1].isShowed = value
+      this.$refs[ref].$children[0].$children[0].$children[0].$children[0].$children[1].$children[0].$children[0].focus()
+    },
+    theActionDiscount(event) {
+      if (this.showCount) {
+        switch (event.srcKey) {
+          case 'enter':
+            if (this.discountAmount > 1) this.addCount(this.discountAmount)
+            break
+          case 'close':
+            this.showCount = false
+            this.$store.commit('updateValueOfField', {
+              containerUuid: 'Discount-Order',
+              columnName: 'Discount',
+              value: ''
+            })
+            break
+        }
+      }
+    },
+    theActionSalesDiscountOff(event) {
+      if (this.showSalesDiscount) {
+        switch (event.srcKey) {
+          case 'enter':
+            if (this.discountAmount > 0) this.SalesDiscount(this.discountRateOff)
+            break
+          case 'close':
+            this.showSalesDiscount = false
+            this.$store.commit('updateValueOfField', {
+              containerUuid: 'Sales-Discount-Off',
+              columnName: 'Discount',
+              value: ''
+            })
             break
         }
       }
@@ -1116,7 +1190,7 @@ export default {
       this.showModal(process)
     },
     deleteOrder() {
-      if (this.isEmptyValue(this.currentOrder.uuid)) {
+      if (this.isEmptyValue(this.currentOrder.uuid) || this.isProcessed) {
         return ''
       }
       this.$store.dispatch('updateOrderPos', true)
