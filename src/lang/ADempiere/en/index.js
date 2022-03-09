@@ -375,8 +375,8 @@ export default {
       title: 'POS',
       priceList: 'Price List',
       releaseOrder: 'Release It',
-      applyDiscountOnOrder: 'Apply Discount on Order',
-      salesDiscountOff: 'Sales Discount Off',
+      applyDiscountOnOrder: 'Apply discount to all lines',
+      salesDiscountOff: 'Apply discount to the order',
       discountRate: '% Descuent',
       optionsPoinSales: {
         title: 'Quick Point of Sales Options',

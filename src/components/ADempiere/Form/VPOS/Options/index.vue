@@ -262,7 +262,7 @@
 
           <!-- applyDiscountOnOrder -->
 
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsApplyDiscount" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover" style="height: 100px">
               <el-popover
                 v-model="showCount"
@@ -307,7 +307,7 @@
 
           <!-- salesDiscountOff -->
 
-          <el-col :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
+          <el-col v-if="isAllowsApplyDiscount" :span="size" style="padding-left: 12px;padding-right: 12px;padding-bottom: 10px;">
             <el-card shadow="hover">
               <el-popover
                 v-model="showSalesDiscount"
@@ -558,7 +558,7 @@ export default {
 
   data() {
     return {
-      activeName: 'salesOrder',
+      activeName: '',
       processPos: '',
       pin: '',
       isAction: false,
@@ -746,6 +746,10 @@ export default {
       if (!this.isEmptyValue(this.currentOrder.uuid)) {
         return this.currentOrder.isProcessed
       }
+      return true
+    },
+    isAllowsApplyDiscount() {
+      if (!this.isEmptyValue(this.currentPointOfSales.isAllowsApplyDiscount)) return this.currentPointOfSales.isAllowsApplyDiscount
       return true
     },
     isOptionPopoverDiscuent() {

@@ -350,8 +350,8 @@ export default {
       title: 'Punto de Venta',
       priceList: 'Lista de Precio',
       releaseOrder: 'Liberar',
-      applyDiscountOnOrder: 'Aplicar descuento en pedido',
-      salesDiscountOff: 'Descuento de Ventas',
+      applyDiscountOnOrder: 'Aplicar descuento a todas la líneas',
+      salesDiscountOff: 'Aplicar descuento a la Orden',
       discountRate: '% Discounto',
       optionsPoinSales: {
         title: 'Opciones Rápidas del Punto de Ventas',
