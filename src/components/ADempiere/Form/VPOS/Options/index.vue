@@ -750,7 +750,7 @@ export default {
     },
     isAllowsApplyDiscount() {
       if (!this.isEmptyValue(this.currentPointOfSales.isAllowsApplyDiscount)) return this.currentPointOfSales.isAllowsApplyDiscount
-      return true
+      return false
     },
     isOptionPopoverDiscuent() {
       if (!this.isEmptyValue(this.currentOrder.uuid) && this.currentOrder.grandTotal > 0) return this.currentOrder.isProcessed
