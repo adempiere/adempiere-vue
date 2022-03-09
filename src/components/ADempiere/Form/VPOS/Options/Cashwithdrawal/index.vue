@@ -167,11 +167,21 @@
                     <el-col
                       :span="8"
                     >
-                      <field-definition
-                        :metadata-field="fieldsList[1]"
-                        :container-uuid="'Cash-Withdrawal'"
-                        :container-manager="containerManager"
-                      />
+                      <el-form-item :label="fieldsList[1].name" class="from-field">
+                        <el-select
+                          v-model="labelCollectAgent"
+                          style="display: block;"
+                          @change="loadListCollectAgent"
+                          @visible-change="getListCampaign(fieldsList[1].reference)"
+                        >
+                          <el-option
+                            v-for="item in listCollectAgent"
+                            :key="item.id"
+                            :label="item.values.DisplayColumn"
+                            :value="item.uuid"
+                          />
+                        </el-select>
+                      </el-form-item>
                     </el-col>
                     <el-col
                       :span="8"
@@ -232,6 +242,7 @@ import {
   cashWithdrawal,
   deletePayment
 } from '@/api/ADempiere/form/point-of-sales.js'
+import { requestLookupList } from '@/api/ADempiere/window.js'
 
 // utils and helper methods
 import { formatPrice, formatDate, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
@@ -292,6 +303,9 @@ export default {
     return {
       isCustomForm: true,
       checked: false,
+      labelCollectAgent: '',
+      collectAgentUuid: '',
+      listCollectAgent: [],
       currencyConversion: 1,
       convertAllPayment: 1,
       allPayCurrency: 0,
@@ -588,11 +602,7 @@ export default {
       return this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
     },
     validateCash() {
-      const collectingAgent = this.$store.getters.getValueOfField({
-        containerUuid: this.containerUuid,
-        columnName: 'CollectingAgent_ID'
-      })
-      if (this.isEmptyValue(collectingAgent) || this.isEmptyValue(this.listCashWithdrawaln)) {
+      if (this.isEmptyValue(this.collectAgentUuid) || this.isEmptyValue(this.listCastOpen)) {
         return true
       }
       return false
@@ -682,6 +692,18 @@ export default {
   methods: {
     formatDateToSend,
     formatDate,
+    loadListCollectAgent(value) {
+      this.collectAgentUuid = value
+    },
+    getListCampaign(campaing) {
+      requestLookupList({
+        tableName: campaing.tableName,
+        query: campaing.query
+      })
+        .then(responseLookupItem => {
+          this.listCollectAgent = responseLookupItem.recordsList
+        })
+    },
     amountConvert(currency) {
       this.$store.dispatch('searchConversion', {
         conversionTypeUuid: this.currentPointOfSales.conversionTypeUuid,
@@ -943,10 +965,9 @@ export default {
         message: 'Acción a realizar',
         showClose: true
       })
-      console.log({ attribute })
       cashWithdrawal({
         posUuid: this.currentPointOfSales.uuid,
-        collectingAgentUuid: attribute.CollectingAgent_ID_UUID,
+        collectingAgentUuid: this.collectAgentUuid,
         description: attribute.Description,
         payments: this.listCashWithdrawaln
       })
