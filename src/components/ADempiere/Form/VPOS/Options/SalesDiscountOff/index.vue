@@ -36,13 +36,11 @@
 import fieldListDiscount from './fieldsList.js'
 
 import formMixin from '@/components/ADempiere/Form/formMixin'
-import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 
 export default {
   name: 'SalesDiscountOff',
   mixins: [
-    formMixin,
-    posMixin
+    formMixin
   ],
   props: {
     metadata: {
