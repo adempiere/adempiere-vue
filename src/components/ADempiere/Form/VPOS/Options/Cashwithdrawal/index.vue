@@ -602,7 +602,7 @@ export default {
       return this.listCurrency.find(currency => currency.iso_code === this.currentFieldCurrency)
     },
     validateCash() {
-      if (this.isEmptyValue(this.collectAgentUuid) || this.isEmptyValue(this.listCastOpen)) {
+      if (this.isEmptyValue(this.collectAgentUuid) || this.isEmptyValue(this.listCashWithdrawaln)) {
         return true
       }
       return false
