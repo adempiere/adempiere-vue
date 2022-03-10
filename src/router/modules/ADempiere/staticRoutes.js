@@ -105,6 +105,24 @@ const staticRoutes = [
   },
 
   {
+    path: '/AppSoport',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/AppSoport',
+        component: () => import('@/views/ADempiere/Form'),
+        name: 'AppSoport',
+        meta: {
+          icon: 'search',
+          title: 'AppSoport',
+          isIndex: true
+        }
+      }
+    ]
+  },
+
+  {
     path: '/ProductInfo',
     component: Layout,
     hidden: false,

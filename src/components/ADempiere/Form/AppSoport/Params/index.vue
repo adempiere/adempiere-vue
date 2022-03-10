@@ -1,0 +1,238 @@
+<!--
+ ADempiere-Vue (Frontend) for ADempiere ERP & CRM Smart Business Solution
+ Copyright (C) 2017-Present E.R.P. Consultores y Asociados, C.A.
+ Contributor(s): Edwin Betancourt EdwinBetanc0urt@outlook.com www.erpya.com
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https:www.gnu.org/licenses/>.
+-->
+
+<template>
+  <div
+    v-if="isLoaded"
+    style="height: 100% !important;display: -webkit-box;"
+  >
+    <el-form
+      key="form-loaded"
+      label-position="top"
+      label-width="10px"
+      style="z-index: -1;"
+      @submit.native.prevent="notSubmitForm"
+    >
+      <field-definition
+        v-for="(field) in fieldsList"
+        id="Params"
+        ref="Params"
+        :key="field.columnName"
+        :container-uuid="'Params'"
+        :container-manager="{
+          ...containerManager,
+          isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic},
+          isDisplayedField({ isDisplayed, isDisplayedFromLogic }) {return field.isDisplayed || field.isDisplayedFromLogic}
+        }"
+        :metadata-field="field"
+        :v-model="field.value"
+      />
+    </el-form>
+  </div>
+
+  <loading-view
+    v-else
+    key="form-loading"
+  />
+</template>
+
+<script>
+// constants
+import fieldsList from './fieldsList.js'
+
+// components and mixins
+import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import formMixin from '@/components/ADempiere/Form/formMixin.js'
+
+// api request methods
+
+// methods and helpers
+export default {
+  name: 'Params',
+
+  components: {
+    LoadingView
+  },
+
+  mixins: [
+    formMixin
+  ],
+
+  props: {
+    metadata: {
+      type: Object,
+      default: () => {
+        return {
+          uuid: 'Params',
+          containerUuid: 'Params',
+          fieldsList
+        }
+      }
+    },
+    parentUuid: {
+      type: String,
+      default: undefined
+    },
+    containerManager: {
+      type: Object,
+      default: () => ({
+        actionPerformed: () => {},
+        changeFieldShowedFromUser: () => {},
+        getFieldsLit: () => {},
+        isDisplayedField: () => { return true },
+        isMandatoryField: () => { return true },
+        isReadOnlyField: () => { return false },
+        setDefaultValues: () => {}
+      })
+    }
+  },
+
+  data() {
+    return {
+      messageError: true,
+      fieldsList,
+      productPrice: {},
+      organizationBackground: '',
+      currentImageOfProduct: '',
+      search: '',
+      resul: '',
+      name: '',
+      value: '',
+      isActive: false,
+      active: 0,
+      backgroundForm: ''
+    }
+  },
+
+  computed: {
+    step() {
+      return [
+        {
+          name: 'Registro de Aplicacion',
+          description: 'Registro de Aplicación para una Conexión Externa'
+        },
+        {
+          name: 'Parametros',
+          description: 'Parámetros por Defecto para Aplicación Soportada'
+        }
+      ]
+    },
+    iconStep() {
+      const step = this.step.length - 1
+      if (step === this.active) {
+        return 'el-icon-s-tools'
+      }
+      return 'el-icon-check'
+    }
+  },
+
+  methods: {
+    next() {
+      if (this.iconStep !== 'el-icon-s-tools') {
+        this.active++
+      }
+    },
+    prev() {
+      this.active--
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+  .background-price-checking {
+    width: 100%;
+    height: 100%;
+    float: inherit;
+    background: white;
+    // color: white;
+    // opacity: 0.5;
+  }
+
+  .product-description {
+    color: #32363a;
+    font-size: 30px;
+    float: right;
+    padding-bottom: 1%;
+    text-align: end;
+
+  }
+  .product-price-base, .product-tax {
+    font-size: 30px;
+    float: right;
+  }
+  .product-price {
+    padding-top: 15px;
+    font-size: 50px;
+    float: right;
+  }
+  .rate-date {
+    padding-top: 30%;
+    font-size: 50px;
+    float: right;
+    color: black;
+    font-weight: bold;
+    text-align: end;
+  }
+  .inquiry-form {
+    // position: absolute;
+    position: inherit;
+    right: 5%;
+    width: 100%;
+    top: 10%;
+    z-index: 0;
+  }
+  .inquiry-product {
+    position: absolute;
+    right: 10%;
+    top: 33%;
+    .amount {
+      color: black;
+      font-weight: bold;
+    }
+  }
+</style>
+<style lang="scss">
+  .price-inquiry {
+    input {
+      color: #606266 !important;
+      font-size: 100% !important;
+    }
+  }
+  .product-value {
+    float: right;
+    padding-right: 0% !important;
+    z-index: 0;
+    .el-form-item__label {
+      font-size: 15px !important;
+      color: #000 !important;
+    }
+  }
+
+  .el-aside {
+    background: white;
+    width: 60%;
+    overflow: hidden;
+  }
+
+  .el-form-item {
+    margin-bottom: 10px !important;
+    margin-left: 10px;
+    margin-right: 0px !important;
+  }
+</style>
