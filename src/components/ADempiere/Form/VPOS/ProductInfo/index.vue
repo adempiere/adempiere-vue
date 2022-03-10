@@ -50,9 +50,11 @@
         style="width: 100%; height: 600px;"
         popper-class="custom-field-prodcut-info"
         :trigger-on-focus="false"
+        :validate-event="true"
         :fetch-suggestions="localSearch"
         :select-when-unmatched="true"
         :highlight-first-item="false"
+        @focus="searchFocus"
         @shortkey.native="shortcutKeyMethod"
         @select="handleSelect"
       >
@@ -138,7 +140,8 @@ export default {
     return {
       visible: false,
       sendProduct: '',
-      timeOut: null
+      timeOut: null,
+      timeOutProduct: null
     }
   },
 
@@ -189,6 +192,12 @@ export default {
   watch: {
     getProductValue(value) {
       this.sendProduct = value
+      clearTimeout(this.timeOutProduct)
+      this.timeOutProduct = setTimeout(() => {
+        if (this.listWithPrice.length === 1) {
+          this.handleSelect(this.listWithPrice[0])
+        }
+      }, 2000)
     },
     sendProduct(value) {
       this.$store.commit('updateValueOfField', {
@@ -198,7 +207,6 @@ export default {
       })
     }
   },
-
   methods: {
     formatPrice,
     formatQuantity,
@@ -216,7 +224,15 @@ export default {
           break
       }
     },
+    searchFocus() {
+      if (this.isEmptyValue(this.sendProduct) || this.listWithPrice.length <= 1) {
+        this.$refs.product.close()
+      } else {
+        this.$refs.product.getData()
+      }
+    },
     localSearch(stringToMatch, callBack) {
+      this.$refs.product.activated = true
       let results = this.listWithPrice
       if (!this.isEmptyValue(stringToMatch)) {
         const parsedValue = stringToMatch.toLowerCase().trim()
@@ -232,7 +248,7 @@ export default {
           return false
         })
         // Remote search
-        if (this.isEmptyValue(results) && String(stringToMatch.length > 3)) {
+        if (this.isEmptyValue(results) && String(stringToMatch.length > 2)) {
           clearTimeout(this.timeOut)
 
           this.timeOut = setTimeout(() => {
@@ -250,12 +266,17 @@ export default {
                     showClose: true
                   })
                 }
-
+                if (this.isEmptyValue(this.sendProduct) || recordsList.length <= 1) {
+                  this.$refs.product.activated = false
+                }
                 callBack(this.orderedByProduct(recordsList))
               })
           }, 1500)
           return
         }
+      }
+      if (this.isEmptyValue(this.sendProduct) || results.length <= 1) {
+        this.$refs.product.activated = false
       }
       // call callback function to return suggestions
       callBack(this.orderedByProduct(results))
@@ -264,6 +285,7 @@ export default {
       this.$store.commit('setShowProductList', false)
     },
     handleSelect(elementSelected) {
+      console.log(elementSelected)
       const valueProduct = this.isEmptyValue(elementSelected.product) ? elementSelected.value : elementSelected.product.value
       this.$store.dispatch('notifyActionKeyPerformed', {
         containerUuid: 'POS',
