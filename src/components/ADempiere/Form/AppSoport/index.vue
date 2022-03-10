@@ -46,7 +46,72 @@
               style="z-index: -1;"
               @submit.native.prevent="notSubmitForm"
             >
-              <field-definition
+              <el-form ref="form" label-position="top" inline :model="form" label-width="120px">
+                <el-row>
+                  <el-col :span="5" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Codigo" style="display: contents;">
+                      <el-input v-model="form.name" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="5" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Tipo de Aplicación" style="display: contents;">
+                      <el-select v-model="form.region" placeholder="please select your zone">
+                        <el-option label="Zone one" value="shanghai" />
+                        <el-option label="Zone two" value="beijing" />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="5" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Aplicación Soportada" style="display: contents;">
+                      <el-select v-model="form.region" placeholder="please select your zone">
+                        <el-option label="Zone one" value="shanghai" />
+                        <el-option label="Zone two" value="beijing" />
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="5" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Nombre" style="display: contents;">
+                      <el-input v-model="form.name" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="4" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Activo" style="display: contents;">
+                      <el-switch v-model="form.delivery" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="24" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Descripción" style="display: contents;">
+                      <el-input v-model="form.name" type="textarea" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="6" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="No. de Versión" style="display: contents;">
+                      <el-input v-model="form.name" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="6" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Usuario" style="display: contents;">
+                      <el-input v-model="form.name" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="6" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Servidor" style="display: contents;">
+                      <el-input v-model="form.name" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="6" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Puerto" style="display: contents;">
+                      <el-input v-model="form.name" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="6" style="padding-left: 1%;padding-right: 1%;">
+                    <el-form-item label="Tiempo de Espera" style="display: contents;">
+                      <el-input v-model="form.name" />
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-form>
+              <!-- <field-definition
                 v-for="(field) in fieldsList"
                 id="AppSoport"
                 ref="AppSoport"
@@ -59,7 +124,7 @@
                 }"
                 :metadata-field="field"
                 :v-model="field.value"
-              />
+              /> -->
             </el-form>
           </el-card>
           <el-card v-if="active === 1" shadow="hover">
@@ -150,6 +215,16 @@ export default {
       productPrice: {},
       organizationBackground: '',
       currentImageOfProduct: '',
+      form: {
+        name: '',
+        region: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: ''
+      },
       search: '',
       resul: '',
       name: 'http://nextcloud.demo-nextcloud/remote.php/dav/files/erp',
