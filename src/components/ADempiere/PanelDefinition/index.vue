@@ -42,6 +42,10 @@ export default defineComponent({
       type: String,
       required: true
     },
+    panelMetadata: {
+      type: Object,
+      default: () => {}
+    },
     containerManager: {
       type: Object,
       required: true
@@ -63,7 +67,8 @@ export default defineComponent({
     }
 
     const componentRender = computed(() => {
-      return () => import('@/components/ADempiere/PanelDefinition/StandardPanel.vue')
+      const panelComponent = () => import('@/components/ADempiere/PanelDefinition/StandardPanel.vue')
+      return panelComponent
     })
 
     /**
@@ -73,6 +78,7 @@ export default defineComponent({
     const getPanel = () => {
       if (props.containerManager && props.containerManager.getPanel) {
         metadata.value = props.containerManager.getPanel({
+          parentUuid: props.parentUuid,
           containerUuid: props.containerUuid
         })
         return
@@ -85,9 +91,9 @@ export default defineComponent({
     getPanel()
 
     return {
+      metadata,
       // computeds
-      componentRender,
-      metadata
+      componentRender
     }
   }
 })
