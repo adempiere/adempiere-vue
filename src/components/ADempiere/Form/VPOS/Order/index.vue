@@ -139,13 +139,13 @@
                     width="300"
                     :hide="closeInfo"
                   >
-                    {{ $t('form.productInfo.productInformation') }} <el-button icon="el-icon-close" style="float: right;" />
+                    {{ (isEmptyValue(scope.row.product.value) ? $t('form.productInfo.chargerInformation') : $t('form.productInfo.productInformation')) }}
                     <el-form
                       label-position="top"
                       style="float: right;display: contents;line-height: 30px;"
                     >
                       <el-row style="margin: 10px!important;">
-                        <el-col :span="4">
+                        <el-col :span="5">
                           <div>
                             <image-product
                               :show="showInfo"
@@ -153,10 +153,10 @@
                             />
                           </div>
                         </el-col>
-                        <el-col :span="12">
-                          {{ $t('form.productInfo.code') }}: <b>{{ scope.row.product.value }}</b><br>
-                          {{ $t('form.productInfo.name') }}: <b>{{ scope.row.product.name }}</b><br>
-                          {{ $t('form.productInfo.description') }}: <b>{{ scope.row.product.description }}</b><br>
+                        <el-col :span="11">
+                          <span v-if="!isEmptyValue(scope.row.product.value)"> {{ $t('form.productInfo.code') }}: <b>{{ scope.row.product.value }}</b><br> </span>
+                          {{ $t('form.productInfo.name') }}: <b>{{ (isEmptyValue(scope.row.product.name) ? scope.row.charge.name : scope.row.product.name) }}</b><br>
+                          {{ $t('form.productInfo.description') }}: <b>{{ (isEmptyValue(scope.row.product.description) ? scope.row.charge.description : scope.row.product.description) }}</b><br>
                           {{ $t('form.productInfo.UM') }}: <b>{{ scope.row.product.uomName }}</b><br>
                         </el-col>
                         <el-col :span="8">

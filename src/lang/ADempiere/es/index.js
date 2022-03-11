@@ -545,6 +545,7 @@ export default {
       product: 'Producto',
       codeProduct: 'Código de Producto',
       productInformation: 'Información de Producto',
+      chargerInformation: 'Información del Cargo',
       code: 'Código',
       name: 'Nombre',
       id: 'ID',
