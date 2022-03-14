@@ -52,7 +52,7 @@ export default {
         },
         discountTotal: {
           columnName: 'DiscountTotal',
-          label: this.$t('form.pos.tableProduct.displayDiscuentAmount'),
+          label: this.$t('form.pos.tableProduct.displayDiscountAmount'),
           isNumeric: true,
           size: '150px'
         },

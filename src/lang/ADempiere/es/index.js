@@ -411,7 +411,7 @@ export default {
         remove: 'Eliminar',
         taxAmount: 'Impuesto',
         taxRate: '% Imp',
-        displayDiscuentAmount: 'Descuento',
+        displayDiscountAmount: 'Descuento',
         empty: 'Ingrese el nombre del producto, código o UPC'
       },
       order: {

@@ -406,7 +406,7 @@
                   {{ currentOrder.salesRepresentative.name }}
                 </b></p>
                 <p class="total"> {{ $t('form.pos.order.subTotal') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" class="order-info">{{ formatPrice(currentOrder.totalLines, pointOfSalesCurrency.iSOCode) }}</b></p>
-                <p class="total"> {{ $t('form.pos.tableProduct.displayDiscuentAmount') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.discountAmount, pointOfSalesCurrency.iSOCode) }}</b> </p>
+                <p class="total"> {{ $t('form.pos.tableProduct.displayDiscountAmount') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.discountAmount, pointOfSalesCurrency.iSOCode) }}</b> </p>
                 <p class="total"> {{ $t('form.pos.order.tax') }}:<b v-if="!isEmptyValue(currentOrder.uuid)" style="float: right;">{{ formatPrice(currentOrder.taxAmount, pointOfSalesCurrency.iSOCode) }}</b> </p>
               </div>
               <div style="border: 1px solid rgb(54, 163, 247);padding-left: 10px;padding-right: 10px;">
