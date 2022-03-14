@@ -139,6 +139,7 @@ export default {
   data() {
     return {
       visible: false,
+      KeyPerformed: false,
       sendProduct: '',
       timeOut: null,
       timeOutProduct: null
@@ -192,12 +193,6 @@ export default {
   watch: {
     getProductValue(value) {
       this.sendProduct = value
-      clearTimeout(this.timeOutProduct)
-      this.timeOutProduct = setTimeout(() => {
-        if (this.listWithPrice.length === 1) {
-          this.handleSelect(this.listWithPrice[0])
-        }
-      }, 2000)
     },
     sendProduct(value) {
       this.$store.commit('updateValueOfField', {
@@ -206,6 +201,13 @@ export default {
         value
       })
     }
+  },
+
+  beforeMount() {
+    this.unsubscribe = this.subscribeChanges()
+  },
+  beforeDestroy() {
+    this.unsubscribe()
   },
   methods: {
     formatPrice,
@@ -249,7 +251,7 @@ export default {
         })
         // Remote search
         if (this.isEmptyValue(results) && String(stringToMatch.length > 2)) {
-          clearTimeout(this.timeOut)
+          (this.timeOut)
 
           this.timeOut = setTimeout(() => {
             this.$store.dispatch('listProductPriceFromServer', {
@@ -268,7 +270,9 @@ export default {
                 }
                 if (this.isEmptyValue(this.sendProduct) || recordsList.length <= 1) {
                   this.$refs.product.activated = false
+                  clearTimeout(this.timeOutProduct)
                 }
+                this.KeyPerformed = true
                 callBack(this.orderedByProduct(recordsList))
               })
           }, 1500)
@@ -278,6 +282,7 @@ export default {
       if (this.isEmptyValue(this.sendProduct) || results.length <= 1) {
         this.$refs.product.activated = false
       }
+      this.KeyPerformed = true
       // call callback function to return suggestions
       callBack(this.orderedByProduct(results))
     },
@@ -294,6 +299,7 @@ export default {
       })
       this.sendProduct = ''
       this.$refs.product.focus()
+      this.KeyPerformed = false
     },
     orderedByProduct(productList) {
       return productList.sort((element, item) => {
@@ -305,6 +311,21 @@ export default {
         }
         // a must be equal to b
         return 0
+      })
+    },
+    subscribeChanges() {
+      return this.$store.subscribe((mutation, state) => {
+        // TODO: Add container uuid comparison
+        if (mutation.type === 'addActionKeyPerformed') {
+          this.KeyPerformed = false
+        } else if (mutation.type === 'updateValueOfField' && mutation.payload.columnName === 'ProductValue') {
+          clearTimeout(this.timeOutProduct)
+          this.timeOutProduct = setTimeout(() => {
+            if (this.listWithPrice.length === 1 && this.KeyPerformed && !this.isEmptyValue(this.sendProduct)) {
+              this.handleSelect(this.listWithPrice[0])
+            }
+          }, 2000)
+        }
       })
     }
   }
