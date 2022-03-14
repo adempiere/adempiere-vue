@@ -32,6 +32,7 @@
             :filter-manager="containerManager.changeFieldShowedFromUser"
             :showed-manager="containerManager.isDisplayedField"
           />
+
           <el-card
             :shadow="shadowGroup"
             :body-style="{ padding: '10px' }"
@@ -57,9 +58,11 @@
 
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
+import store from '@/store'
 
+// components and mixins
 import FieldDefinition from '@/components/ADempiere/Field/index.vue'
-import FilterFields from '@/components/ADempiere/FilterFields'
+import FilterFields from '@/components/ADempiere/FilterFields/index.vue'
 
 export default defineComponent({
   name: 'StandardPanel',
@@ -86,13 +89,14 @@ export default defineComponent({
       type: Object,
       default: () => {}
     },
+    // TODO: Manage with store and container manager
     isShowFilter: {
       type: Boolean,
       default: true
     }
   },
 
-  setup(props, { root }) {
+  setup(props) {
     let fieldsList = []
 
     const generatePanel = () => {
@@ -103,7 +107,7 @@ export default defineComponent({
     }
 
     const shadowGroup = computed(() => {
-      if (root.$store.state.app.device === 'mobile') {
+      if (store.state.app.device === 'mobile') {
         return 'never'
       }
       return 'hover'

@@ -77,7 +77,6 @@
               :parent-uuid="parentUuid"
               :container-uuid="tabAttributes.uuid"
               :container-manager="containerManager"
-              :panel-metadata="tabAttributes"
               :group-tab="tabAttributes.tabGroup"
             />
           </div>
@@ -90,12 +89,18 @@
 <script>
 import { defineComponent, computed, watch, ref } from '@vue/composition-api'
 
+import router from '@/router'
+import store from '@/store'
+
 // components and mixins
 import AuxiliaryPanel from '@/components/ADempiere/AuxiliaryPanel/index.vue'
 import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import RecordNavigation from '@/components/ADempiere/RecordNavigation/index.vue'
 import TabLabel from '@/components/ADempiere/TabManager/TabLabel.vue'
+
+// utils and helper methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 export default defineComponent({
   name: 'TabManager',
@@ -154,14 +159,14 @@ export default defineComponent({
 
     // use getter to reactive properties
     const currentTabMetadata = computed(() => {
-      return root.$store.getters.getStoredTab(props.parentUuid, tabUuid.value)
+      return store.getters.getStoredTab(props.parentUuid, tabUuid.value)
     })
 
     const isShowedTabs = computed(() => {
       if (props.isParentTabs) {
-        return root.$store.getters.getStoredWindow(props.parentUuid).isShowedTabsParent
+        return store.getters.getStoredWindow(props.parentUuid).isShowedTabsParent
       }
-      return root.$store.getters.getStoredWindow(props.parentUuid).isShowedTabsChildren
+      return store.getters.getStoredWindow(props.parentUuid).isShowedTabsChildren
     })
 
     const isShowedTableRecords = computed(() => {
@@ -174,7 +179,7 @@ export default defineComponent({
 
     function isDisabledTab(key) {
       return (key > 0 || !props.isParentTabs) &&
-        (isCreateNew.value || root.isEmptyValue(recordUuidTabParent.value))
+        (isCreateNew.value || isEmptyValue(recordUuidTabParent.value))
     }
 
     function setCurrentTab() {
@@ -182,7 +187,7 @@ export default defineComponent({
       if (!props.isParentTabs) {
         tabMutation = 'setCurrentTabChild'
       }
-      root.$store.commit(tabMutation, {
+      store.commit(tabMutation, {
         parentUuid: props.parentUuid,
         tab: props.tabsList[currentTab.value]
       })
@@ -213,14 +218,14 @@ export default defineComponent({
     }
 
     const setTabNumber = (tabNumber = '0') => {
-      if (root.isEmptyValue(tabNumber)) {
+      if (isEmptyValue(tabNumber)) {
         tabNumber = '0'
       }
       if (tabNumber !== currentTab.value) {
         currentTab.value = tabNumber
       }
 
-      root.$router.push({
+      router.push({
         query: {
           ...root.$route.query,
           [queryProperty]: currentTab.value
@@ -234,21 +239,21 @@ export default defineComponent({
     }
 
     const tabData = computed(() => {
-      return root.$store.getters.getTabData({
+      return store.getters.getTabData({
         containerUuid: currentTabMetadata.value.uuid
       })
     })
 
     // get records list
     const recordsList = computed(() => {
-      if (!props.isParentTabs && root.isEmptyValue(recordUuidTabParent.value)) {
+      if (!props.isParentTabs && isEmptyValue(recordUuidTabParent.value)) {
         return []
       }
       return tabData.value.recordsList
     })
 
     const isLoadedParentRecords = computed(() => {
-      return root.$store.getters.getTabData({
+      return store.getters.getTabData({
         containerUuid: currentTabMetadata.value.firstTabUuid
       }).isLoaded
     })
@@ -262,7 +267,7 @@ export default defineComponent({
     })
 
     const recordUuidTabParent = computed(() => {
-      return root.$store.getters.getValueOfField({
+      return store.getters.getValueOfField({
         parentUuid: props.parentUuid,
         containerUuid: currentTabMetadata.value.firstTabUuid,
         columnName: 'UUID'
@@ -270,16 +275,16 @@ export default defineComponent({
     })
 
     const getData = () => {
-      root.$store.dispatch('getEntities', {
+      store.dispatch('getEntities', {
         parentUuid: props.parentUuid,
         containerUuid: tabUuid.value
       }).then(responseData => {
-        const tab = root.$store.getters.getStoredTab(props.parentUuid, tabUuid.value)
-        if (!isCreateNew.value && !root.isEmptyValue(responseData)) {
+        const tab = store.getters.getStoredTab(props.parentUuid, tabUuid.value)
+        if (!isCreateNew.value && !isEmptyValue(responseData)) {
           let row
           const { action } = root.$route.query
           // uuid into action query
-          if (!root.isEmptyValue(action)) {
+          if (!isEmptyValue(action)) {
             if (action === 'zoomIn') {
               const { columnName, value } = root.$route.query
               row = responseData.find(rowData => {
@@ -291,13 +296,13 @@ export default defineComponent({
               })
 
               // search link value
-              if (root.isEmptyValue(row) && !tab.isParentTab) {
+              if (isEmptyValue(row) && !tab.isParentTab) {
                 const { linkColumnName } = tab
-                const value = root.$store.getters.getValueOfField({
+                const value = store.getters.getValueOfField({
                   parentUuid: props.parentUuid,
                   columnName: linkColumnName
                 })
-                if (linkColumnName && !root.isEmptyValue(value)) {
+                if (linkColumnName && !isEmptyValue(value)) {
                   row = responseData.find(rowData => {
                     return rowData[linkColumnName] === value
                   })
@@ -307,7 +312,7 @@ export default defineComponent({
           }
 
           // set first record
-          if (root.isEmptyValue(row)) {
+          if (isEmptyValue(row)) {
             row = responseData[0]
           }
 
@@ -327,7 +332,7 @@ export default defineComponent({
      * Close table when clicking on group of fields
      */
     const closeRecordNavigation = () => {
-      root.$store.dispatch('changeTabAttribute', {
+      store.dispatch('changeTabAttribute', {
         parentUuid: props.parentUuid,
         containerUuid: tabUuid.value,
         attributeName: 'isShowedTableRecords',
@@ -341,7 +346,7 @@ export default defineComponent({
       }
       // if changed tab and not records in stored, get records from server
       watch(tabUuid, (newValue, oldValue) => {
-        if (newValue !== oldValue && !root.isEmptyValue(recordUuidTabParent.value) && !tabData.value.isLoaded) {
+        if (newValue !== oldValue && !isEmptyValue(recordUuidTabParent.value) && !tabData.value.isLoaded) {
           getData()
         }
       })
@@ -354,7 +359,7 @@ export default defineComponent({
 
       // if changed record in parent tab, reload tab child
       watch(recordUuidTabParent, (newValue, oldValue) => {
-        if (newValue !== oldValue && !root.isEmptyValue(newValue)) {
+        if (newValue !== oldValue && !isEmptyValue(newValue)) {
           getData()
         }
       })
