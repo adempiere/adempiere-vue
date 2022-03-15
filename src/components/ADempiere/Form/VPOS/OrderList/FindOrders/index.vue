@@ -33,6 +33,7 @@
         fit
         highlight-current-row
         @current-change="handleCurrentChange"
+        @row-dblclick="selectionChangeOrder"
       >
         <el-table-column
           prop="documentNo"
@@ -203,6 +204,7 @@ import {
 } from '@/utils/ADempiere/valueFormat.js'
 import { extractPagingToken } from '@/utils/ADempiere/valueUtils.js'
 import DocumentStatusTag from '@/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import { holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
 export default {
   name: 'FindOrders',
@@ -339,8 +341,12 @@ export default {
     handleCurrentChange(row) {
       // close popover
       this.$store.commit('setQuickSearchOrder', row)
+      // if (row) {
+      //   this.selectionChangeOrder(row)
+      // }
     },
-    selectionChangeOrder() {
+    selectionChangeOrder(row) {
+      this.changeOrder = row
       const posUuid = this.$store.getters.posAttributes.currentPointOfSales.uuid
       const currentOrder = this.$store.getters.posAttributes.currentPointOfSales.currentOrder
       if (!this.isEmptyValue(this.changeOrder) && this.changeOrder.documentNo !== currentOrder.documentNo) {
@@ -359,6 +365,22 @@ export default {
         const orderUuid = this.$route.query.action
         this.$store.dispatch('listPayments', { posUuid, orderUuid })
       }
+      holdOrder({
+        posUuid: this.$store.getters.posAttributes.currentPointOfSales.uuid,
+        salesRepresentativeUuid: this.$store.getters['user/getUserUuid'],
+        orderUuid: this.changeOrder.uuid
+      })
+        .then(response => {
+          this.$message.success(this.$t('form.pos.generalNotifications.selectedOrder') + response.documentNo)
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            isShowClose: true,
+            type: 'error'
+          })
+          console.warn(`Error Hold Order ${error.message}. Code: ${error.code}.`)
+        })
       this.clear()
     },
     orderPrpcess(row) {
