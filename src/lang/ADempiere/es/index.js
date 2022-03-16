@@ -351,6 +351,7 @@ export default {
       priceList: 'Lista de Precio',
       releaseOrder: 'Liberar',
       applyDiscountOnOrder: 'Aplicar Descuento basado en Monto',
+      fieldDiscountAmount: 'Monto de Descuento',
       salesDiscountOff: 'Aplicar Descuento en Venta',
       discountRate: '% Discounto',
       optionsPoinSales: {

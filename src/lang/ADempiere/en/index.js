@@ -376,6 +376,7 @@ export default {
       priceList: 'Price List',
       releaseOrder: 'Release It',
       applyDiscountOnOrder: 'Apply Discount Based on Amount',
+      fieldDiscountAmount: 'Discount Amount',
       salesDiscountOff: 'Apply Discount on Sale',
       discountRate: '% Descuent',
       optionsPoinSales: {

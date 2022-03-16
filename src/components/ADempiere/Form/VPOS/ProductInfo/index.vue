@@ -292,7 +292,6 @@ export default {
       this.$store.commit('setShowProductList', false)
     },
     handleSelect(elementSelected) {
-      console.log({ elementSelected })
       const valueProduct = this.isEmptyValue(elementSelected.product) ? elementSelected.value : elementSelected.product.value
       this.$store.dispatch('notifyActionKeyPerformed', {
         containerUuid: 'POS',

@@ -13,6 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import language from '@/lang'
 
 export default [
   {
@@ -22,6 +23,7 @@ export default [
     overwriteDefinition: {
       size: 24,
       sequence: 9,
+      name: language.t('form.pos.fieldDiscountAmount'),
       valueMin: 0
     }
   }
