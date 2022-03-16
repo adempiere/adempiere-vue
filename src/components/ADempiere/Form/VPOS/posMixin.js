@@ -663,28 +663,7 @@ export default {
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
         // TODO: Add container uuid comparison
-        if (mutation.type === 'addActionKeyPerformed') {
-          switch (mutation.payload.columnName) {
-            case 'ProductValue':
-              // this.findProduct(mutation.payload.value)
-              // if (this.isPosRequiredPin) {
-              if (this.allowsCreateOrder) {
-                this.findProduct(mutation.payload.value)
-              } else {
-                const attributePin = {
-                  ...mutation.payload,
-                  type: 'addProduct',
-                  label: this.$t('form.pos.pinMessage.addProduct')
-                }
-                this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
-                this.visible = true
-              }
-              // } else {
-              //   this.findProduct(mutation.payload.value)
-              // }
-              break
-          }
-        } else if (mutation.type === 'addActionPerformed') {
+        if (mutation.type === 'addActionPerformed') {
           switch (mutation.payload.columnName) {
             case 'QtyEntered':
               if (this.allowsModifyQuantity && !this.isEmptyValue(this.$store.state['pointOfSales/orderLine/index'].line)) {

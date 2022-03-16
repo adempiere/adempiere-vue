@@ -103,6 +103,7 @@ import {
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 
+import posMixin from '@/components/ADempiere/Form/VPOS/posMixin.js'
 /**
  * This component is made to be the prototype of the Product Info search field
  */
@@ -113,9 +114,10 @@ export default {
     ProductInfoList
   },
 
-  // mixins: [
-  //   fieldMixin
-  // ],
+  mixins: [
+  //   fieldMixin,
+    posMixin
+  ],
 
   props: {
     popoverName: {
@@ -290,6 +292,7 @@ export default {
       this.$store.commit('setShowProductList', false)
     },
     handleSelect(elementSelected) {
+      console.log({ elementSelected })
       const valueProduct = this.isEmptyValue(elementSelected.product) ? elementSelected.value : elementSelected.product.value
       this.$store.dispatch('notifyActionKeyPerformed', {
         containerUuid: 'POS',
@@ -297,6 +300,19 @@ export default {
         // TODO: Verify with 'value' or 'searchValue' attribute
         value: valueProduct
       })
+      // this.findProduct(valueProduct)
+      if (this.allowsCreateOrder) {
+        this.findProduct(valueProduct)
+      } else {
+        const attributePin = {
+          columnName: 'ProductValue',
+          value: valueProduct,
+          type: 'addProduct',
+          label: this.$t('form.pos.pinMessage.addProduct')
+        }
+        this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
+        this.visible = true
+      }
       this.sendProduct = ''
       this.$refs.product.focus()
       this.KeyPerformed = false
