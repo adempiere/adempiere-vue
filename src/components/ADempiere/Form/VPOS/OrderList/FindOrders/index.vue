@@ -341,9 +341,6 @@ export default {
     handleCurrentChange(row) {
       // close popover
       this.$store.commit('setQuickSearchOrder', row)
-      // if (row) {
-      //   this.selectionChangeOrder(row)
-      // }
     },
     selectionChangeOrder(row) {
       this.changeOrder = row
