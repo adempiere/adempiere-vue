@@ -307,10 +307,7 @@ export default {
       }
       const currency = this.pointOfSalesCurrency.iSOCode
       if (columnName === 'CurrentPrice') {
-        if (this.currentPointOfSales.currentPriceList.isTaxIncluded) {
-          return this.formatPrice(row.price, currency)
-        }
-        if (this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
+        if (this.currentPointOfSales.currentPriceList.isTaxIncluded || this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
           return this.formatPrice(row.price, currency)
         }
         if (!this.currentPointOfSales.isDisplayTaxAmount && !this.currentPointOfSales.isDisplayDiscount) {
