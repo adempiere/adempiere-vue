@@ -326,8 +326,14 @@ export default {
       } else if (columnName === 'taxIndicator') {
         return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
+        if (this.currentPointOfSales.currentPriceList.isTaxIncluded) {
+          return this.formatPrice(row.price, currency)
+        }
         return this.formatPrice(row.totalAmountWithTax, currency)
       } else if (columnName === 'ConvertedAmount') {
+        if (this.currentPointOfSales.currentPriceList.isTaxIncluded) {
+          return this.formatPrice(row.price / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
+        }
         return this.formatPrice(row.totalAmountWithTax / this.totalAmountConverted, this.currentPointOfSales.displayCurrency.iso_code)
       } else if (columnName === 'DiscountTotal') {
         return this.formatPrice(row.totalDiscountAmount, currency)
