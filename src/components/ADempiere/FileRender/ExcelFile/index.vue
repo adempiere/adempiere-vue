@@ -52,7 +52,7 @@
 import { defineComponent, ref } from '@vue/composition-api'
 
 // components and mixins
-import XLSX from 'xlsx'
+import { read, utils } from 'xlsx'
 import DownloadFile from '@/components/ADempiere/FileRender/downloadFile.vue'
 
 // utils and helper methods
@@ -89,16 +89,16 @@ export default defineComponent({
 
     function getHeaderRow(sheet) {
       const headers = []
-      const range = XLSX.utils.decode_range(sheet['!ref'])
+      const range = utils.decode_range(sheet['!ref'])
       let C
       const R = range.s.r
       /* start in the first row */
       for (C = range.s.c; C <= range.e.c; ++C) { /* walk every column in the range */
-        const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })]
+        const cell = sheet[utils.encode_cell({ c: C, r: R })]
         /* find the cell in the first row */
         let hdr = 'UNKNOWN ' + C // <-- replace with your desired default
         if (cell && cell.t) {
-          hdr = XLSX.utils.format_cell(cell)
+          hdr = utils.format_cell(cell)
         }
         headers.push(hdr)
       }
@@ -114,13 +114,13 @@ export default defineComponent({
       return new Promise((resolve) => {
         const reader = new FileReader()
         reader.onload = (e) => {
-          const workbook = XLSX.read(dataValues, {
+          const workbook = read(dataValues, {
             type: 'array'
           })
           const firstSheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[firstSheetName]
           const header = getHeaderRow(worksheet)
-          const results = XLSX.utils.sheet_to_json(worksheet)
+          const results = utils.sheet_to_json(worksheet)
 
           // value to render
           excelData.value = {
