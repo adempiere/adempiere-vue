@@ -44,6 +44,9 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 
 // constants
 import { READ_ONLY_FORM_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'
+import {
+  ACTIVE, CLIENT, PROCESSING, PROCESSED, UUID
+} from '@/utils/ADempiere/constants/systemColumns'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -117,19 +120,42 @@ export default defineComponent({
       isDisplayedField,
       isDisplayedColumn,
 
-      isReadOnlyField({
-        field,
-        // records values
-        clientId,
-        isActive,
-        isProcessing,
-        isProcessed,
-        isWithRecord
-      }) {
+      isReadOnlyField(field) {
+        const { parentUuid, containerUuid } = field
+
+        const { isParentTab, isReadOnly } = store.getters.getStoredTab(parentUuid, containerUuid)
+        // if tab is read only, all fields are read only
+        if (isReadOnly) {
+          return true
+        }
+        if (!isParentTab) {
+          // if parent record is new lock childs field to read only
+          const recordParentTab = store.getters.getUuidOfContainer(field.firstTabUuid)
+          if (isEmptyValue(recordParentTab) || recordParentTab === 'create-new') {
+            return true
+          }
+        }
+
+        // record uuid
+        const recordUuid = store.getters.getValueOfField({
+          parentUuid,
+          containerUuid,
+          columnName: UUID
+        })
+        // edit mode is diferent to create new
+        const isWithRecord = recordUuid !== 'create-new' &&
+          !isEmptyValue(recordUuid)
+
         if (isWithRecord) {
+          // client id value of record
+          const clientIdRecord = store.getters.getValueOfField({
+            parentUuid,
+            containerUuid,
+            columnName: CLIENT
+          })
           // evaluate client id context with record
           const preferenceClientId = store.getters.getPreferenceClientId
-          if (preferenceClientId !== clientId) {
+          if (clientIdRecord !== preferenceClientId) {
             return true
           }
 
@@ -138,11 +164,34 @@ export default defineComponent({
             return true
           }
 
+          // is active value of record
+          const isActiveRecord = store.getters.getValueOfField({
+            parentUuid,
+            containerUuid,
+            columnName: ACTIVE
+          })
           // record is inactive isReadOnlyFromForm
-          if (!isActive && field.columnName !== 'IsActive') {
+          if (!isActiveRecord && field.columnName !== 'IsActive') {
             return true
           }
-          if (isProcessing || isProcessed) {
+
+          // is processed value of record
+          const isProcessed = store.getters.getValueOfField({
+            parentUuid,
+            containerUuid,
+            columnName: PROCESSED
+          })
+          if (isProcessed) {
+            return true
+          }
+
+          // is processing value of record
+          const isProcessing = store.getters.getValueOfField({
+            parentUuid,
+            containerUuid,
+            columnName: PROCESSING
+          })
+          if (isProcessing) {
             return true
           }
         }
@@ -159,6 +208,12 @@ export default defineComponent({
         // records values
         row
       }) {
+        // if tab is read only, all columns are read only
+        const { isReadOnly } = store.getters.getStoredTab(field.parentUuid, field.containerUuid)
+        if (isReadOnly) {
+          return true
+        }
+
         // read only with metadata
         if (isReadOnlyColumn(field)) {
           true

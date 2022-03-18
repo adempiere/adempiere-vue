@@ -70,9 +70,6 @@ import FieldOptions from '@/components/ADempiere/Field/FieldOptions/index.vue'
 
 // constants
 import { TEXT } from '@/utils/ADempiere/references'
-import {
-  ACTIVE, CLIENT, PROCESSING, PROCESSED
-} from '@/utils/ADempiere/constants/systemColumns'
 
 // utils and helper methods
 import { evalutateTypeField } from '@/utils/ADempiere/dictionaryUtils'
@@ -245,21 +242,8 @@ export default {
         return false
       }
 
-      // TODO: Add validate method to record uuid uuid without route.action
-      // edit mode is diferent to create new
-      const isWithRecord = this.recordUuid !== 'create-new' &&
-        !this.isEmptyValue(this.recordUuid)
-
       // validate with container manager
-      return this.containerManager.isReadOnlyField({
-        field: this.field,
-        // record values
-        clientId: this.containerClientId,
-        isActive: this.containerIsActive,
-        isProcessing: this.containerIsProcessing,
-        isProcessed: this.containerIsProcessed,
-        isWithRecord
-      })
+      return this.containerManager.isReadOnlyField(this.field)
     },
     isMandatoryField() {
       // validate with container manager
@@ -272,38 +256,6 @@ export default {
         parentUuid: this.parentUuid,
         containerUuid: this.containerUuid,
         columnName: 'UUID'
-      })
-    },
-    containerIsActive() {
-      // panel processing value
-      return this.$store.getters.getValueOfField({
-        parentUuid: this.parentUuid,
-        containerUuid: this.containerUuid,
-        columnName: ACTIVE
-      })
-    },
-    containerIsProcessing() {
-      // panel processing value
-      return this.$store.getters.getValueOfField({
-        parentUuid: this.parentUuid,
-        containerUuid: this.containerUuid,
-        columnName: PROCESSING
-      })
-    },
-    containerIsProcessed() {
-      // panel processed value
-      return this.$store.getters.getValueOfField({
-        parentUuid: this.parentUuid,
-        containerUuid: this.containerUuid,
-        columnName: PROCESSED
-      })
-    },
-    containerClientId() {
-      // panel client value
-      return this.$store.getters.getValueOfField({
-        parentUuid: this.parentUuid,
-        containerUuid: this.containerUuid,
-        columnName: CLIENT
       })
     },
 

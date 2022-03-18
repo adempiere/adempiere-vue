@@ -30,6 +30,10 @@ export default {
     return state.storedWindows[windowUuid]
   },
 
+  getParentTabUuid: (state) => (windowUuid) => {
+    return state.storedWindows[windowUuid].firstTabUuid
+  },
+
   getStoredTabs: (state) => (windowUuid) => {
     return state.storedWindows[windowUuid].tabsList
   },
@@ -71,7 +75,8 @@ export default {
   getStoredFieldFromTab: (state, getters) => ({ windowUuid, tabUuid, columnName, fieldUuid }) => {
     return getters.getStoredFieldsFromTab(windowUuid, tabUuid)
       .find(field => {
-        return field.columnName === columnName || field.uuid === fieldUuid
+        return field.columnName === columnName ||
+          field.uuid === fieldUuid
       })
   },
 

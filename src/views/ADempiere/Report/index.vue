@@ -60,6 +60,7 @@
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
+
 import lang from '@/lang'
 import store from '@/store'
 
@@ -167,11 +168,7 @@ export default defineComponent({
       },
 
       actionPerformed: ({ field, value }) => {
-        // let action = 'reportActionPerformed'
-        // if (field.isReport) {
-        //   action = 'reportActionPerformed'
-        // }
-        // store.dispatch(action, {
+        // store.dispatch('reportActionPerformed', {
         //   field,
         //   value
         // })
@@ -185,11 +182,7 @@ export default defineComponent({
 
       isDisplayedField,
 
-      isReadOnlyField({
-        field
-      }) {
-        return isReadOnlyField(field)
-      },
+      isReadOnlyField,
 
       isMandatoryField,
 

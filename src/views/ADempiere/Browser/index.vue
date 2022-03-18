@@ -84,6 +84,7 @@
 
 <script>
 import { computed, defineComponent, ref } from '@vue/composition-api'
+
 import lang from '@/lang'
 import store from '@/store'
 
@@ -285,9 +286,7 @@ export default defineComponent({
 
       isMandatoryField,
 
-      isReadOnlyField({ field }) {
-        return isReadOnlyField(field)
-      },
+      isReadOnlyField,
 
       changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
         store.dispatch('changeBrowserFieldShowedFromUser', {

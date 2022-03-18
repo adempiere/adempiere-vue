@@ -312,7 +312,8 @@ export function generateTabs({
       isAddFieldUuid: true,
       isAddLinkColumn: true,
       fieldOverwrite: {
-        isReadOnlyFromForm: true
+        isReadOnlyFromForm: true,
+        firstTabUuid
       }
     })
   })

@@ -54,11 +54,7 @@ export default (processUuid) => {
 
     isDisplayedField,
 
-    isReadOnlyField({
-      field
-    }) {
-      return isReadOnlyField(field)
-    },
+    isReadOnlyField,
 
     isMandatoryField,
 
