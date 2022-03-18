@@ -327,7 +327,7 @@ export default {
         return this.formatQuantity(row.taxIndicator)
       } else if (columnName === 'GrandTotal') {
         if (this.currentPointOfSales.currentPriceList.isTaxIncluded) {
-          return this.formatPrice(row.price, currency)
+          return this.formatPrice(row.totalAmount, currency)
         }
         return this.formatPrice(row.totalAmountWithTax, currency)
       } else if (columnName === 'ConvertedAmount') {
