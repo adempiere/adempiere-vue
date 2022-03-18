@@ -307,12 +307,6 @@ export default {
       })
     },
 
-    isFieldOnly() {
-      if (this.inTable || this.field.isFieldOnly) {
-        return undefined
-      }
-      return this.field.name
-    },
     isSelectCreated() {
       return this.isAdvancedQuery &&
         ['IN', 'NOT_IN'].includes(this.field.operator) &&

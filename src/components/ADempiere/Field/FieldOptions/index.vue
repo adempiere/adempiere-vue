@@ -28,8 +28,12 @@
       @command="handleCommand"
       @click="false"
     >
-      <label-field :is-mandatory="metadata.required" :label="metadata.name" :is-mobile="true" />
-
+      <label-field
+        :is-mandatory="metadata.required"
+        :label="metadata.name"
+        :is-field-only="metadata.isFieldOnly"
+        :is-mobile="true"
+      />
       <el-dropdown-menu slot="dropdown">
         <template
           v-for="(option, key) in optionsList"
@@ -60,7 +64,11 @@
     >
       <el-submenu index="menu">
         <template slot="title">
-          <label-field :is-mandatory="metadata.required" :label="metadata.name" />
+          <label-field
+            :is-mandatory="metadata.required"
+            :label="metadata.name"
+            :is-field-only="metadata.isFieldOnly"
+          />
         </template>
 
         <el-menu-item
@@ -96,7 +104,11 @@
 
     <span v-else key="options-form">
       <!-- label or name of field in form -->
-      <label-field :is-mandatory="metadata.required" :label="metadata.name" />
+      <label-field
+        :is-mandatory="metadata.required"
+        :label="metadata.name"
+        :is-field-only="metadata.isFieldOnly"
+      />
     </span>
   </div>
 </template>
