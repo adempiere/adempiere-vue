@@ -18,7 +18,7 @@
 
 <template>
   <el-col :span="24">
-    <el-card class="box-card" shadow="never" style="height: 350px;">
+    <el-card class="box-card" shadow="never" style="height: 400px;">
       <div slot="header" class="clearfix">
         <span>
           {{ $t('form.pos.order.BusinessPartnerCreate.address.addNewAddress') }}

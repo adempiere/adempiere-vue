@@ -593,7 +593,28 @@ export default {
         })
         values.value = values.taxId
       }
-      values.addresses = [this.billingAddress, this.shippingAddress]
+      const createBillingAddress = this.addressForm(this.$store.getters.getValuesView({
+        containerUuid: 'Billing-Address',
+        format: 'object'
+      }))
+      createBillingAddress.is_default_billing = true
+      createBillingAddress.is_default_shipping = false
+      let createShippingAddress = this.addressForm(this.$store.getters.getValuesView({
+        containerUuid: 'Shipping-Address',
+        format: 'object'
+      }))
+      createShippingAddress = {
+        ...createShippingAddress,
+        is_default_billing: false,
+        is_default_shipping: true
+      }
+      if (this.copyShippingAddress) {
+        createShippingAddress = {
+          ...createBillingAddress,
+          is_default_shipping: true
+        }
+      }
+      values.addresses = [createBillingAddress, createShippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: 'Business-Partner-Create',
         formatReturn: 'name'

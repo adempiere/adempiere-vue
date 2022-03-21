@@ -331,7 +331,21 @@ export default {
           })
         }
       ]
-      values.addresses = [this.billingAddress, this.shippingAddress]
+      const createBillingAddress = this.addressForm(this.$store.getters.getValuesView({
+        containerUuid: 'Billing-Address',
+        format: 'object'
+      }))
+
+      let createShippingAddress = this.addressForm(this.$store.getters.getValuesView({
+        containerUuid: 'Shipping-Address',
+        format: 'object'
+      }))
+      if (this.copyShippingAddress) {
+        createShippingAddress = {
+          ...createBillingAddress
+        }
+      }
+      values.addresses = [createBillingAddress, createShippingAddress]
       const emptyMandatoryFields = this.$store.getters.getFieldsListEmptyMandatory({
         containerUuid: this.containerUuid,
         formatReturn: 'name'
