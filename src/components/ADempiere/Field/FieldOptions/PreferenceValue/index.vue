@@ -180,7 +180,7 @@ export default {
         })
       }
 
-      return this.$store.getters.getValueOfField({
+      return this.$store.getters.getValueOfFieldOnContainer({
         parentUuid: this.fieldAttributes.parentUuid,
         containerUuid,
         columnName
@@ -198,7 +198,7 @@ export default {
         })
       }
 
-      return this.$store.getters.getValueOfField({
+      return this.$store.getters.getValueOfFieldOnContainer({
         parentUuid: this.fieldAttributes.parentUuid,
         containerUuid,
         columnName

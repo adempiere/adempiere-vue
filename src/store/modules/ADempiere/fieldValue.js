@@ -135,28 +135,63 @@ const value = {
   },
 
   getters: {
-    getValueOfField: (state) => ({
+    getValueOfField: (state, getters) => ({
       parentUuid,
       containerUuid,
       columnName
     }) => {
-      let key = ''
       let value
+      if (containerUuid) {
+        // get in tab level
+        value = getters.getValueOfFieldOnContainer({
+          containerUuid,
+          columnName
+        })
+      }
+
+      if (parentUuid && isEmptyValue(value)) {
+        // get in window level
+        value = getters.getValueOfFieldOnParent({
+          parentUuid,
+          columnName
+        })
+      }
+
+      return value
+    },
+
+    getValueOfFieldOnContainer: (state) => ({
+      containerUuid,
+      columnName
+    }) => {
+      let key = ''
       if (containerUuid) {
         // get in tab level
         key += containerUuid + '_'
       }
       key += columnName
-      value = state.field[key]
 
-      if (parentUuid && isEmptyValue(value)) {
-        // get in window level
-        key = parentUuid + '_' + columnName
-        value = state.field[parentUuid + '_' + columnName]
-      }
+      const value = state.field[key]
 
       return value
     },
+
+    getValueOfFieldOnParent: (state) => ({
+      parentUuid,
+      columnName
+    }) => {
+      let key = ''
+      if (parentUuid) {
+        // get in window level
+        key = parentUuid + '_'
+      }
+      key += columnName
+
+      const value = state.field[key]
+
+      return value
+    },
+
     /**
      * Get values and column's name as key (without parent uuid or container
      * uuid), from a view (container)

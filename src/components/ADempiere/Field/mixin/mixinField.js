@@ -75,7 +75,7 @@ export default {
         }
 
         // main panel values
-        return this.$store.getters.getValueOfField({
+        return this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid,
           columnName

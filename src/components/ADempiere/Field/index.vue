@@ -69,6 +69,7 @@
 import FieldOptions from '@/components/ADempiere/Field/FieldOptions/index.vue'
 
 // constants
+import { UUID } from '@/utils/ADempiere/constants/systemColumns'
 import { TEXT } from '@/utils/ADempiere/references'
 
 // utils and helper methods
@@ -252,10 +253,10 @@ export default {
 
     recordUuid() {
       // is active record
-      return this.$store.getters.getValueOfField({
+      return this.$store.getters.getValueOfFieldOnContainer({
         parentUuid: this.parentUuid,
         containerUuid: this.containerUuid,
-        columnName: 'UUID'
+        columnName: UUID
       })
     },
 

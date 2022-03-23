@@ -175,7 +175,7 @@ export default {
       }
 
       // main panel values
-      return this.$store.getters.getValueOfField({
+      return this.$store.getters.getValueOfFieldOnContainer({
         parentUuid: this.fieldAttributes.parentUuid,
         containerUuid,
         columnName

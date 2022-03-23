@@ -155,7 +155,7 @@ export default {
           }
         }
 
-        return this.$store.getters.getValueOfField({
+        return this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid,
           columnName
@@ -194,7 +194,7 @@ export default {
         if (this.metadata.inTable) {
           return undefined
         }
-        return this.$store.getters.getValueOfField({
+        return this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           // 'ColumnName'_UUID
@@ -230,7 +230,7 @@ export default {
           }
         }
 
-        return this.$store.getters.getValueOfField({
+        return this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid,
           columnName
