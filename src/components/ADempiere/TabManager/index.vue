@@ -31,58 +31,75 @@
         :current-tab="tabsList[currentTab]"
       />
     </auxiliary-panel>
-
-    <el-tabs
-      v-model="currentTab"
-      type="border-card"
-      @tab-click="handleClick"
-    >
-      <el-tab-pane
-        v-for="(tabAttributes, key) in tabsList"
-        :key="key"
-        :label="tabAttributes.name"
-        :name="String(key)"
-        :tabuuid="tabAttributes.uuid"
-        :tabindex="String(key)"
-        lazy
-        :disabled="isDisabledTab(key)"
-        :style="tabStyle"
+    <div style="display: flex;">
+      <el-tabs
+        v-model="currentTab"
+        type="border-card"
+        style="width: 99%"
+        @tab-click="handleClick"
       >
-        <tab-label
-          slot="label"
-          :is-active-tab="tabAttributes.uuid === tabUuid"
-          :parent-uuid="parentUuid"
-          :container-uuid="tabAttributes.uuid"
-        />
-
-        <div v-if="isShowedTabs">
-          <!-- records in table to multi records -->
-          <default-table
-            v-if="!isParentTabs"
-            v-show="!isParentTabs && isShowedTableRecords"
-            key="default-table"
+        <el-tab-pane
+          v-for="(tabAttributes, key) in tabsList"
+          :key="key"
+          :label="tabAttributes.name"
+          :name="String(key)"
+          :tabuuid="tabAttributes.uuid"
+          :tabindex="String(key)"
+          lazy
+          :disabled="isDisabledTab(key)"
+          :style="tabStyle"
+        >
+          <tab-label
+            slot="label"
+            :is-active-tab="tabAttributes.uuid === tabUuid"
             :parent-uuid="parentUuid"
             :container-uuid="tabAttributes.uuid"
-            :container-manager="containerManager"
-            :header="tableHeaders"
-            :data-table="recordsList"
-            :panel-metadata="tabAttributes"
           />
-          <!-- Close table when clicking on group of fields -->
-          <div @click="closeRecordNavigation()">
-            <!-- fields in panel to single record -->
-            <panel-definition
-              v-show="isParentTabs || (!isParentTabs && !isShowedTableRecords)"
-              key="panel-definition"
+
+          <div v-if="isShowedTabs">
+            <!-- records in table to multi records -->
+            <default-table
+              v-if="!isParentTabs"
+              v-show="!isParentTabs && isShowedTableRecords"
+              key="default-table"
               :parent-uuid="parentUuid"
               :container-uuid="tabAttributes.uuid"
               :container-manager="containerManager"
-              :group-tab="tabAttributes.tabGroup"
+              :header="tableHeaders"
+              :data-table="recordsList"
+              :panel-metadata="tabAttributes"
             />
+            <!-- Close table when clicking on group of fields -->
+            <div @click="closeRecordNavigation()">
+              <!-- fields in panel to single record -->
+              <panel-definition
+                v-show="isParentTabs || (!isParentTabs && !isShowedTableRecords)"
+                key="panel-definition"
+                :parent-uuid="parentUuid"
+                :container-uuid="tabAttributes.uuid"
+                :container-manager="containerManager"
+                :group-tab="tabAttributes.tabGroup"
+              />
+            </div>
           </div>
-        </div>
-      </el-tab-pane>
-    </el-tabs>
+        </el-tab-pane>
+      </el-tabs>
+      <div style="width: 1%;height: 100%;position: fixed;right: 1%;top: 50%;">
+        <el-button type="primary" size="mini" circle @click="openRecordLogs">
+          <svg-icon icon-class="tree-table" />
+        </el-button>
+      </div>
+    </div>
+    <el-drawer
+      :visible.sync="drawer"
+      :with-header="false"
+      :before-close="openRecordLogs"
+    >
+      <record-logs
+        :all-tabs-list="allTabsList"
+        :is-open-logs="drawer"
+      />
+    </el-drawer>
   </div>
 </template>
 
@@ -98,6 +115,7 @@ import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import RecordNavigation from '@/components/ADempiere/RecordNavigation/index.vue'
 import TabLabel from '@/components/ADempiere/TabManager/TabLabel.vue'
+import RecordLogs from '../recordLogs/index.vue'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -110,6 +128,7 @@ export default defineComponent({
     DefaultTable,
     PanelDefinition,
     RecordNavigation,
+    RecordLogs,
     TabLabel
   },
 
@@ -121,6 +140,10 @@ export default defineComponent({
     containerManager: {
       type: Object,
       required: true
+    },
+    allTabsList: {
+      type: Array,
+      required: false
     },
     tabsList: {
       type: Array,
@@ -137,7 +160,6 @@ export default defineComponent({
     if (!props.isParentTabs) {
       queryProperty = 'tabChild'
     }
-
     // if tabParent is present in path set this
     const tabNo = root.$route.query[queryProperty] || '0'
     const currentTab = ref(tabNo)
@@ -364,6 +386,16 @@ export default defineComponent({
         }
       })
     }
+    /**
+     * Listar Historico de cambios
+     */
+    const openRecordLogs = (a) => {
+      const newValue = isEmptyValue(a) ? a.isTrusted : !drawer.value
+      store.commit('setShowRecordLogs', newValue)
+    }
+    const drawer = computed(() => {
+      return store.getters.getShowRecordLogs
+    })
 
     setTabNumber(currentTab.value)
 
@@ -372,12 +404,14 @@ export default defineComponent({
       currentTab,
       tableHeaders,
       recordsList,
+      drawer,
       // computed
       isShowedTabs,
       isShowedTableRecords,
       tabStyle,
       // methods
       handleClick,
+      openRecordLogs,
       closeRecordNavigation,
       isDisabledTab
     }

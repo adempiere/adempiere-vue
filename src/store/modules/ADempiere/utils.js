@@ -42,7 +42,8 @@ const initStateUtils = {
   showPanelAddress: false,
   showTransfer: false,
   showMoneyIncome: false,
-  quickSearchOrder: {}
+  quickSearchOrder: {},
+  showRecordLogs: false
 }
 
 export default {
@@ -171,6 +172,9 @@ export default {
     },
     setShowMoneyIncome(state, showMoneyIncome) {
       state.showMoneyIncome = showMoneyIncome
+    },
+    setShowRecordLogs(state, showRecordLogs) {
+      state.showRecordLogs = showRecordLogs
     }
   },
   actions: {
@@ -380,6 +384,9 @@ export default {
     },
     getQuickSearchOrder: (state) => {
       return state.quickSearchOrder
+    },
+    getShowRecordLogs: (state) => {
+      return state.showRecordLogs
     }
   }
 }

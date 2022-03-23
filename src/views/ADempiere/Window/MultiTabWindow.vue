@@ -32,6 +32,7 @@
       :parent-uuid="windowMetadata.uuid"
       :container-manager="containerManager"
       :tabs-list="windowMetadata.tabsListParent"
+      :all-tabs-list="allTabsList"
     />
 
     <tab-manager
@@ -39,6 +40,7 @@
       :parent-uuid="windowMetadata.uuid"
       :container-manager="containerManager"
       :tabs-list="windowMetadata.tabsListChild"
+      :all-tabs-list="allTabsList"
       :is-parent-tabs="false"
     />
   </div>
@@ -81,6 +83,8 @@ export default defineComponent({
     const isWithChildsTab = computed(() => {
       return !isEmptyValue(props.windowMetadata.tabsListChild)
     })
+
+    const allTabsList = ref([])
 
     const containerManager = {
       ...props.windowManager,
@@ -216,10 +220,14 @@ export default defineComponent({
     const relationsManager = ref({
       menuParentUuid: root.$route.meta.parentUuid
     })
+    if (props.windowMetadata.tabsList) {
+      allTabsList.value = props.windowMetadata.tabsList
+    }
 
     return {
       currentTabUuid: props.windowMetadata.currentTabUuid,
       actionsManager,
+      allTabsList,
       referencesManager,
       relationsManager,
       isWithChildsTab,
