@@ -54,31 +54,24 @@
 
   <loading-view
     v-else
-    key="window-loading"
+    key="report-loading"
   />
 </template>
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import lang from '@/lang'
 import store from '@/store'
 
 // components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import mixinReport from '@/views/ADempiere/Report/mixinReport.js'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
 
 import { convertProcess as convertReport } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import { generateProcess as generateReport } from '@/utils/ADempiere/dictionary/process.js'
-
-// utils and helper methods
-import {
-  isDisplayedField,
-  isMandatoryField,
-  isReadOnlyField
-} from '@/utils/ADempiere/dictionary/process.js'
 
 export default defineComponent({
   name: 'ReportView',
@@ -108,12 +101,10 @@ export default defineComponent({
       reportUuid = props.uuid
     }
 
+    const { containerManager, actionsManager, storedReportDefinition } = mixinReport(reportUuid)
+
     const showContextMenu = computed(() => {
       return store.state.settings.showContextMenu
-    })
-
-    const storedReport = computed(() => {
-      return store.getters.getStoredReport(reportUuid)
     })
 
     store.dispatch('settings/changeSetting', {
@@ -123,7 +114,7 @@ export default defineComponent({
 
     // get report from vuex store or request from server
     const getReport = async() => {
-      let report = storedReport.value
+      let report = storedReportDefinition.value
       if (report) {
         reportMetadata.value = report
         isLoadedMetadata.value = true
@@ -159,60 +150,11 @@ export default defineComponent({
         })
     }
 
-    const containerManager = {
-      getPanel({ containerUuid }) {
-        return store.getters.getStoredReport(containerUuid)
-      },
-      getFieldsList({ containerUuid }) {
-        return store.getters.getStoredFieldsFromReport(containerUuid)
-      },
-
-      actionPerformed: ({ field, value }) => {
-        // store.dispatch('reportActionPerformed', {
-        //   field,
-        //   value
-        // })
-      },
-
-      setDefaultValues: ({ containerUuid }) => {
-        store.dispatch('setReportDefaultValues', {
-          containerUuid
-        })
-      },
-
-      isDisplayedField,
-
-      isReadOnlyField,
-
-      isMandatoryField,
-
-      changeFieldShowedFromUser({ containerUuid, fieldsShowed }) {
-        store.dispatch('changeReportFieldShowedFromUser', {
-          containerUuid,
-          fieldsShowed
-        })
-      }
-    }
-
-    const actionsList = computed(() => {
-      return store.getters.getStoredActionsMenu({
-        containerUuid: reportUuid
-      })
-    })
-
-    getReport()
-
-    const actionsManager = ref({
-      containerUuid: reportUuid,
-
-      defaultActionName: lang.t('actionMenu.generateReport'),
-
-      getActionList: () => actionsList.value
-    })
-
     const relationsManager = ref({
       menuParentUuid: root.$route.meta.parentUuid
     })
+
+    getReport()
 
     return {
       reportUuid,

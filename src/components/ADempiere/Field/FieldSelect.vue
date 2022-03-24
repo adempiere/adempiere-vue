@@ -109,22 +109,22 @@ export default {
       return styleClass
     },
     getLookupList() {
-      if (this.isEmptyValue(this.metadata.reference.query) ||
-        !this.metadata.displayed) {
+      if (!this.metadata.displayed) {
         return [this.blankOption]
       }
       return this.$store.getters.getStoredLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        uuid: this.metadata.uuid,
         tableName: this.metadata.reference.tableName,
-        query: this.metadata.reference.query,
-        validationCode: this.metadata.reference.validationCode
+        columnName: this.metadata.columnName
       })
     },
     getLookupAll() {
       const allOptions = this.$store.getters.getStoredLookupAll({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        uuid: this.metadata.uuid,
         tableName: this.metadata.reference.tableName,
         query: this.metadata.reference.query,
         validationCode: this.metadata.reference.validationCode,
@@ -420,14 +420,14 @@ export default {
     },
     remoteMethod() {
       this.isLoading = true
-      this.$store.dispatch('getLookupListFromServer', {
+      this.containerManager.getLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        uuid: this.metadata.uuid,
+        //
         columnName: this.metadata.columnName,
         tableName: this.metadata.reference.tableName,
-        query: this.metadata.reference.query,
-        validationCode: this.metadata.reference.validationCode,
-        // valuesList: this.value
+        // app attributes
         isAddBlankValue: true,
         blankValue: this.blankOption.value
       })
@@ -446,6 +446,7 @@ export default {
       this.$store.dispatch('deleteLookupList', {
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        uuid: this.metadata.uuid,
         tableName: this.metadata.reference.tableName,
         query: this.metadata.reference.query,
         directQuery: this.metadata.reference.directQuery,

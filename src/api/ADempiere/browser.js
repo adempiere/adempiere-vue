@@ -38,7 +38,7 @@ export function requestBrowserSearch({
   uuid,
   parametersList = [],
   tableName,
-  contextAttriburesList = [],
+  contextAttributesList = [],
   nextPageToken: pageToken,
   pageSize
 }) {
@@ -60,7 +60,7 @@ export function requestBrowserSearch({
       // DSL Query
       filters,
       // Custom Query
-      context_attributes: contextAttriburesList
+      context_attributes: contextAttributesList
     },
     params: {
       // Page Data

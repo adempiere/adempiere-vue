@@ -310,6 +310,14 @@ export default defineComponent({
         return store.getters.getBrowserSelectionsList({
           containerUuid
         })
+      },
+
+      getLookupList({ parentUuid, containerUuid, uuid }) {
+        return store.dispatch('getLookupListFromServer', {
+          parentUuid,
+          containerUuid,
+          browseFieldUuid: uuid
+        })
       }
     }
 

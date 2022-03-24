@@ -51,38 +51,48 @@ export function requestLookup({
 /**
  * Request a Lookup list data from Reference
  * The main attributes that function hope are:
- * @param {string} tableName
- * @param {string} query
- * @param {string} whereClause
- * @param {array}  valuesList // TODO: Add support
+ * @param {string} fieldUuid
+ * @param {string} browseFieldUuid
+ * @param {string} processParameterUuid
+ * @param {array}  contextAttributesList
  * @param {string} pageToken
  * @param {number} pageSize
  */
 export function requestLookupList({
+  contextAttributesList,
+  fieldUuid,
+  processParameterUuid,
+  browseFieldUuid,
+  referenceUuid,
   tableName,
-  query,
-  whereClause,
   columnName,
-  valuesList = [],
+  searchValue,
   pageToken,
   pageSize
 }) {
-  let filters = []
-  if (!isEmptyValue(valuesList)) {
-    filters = [{
-      column_name: columnName,
-      values: valuesList
-    }]
+  let contextAttributes = []
+  if (!isEmptyValue(contextAttributesList)) {
+    contextAttributes = contextAttributesList.map(attribute => {
+      return {
+        column_name: attribute.columnName,
+        value: attribute.value
+      }
+    })
   }
 
   return request({
     url: '/user-interface/window/lookup-items',
     method: 'get',
     params: {
+      context_attribures: contextAttributes,
+      field_uuid: fieldUuid,
+      process_parameter_uuid: processParameterUuid,
+      browse_field_uuid: browseFieldUuid,
+      //
+      reference_uuid: referenceUuid,
+      search_value: searchValue,
       table_name: tableName,
-      query,
-      where_clause: whereClause,
-      filters,
+      column_name: columnName,
       // Page Data
       pageToken,
       pageSize

@@ -157,14 +157,14 @@ const browserControl = {
       })
 
       // get context values
-      const contextAttriburesList = getContextAttributes({
+      const contextAttributesList = getContextAttributes({
         containerUuid,
         contextColumnNames
       })
 
       return requestBrowserSearch({
         uuid: containerUuid,
-        contextAttriburesList,
+        contextAttributesList,
         parametersList,
         nextPageToken: pageToken
       })

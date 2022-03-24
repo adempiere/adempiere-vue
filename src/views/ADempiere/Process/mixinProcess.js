@@ -63,6 +63,14 @@ export default (processUuid) => {
         containerUuid,
         fieldsShowed
       })
+    },
+
+    getLookupList({ parentUuid, containerUuid, uuid }) {
+      return store.dispatch('getLookupListFromServer', {
+        parentUuid,
+        containerUuid,
+        processParameterUuid: uuid
+      })
     }
   }
 

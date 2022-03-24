@@ -292,6 +292,14 @@ export default defineComponent({
           containerUuid,
           fieldsShowed
         })
+      },
+
+      getLookupList({ parentUuid, containerUuid, uuid }) {
+        return store.dispatch('getLookupListFromServer', {
+          parentUuid,
+          containerUuid,
+          fieldUuid: uuid
+        })
       }
 
     }

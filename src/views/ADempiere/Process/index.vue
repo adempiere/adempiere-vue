@@ -45,7 +45,6 @@
 
         <panel-definition
           :container-uuid="processUuid"
-          :panel-metadata="processMetadata"
           :container-manager="containerManager"
         />
       </el-card>
@@ -54,12 +53,13 @@
 
   <loading-view
     v-else
-    key="window-loading"
+    key="process-loading"
   />
 </template>
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
+
 import store from '@/store'
 
 // components and mixins
