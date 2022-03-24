@@ -605,8 +605,8 @@ export default {
       }))
       createShippingAddress = {
         ...createShippingAddress,
-        is_default_billing: false,
-        is_default_shipping: true
+        is_default_billing: true,
+        is_default_shipping: false
       }
       if (this.copyShippingAddress) {
         createShippingAddress = {
