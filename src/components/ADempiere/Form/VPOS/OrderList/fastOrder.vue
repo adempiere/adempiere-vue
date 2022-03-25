@@ -69,7 +69,14 @@
                           name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
                         }"
                         :container-uuid="'Cash-Withdrawal'"
-                        :container-manager="containerManager"
+                        :container-manager="{
+                          ...containerManager,
+                          getLookupList,
+                          isDisplayedField,
+                          isMandatoryField,
+                          isReadOnlyField,
+                          changeFieldShowedFromUser
+                        }"
                       />
                     </el-form-item>
                   </el-form>
@@ -130,6 +137,13 @@ import { createShipment, shipments, holdOrder } from '@/api/ADempiere/form/point
 import {
   listOrders
 } from '@/api/ADempiere/form/point-of-sales.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 // ultils and helper methods
 import {
@@ -147,7 +161,6 @@ export default {
     DocumentStatusTag,
     FieldDefinition
   },
-
   props: {
     metadata: {
       type: Object,
@@ -167,11 +180,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return false },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -350,6 +359,11 @@ export default {
   methods: {
     extractPagingToken,
     createFieldFromDictionary,
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     handleCommand(command) {
       if (this.isEmptyValue(this.metadataList)) {
         this.setFieldsList()

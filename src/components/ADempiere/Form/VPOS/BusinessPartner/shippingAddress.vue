@@ -31,7 +31,14 @@
             isReadOnly: disabled
           }"
           :container-uuid="'Shipping-Address'"
-          :container-manager="containerManager"
+          :container-manager="{
+            ...containerManager,
+            getLookupList,
+            isDisplayedField,
+            isMandatoryField,
+            isReadOnlyField,
+            changeFieldShowedFromUser
+          }"
         />
       </div>
     </el-card>
@@ -46,6 +53,13 @@ import fieldsList from './shippingFieldLocation/fieldsList'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import BParterMixin from './mixinBusinessPartner.js'
 import FieldLocation from './shippingFieldLocation'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'ShippingAddress',
@@ -79,11 +93,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -137,6 +147,13 @@ export default {
   },
   beforeDestroy() {
     this.unsubscribe()
+  },
+  methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser
   }
 }
 </script>

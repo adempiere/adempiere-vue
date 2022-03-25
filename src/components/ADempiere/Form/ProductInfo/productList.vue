@@ -32,7 +32,14 @@
         :key="field.columnName"
         :metadata-field="field"
         :container-uuid="'Products-Price-List-ProductInfo'"
-        :container-manager="containerManager"
+        :container-manager="{
+          ...containerManager,
+          getLookupList,
+          isDisplayedField,
+          isMandatoryField,
+          isReadOnlyField,
+          changeFieldShowedFromUser
+        }"
       />
     </el-form>
     <el-table
@@ -153,6 +160,13 @@ import fieldsListProductPrice from './fieldsList.js'
 
 // utils and herlper methods
 import { formatPrice, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'ProductList',
@@ -190,11 +204,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -298,6 +308,11 @@ export default {
   methods: {
     formatPrice,
     formatQuantity,
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     getImageFromSource(keyValue) {
       if (this.isEmptyValue(keyValue)) {
         return this.defaultImage

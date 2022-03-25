@@ -33,8 +33,11 @@
               :container-uuid="containerUuid"
               :container-manager="{
                 ...containerManager,
-                isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic},
-                isDisplayedField({ isDisplayed, isDisplayedFromLogic }) {return field.isDisplayed || field.isDisplayedFromLogic}
+                getLookupList,
+                isDisplayedField,
+                isMandatoryField,
+                isReadOnlyField,
+                changeFieldShowedFromUser
               }"
               :metadata-field="field"
             />

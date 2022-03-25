@@ -30,7 +30,14 @@
         }"
         :value-model="fieldsList[0].value"
         :container-uuid="'Billing-Address'"
-        :container-manager="containerManager"
+        :container-manager="{
+          ...containerManager,
+          getLookupList,
+          isDisplayedField,
+          isMandatoryField,
+          isReadOnlyField,
+          changeFieldShowedFromUser
+        }"
       />
       <br>
       <br>
@@ -46,6 +53,13 @@ import fieldsList from './BillingFieldLocation/fieldsList.js'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 import BParterMixin from './mixinBusinessPartner.js'
 import FieldLocation from './BillingFieldLocation'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'BillingAddress',
@@ -82,11 +96,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -145,6 +155,13 @@ export default {
     popoverCreateBusinessParnet() {
       return this.$store.getters.getPopoverCreateBusinessParnet
     }
+  },
+  methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser
   }
 }
 </script>

@@ -19,7 +19,14 @@
   <div>
     <product-info-list
       :report-asociated="process"
-      :container-manager="containerManager"
+      :container-manager="{
+        ...containerManager,
+        getLookupList,
+        isDisplayedField,
+        isMandatoryField,
+        isReadOnlyField,
+        changeFieldShowedFromUser
+      }"
     />
   </div>
 </template>
@@ -34,6 +41,13 @@ import {
   formatPrice,
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'ProductInfo',
@@ -45,11 +59,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -105,6 +115,11 @@ export default {
   methods: {
     formatPrice,
     formatQuantity,
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     shortcutKeyMethod(event) {
       switch (event.srcKey) {
         case 'refreshList':

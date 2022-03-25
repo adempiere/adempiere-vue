@@ -68,7 +68,14 @@
                       labelCurrency: refundReferenceCurrency
                     }"
                     :container-uuid="'OverdrawnInvoice'"
-                    :container-manager="containerManager"
+                    :container-manager="{
+                      ...containerManager,
+                      getLookupList,
+                      isDisplayedField,
+                      isMandatoryField,
+                      isReadOnlyField,
+                      changeFieldShowedFromUser
+                    }"
                   />
                 </el-col>
                 <el-col :span="8">
@@ -111,7 +118,14 @@
                   <field-definition
                     :metadata-field="field"
                     :container-uuid="'OverdrawnInvoice'"
-                    :container-manager="containerManager"
+                    :container-manager="{
+                      ...containerManager,
+                      getLookupList,
+                      isDisplayedField,
+                      isMandatoryField,
+                      isReadOnlyField,
+                      changeFieldShowedFromUser
+                    }"
                   />
                 </el-col>
               </el-row>
@@ -162,7 +176,14 @@
                     :key="field.columnName"
                     :metadata-field="field"
                     :container-uuid="'OverdrawnInvoice'"
-                    :container-manager="containerManager"
+                    :container-manager="{
+                      ...containerManager,
+                      getLookupList,
+                      isDisplayedField,
+                      isMandatoryField,
+                      isReadOnlyField,
+                      changeFieldShowedFromUser
+                    }"
                   />
                 </el-col>
               </el-row>
@@ -202,7 +223,14 @@
                       labelCurrency: refundReferenceCurrency
                     }"
                     :container-uuid="'OverdrawnInvoice'"
-                    :container-manager="containerManager"
+                    :container-manager="{
+                      ...containerManager,
+                      getLookupList,
+                      isDisplayedField,
+                      isMandatoryField,
+                      isReadOnlyField,
+                      changeFieldShowedFromUser
+                    }"
                   />
                 </el-col>
                 <el-col :span="8">
@@ -262,7 +290,14 @@
                   <field-definition
                     :metadata-field="field"
                     :container-uuid="'OverdrawnInvoice'"
-                    :container-manager="containerManager"
+                    :container-manager="{
+                      ...containerManager,
+                      getLookupList,
+                      isDisplayedField,
+                      isMandatoryField,
+                      isReadOnlyField,
+                      changeFieldShowedFromUser
+                    }"
                   />
                 </el-col>
               </el-row>
@@ -361,6 +396,13 @@ import fieldsListOverdrawnInvoice from './fieldsListOverdrawnInvoice.js'
 import typeCollection from '@/components/ADempiere/Form/VPOS/Collection/typeCollection'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 // import typeRefund from './typeRefund/index.vue'
 
 export default {
@@ -407,11 +449,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -786,6 +824,11 @@ export default {
   methods: {
     formatPrice,
     formatDateToSend,
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     sumRefund(cash) {
       let sum = 0
       if (!this.isEmptyValue(cash)) {
