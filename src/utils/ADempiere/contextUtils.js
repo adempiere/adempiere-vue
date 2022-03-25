@@ -38,6 +38,7 @@ export const getContext = ({
   parentUuid,
   containerUuid,
   isBooleanToString = false,
+  isForceBoolean = true,
   columnName
 }) => {
   let value
@@ -62,7 +63,7 @@ export const getContext = ({
   }
 
   if (isBooleanToString) {
-    return convertBooleanToString(value)
+    return convertBooleanToString(value, isForceBoolean)
   }
 
   return value
@@ -313,7 +314,9 @@ export function parseContext({
 export function getContextAttributes({
   parentUuid,
   containerUuid,
-  contextColumnNames = []
+  contextColumnNames = [],
+  isBooleanToString = false,
+  isForceBoolean = false
 }) {
   const contextAttributesList = []
   if (isEmptyValue(contextColumnNames)) {
@@ -324,7 +327,9 @@ export function getContextAttributes({
     const value = getContext({
       parentUuid,
       containerUuid,
-      columnName
+      columnName,
+      isBooleanToString,
+      isForceBoolean
     })
 
     contextAttributesList.push({

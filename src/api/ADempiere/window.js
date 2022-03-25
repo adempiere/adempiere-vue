@@ -26,21 +26,43 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  * @param {string|number} value
  */
 export function requestLookup({
+  contextAttributesList,
+  uuid,
+  //
+  referenceUuid,
+  searchValue,
+  //
   tableName,
-  directQuery,
+  columnName,
+  columnUuid,
+  //
   value
 }) {
-  const filters = [{
-    value
-  }]
+  let contextAttributes = []
+  if (!isEmptyValue(contextAttributesList)) {
+    contextAttributes = contextAttributesList.map(attribute => {
+      return {
+        key: attribute.columnName,
+        value: attribute.value
+      }
+    })
+  }
 
   return request({
     url: '/user-interface/window/lookup-item',
     method: 'get',
     params: {
+      context_attributes: contextAttributes,
+      uuid,
+      //
+      reference_uuid: referenceUuid,
+      search_value: searchValue,
+      //
       table_name: tableName,
-      query: directQuery,
-      filters
+      column_name: columnName,
+      column_uuid: columnUuid,
+      //
+      value
     }
   })
     .then(respose => {
@@ -63,10 +85,14 @@ export function requestLookupList({
   fieldUuid,
   processParameterUuid,
   browseFieldUuid,
+  //
   referenceUuid,
+  searchValue,
+  //
   tableName,
   columnName,
-  searchValue,
+  columnUuid,
+  //
   pageToken,
   pageSize
 }) {
@@ -74,7 +100,7 @@ export function requestLookupList({
   if (!isEmptyValue(contextAttributesList)) {
     contextAttributes = contextAttributesList.map(attribute => {
       return {
-        column_name: attribute.columnName,
+        key: attribute.columnName,
         value: attribute.value
       }
     })
@@ -84,15 +110,17 @@ export function requestLookupList({
     url: '/user-interface/window/lookup-items',
     method: 'get',
     params: {
-      context_attribures: contextAttributes,
+      context_attributes: contextAttributes,
       field_uuid: fieldUuid,
       process_parameter_uuid: processParameterUuid,
       browse_field_uuid: browseFieldUuid,
       //
       reference_uuid: referenceUuid,
       search_value: searchValue,
+      //
       table_name: tableName,
       column_name: columnName,
+      column_uuid: columnUuid,
       // Page Data
       pageToken,
       pageSize

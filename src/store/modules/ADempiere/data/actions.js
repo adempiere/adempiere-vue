@@ -26,7 +26,7 @@ import {
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { convertArrayKeyValueToObject } from '@/utils/ADempiere/valueFormat.js'
+import { convertArrayKeyValueToObject } from '@/utils/ADempiere/formatValue/iterableFormat.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 import {
   getPreference

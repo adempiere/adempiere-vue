@@ -294,10 +294,11 @@ export default defineComponent({
         })
       },
 
-      getLookupList({ parentUuid, containerUuid, uuid }) {
+      getLookupList({ parentUuid, containerUuid, uuid, contextColumnNames }) {
         return store.dispatch('getLookupListFromServer', {
           parentUuid,
           containerUuid,
+          contextColumnNames,
           fieldUuid: uuid
         })
       }

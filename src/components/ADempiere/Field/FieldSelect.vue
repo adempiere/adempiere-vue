@@ -58,7 +58,6 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  * - Table Direct
  *
  * TODO: String values add single quotation marks 'value'
- * TODO: Add support to valuesList filter on proxy-api
  * TODO: No blanck option enabled if is mandatory field
  * TODO: ALL: Although in the future these will have different components, and
  * are currently not supported is also displayed as a substitute for fields:
@@ -115,7 +114,9 @@ export default {
       return this.$store.getters.getStoredLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        contextColumnNames: this.metadata.reference.contextColumnNames,
         uuid: this.metadata.uuid,
+        //
         tableName: this.metadata.reference.tableName,
         columnName: this.metadata.columnName
       })
@@ -124,11 +125,11 @@ export default {
       const allOptions = this.$store.getters.getStoredLookupAll({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        contextColumnNames: this.metadata.reference.contextColumnNames,
         uuid: this.metadata.uuid,
+        //
         tableName: this.metadata.reference.tableName,
-        query: this.metadata.reference.query,
-        validationCode: this.metadata.reference.validationCode,
-        directQuery: this.metadata.reference.directQuery,
+        columnName: this.metadata.columnName,
         value: this.value
       })
 
@@ -377,16 +378,18 @@ export default {
       }
     },
     async getDataLookupItem() {
-      if (this.isEmptyValue(this.metadata.reference.directQuery) ||
-        (this.metadata.isAdvancedQuery && this.isSelectMultiple)) {
+      if (this.metadata.isAdvancedQuery && this.isSelectMultiple) {
         return
       }
       this.isLoading = true
       this.$store.dispatch('getLookupItemFromServer', {
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        contextColumnNames: this.metadata.reference.contextColumnNames,
+        uuid: this.metadata.uuid,
+        //
         tableName: this.metadata.reference.tableName,
-        directQuery: this.metadata.reference.directQuery,
+        columnName: this.metadata.columnName,
         value: this.value
       })
         .then(responseLookupItem => {
@@ -420,13 +423,15 @@ export default {
     },
     remoteMethod() {
       this.isLoading = true
+
       this.containerManager.getLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        contextColumnNames: this.metadata.reference.contextColumnNames,
         uuid: this.metadata.uuid,
         //
-        columnName: this.metadata.columnName,
         tableName: this.metadata.reference.tableName,
+        columnName: this.metadata.columnName,
         // app attributes
         isAddBlankValue: true,
         blankValue: this.blankOption.value
@@ -443,14 +448,14 @@ export default {
         })
     },
     clearLookup() {
-      this.$store.dispatch('deleteLookupList', {
+      this.$store.dispatch('deleteLookup', {
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
+        contextColumnNames: this.metadata.reference.contextColumnNames,
         uuid: this.metadata.uuid,
+        //
         tableName: this.metadata.reference.tableName,
-        query: this.metadata.reference.query,
-        directQuery: this.metadata.reference.directQuery,
-        validationCode: this.metadata.reference.validationCode,
+        columnName: this.metadata.columnName,
         value: this.value
       })
         .then(() => {

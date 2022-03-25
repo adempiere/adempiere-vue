@@ -65,10 +65,11 @@ export default (processUuid) => {
       })
     },
 
-    getLookupList({ parentUuid, containerUuid, uuid }) {
+    getLookupList({ parentUuid, containerUuid, contextColumnNames, uuid }) {
       return store.dispatch('getLookupListFromServer', {
         parentUuid,
         containerUuid,
+        contextColumnNames,
         processParameterUuid: uuid
       })
     }
