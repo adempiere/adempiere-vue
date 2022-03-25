@@ -28,6 +28,7 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 export function requestLookup({
   contextAttributesList,
   uuid,
+  id,
   //
   referenceUuid,
   searchValue,
@@ -54,6 +55,7 @@ export function requestLookup({
     params: {
       context_attributes: contextAttributes,
       uuid,
+      id,
       //
       reference_uuid: referenceUuid,
       search_value: searchValue,

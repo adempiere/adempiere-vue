@@ -108,6 +108,7 @@ const lookupManager = {
       containerUuid,
       contextColumnNames,
       uuid,
+      id,
       //
       referenceUuid,
       searchValue,
@@ -115,11 +116,10 @@ const lookupManager = {
       tableName,
       columnName,
       columnUuid,
-      directQuery,
       value
     }) {
       return new Promise(resolve => {
-        if (isEmptyValue(directQuery)) {
+        if (isEmptyValue(id) && isEmptyValue(uuid)) {
           resolve()
           return
         }
@@ -134,6 +134,7 @@ const lookupManager = {
         requestLookup({
           contextAttributesList,
           uuid,
+          id,
           //
           referenceUuid,
           searchValue,
