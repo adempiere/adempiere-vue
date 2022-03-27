@@ -17,7 +17,7 @@
 import evaluator from '@/utils/ADempiere/evaluator'
 import { arrayMatches, isEmptyValue, parsedValueComponent } from '@/utils/ADempiere/valueUtils'
 import { getContext, getParentFields, getPreference, parseContext } from '@/utils/ADempiere/contextUtils'
-import REFERENCES, { BUTTON, YES_NO, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
+import REFERENCES, { BUTTON, FIELDS_QUANTITY, YES_NO, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
 import { FIELD_OPERATORS_LIST } from '@/utils/ADempiere/dataUtils'
 import {
   ACCOUNTING_COLUMNS,
@@ -348,8 +348,15 @@ export function getDefaultValue({
   }
 
   // set default value
-  if (isEmptyValue(parsedDefaultValue) && !isContextValue) {
-    parsedDefaultValue = defaultValue
+  if (!isContextValue) {
+    if (isEmptyValue(parsedDefaultValue)) {
+      parsedDefaultValue = defaultValue
+    }
+    if (isMandatory &&
+      isEmptyValue(parsedDefaultValue) &&
+      FIELDS_QUANTITY.includes(displayType)) {
+      parsedDefaultValue = 0
+    }
   }
 
   // convert to element-ui compatible value
