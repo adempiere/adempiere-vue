@@ -27,17 +27,16 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  */
 export function requestLookup({
   contextAttributesList,
-  uuid,
+  fieldUuid,
+  processParameterUuid,
+  browseFieldUuid,
   id,
   //
   referenceUuid,
-  searchValue,
   //
   tableName,
   columnName,
-  columnUuid,
-  //
-  value
+  columnUuid
 }) {
   let contextAttributes = []
   if (!isEmptyValue(contextAttributesList)) {
@@ -54,17 +53,16 @@ export function requestLookup({
     method: 'get',
     params: {
       context_attributes: contextAttributes,
-      uuid,
+      field_uuid: fieldUuid,
+      process_parameter_uuid: processParameterUuid,
+      browse_field_uuid: browseFieldUuid,
       id,
       //
       reference_uuid: referenceUuid,
-      search_value: searchValue,
       //
       table_name: tableName,
       column_name: columnName,
-      column_uuid: columnUuid,
-      //
-      value
+      column_uuid: columnUuid
     }
   })
     .then(respose => {

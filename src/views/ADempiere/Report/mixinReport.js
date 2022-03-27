@@ -65,6 +65,17 @@ export default (reportUuid) => {
       })
     },
 
+    getLookupItem({ parentUuid, containerUuid, uuid, id, contextColumnNames, columnName }) {
+      return store.dispatch('getLookupItemFromServer', {
+        parentUuid,
+        containerUuid,
+        contextColumnNames,
+        processParameterUuid: uuid,
+        id,
+        //
+        columnName
+      })
+    },
     getLookupList({ parentUuid, containerUuid, contextColumnNames, uuid }) {
       return store.dispatch('getLookupListFromServer', {
         parentUuid,

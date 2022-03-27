@@ -384,7 +384,8 @@ export default {
         return
       }
       this.isLoading = true
-      this.$store.dispatch('getLookupItemFromServer', {
+
+      this.containerManager.getLookupItem({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
         contextColumnNames: this.metadata.reference.contextColumnNames,

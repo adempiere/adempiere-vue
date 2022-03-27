@@ -107,19 +107,19 @@ const lookupManager = {
       parentUuid,
       containerUuid,
       contextColumnNames,
-      uuid,
+      fieldUuid,
+      processParameterUuid,
+      browseFieldUuid,
       id,
       //
       referenceUuid,
-      searchValue,
       //
       tableName,
       columnName,
-      columnUuid,
-      value
+      columnUuid
     }) {
       return new Promise(resolve => {
-        if (isEmptyValue(id) && isEmptyValue(uuid)) {
+        if (isEmptyValue(id) && isEmptyValue(fieldUuid)) {
           resolve()
           return
         }
@@ -133,17 +133,16 @@ const lookupManager = {
 
         requestLookup({
           contextAttributesList,
-          uuid,
+          fieldUuid,
+          processParameterUuid,
+          browseFieldUuid,
           id,
           //
           referenceUuid,
-          searchValue,
           //
           tableName,
           columnName,
-          columnUuid,
-          //
-          value
+          columnUuid
         })
           .then(lookupItemResponse => {
             const {
@@ -152,16 +151,22 @@ const lookupManager = {
             const option = {
               label: isEmptyValue(label) ? ' ' : label,
               uuid: lookupItemResponse.uuid,
-              value // lookupItemResponse.values.KeyColumn
+              value: lookupItemResponse.values.KeyColumn
             }
 
             const clientId = rootGetters.getPreferenceClientId
 
-            let key = `${clientId}|${uuid}`
+            let key = clientId
+            if (!isEmptyValue(fieldUuid)) {
+              key += `|${fieldUuid}`
+            } else if (!isEmptyValue(processParameterUuid)) {
+              key += `|${processParameterUuid}`
+            } else if (!isEmptyValue(browseFieldUuid)) {
+              key += `|${browseFieldUuid}`
+            }
 
             const contextKey = generateContextKey(contextAttributesList)
             key += contextKey
-            key += `|${value}`
 
             commit('setLookupItem', {
               parentUuid, // used by suscription filter
@@ -169,7 +174,7 @@ const lookupManager = {
               key,
               contextAttributesList,
               option,
-              value, // isNaN(value) ? value : parseInt(value, 10),
+              value: option.value, // isNaN(value) ? value : parseInt(value, 10),
               clientId: rootGetters.getPreferenceClientId
             })
 
@@ -336,8 +341,7 @@ const lookupManager = {
       containerUuid,
       contextColumnNames = [],
       contextAttributesList = [],
-      uuid,
-      value
+      uuid
     }) => {
       const clientId = rootGetters.getPreferenceClientId
       let key = `${clientId}|${uuid}`
@@ -352,8 +356,6 @@ const lookupManager = {
       }
       const contextKey = generateContextKey(contextAttributesList)
       key += contextKey
-
-      key += `|${value}`
 
       const lookupItem = state.lookupItem[key]
       if (lookupItem) {
@@ -399,8 +401,7 @@ const lookupManager = {
       parentUuid,
       containerUuid,
       contextColumnNames,
-      uuid,
-      value
+      uuid
     }) => {
       const contextAttributesList = getContextAttributes({
         parentUuid,
@@ -424,8 +425,7 @@ const lookupManager = {
           containerUuid,
           contextColumnNames,
           contextAttributesList,
-          uuid,
-          value
+          uuid
         })
 
         // add a item option
