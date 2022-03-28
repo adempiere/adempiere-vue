@@ -311,25 +311,27 @@ export function parseContext({
  * @returns {array<object>}
  */
 export function getContextAttributes({
+  parentUuid,
   containerUuid,
   contextColumnNames = []
 }) {
-  const contextAttriburesList = []
+  const contextAttributesList = []
   if (isEmptyValue(contextColumnNames)) {
-    return contextAttriburesList
+    return contextAttributesList
   }
 
   contextColumnNames.forEach(columnName => {
     const value = getContext({
+      parentUuid,
       containerUuid,
       columnName
     })
 
-    contextAttriburesList.push({
+    contextAttributesList.push({
       value,
       columnName
     })
   })
 
-  return contextAttriburesList
+  return contextAttributesList
 }

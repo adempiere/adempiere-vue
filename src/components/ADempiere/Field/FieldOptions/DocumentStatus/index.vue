@@ -124,7 +124,7 @@ export default defineComponent({
   setup(props, { root }) {
     const displayedValue = computed(() => {
       const { parentUuid, containerUuid, displayColumnName } = props.fieldAttributes
-      return root.$store.getters.getValueOfField({
+      return root.$store.getters.getValueOfFieldOnContainer({
         parentUuid,
         containerUuid,
         columnName: displayColumnName
@@ -133,7 +133,7 @@ export default defineComponent({
 
     const value = computed(() => {
       const { parentUuid, containerUuid, columnName } = props.fieldAttributes
-      return root.$store.getters.getValueOfField({
+      return root.$store.getters.getValueOfFieldOnContainer({
         parentUuid,
         containerUuid,
         columnName

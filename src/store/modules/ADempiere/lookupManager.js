@@ -21,7 +21,7 @@ import { requestLookup, requestLookupList } from '@/api/ADempiere/window.js'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { parseContext } from '@/utils/ADempiere/contextUtils.js'
+import { parseContext, getContextAttributes } from '@/utils/ADempiere/contextUtils.js'
 
 const initStateLookup = {
   lookupItem: {},
@@ -53,18 +53,14 @@ const lookupManager = {
 
     setLookupList(state, {
       clientId,
-      tableName,
-      parsedQuery,
-      parsedValidationCode,
+      key,
+      contextAttributesList,
       optionsList
     }) {
-      const key = `${clientId}_${tableName}_${parsedQuery}_${parsedValidationCode}`
-
       Vue.set(state.lookupList, key, {
         clientId,
-        tableName,
-        parsedQuery,
-        parsedValidationCode,
+        key,
+        contextAttributesList,
         optionsList
       })
     },
@@ -80,12 +76,8 @@ const lookupManager = {
     },
 
     deleteLookupList(state, {
-      clientId,
-      tableName,
-      parsedQuery,
-      parsedValidationCode
+      key
     }) {
-      const key = `${clientId}_${tableName}_${parsedQuery}_${parsedValidationCode}`
       Vue.set(state.lookupList, key, undefined)
     },
 
@@ -160,60 +152,48 @@ const lookupManager = {
     },
 
     /**
-    * Get display column's list from lookup
-    * @param {string}  parentUuid
-    * @param {string}  containerUuid
-    * @param {string}  tableName
-    * @param {string}  query
-    * @param {string}  validationCode
-    * @param {boolean} isAddBlankValue
-    * @param {mixed}   blankValue
-    * @param {string}  columnName, used by multiple values
-    * @param {Array<String>|<Number>}  valuesList, used by multiple values
-    */
+     * Get display column from lookup
+     * @param {string} parentUuid
+     * @param {string} containerUuid
+     * @param {string} tableName
+     * @param {string} directQuery
+     * @param {string|number} value identifier or key
+     */
     getLookupListFromServer({ commit, rootGetters }, {
-      parentUuid,
-      containerUuid,
-      columnName,
-      tableName,
-      query,
-      validationCode,
       isAddBlankValue = false,
       blankValue,
-      valuesList = []
+      parentUuid,
+      containerUuid,
+      contextColumnNames = [],
+      fieldUuid,
+      processParameterUuid,
+      browseFieldUuid,
+      referenceUuid,
+      tableName,
+      columnName,
+      searchValue
     }) {
       return new Promise(resolve => {
-        if (isEmptyValue(query)) {
-          resolve()
+        if (isEmptyValue(fieldUuid) && isEmptyValue(processParameterUuid) && isEmptyValue(browseFieldUuid)) {
+          resolve([])
           return
         }
 
-        let parsedQuery = query
-        if (String(query).includes('@')) {
-          parsedQuery = parseContext({
-            parentUuid,
-            containerUuid,
-            value: query,
-            isBooleanToString: true
-          }).value
-        }
-
-        let parsedValidationCode = validationCode
-        if (String(validationCode).includes('@')) {
-          parsedValidationCode = parseContext({
-            parentUuid,
-            containerUuid,
-            value: validationCode,
-            isBooleanToString: true
-          }).value
-        }
+        const contextAttributesList = getContextAttributes({
+          parentUuid,
+          containerUuid,
+          contextColumnNames
+        })
 
         requestLookupList({
+          contextAttributesList,
+          fieldUuid,
+          processParameterUuid,
+          browseFieldUuid,
+          referenceUuid,
           tableName,
-          query: parsedQuery,
-          whereClause: parsedValidationCode,
           columnName,
-          valuesList
+          searchValue
         })
           .then(lookupListResponse => {
             const optionsList = []
@@ -239,12 +219,34 @@ const lookupManager = {
                 uuid: undefined
               })
             }
+
+            const clientId = rootGetters.getPreferenceClientId
+
+            let key = clientId
+            if (!isEmptyValue(fieldUuid)) {
+              key += `_${fieldUuid}`
+            } else if (!isEmptyValue(processParameterUuid)) {
+              key += `_${processParameterUuid}`
+            } else if (!isEmptyValue(browseFieldUuid)) {
+              key += `_${browseFieldUuid}`
+            }
+
+            if (!isEmptyValue(contextAttributesList)) {
+              let contextKey = ''
+              contextAttributesList.map(attribute => {
+                contextKey += '_' + attribute.columnName + '_' + attribute.value
+              })
+
+              key += '_' + contextKey
+            }
+
             commit('setLookupList', {
-              clientId: rootGetters.getPreferenceClientId,
-              tableName,
-              parsedQuery,
-              parsedValidationCode,
-              optionsList
+              clientId,
+              parentUuid, // used by suscription filter
+              containerUuid, // used by suscription filter
+              contextAttributesList,
+              optionsList,
+              key
             })
 
             resolve(optionsList)
@@ -258,10 +260,10 @@ const lookupManager = {
     deleteLookupList({ commit, rootGetters }, {
       parentUuid,
       containerUuid,
+      uuid,
+      contextColumnNames = [],
       tableName,
-      query,
       directQuery,
-      validationCode,
       value
     }) {
       return new Promise(resolve => {
@@ -283,29 +285,26 @@ const lookupManager = {
           value
         })
 
-        let parsedQuery = query
-        if (!isEmptyValue(parsedQuery) && parsedQuery.includes('@')) {
-          parsedQuery = parseContext({
-            parentUuid,
-            containerUuid,
-            value: parsedQuery,
-            isBooleanToString: true
-          }).value
+        let key = clientId
+        if (!isEmptyValue(uuid)) {
+          key += `_${uuid}`
         }
-        let parsedValidationCode = validationCode
-        if (!isEmptyValue(validationCode) && validationCode.includes('@')) {
-          parsedValidationCode = parseContext({
-            parentUuid,
-            containerUuid,
-            value: validationCode,
-            isBooleanToString: true
-          }).value
+
+        const contextAttributesList = getContextAttributes({
+          parentUuid,
+          containerUuid,
+          contextColumnNames
+        })
+        if (!isEmptyValue(contextAttributesList)) {
+          let contextKey = ''
+          contextAttributesList.map(attribute => {
+            contextKey += '_' + attribute.columnName + '_' + attribute.value
+          })
+
+          key += '_' + contextKey
         }
         commit('deleteLookupList', {
-          clientId,
-          tableName,
-          parsedQuery,
-          parsedValidationCode
+          key
         })
 
         resolve()
@@ -344,32 +343,28 @@ const lookupManager = {
     getStoredLookupList: (state, getters, rootState, rootGetters) => ({
       parentUuid,
       containerUuid,
-      tableName,
-      query,
-      validationCode
+      uuid,
+      contextColumnNames = []
     }) => {
-      let parsedQuery = query
-      if (!isEmptyValue(query) && query.includes('@')) {
-        parsedQuery = parseContext({
-          parentUuid,
-          containerUuid,
-          value: query,
-          isBooleanToString: true
-        }).value
+      let key = rootGetters.getPreferenceClientId
+      if (!isEmptyValue(uuid)) {
+        key += `_${uuid}`
       }
 
-      let parsedValidationCode = validationCode
-      if (!isEmptyValue(validationCode) && validationCode.includes('@')) {
-        parsedValidationCode = parseContext({
-          parentUuid,
-          containerUuid,
-          value: validationCode,
-          isBooleanToString: true
-        }).value
-      }
+      const contextAttributesList = getContextAttributes({
+        parentUuid,
+        containerUuid,
+        contextColumnNames
+      })
 
-      const clientId = rootGetters.getPreferenceClientId
-      const key = `${clientId}_${tableName}_${parsedQuery}_${parsedValidationCode}`
+      if (!isEmptyValue(contextAttributesList)) {
+        let contextKey = ''
+        contextAttributesList.map(attribute => {
+          contextKey += '_' + attribute.columnName + '_' + attribute.value
+        })
+
+        key += '_' + contextKey
+      }
 
       const lookupList = state.lookupList[key]
       if (lookupList) {
@@ -384,18 +379,15 @@ const lookupManager = {
     getStoredLookupAll: (state, getters) => ({
       parentUuid,
       containerUuid,
+      uuid,
       tableName,
-      query,
       directQuery,
-      validationCode,
       value
     }) => {
       const optionsList = getters.getStoredLookupList({
         parentUuid,
         containerUuid,
-        tableName,
-        query,
-        validationCode
+        uuid
       })
 
       // set item values getter from server into list

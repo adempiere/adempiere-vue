@@ -136,7 +136,7 @@ export default {
     },
     value: {
       get() {
-        const value = this.$store.getters.getValueOfField({
+        const value = this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           columnName: this.metadata.columnName
@@ -172,7 +172,7 @@ export default {
     },
     displayedValue: {
       get() {
-        return this.$store.getters.getValueOfField({
+        return this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           // DisplayColumn_'ColumnName'

@@ -163,7 +163,7 @@ export default defineComponent({
           parentUuid,
           containerUuid,
           attributes,
-          isOverWriteParent: true
+          isOverWriteParent: tab.isParentTab
         })
 
         // active logics with set records values

@@ -27,10 +27,9 @@ import {
 
 // constants
 import { ROW_ATTRIBUTES } from '@/utils/ADempiere/constants/table'
-import { OPERATOR_EQUAL } from '@/utils/ADempiere/dataUtils.js'
 
 // utils and helper methods
-import { getContext } from '@/utils/ADempiere/contextUtils.js'
+import { getContextAttributes } from '@/utils/ADempiere/contextUtils.js'
 import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils.js'
 
 const initState = {
@@ -105,27 +104,18 @@ const windowManager = {
 
       const { contextColumnNames } = rootGetters.getStoredTab(parentUuid, containerUuid)
 
-      const contextAttriburesList = []
-      if (!isEmptyValue(contextColumnNames)) {
-        contextColumnNames.forEach(columnName => {
-          const value = getContext({
-            parentUuid,
-            containerUuid,
-            columnName
-          })
-          contextAttriburesList.push({
-            value,
-            operator: OPERATOR_EQUAL.operator,
-            columnName
-          })
-        })
-      }
+      // get context values
+      const contextAttributesList = getContextAttributes({
+        parentUuid,
+        containerUuid,
+        contextColumnNames
+      })
 
       return new Promise(resolve => {
         getEntities({
           windowUuid: parentUuid,
           tabUuid: containerUuid,
-          attributes: contextAttriburesList,
+          attributes: contextAttributesList,
           filters,
           pageToken
         })

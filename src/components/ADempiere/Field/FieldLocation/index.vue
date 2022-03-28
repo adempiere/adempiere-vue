@@ -120,7 +120,7 @@ export default {
           return undefined
         }
 
-        return this.$store.getters.getValueOfField({
+        return this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           // DisplayColumn_'ColumnName'

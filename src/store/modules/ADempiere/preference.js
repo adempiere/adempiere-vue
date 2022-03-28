@@ -165,23 +165,30 @@ const preference = {
       columnName
     }) => {
       let key = ''
+      let value
 
       if (parentUuid) {
         key += parentUuid + '|'
 
         // context for window
         const keyParent = key + columnName
-        const valueParent = state.preference[keyParent]
-        if (!isEmptyValue(valueParent)) {
-          return valueParent
+        value = state.preference[keyParent]
+        if (!isEmptyValue(value)) {
+          return value
         }
       }
+
       if (containerUuid) {
         key += containerUuid + '|'
       }
       key += columnName
+      value = state.preference[key]
+      if (!isEmptyValue(value)) {
+        return value
+      }
 
-      return state.preference[key]
+      value = state.preference[columnName]
+      return value
     },
     getAllPreference: (state) => {
       return state.preference

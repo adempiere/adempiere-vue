@@ -169,7 +169,7 @@ export default defineComponent({
 
     const valueField = computed(() => {
       const { parentUuid, containerUuid, columnName } = props.metadata
-      return root.$store.getters.getValueOfField({
+      return root.$store.getters.getValueOfFieldOnContainer({
         parentUuid,
         containerUuid,
         columnName

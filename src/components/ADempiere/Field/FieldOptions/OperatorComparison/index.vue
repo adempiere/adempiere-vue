@@ -79,7 +79,7 @@ export default defineComponent({
       const { columnName, containerUuid, parentUuid } = props.fieldAttributes
 
       // main panel values
-      return root.$store.getters.getValueOfField({
+      return root.$store.getters.getValueOfFieldOnContainer({
         parentUuid,
         containerUuid,
         columnName

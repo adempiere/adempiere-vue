@@ -20,12 +20,12 @@ export default {
   computed: {
     value: {
       get() {
-        const value = this.$store.getters.getValueOfField({
+        const value = this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           columnName: this.metadata.columnName
         })
-        const valueTo = this.$store.getters.getValueOfField({
+        const valueTo = this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid: this.metadata.containerUuid,
           columnName: this.metadata.columnName

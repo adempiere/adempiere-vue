@@ -207,7 +207,7 @@ export default {
         }
 
         // main panel values
-        let value = this.$store.getters.getValueOfField({
+        let value = this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid,
           columnName
@@ -216,7 +216,7 @@ export default {
           return this.parseValue(value)
         }
 
-        const valueTo = this.$store.getters.getValueOfField({
+        const valueTo = this.$store.getters.getValueOfFieldOnContainer({
           parentUuid: this.metadata.parentUuid,
           containerUuid,
           columnName: this.metadata.columnNameTo

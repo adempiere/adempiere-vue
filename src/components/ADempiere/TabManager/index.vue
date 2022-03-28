@@ -117,6 +117,9 @@ import RecordNavigation from '@/components/ADempiere/RecordNavigation/index.vue'
 import TabLabel from '@/components/ADempiere/TabManager/TabLabel.vue'
 import RecordLogs from '../recordLogs/index.vue'
 
+// constants
+import { UUID } from '@/utils/ADempiere/constants/systemColumns.js'
+
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
@@ -167,14 +170,10 @@ export default defineComponent({
     const tabUuid = ref(props.tabsList[tabNo].uuid)
 
     const tabStyle = computed(() => {
-      let height = '68vh'
-      if (!isShowedTabs.value) {
-        height = '0vh'
-      }
       // height tab content
       return {
         // height: '75vh',
-        height,
+        height: 'auto',
         overflow: 'auto'
       }
     })
@@ -185,10 +184,11 @@ export default defineComponent({
     })
 
     const isShowedTabs = computed(() => {
+      const storedWindow = store.getters.getStoredWindow(props.parentUuid)
       if (props.isParentTabs) {
-        return store.getters.getStoredWindow(props.parentUuid).isShowedTabsParent
+        return storedWindow.isShowedTabsParent
       }
-      return store.getters.getStoredWindow(props.parentUuid).isShowedTabsChildren
+      return storedWindow.isShowedTabsChildren
     })
 
     const isShowedTableRecords = computed(() => {
@@ -289,24 +289,29 @@ export default defineComponent({
     })
 
     const recordUuidTabParent = computed(() => {
-      return store.getters.getValueOfField({
+      return store.getters.getValueOfFieldOnContainer({
         parentUuid: props.parentUuid,
         containerUuid: currentTabMetadata.value.firstTabUuid,
-        columnName: 'UUID'
+        columnName: UUID
       })
     })
 
     const getData = () => {
+      const containerUuid = tabUuid.value
       store.dispatch('getEntities', {
         parentUuid: props.parentUuid,
-        containerUuid: tabUuid.value
+        containerUuid
       }).then(responseData => {
-        const tab = store.getters.getStoredTab(props.parentUuid, tabUuid.value)
-        if (!isCreateNew.value && !isEmptyValue(responseData)) {
-          let row
-          const { action } = root.$route.query
-          // uuid into action query
-          if (!isEmptyValue(action)) {
+        if (isCreateNew.value || isEmptyValue(responseData)) {
+          return
+        }
+
+        const tab = store.getters.getStoredTab(props.parentUuid, containerUuid)
+        let row = {}
+        const { action } = root.$route.query
+        // uuid into action query
+        if (!isEmptyValue(action) && action !== 'create-new') {
+          if (tab.isParentTab) {
             if (action === 'zoomIn') {
               const { columnName, value } = root.$route.query
               row = responseData.find(rowData => {
@@ -316,37 +321,36 @@ export default defineComponent({
               row = responseData.find(rowData => {
                 return rowData.UUID === action
               })
-
-              // search link value
-              if (isEmptyValue(row) && !tab.isParentTab) {
-                const { linkColumnName } = tab
-                const value = store.getters.getValueOfField({
-                  parentUuid: props.parentUuid,
-                  columnName: linkColumnName
-                })
-                if (linkColumnName && !isEmptyValue(value)) {
-                  row = responseData.find(rowData => {
-                    return rowData[linkColumnName] === value
-                  })
-                }
-              }
             }
+          } else {
+            /*
+            // search link value
+            const { linkColumnName } = tab
+            const value = store.getters.getValueOfField({
+              parentUuid: props.parentUuid,
+              columnName: linkColumnName
+            })
+            if (linkColumnName && !isEmptyValue(value)) {
+              row = responseData.find(rowData => {
+                return rowData[linkColumnName] === value
+              })
+            }
+            */
           }
-
-          // set first record
-          if (isEmptyValue(row)) {
-            row = responseData[0]
-          }
-
-          const { tableName } = tab
-          // set values in panel
-          props.containerManager.seekRecord({
-            parentUuid: props.parentUuid,
-            containerUuid: tabUuid.value,
-            row,
-            tableName
-          })
         }
+
+        // set first record
+        if (isEmptyValue(row)) {
+          row = responseData[0]
+        }
+
+        // set values in panel
+        props.containerManager.seekRecord({
+          parentUuid: props.parentUuid,
+          containerUuid,
+          row,
+          tableName: tab.tableName
+        })
       })
     }
 
