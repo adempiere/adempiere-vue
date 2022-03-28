@@ -203,6 +203,7 @@ const lookupManager = {
       fieldUuid,
       processParameterUuid,
       browseFieldUuid,
+      id,
       //
       referenceUuid,
       searchValue,
@@ -229,6 +230,7 @@ const lookupManager = {
           fieldUuid,
           processParameterUuid,
           browseFieldUuid,
+          id,
           //
           referenceUuid,
           searchValue,

@@ -85,6 +85,7 @@ export function requestLookupList({
   fieldUuid,
   processParameterUuid,
   browseFieldUuid,
+  id,
   //
   referenceUuid,
   searchValue,
@@ -114,6 +115,7 @@ export function requestLookupList({
       field_uuid: fieldUuid,
       process_parameter_uuid: processParameterUuid,
       browse_field_uuid: browseFieldUuid,
+      id,
       //
       reference_uuid: referenceUuid,
       search_value: searchValue,

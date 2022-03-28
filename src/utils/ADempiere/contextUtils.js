@@ -138,7 +138,7 @@ export function getPreference({
  * @param {string} displayLogic
  * @param {string} mandatoryLogic
  * @param {string} readOnlyLogic
- * @param {object} reference
+ * @param {object} reference.contextColumnNames array
  * @param {string} defaultValue
  * @returns {array} List column name of parent fields
  */
@@ -149,12 +149,10 @@ export function getParentFields({
   reference,
   defaultValue
 }) {
-  const validationCode = []
+  let contextColumnNames = []
   //  Validate reference
-  if (!isEmptyValue(reference) && !isEmptyValue(reference.validationCode)) {
-    validationCode.push(
-      ...evaluator.parseDepends(reference.validationCode)
-    )
+  if (!isEmptyValue(reference) && !isEmptyValue(reference.contextColumnNames)) {
+    contextColumnNames = reference.contextColumnNames
   }
   const parentFields = Array.from(new Set([
     //  For Display logic
@@ -165,8 +163,8 @@ export function getParentFields({
     ...evaluator.parseDepends(readOnlyLogic),
     //  For Default Value
     ...evaluator.parseDepends(defaultValue),
-    //  For Validation Code
-    ...validationCode
+    //  For Validation Code / SQL values
+    ...contextColumnNames
   ]))
 
   return parentFields

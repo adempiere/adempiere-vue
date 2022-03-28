@@ -324,13 +324,14 @@ const getters = {
           const { displayColumnName } = fieldItem
           let displayedValue
           if (!isEmptyValue(parsedDefaultValue)) {
-            const { tableName, directQuery, query } = fieldItem.reference
+            const { tableName, contextColumnNames } = fieldItem.reference
             const optionsList = rootGetters.getStoredLookupAll({
               parentUuid,
               containerUuid,
-              directQuery,
+              contextColumnNames,
+              id: fieldItem.id,
+              uuid: fieldItem.uuid,
               tableName,
-              query,
               value: parsedDefaultValue
             })
             if (!isEmptyValue(optionsList)) {

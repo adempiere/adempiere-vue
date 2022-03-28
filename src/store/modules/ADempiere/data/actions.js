@@ -171,12 +171,15 @@ const actions = {
             }
 
             // get label (DisplayColumn) from vuex store
-            const options = rootGetters.getLookupAll({
+            const options = rootGetters.getStoredLookupAll({
               parentUuid,
               containerUuid,
+              contextColumnNames: itemField.reference.contextColumnNames,
+              //
+              id: itemField.id,
+              fieldUuid: itemField.uuid,
+              columnName: itemField.columnName,
               tableName: itemField.reference.tableName,
-              query: itemField.reference.query,
-              directQuery: itemField.reference.directQuery,
               value: valueGetDisplayColumn
             })
 
@@ -205,9 +208,12 @@ const actions = {
             const { label } = await dispatch('getLookupItemFromServer', {
               parentUuid,
               containerUuid,
+              contextColumnNames: itemField.reference.contextColumnNames,
+              //
+              id: itemField.id,
+              fieldUuid: itemField.uuid,
               columnName: itemField.columnName,
               tableName: itemField.reference.tableName,
-              directQuery: itemField.reference.directQuery,
               value: valueGetDisplayColumn
             })
             values[itemField.displayColumnName] = label
