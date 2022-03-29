@@ -300,6 +300,22 @@ export default defineComponent({
           containerUuid,
           fieldUuid: uuid
         })
+      },
+
+      getRecordLogs({ tableName, recordId, recordUuid }) {
+        return store.dispatch('listRecordLogs', {
+          tableName,
+          recordId,
+          recordUuid
+        })
+      },
+
+      getAttachment({ tableName, recordId, recordUuid }) {
+        return store.dispatch('findAttachment', {
+          tableName,
+          recordId,
+          recordUuid
+        })
       }
 
     }

@@ -94,10 +94,12 @@
       :visible.sync="drawer"
       :with-header="false"
       :before-close="openRecordLogs"
+      :size="'50%'"
     >
-      <record-logs
+      <panel-info
         :all-tabs-list="allTabsList"
-        :is-open-logs="drawer"
+        :container-manager="containerManager"
+        :current-record="currentRecordLogs"
       />
     </el-drawer>
   </div>
@@ -115,7 +117,7 @@ import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
 import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 import RecordNavigation from '@/components/ADempiere/RecordNavigation/index.vue'
 import TabLabel from '@/components/ADempiere/TabManager/TabLabel.vue'
-import RecordLogs from '../recordLogs/index.vue'
+import PanelInfo from '../PanelInfo/index.vue'
 
 // constants
 import { UUID } from '@/utils/ADempiere/constants/systemColumns.js'
@@ -131,7 +133,7 @@ export default defineComponent({
     DefaultTable,
     PanelDefinition,
     RecordNavigation,
-    RecordLogs,
+    PanelInfo,
     TabLabel
   },
 
@@ -177,6 +179,11 @@ export default defineComponent({
         overflow: 'auto'
       }
     })
+
+    // Panel Info
+
+    const currentRecordLogs = ref({})
+    const drawer = ref(false)
 
     // use getter to reactive properties
     const currentTabMetadata = computed(() => {
@@ -229,7 +236,7 @@ export default defineComponent({
      */
     const handleClick = (tabHTML) => {
       const { tabuuid, tabindex } = tabHTML.$attrs
-
+      findRecordLogs(props.allTabsList[0])
       setTabNumber(tabindex)
 
       // set metadata tab
@@ -390,17 +397,34 @@ export default defineComponent({
         }
       })
     }
+
     /**
      * Listar Historico de cambios
      */
     const openRecordLogs = (a) => {
-      const newValue = isEmptyValue(a) ? a.isTrusted : !drawer.value
-      store.commit('setShowRecordLogs', newValue)
+      findRecordLogs(props.allTabsList[0])
+      drawer.value = !drawer.value
+      if (drawer.value) {
+        props.containerManager.getRecordLogs({
+          tableName: props.allTabsList[0].tableName,
+          recordId: currentRecordLogs.value[props.allTabsList[parseInt(currentTab.value)].tableName + '_ID'],
+          recordUuid: currentRecordLogs.value.UUID
+        })
+      }
+      // store.commit('setShowRecordLogs', newValue)
     }
-    const drawer = computed(() => {
-      return store.getters.getShowRecordLogs
-    })
 
+    /**
+     * Current Record
+     */
+    const findRecordLogs = (tab) => {
+      currentRecordLogs.value = root.$store.getters.getValuesView({
+        parentUuid: tab.parentUuid,
+        containerUuid: tab.containerUuid,
+        format: 'object'
+      })
+    }
+    findRecordLogs(props.allTabsList[0])
     setTabNumber(currentTab.value)
 
     return {
@@ -409,12 +433,14 @@ export default defineComponent({
       tableHeaders,
       recordsList,
       drawer,
+      currentRecordLogs,
       // computed
       isShowedTabs,
       isShowedTableRecords,
       tabStyle,
       // methods
       handleClick,
+      findRecordLogs,
       openRecordLogs,
       closeRecordNavigation,
       isDisabledTab
