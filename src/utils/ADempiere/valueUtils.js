@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import language from '@/lang'
-import { getImagePath } from '@/utils/ADempiere/resource.js'
+import { getResoursePath } from '@/utils/ADempiere/resource.js'
 // constants
 import { TABLE, TABLE_DIRECT } from '@/utils/ADempiere/references.js'
 
@@ -716,14 +716,13 @@ export function convertValuesToSend(values) {
   return valuesToSend
 }
 
-export function getImageFromSource({ fileName, width = 900, height = 900 }) {
-  const image = getImagePath({
-    file: fileName,
-    width,
-    height
+export function getSource({ resourceUuid, resourceName, resourceType }) {
+  const image = getResoursePath({
+    resourceUuid,
+    resourceName
   })
   if (isEmptyValue(image)) {
     return require('@/image/ADempiere/priceChecking/no-image.jpg')
   }
-  return image.uri
+  return image
 }

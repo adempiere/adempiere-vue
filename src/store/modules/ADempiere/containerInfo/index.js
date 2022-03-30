@@ -4,7 +4,7 @@ import {
 import {
   getAttachment
 } from '@/api/ADempiere/user-interface/resources.js'
-import { isEmptyValue, getImageFromSource } from '@/utils/ADempiere'
+import { isEmptyValue, getSource } from '@/utils/ADempiere'
 
 // const initStateContainerInfo = {
 //   recordLogs: [],
@@ -71,15 +71,9 @@ const containerInfo = {
         .then(response => {
           if (response.resourceReferencesList.length > 0) {
             const image = response.resourceReferencesList.map(element => {
-              if (element.content_type.includes('image')) {
-                return {
-                  ...element,
-                  url: getImageFromSource({ fileName: element.file_name })
-                }
-              }
               return {
                 ...element,
-                url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png'
+                url: getSource({ resourceUuid: element.resource_uuid, resourceName: element.file_name, resourceType: element.content_type })
               }
             })
             if (image.length > 0) {

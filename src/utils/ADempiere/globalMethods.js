@@ -17,7 +17,7 @@
 export {
   isEmptyValue,
   currencyFind,
-  getImageFromSource,
+  getSource,
   tenderTypeFind,
   formatConversionCurrenty,
   // round,
