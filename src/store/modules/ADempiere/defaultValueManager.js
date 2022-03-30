@@ -21,7 +21,7 @@ import { requestDefaultValue } from '@/api/ADempiere/user-interface/persistence.
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 // utils and helper methods
-import { parseContext } from '@/utils/ADempiere/contextUtils'
+import { parseContext, generateContextKey, getContextAttributes } from '@/utils/ADempiere/contextUtils'
 
 const initState = {
   inRequest: new Map(),
@@ -32,7 +32,7 @@ const defaultValueManager = {
   state: initState,
 
   mutations: {
-    setDefaultValue(state, { clientId, parsedQuery, value }) {
+    setDefaultValueOld(state, { clientId, parsedQuery, value }) {
       const key = `${clientId}_${parsedQuery}`
 
       Vue.set(state.storedDefaultValue, key, {
@@ -41,12 +41,103 @@ const defaultValueManager = {
         value
       })
     },
+
+    setDefaultValue(state, { key, clientId, contextAttributes, value, displayedValue }) {
+      Vue.set(state.storedDefaultValue, key, {
+        clientId,
+        contextAttributes,
+        value,
+        displayedValue
+      })
+    },
+
     resetStateDefaultValue(state) {
       state = initState
     }
   },
 
   actions: {
+    /**
+     * @param {string} parentUuid
+     * @param {string} containerUuid
+     * @param {string} columnName
+     * @param {string} query
+     */
+    getDefaultValueFromServer({ state, commit, rootGetters }, {
+      parentUuid,
+      containerUuid,
+      contextColumnNames,
+      columnName,
+      id,
+      fieldUuid,
+      processParameterUuid,
+      browseFieldUuid
+    }) {
+      return new Promise(resolve => {
+        if (isEmptyValue(id) && isEmptyValue(fieldUuid) && isEmptyValue(processParameterUuid) && isEmptyValue(browseFieldUuid)) {
+          resolve()
+          return
+        }
+
+        const contextAttributesList = getContextAttributes({
+          parentUuid,
+          containerUuid,
+          contextColumnNames,
+          isBooleanToString: true
+        })
+        const clientId = rootGetters.getPreferenceClientId
+
+        let key = clientId
+        if (!isEmptyValue(fieldUuid)) {
+          key += `|${fieldUuid}`
+        } else if (!isEmptyValue(processParameterUuid)) {
+          key += `|${processParameterUuid}`
+        } else if (!isEmptyValue(browseFieldUuid)) {
+          key += `|${browseFieldUuid}`
+        }
+
+        const contextKey = generateContextKey(contextAttributesList)
+        key += contextKey
+
+        // if it is the same request, it is not made
+        if (state.inRequest.get(key)) {
+          resolve()
+          return
+        }
+        state.inRequest.set(key, true)
+        requestDefaultValue({
+          contextAttributesList,
+          id,
+          fieldUuid,
+          processParameterUuid,
+          browseFieldUuid
+        })
+          .then(valueResponse => {
+            commit('setDefaultValue', {
+              key,
+              clientId,
+              value: valueResponse
+            })
+
+            commit('updateValueOfField', {
+              parentUuid,
+              containerUuid,
+              columnName,
+              value: valueResponse
+            })
+
+            resolve(valueResponse)
+          })
+          .catch(error => {
+            console.warn(`Error getting default value from server. Error code ${error.code}: ${error.message}.`)
+          })
+          .finally(() => {
+            // current request finalized
+            state.inRequest.set(key, false)
+          })
+      })
+    },
+
     /**
      * @param {string} parentUuid
      * @param {string} containerUuid
@@ -111,7 +202,7 @@ const defaultValueManager = {
   },
 
   getters: {
-    getStoredDefaultValue: (state, getters, rootState, rootGetters) => ({
+    getStoredDefaultValueOld: (state, getters, rootState, rootGetters) => ({
       parentUuid,
       containerUuid,
       query
@@ -128,6 +219,22 @@ const defaultValueManager = {
 
       const clientId = rootGetters.getPreferenceClientId
       const key = `${clientId}_${parsedQuery}`
+
+      const defaultValue = state.storedDefaultValue[key]
+      if (!isEmptyValue(defaultValue)) {
+        return defaultValue.value
+      }
+      return undefined
+    },
+
+    getStoredDefaultValue: (state, getters, rootState, rootGetters) => ({
+      parentUuid,
+      containerUuid,
+      contextColumnNames = [],
+      uuid
+    }) => {
+      const clientId = rootGetters.getPreferenceClientId
+      const key = `${clientId}|${uuid}`
 
       const defaultValue = state.storedDefaultValue[key]
       if (!isEmptyValue(defaultValue)) {

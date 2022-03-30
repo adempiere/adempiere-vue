@@ -21,23 +21,11 @@ import { requestLookup, requestLookupList } from '@/api/ADempiere/window.js'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { getContextAttributes } from '@/utils/ADempiere/contextUtils.js'
+import { getContextAttributes, generateContextKey } from '@/utils/ADempiere/contextUtils.js'
 
 const initStateLookup = {
   lookupItem: {},
   lookupList: {}
-}
-
-function generateContextKey(contextAttributes = []) {
-  let contextKey = ''
-  if (isEmptyValue(contextAttributes)) {
-    return contextKey
-  }
-
-  contextAttributes.map(attribute => {
-    contextKey += '|' + attribute.columnName + '|' + attribute.value
-  })
-  return '_' + contextKey
 }
 
 const lookupManager = {
@@ -311,9 +299,10 @@ const lookupManager = {
           contextColumnNames,
           isBooleanToString: true
         })
-        let keyItem = `${clientId}|${uuid}`
 
         const contextKey = generateContextKey(contextAttributesList)
+
+        let keyItem = `${clientId}|${uuid}`
         keyItem += contextKey
         keyItem += `|${value}`
 

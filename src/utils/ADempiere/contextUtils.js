@@ -338,3 +338,15 @@ export function getContextAttributes({
 
   return contextAttributesList
 }
+
+export function generateContextKey(contextAttributes = []) {
+  let contextKey = ''
+  if (isEmptyValue(contextAttributes)) {
+    return contextKey
+  }
+
+  contextAttributes.map(attribute => {
+    contextKey += '|' + attribute.columnName + '|' + attribute.value
+  })
+  return '_' + contextKey
+}

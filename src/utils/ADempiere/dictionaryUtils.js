@@ -60,6 +60,7 @@ export function generateField({
   }
 
   let parentFieldsList = []
+  let contextColumnNames = []
   let parsedDefaultValue = fieldToGenerate.defaultValue
   let parsedDefaultValueTo = fieldToGenerate.defaultValueTo
   let operator = 'EQUAL'
@@ -121,6 +122,7 @@ export function generateField({
     if (String(fieldToGenerate.defaultValue).includes('@SQL=')) {
       isShowedFromUser = true
       isSQLValue = true
+      contextColumnNames = evaluator.parseDepends(fieldToGenerate.defaultValue)
     }
 
     // VALUE TO
@@ -136,6 +138,16 @@ export function generateField({
         elementName: `${fieldToGenerate.elementName}_To`,
         isSOTrxMenu
       })
+
+      if (String(fieldToGenerate.defaultValueTo).includes('@SQL=')) {
+        isShowedFromUser = true
+        isSQLValue = true
+        const contextColumnNamesTo = evaluator.parseDepends(fieldToGenerate.defaultValueTo)
+        contextColumnNames = Array.from(new Set([
+          ...contextColumnNames,
+          ...contextColumnNamesTo
+        ]))
+      }
     }
 
     parentFieldsList = getParentFields(fieldToGenerate)
@@ -185,6 +197,7 @@ export function generateField({
     isFixedTableColumn: false,
     valueType: componentReference.valueType, // value type to convert with gGRPC
     isSQLValue,
+    contextColumnNames,
     // Advanced query
     operator, // current operator
     oldOperator: undefined, // old operator
