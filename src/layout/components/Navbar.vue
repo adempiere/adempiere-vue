@@ -124,13 +124,12 @@ export default {
       return uri
     },
     fieldPanel() {
-      return this.$store.getters.getFieldsListFromPanel(this.$route.meta.uuid).filter(field => field.isShowedFromUser)
+      return this.$store.getters.getStoredFieldsFromProcess(this.$route.meta.uuid).filter(field => field.isMandatory || field.isShowedFromUser)
     },
     fieldWindow() {
-      const windowUuid = this.$store.getters.getWindow(this.$route.meta.uuid).currentTab.uuid
-      const list = this.$store.getters.getFieldsListFromPanel(windowUuid)
+      const list = this.$store.getters.getStoredFieldsFromTab('a52192bc-fb40-11e8-a479-7a0060f0aa01')
       if (!this.isEmptyValue(list)) {
-        return list.filter(field => field.isShowedFromUserDefault)
+        return list.filter(field => field.isDisplayed && field.isDisplayedFromLogic)
       }
       return []
     },
