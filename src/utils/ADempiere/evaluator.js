@@ -287,17 +287,17 @@ class evaluator {
       } // error number of @@ not correct
 
       // remove second @: ExampleColumn@ = ExampleColumn
-      const value = string.substring(0, pos)
+      const columnName = string.substring(0, pos)
 
       // delete secodn columnName and @
       string = string.substring(pos + 1)
 
       // add column name in array
-      columnsList.push(value)
+      columnsList.push(columnName)
     }
 
+    // remove duplicate columns
     return [
-      // remove duplicate columns
       ...new Set(columnsList)
     ]
   }

@@ -18,7 +18,10 @@ import evaluator from '@/utils/ADempiere/evaluator'
 import { arrayMatches, isEmptyValue, parsedValueComponent } from '@/utils/ADempiere/valueUtils'
 import { getContext, getParentFields, getPreference, parseContext } from '@/utils/ADempiere/contextUtils'
 import REFERENCES, { BUTTON, YES_NO, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
-import { FIELD_OPERATORS_LIST } from '@/utils/ADempiere/dataUtils'
+import {
+  FIELD_OPERATORS_LIST, OPERATOR_EQUAL,
+  OPERATOR_LIKE, OPERATOR_GREATER_EQUAL, OPERATOR_LESS_EQUAL
+} from '@/utils/ADempiere/dataUtils'
 import {
   ACCOUNTING_COLUMNS,
   isDocumentStatus,
@@ -62,7 +65,7 @@ export function generateField({
   let parentFieldsList = []
   let parsedDefaultValue = fieldToGenerate.defaultValue
   let parsedDefaultValueTo = fieldToGenerate.defaultValueTo
-  let operator = 'EQUAL'
+  let operator = OPERATOR_EQUAL.operator
   let isNumericField = componentReference.componentPath === 'FieldNumber'
   let isTranslatedField = fieldToGenerate.isTranslated
   let isComparisonField = false // to list operators comparison
@@ -96,7 +99,7 @@ export function generateField({
     }
 
     if (['FieldText', 'FieldTextLong'].includes(componentReference.componentPath)) {
-      operator = 'LIKE'
+      operator = OPERATOR_LIKE.operator
     }
   } else {
     // Yes No value, and form manage
@@ -204,7 +207,7 @@ export function generateField({
 
   // Overwrite some values
   if (field.isRange) {
-    field.operator = 'GREATER_EQUAL'
+    field.operator = OPERATOR_GREATER_EQUAL.operator
     field.columnNameTo = `${columnName}_To`
     field.elementNameTo = `${field.elementNameTo}_To`
     if (typeRange) {
@@ -215,7 +218,7 @@ export function generateField({
       field.value = parsedDefaultValueTo
       field.defaultValue = field.defaultValueTo
       field.parsedDefaultValue = field.parsedDefaultValueTo
-      field.operator = 'LESS_EQUAL'
+      field.operator = OPERATOR_LESS_EQUAL.operator
       field.sequence = field.sequence + 1
 
       // if field with value displayed in main panel
