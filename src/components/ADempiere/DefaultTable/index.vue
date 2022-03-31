@@ -38,6 +38,7 @@
 
     <el-table
       ref="multipleTable"
+      v-loading="isLoadingDataTale"
       style="width: 100%; height: 88% !important;"
       border
       height="90% !important"
@@ -167,6 +168,10 @@ export default defineComponent({
 
   setup(props, { root, refs }) {
     const valueToSearch = ref('')
+
+    const isLoadingDataTale = computed(() => {
+      return root.isEmptyValue(props.dataTable)
+    })
 
     const currentOption = computed(() => {
       return root.$store.getters.getTableOption
@@ -362,6 +367,7 @@ export default defineComponent({
       isLoadFilter,
       // computeds
       headerList,
+      isLoadingDataTale,
       sizeOption,
       styleOption,
       recordsWithFilter,

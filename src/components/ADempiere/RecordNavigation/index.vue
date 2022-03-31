@@ -25,8 +25,20 @@
       :container-manager="containerManager"
       :panel-metadata="panelMetadata"
       :header="tableheaders"
-      :data-table="recordsList"
+      :data-table="listDataTabla"
     />
+    <!-- <div class="infinite-list-wrapper" style="overflow:auto;max-height: 200px;">
+      <ul
+        class="list"
+        v-infinite-scroll="epale"
+        infinite-scroll-disabled="disabled"
+      >
+        <li v-for="(i, key) in count" :key="key" class="list-item">{{ i }}</li>
+      </ul>
+      <p v-if="loading">Loading...</p>
+      <p v-if="noMore">No more</p>
+    </div> -->
+
   </el-container>
 </template>
 
@@ -65,6 +77,9 @@ export default defineComponent({
 
   setup(props, { root }) {
     const activeName = ref([])
+    const listDataTabla = ref([])
+    const timeOut = ref(() => {})
+    const loading = ref(false)
     // TODO: Manage attribute with vuex store in window module
     if (root.$route.query.action && root.$route.query.action === 'advancedQuery') {
       activeName.value.push('PanelAdvancedQuery')
@@ -109,6 +124,16 @@ export default defineComponent({
       return tabData.value.recordsList
     })
 
+    function load(value) {
+      clearTimeout(timeOut.value)
+      timeOut.value = setTimeout(() => {
+        console.log(listDataTabla.value)
+        listDataTabla.value = tabData.value.recordsList
+      }, 1)
+    }
+
+    load()
+
     const actionAdvancedQuery = () => {
       const activeNames = []
       if (!activeName.value.length) {
@@ -119,6 +144,9 @@ export default defineComponent({
 
     return {
       activeName,
+      timeOut,
+      listDataTabla,
+      loading,
       // computeds
       recordsList,
       isLoadedPanel,
@@ -126,6 +154,7 @@ export default defineComponent({
       tableheaders,
       shorcutKey,
       // methods
+      load,
       actionAdvancedQuery
     }
   }
@@ -136,6 +165,7 @@ export default defineComponent({
 .record-navigation {
   background-color: #fff;
   height: 100%;
+  max-height: 200px;
   display: contents;
 }
 </style>
