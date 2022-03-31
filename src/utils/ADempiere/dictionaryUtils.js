@@ -18,7 +18,10 @@ import evaluator from '@/utils/ADempiere/evaluator'
 import { arrayMatches, isEmptyValue, parsedValueComponent } from '@/utils/ADempiere/valueUtils'
 import { getContext, getParentFields, getPreference, parseContext } from '@/utils/ADempiere/contextUtils'
 import REFERENCES, { BUTTON, YES_NO, DEFAULT_SIZE, isHiddenField } from '@/utils/ADempiere/references'
-import { FIELD_OPERATORS_LIST } from '@/utils/ADempiere/dataUtils'
+import {
+  FIELD_OPERATORS_LIST, OPERATOR_EQUAL,
+  OPERATOR_LIKE, OPERATOR_GREATER_EQUAL, OPERATOR_LESS_EQUAL
+} from '@/utils/ADempiere/dataUtils'
 import {
   ACCOUNTING_COLUMNS,
   isDocumentStatus,
@@ -40,7 +43,7 @@ export function generateField({
 }) {
   const { columnName } = fieldToGenerate
   let isShowedFromUser = false
-  let isSQLValue = false
+  let isGetValueFromServer = false
   // verify if it no overwrite value with ...moreAttributes
   if (moreAttributes.isShowedFromUser) {
     isShowedFromUser = moreAttributes.isShowedFromUser
@@ -60,10 +63,10 @@ export function generateField({
   }
 
   let parentFieldsList = []
-  let contextColumnNames = []
+
   let parsedDefaultValue = fieldToGenerate.defaultValue
   let parsedDefaultValueTo = fieldToGenerate.defaultValueTo
-  let operator = 'EQUAL'
+  let operator = OPERATOR_EQUAL.operator
   let isNumericField = componentReference.componentPath === 'FieldNumber'
   let isTranslatedField = fieldToGenerate.isTranslated
   let isComparisonField = false // to list operators comparison
@@ -97,7 +100,7 @@ export function generateField({
     }
 
     if (['FieldText', 'FieldTextLong'].includes(componentReference.componentPath)) {
-      operator = 'LIKE'
+      operator = OPERATOR_LIKE.operator
     }
   } else {
     // Yes No value, and form manage
@@ -121,8 +124,8 @@ export function generateField({
 
     if (String(fieldToGenerate.defaultValue).includes('@SQL=')) {
       isShowedFromUser = true
-      isSQLValue = true
-      contextColumnNames = evaluator.parseDepends(fieldToGenerate.defaultValue)
+      isGetValueFromServer = true
+      // contextColumnNames = evaluator.parseDepends(fieldToGenerate.defaultValue)
     }
 
     // VALUE TO
@@ -141,12 +144,8 @@ export function generateField({
 
       if (String(fieldToGenerate.defaultValueTo).includes('@SQL=')) {
         isShowedFromUser = true
-        isSQLValue = true
-        const contextColumnNamesTo = evaluator.parseDepends(fieldToGenerate.defaultValueTo)
-        contextColumnNames = Array.from(new Set([
-          ...contextColumnNames,
-          ...contextColumnNamesTo
-        ]))
+        isGetValueFromServer = true
+        // const contextColumnNamesTo = evaluator.parseDepends(fieldToGenerate.defaultValueTo)
       }
     }
 
@@ -196,8 +195,7 @@ export function generateField({
     isShowedTableFromUser: fieldToGenerate.isDisplayed,
     isFixedTableColumn: false,
     valueType: componentReference.valueType, // value type to convert with gGRPC
-    isSQLValue,
-    contextColumnNames,
+    isGetValueFromServer,
     // Advanced query
     operator, // current operator
     oldOperator: undefined, // old operator
@@ -212,7 +210,7 @@ export function generateField({
 
   // Overwrite some values
   if (field.isRange) {
-    field.operator = 'GREATER_EQUAL'
+    field.operator = OPERATOR_GREATER_EQUAL.operator
     field.columnNameTo = `${columnName}_To`
     field.elementNameTo = `${field.elementNameTo}_To`
     if (typeRange) {
@@ -223,7 +221,7 @@ export function generateField({
       field.value = parsedDefaultValueTo
       field.defaultValue = field.defaultValueTo
       field.parsedDefaultValue = field.parsedDefaultValueTo
-      field.operator = 'LESS_EQUAL'
+      field.operator = OPERATOR_LESS_EQUAL.operator
       field.sequence = field.sequence + 1
 
       // if field with value displayed in main panel

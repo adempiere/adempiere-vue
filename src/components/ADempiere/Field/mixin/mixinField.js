@@ -108,7 +108,7 @@ export default {
   },
 
   async created() {
-    if (this.metadata.isSQLValue && this.isEmptyValue(this.value)) {
+    if (this.metadata.isGetValueFromServer && this.isEmptyValue(this.value)) {
       let value = this.$store.getters.getStoredDefaultValue({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,

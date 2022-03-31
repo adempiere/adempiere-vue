@@ -117,7 +117,7 @@ const actions = {
           .filter(itemField => {
             return itemField.componentPath === 'FieldSelect' ||
               typeValue(values[itemField.columnName]) === 'OBJECT' ||
-              itemField.isSQLValue
+              itemField.isGetValueFromServer
           })
           .map(async itemField => {
             const { columnName, componentPath } = itemField
