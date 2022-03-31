@@ -57,3 +57,17 @@ export function convertObjectToString({
 
   return str
 }
+
+/**
+ * Detect if is same size of lenth
+ * @param {array} arrayA
+ * @param {arrayB} arrayB
+ * @returns {boolean}
+ */
+export function isSameSize(arrayA, arrayB) {
+  if (isEmptyValue(arrayA) && isEmptyValue(arrayB)) {
+    return true
+  }
+
+  return arrayA.length === arrayB.length
+}

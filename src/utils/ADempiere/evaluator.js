@@ -264,13 +264,13 @@ class evaluator {
   /**
    * Parse Depends or relations
    * @param {string} parseString
-   * @return {array}
+   * @return {array} columns list
    */
   static parseDepends(parseString) {
-    const listFields = []
+    const columnsList = []
     if (isEmptyValue(parseString)) {
       // return array empty
-      return listFields
+      return columnsList
     }
 
     let string = parseString.replace('@SQL=', '')
@@ -293,9 +293,13 @@ class evaluator {
       string = string.substring(pos + 1)
 
       // add column name in array
-      listFields.push(value)
+      columnsList.push(value)
     }
-    return listFields
+
+    return [
+      // remove duplicate columns
+      ...new Set(columnsList)
+    ]
   }
 }
 

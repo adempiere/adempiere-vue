@@ -108,20 +108,33 @@ export default {
   },
 
   async created() {
-    if (this.metadata.isSQLValue && this.isEmptyValue(this.value)) {
-      let value = this.$store.getters.getStoredDefaultValue({
+    if (this.metadata.isGetServerValue && this.isEmptyValue(this.value)) {
+      let value
+      let displayedValue
+      const stoedValues = this.$store.getters.getStoredDefaultValue({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
-        query: this.metadata.defaultValue
+        contextColumnNames: this.metadata.contextColumnNames,
+        //
+        uuid: this.metadata.uuid,
+        id: this.metadata.id
       })
 
-      if (this.isEmptyValue(value)) {
-        value = await this.$store.dispatch('getDefaultValue', {
-          parentUuid: this.metadata.parentUuid,
-          containerUuid: this.metadata.containerUuid,
-          columnName: this.metadata.columnName,
-          query: this.metadata.defaultValue
-        })
+      if (this.isEmptyValue(stoedValues)) {
+        // get from server
+        const {
+          value: valueOfServer,
+          displayedValue: displayedValueOfServer
+        } = await this.getDefaultValueFromServer()
+        value = valueOfServer
+        displayedValue = displayedValueOfServer
+      } else {
+        value = stoedValues.value
+        displayedValue = stoedValues.value
+      }
+
+      if (this.metadata.componentPath === 'FieldSelect') {
+        this.displayedValue = displayedValue
       }
 
       // set value into component and fieldValue store
@@ -147,6 +160,32 @@ export default {
     parseValue(value) {
       return value
     },
+
+    /**
+     * Get default value from server
+     * @returns promisse with object = { value, defaultValue, uuid, id }
+     */
+    getDefaultValueFromServer() {
+      if (this.containerManager && this.containerManager.getDefaultValue) {
+        return this.containerManager.getDefaultValue({
+          parentUuid: this.metadata.parentUuid,
+          containerUuid: this.metadata.containerUuid,
+          contextColumnNames: this.metadata.contextColumnNames,
+          //
+          uuid: this.metadata.uuid,
+          id: this.metadata.id,
+          columnName: this.metadata.columnName
+        })
+      }
+
+      return this.$store.dispatch('getDefaultValueFromServer', {
+        parentUuid: this.metadata.parentUuid,
+        containerUuid: this.metadata.containerUuid,
+        columnName: this.metadata.columnName,
+        query: this.metadata.defaultValue
+      })
+    },
+
     /**
      * Set focus if handle focus attribute is true
      */
@@ -222,12 +261,12 @@ export default {
     /**
      * @param {mixed} value, main value in component
      * @param {mixed} valueTo, used in end value in range
-     * @param {string} label, or displayColumnName to show in select
+     * @param {string} displayedValue, or displayColumnName to show in select
      */
     handleFieldChange({
       value,
       valueTo,
-      label
+      displayedValue
     }) {
       // Global Action performed
       if (this.metadata.handleActionPerformed) {

@@ -38,7 +38,7 @@
       v-for="(option, key) in optionsList"
       :key="key"
       :value="option.value"
-      :label="option.label"
+      :label="option.displayedValue"
     />
   </el-select>
 </template>
@@ -46,7 +46,7 @@
 <script>
 // components and mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import selectMixin from '@/components/ADempiere/Field/mixin/mixinSelect.js'
+import selectMixin from '@/components/ADempiere/Field/mixin/mixinFieldSelect.js'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -247,17 +247,17 @@ export default {
       }
 
       const option = this.findOption(newValue)
-      if (!option.label) {
-        const label = this.displayedValue
-        if (!isEmptyValue(label)) {
+      if (!option.displayedValue) {
+        const displayedValue = this.displayedValue
+        if (!isEmptyValue(displayedValue)) {
           this.optionsList.push({
             value: newValue,
             uuid: option.uuid,
-            label
+            displayedValue
           })
         } else {
           // request lookup
-          this.getDataLookupItem()
+          this.getValueOfLookup()
         }
       }
     }
@@ -269,8 +269,8 @@ export default {
       const value = this.value
       if (!this.isEmptyValue(value) && !this.metadata.isAdvancedQuery) {
         const option = this.findOption(value)
-        if (option.label) {
-          this.displayedValue = option.label
+        if (option.displayedValue) {
+          this.displayedValue = option.displayedValue
           this.uuidValue = option.uuid
         } else {
           if (!this.isEmptyValue(this.displayedValue)) {
@@ -278,11 +278,11 @@ export default {
             this.optionsList.push({
               value,
               uuid: option.uuid,
-              label: this.displayedValue
+              displayedValue: this.displayedValue
             })
           } else {
             // request lookup
-            this.getDataLookupItem()
+            this.getValueOfLookup()
           }
         }
       }
@@ -291,45 +291,44 @@ export default {
 
   methods: {
     preHandleChange(value) {
-      const { label } = this.findOption(value)
-      this.displayedValue = label
+      const { displayedValue } = this.findOption(value)
+      this.displayedValue = displayedValue
       this.handleFieldChange({
         value,
-        label
+        displayedValue
       })
     },
     findOption(value) {
       const option = this.optionsList.find(item => item.value === value)
-      if (option && option.label) {
+      if (option && option.displayedValue) {
         return option
       }
       return {
-        label: undefined,
+        displayedValue: undefined,
         value: undefined,
         uuid: undefined
       }
     },
-    async getDataLookupItem() {
+    getValueOfLookup() {
       if (this.metadata.isAdvancedQuery && this.isSelectMultiple) {
         return
       }
       this.isLoading = true
 
-      this.containerManager.getLookupItem({
+      this.getDefaultValueFromServer({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
-        contextColumnNames: this.metadata.reference.contextColumnNames,
+        contextColumnNames: this.metadata.contextColumnNames,
         uuid: this.metadata.uuid,
         id: this.metadata.id,
         //
-        tableName: this.metadata.reference.tableName,
-        columnName: this.metadata.columnName,
-        value: this.value
+        columnName: this.metadata.columnName
       })
         .then(responseLookupItem => {
           // with value response update local component list
           if (!this.isEmptyValue(responseLookupItem)) {
-            this.displayedValue = responseLookupItem.label
+            this.value = responseLookupItem.value
+            this.displayedValue = responseLookupItem.displayedValue
             this.uuidValue = responseLookupItem.uuid
             this.$nextTick(() => {
               this.optionsList = this.getLookupAll
@@ -361,7 +360,7 @@ export default {
       this.containerManager.getLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
-        contextColumnNames: this.metadata.reference.contextColumnNames,
+        contextColumnNames: this.metadata.contextColumnNames,
         uuid: this.metadata.uuid,
         //
         tableName: this.metadata.reference.tableName,
@@ -385,7 +384,7 @@ export default {
       this.$store.dispatch('deleteLookup', {
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
-        contextColumnNames: this.metadata.reference.contextColumnNames,
+        contextColumnNames: this.metadata.contextColumnNames,
         uuid: this.metadata.uuid,
         //
         tableName: this.metadata.reference.tableName,

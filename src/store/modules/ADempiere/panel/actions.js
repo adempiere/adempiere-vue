@@ -493,7 +493,7 @@ const actions = {
           value: fieldDependent.defaultValue
         }).query
         if (defaultValue !== fieldDependent.parsedDefaultValue) {
-          const newValue = await dispatch('getDefaultValue', {
+          const newValue = await dispatch('getDefaultValueFromServer', {
             parentUuid,
             containerUuid,
             query: defaultValue

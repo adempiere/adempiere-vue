@@ -19,58 +19,6 @@ import { request } from '@/utils/ADempiere/request'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
- * Request a Lookup data from Reference
- * The main attributes that function hope are:
- * @param {string} tableName
- * @param {string} directQuery
- * @param {string|number} value
- */
-export function requestLookup({
-  contextAttributesList,
-  fieldUuid,
-  processParameterUuid,
-  browseFieldUuid,
-  id,
-  //
-  referenceUuid,
-  //
-  tableName,
-  columnName,
-  columnUuid
-}) {
-  let contextAttributes = []
-  if (!isEmptyValue(contextAttributesList)) {
-    contextAttributes = contextAttributesList.map(attribute => {
-      return {
-        key: attribute.columnName,
-        value: attribute.value
-      }
-    })
-  }
-
-  return request({
-    url: '/user-interface/window/lookup-item',
-    method: 'get',
-    params: {
-      context_attributes: contextAttributes,
-      field_uuid: fieldUuid,
-      process_parameter_uuid: processParameterUuid,
-      browse_field_uuid: browseFieldUuid,
-      id,
-      //
-      reference_uuid: referenceUuid,
-      //
-      table_name: tableName,
-      column_name: columnName,
-      column_uuid: columnUuid
-    }
-  })
-    .then(respose => {
-      return respose
-    })
-}
-
-/**
  * Request a Lookup list data from Reference
  * The main attributes that function hope are:
  * @param {string} fieldUuid

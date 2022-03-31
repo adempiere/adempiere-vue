@@ -88,6 +88,9 @@ export default {
   },
 
   methods: {
+    /**
+     @overwride
+     */
     parseValue(value) {
       if (typeof value === 'boolean') {
         // value ? 'Y' : 'N'

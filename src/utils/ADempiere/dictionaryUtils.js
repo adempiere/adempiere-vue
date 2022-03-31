@@ -40,7 +40,7 @@ export function generateField({
 }) {
   const { columnName } = fieldToGenerate
   let isShowedFromUser = false
-  let isSQLValue = false
+  let isGetServerValue = false
   // verify if it no overwrite value with ...moreAttributes
   if (moreAttributes.isShowedFromUser) {
     isShowedFromUser = moreAttributes.isShowedFromUser
@@ -60,7 +60,6 @@ export function generateField({
   }
 
   let parentFieldsList = []
-  let contextColumnNames = []
   let parsedDefaultValue = fieldToGenerate.defaultValue
   let parsedDefaultValueTo = fieldToGenerate.defaultValueTo
   let operator = 'EQUAL'
@@ -121,8 +120,7 @@ export function generateField({
 
     if (String(fieldToGenerate.defaultValue).includes('@SQL=')) {
       isShowedFromUser = true
-      isSQLValue = true
-      contextColumnNames = evaluator.parseDepends(fieldToGenerate.defaultValue)
+      isGetServerValue = true
     }
 
     // VALUE TO
@@ -141,12 +139,7 @@ export function generateField({
 
       if (String(fieldToGenerate.defaultValueTo).includes('@SQL=')) {
         isShowedFromUser = true
-        isSQLValue = true
-        const contextColumnNamesTo = evaluator.parseDepends(fieldToGenerate.defaultValueTo)
-        contextColumnNames = Array.from(new Set([
-          ...contextColumnNames,
-          ...contextColumnNamesTo
-        ]))
+        isGetServerValue = true
       }
     }
 
@@ -196,8 +189,7 @@ export function generateField({
     isShowedTableFromUser: fieldToGenerate.isDisplayed,
     isFixedTableColumn: false,
     valueType: componentReference.valueType, // value type to convert with gGRPC
-    isSQLValue,
-    contextColumnNames,
+    isGetServerValue,
     // Advanced query
     operator, // current operator
     oldOperator: undefined, // old operator

@@ -312,8 +312,11 @@ export default defineComponent({
         })
       },
 
-      getLookupItem({ parentUuid, containerUuid, uuid, id, contextColumnNames, columnName }) {
-        return store.dispatch('getLookupItemFromServer', {
+      /**
+       * @returns Promisse with value and displayedValue
+       */
+      getDefaultValue({ parentUuid, containerUuid, uuid, id, contextColumnNames, columnName }) {
+        return store.dispatch('getDefaultValueFromServer', {
           parentUuid,
           containerUuid,
           contextColumnNames,

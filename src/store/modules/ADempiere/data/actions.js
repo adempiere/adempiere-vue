@@ -117,7 +117,7 @@ const actions = {
           .filter(itemField => {
             return itemField.componentPath === 'FieldSelect' ||
               typeValue(values[itemField.columnName]) === 'OBJECT' ||
-              itemField.isSQLValue
+              itemField.isGetServerValue
           })
           .map(async itemField => {
             const { columnName, componentPath } = itemField
@@ -153,11 +153,12 @@ const actions = {
               }
             }
 
+            // TODO: Add support with displayedValue response
             if (!isEmptyValue(valueGetDisplayColumn) &&
               typeValue(valueGetDisplayColumn) === 'OBJECT' &&
               valueGetDisplayColumn.isSQL) {
               // get value from Query
-              valueGetDisplayColumn = await dispatch('getDefaultValue', {
+              valueGetDisplayColumn = await dispatch('getDefaultValueFromServer', {
                 parentUuid,
                 containerUuid,
                 query: itemField.defaultValue
@@ -204,8 +205,8 @@ const actions = {
                 return
               }
             }
-            // get value to displayed from server
-            const { label } = await dispatch('getLookupItemFromServer', {
+            // TODO: Deprecated get value to displayed from server
+            const { displayedValue } = await dispatch('getLookupItemFromServer', {
               parentUuid,
               containerUuid,
               contextColumnNames: itemField.reference.contextColumnNames,
@@ -216,7 +217,7 @@ const actions = {
               tableName: itemField.reference.tableName,
               value: valueGetDisplayColumn
             })
-            values[itemField.displayColumnName] = label
+            values[itemField.displayColumnName] = displayedValue
           })
       }
 
