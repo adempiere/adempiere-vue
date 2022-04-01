@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRecordAccess, setRecordAccess } from '@/api/ADempiere/actions/record-access.js'
+import { setRecordAccess } from '@/api/ADempiere/actions/record-access.js'
 import { showMessage } from '@/utils/ADempiere/notification.js'
 import language from '@/lang'
 export default {
@@ -90,33 +90,36 @@ export default {
     getIdentifiersList() {
       return this.identifiersList
         .filter(item => item.componentPath !== 'FieldSelect')
+    },
+    listRecordAccess() {
+      return this.$store.getters.getRecordAccess
     }
   },
   created() {
-    getRecordAccess({
-      tableName: this.tableName,
-      recordId: this.record[this.tableName + '_ID'],
-      recordUuid: this.record.UUID
-    })
-      .then(access => {
-        this.recordAccess.tableName = access.tableName
-        this.recordAccess.recordId = access.recordId
-        this.recordAccess.recordUuid = access.recordUuid
-        access.availableRoles.forEach(role => {
-          this.recordAccess.roles.push({
-            ...role,
-            isRoleConfig: false,
-            isLocked: role.isExclude
-          })
-        })
-        access.currentRoles.forEach(role => {
-          this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isLocked = role.isExclude
-          this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isRoleConfig = true
-          this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isDependentEntities = role.isDependentEntities
-          this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isReadOnly = role.isReadOnly
-          this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isExclude = role.isExclude
-        })
+  //   getRecordAccess({
+  //     tableName: this.tableName,
+  //     recordId: this.record[this.tableName + '_ID'],
+  //     recordUuid: this.record.UUID
+  //   })
+  //     .then(access => {
+    this.recordAccess.tableName = this.listRecordAccess.tableName
+    this.recordAccess.recordId = this.listRecordAccess.recordId
+    this.recordAccess.recordUuid = this.listRecordAccess.recordUuid
+    this.listRecordAccess.availableRoles.forEach(role => {
+      this.recordAccess.roles.push({
+        ...role,
+        isRoleConfig: false,
+        isLocked: role.isExclude
       })
+    })
+    this.listRecordAccess.currentRoles.forEach(role => {
+      this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isLocked = role.isExclude
+      this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isRoleConfig = true
+      this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isDependentEntities = role.isDependentEntities
+      this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isReadOnly = role.isReadOnly
+      this.recordAccess.roles.find(availableRole => availableRole.roleId === role.roleId).isExclude = role.isExclude
+    })
+  //     })
   },
   methods: {
     handleChange(value) {
@@ -165,9 +168,9 @@ export default {
     },
     saveRecordAccess(recordAccesses) {
       setRecordAccess({
-        tableName: this.tableName,
-        recordId: this.record[this.tableName + '_ID'],
-        recordUuid: this.record.UUID,
+        tableName: this.listRecordAccess.tableName,
+        recordId: this.listRecordAccess.id,
+        recordUuid: this.listRecordAccess.uuid,
         recordAccesses
       })
         .then(response => {
@@ -195,19 +198,7 @@ export default {
       return list
     },
     close() {
-      this.$store.dispatch('setShowDialog', {
-        type: 'window',
-        action: undefined
-      })
-      this.$router.push({
-        name: this.$route.name,
-        query: {
-          ...this.$route.query,
-          typeAction: ''
-        }
-      }, () => {})
-      this.$store.commit('setRecordAccess', false)
-      this.$store.commit('changeShowRigthPanel', false)
+      this.$store.dispatch('showPanel', false)
     }
   }
 }

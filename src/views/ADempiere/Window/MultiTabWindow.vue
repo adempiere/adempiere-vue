@@ -28,6 +28,11 @@
       :relations-manager="relationsManager"
     />
 
+    <embedded
+      :visible="showRecordAccess"
+    >
+      <record-access />
+    </embedded>
     <tab-manager
       :parent-uuid="windowMetadata.uuid"
       :container-manager="containerManager"
@@ -53,6 +58,8 @@ import store from '@/store'
 // components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import TabManager from '@/components/ADempiere/TabManager/index.vue'
+import Embedded from '@/components/ADempiere/Dialog/embedded'
+import RecordAccess from '@/components/ADempiere/RecordAccess'
 
 // utils and helpers methods
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
@@ -63,6 +70,8 @@ export default defineComponent({
 
   components: {
     ActionMenu,
+    RecordAccess,
+    Embedded,
     TabManager
   },
 
@@ -80,6 +89,10 @@ export default defineComponent({
   setup(props, { root }) {
     const isWithChildsTab = computed(() => {
       return !isEmptyValue(props.windowMetadata.tabsListChild)
+    })
+
+    const showRecordAccess = computed(() => {
+      return store.getters.getShowPanelRecordAccess
     })
 
     const containerManager = {
@@ -196,7 +209,7 @@ export default defineComponent({
       containerUuid: props.windowMetadata.currentTabUuid,
 
       defaultActionName: lang.t('actionMenu.createNewRecord'),
-
+      tableName: store.getters.getTableName(props.windowMetadata.uuid, props.windowMetadata.currentTabUuid),
       getActionList: () => {
         return store.getters.getStoredActionsMenu({
           containerUuid: props.windowMetadata.currentTabUuid
@@ -221,6 +234,7 @@ export default defineComponent({
       currentTabUuid: props.windowMetadata.currentTabUuid,
       actionsManager,
       referencesManager,
+      showRecordAccess,
       relationsManager,
       isWithChildsTab,
       containerManager

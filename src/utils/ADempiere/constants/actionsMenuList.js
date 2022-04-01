@@ -66,6 +66,28 @@ export const sharedLink = {
   }
 }
 
+export const recordAccess = {
+  name: language.t('data.recordAccess.actions'),
+  description: language.t('data.noDescription'),
+  // enabled: true,
+  enabled: ({ parentUuid, containerUuid }) => {
+    return !isEmptyValue(
+      store.getters.getUuidOfContainer(containerUuid)
+    )
+  },
+  svg: false,
+  icon: 'el-icon-set-up',
+  actionName: 'recordAccess',
+  recordAccess: ({ tableName, recordId, recordUuid }) => {
+    store.dispatch('listRecordAccess', {
+      tableName,
+      recordId,
+      recordUuid
+    })
+    store.commit('setShowRecordAccess', true)
+  }
+}
+
 export const exportRecords = ({ parentUuid, containerUuid, containerManager, formatToExport = 'json' }) => {
   const selection = containerManager.getSelection({
     containerUuid
