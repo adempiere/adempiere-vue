@@ -84,6 +84,7 @@ export default {
   data() {
     return {
       user: {},
+      listWindow: [],
       isMenuMobile: false,
       driver: null
     }
@@ -126,13 +127,6 @@ export default {
     fieldPanel() {
       return this.$store.getters.getStoredFieldsFromProcess(this.$route.meta.uuid).filter(field => field.isMandatory || field.isShowedFromUser)
     },
-    fieldWindow() {
-      const list = this.$store.getters.getStoredFieldsFromTab('a52192bc-fb40-11e8-a479-7a0060f0aa01')
-      if (!this.isEmptyValue(list)) {
-        return list.filter(field => field.isDisplayed && field.isDisplayedFromLogic)
-      }
-      return []
-    },
     getForm() {
       return this.$store.getters.getForm(this.$route.meta.uuid)
     },
@@ -152,12 +146,34 @@ export default {
           break
       }
       return form.default
+    },
+    defaultViews() {
+      return {
+        type: this.$route.meta.type,
+        uuid: this.$route.meta.uuid
+      }
+    }
+  },
+  watch: {
+    defaultViews(value) {
+      if (value.type === 'window') {
+        this.loadDataWindows(value)
+      }
     }
   },
   mounted() {
     this.driver = new Driver()
+    this.loadDataWindows(this.defaultViews)
   },
   methods: {
+    loadDataWindows(window) {
+      this.$store.dispatch('getWindowDefinitionFromServer', {
+        uuid: window.uuid
+      })
+        .then(windowResponse => {
+          this.listWindow = this.$store.getters.getStoredFieldsFromTab(windowResponse.uuid, windowResponse.currentTabUuid).filter(field => field.isMandatory || field.isShowedFromUser)
+        })
+    },
     guide() {
       const value = this.formatGuide(this.$route.meta.type)
       this.driver.defineSteps(value)
@@ -223,7 +239,7 @@ export default {
           })
           break
         case 'window':
-          field = this.fieldWindow.map(steps => {
+          field = this.listWindow.map(steps => {
             return {
               element: '#' + steps.columnName,
               popover: {
