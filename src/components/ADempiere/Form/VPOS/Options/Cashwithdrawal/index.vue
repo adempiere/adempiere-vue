@@ -38,7 +38,14 @@
                     labelCurrency: currentFieldCurrency
                   } "
                   :container-uuid="'Cash-Withdrawal'"
-                  :container-manager="containerManager"
+                  :container-manager="{
+                    ...containerManager,
+                    getLookupList,
+                    isDisplayedField,
+                    isMandatoryField,
+                    isReadOnlyField,
+                    changeFieldShowedFromUser
+                  }"
                 />
               </el-col>
               <el-col :span="8">
@@ -190,7 +197,14 @@
                         v-if="isShowFieldBankAccount"
                         :metadata-field="fieldsList[3]"
                         :container-uuid="'Cash-Opening'"
-                        :container-manager="containerManager"
+                        :container-manager="{
+                          ...containerManager,
+                          getLookupList,
+                          isDisplayedField,
+                          isMandatoryField,
+                          isReadOnlyField,
+                          changeFieldShowedFromUser
+                        }"
                       />
                     </el-col>
                     <el-col
@@ -199,7 +213,14 @@
                       <field-definition
                         :metadata-field="fieldsList[2]"
                         :container-uuid="'Cash-Withdrawal'"
-                        :container-manager="containerManager"
+                        :container-manager="{
+                          ...containerManager,
+                          getLookupList,
+                          isDisplayedField,
+                          isMandatoryField,
+                          isReadOnlyField,
+                          changeFieldShowedFromUser
+                        }"
                       />
                     </el-col>
                   </el-row>
@@ -246,6 +267,13 @@ import { requestLookupList } from '@/api/ADempiere/window.js'
 
 // utils and helper methods
 import { formatPrice, formatDate, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'Cashwithdrawal',
@@ -289,11 +317,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -690,6 +714,11 @@ export default {
   },
 
   methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     formatDateToSend,
     formatDate,
     loadListCollectAgent(value) {

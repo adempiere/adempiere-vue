@@ -21,7 +21,8 @@ import { requestDefaultValue } from '@/api/ADempiere/user-interface/persistence.
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 // utils and helper methods
-import { parseContext } from '@/utils/ADempiere/contextUtils'
+import { isSameSize } from '@/utils/ADempiere/formatValue/iterableFormat'
+import { generateContextKey, getContextAttributes } from '@/utils/ADempiere/contextUtils'
 
 const initState = {
   inRequest: new Map(),
@@ -32,15 +33,22 @@ const defaultValueManager = {
   state: initState,
 
   mutations: {
-    setDefaultValue(state, { clientId, parsedQuery, value }) {
-      const key = `${clientId}_${parsedQuery}`
-
+    setDefaultValue(state, { key, clientId, contextAttributesList, uuid, displayedValue, value }) {
       Vue.set(state.storedDefaultValue, key, {
         clientId,
-        parsedQuery,
+        contextAttributesList,
+        uuid,
+        displayedValue,
         value
       })
     },
+
+    deleteDefaultValue(state, {
+      key
+    }) {
+      Vue.set(state.storedDefaultValue, key, undefined)
+    },
+
     resetStateDefaultValue(state) {
       state = initState
     }
@@ -51,61 +59,164 @@ const defaultValueManager = {
      * @param {string} parentUuid
      * @param {string} containerUuid
      * @param {string} columnName
-     * @param {string} query
+     * @param {array} contextColumnNames
+     * @param {string} fieldUuid|processParameterUuid|columnUuid|browseFieldUuid
      */
-    getDefaultValue({ state, commit, rootGetters }, {
+    getDefaultValueFromServer({ state, commit, rootGetters }, {
       parentUuid,
       containerUuid,
-      columnName,
-      query
+      contextColumnNames,
+      //
+      id,
+      fieldUuid,
+      processParameterUuid,
+      browseFieldUuid,
+      columnUuid,
+      columnName
     }) {
+      const defaultEmptyResponse = {
+        uuid: undefined,
+        displayedValue: undefined,
+        value: undefined
+      }
       return new Promise(resolve => {
-        let parsedQuery = query
-        if (query.includes('@')) {
-          const context = parseContext({
-            parentUuid,
-            containerUuid,
-            isSQL: true,
-            value: query
-          })
-          if (context.isError) {
-            return undefined
-          }
-          parsedQuery = context.query
+        if (isEmptyValue(id) && isEmptyValue(fieldUuid) && isEmptyValue(processParameterUuid) && isEmptyValue(browseFieldUuid)) {
+          resolve(defaultEmptyResponse)
+          return
+        }
+
+        const contextAttributesList = getContextAttributes({
+          parentUuid,
+          containerUuid,
+          contextColumnNames,
+          isBooleanToString: true
+        })
+        // fill context value to continue
+        if (!isSameSize(contextColumnNames, contextAttributesList)) {
+          resolve(defaultEmptyResponse)
+          return
+        }
+
+        const isWithoutValues = contextAttributesList.find(attribute => isEmptyValue(attribute.value))
+        if (isWithoutValues) {
+          console.warn(`Without response, fill the ${isWithoutValues.columnName} field.`)
+          resolve(defaultEmptyResponse)
+          return
         }
 
         const clientId = rootGetters.getPreferenceClientId
-        const key = `${clientId}_${parsedQuery}`
+
+        let key = clientId
+        if (!isEmptyValue(fieldUuid)) {
+          key += `|${fieldUuid}`
+        } else if (!isEmptyValue(processParameterUuid)) {
+          key += `|${processParameterUuid}`
+        } else if (!isEmptyValue(browseFieldUuid)) {
+          key += `|${browseFieldUuid}`
+        }
+
+        const contextKey = generateContextKey(contextAttributesList)
+        key += contextKey
 
         // if it is the same request, it is not made
         if (state.inRequest.get(key)) {
+          resolve()
           return
         }
         state.inRequest.set(key, true)
-        requestDefaultValue(parsedQuery)
+        requestDefaultValue({
+          contextAttributesList,
+          id,
+          fieldUuid,
+          processParameterUuid,
+          browseFieldUuid,
+          columnUuid
+        })
           .then(valueResponse => {
+            const values = {}
+
+            // TODO: Response from server same name key of value
+            if (valueResponse.attributes.length === 1) {
+              values.KeyColumn = valueResponse.attributes[0].value
+              values.DisplayColumn = undefined
+            } else {
+              valueResponse.attributes.forEach(attribute => {
+                const { key: column, value } = attribute
+                values[column] = value
+              })
+            }
+            const value = values.KeyColumn
+            const displayedValue = values.DisplayColumn
+
             commit('setDefaultValue', {
+              key,
               clientId,
-              parsedQuery,
-              value: valueResponse
+              contextAttributesList,
+              id,
+              displayedValue,
+              value,
+              uuid: values.uuid
             })
 
             commit('updateValueOfField', {
               parentUuid,
               containerUuid,
               columnName,
-              value: valueResponse
+              value
             })
+            if (!isEmptyValue(values.DisplayColumn)) {
+              commit('updateValueOfField', {
+                parentUuid,
+                containerUuid,
+                columnName: `DisplayColumn_${columnName}`,
+                value: displayedValue
+              })
+            }
 
-            resolve(valueResponse)
+            resolve({
+              displayedValue,
+              value: value,
+              uuid: values.uuid
+            })
           })
           .catch(error => {
-            console.warn(`Error getting default value from server. Error code ${error.code}: ${error.message}.`)
+            console.warn(`Error getting default value (${columnName}) from server. Error code ${error.code}: ${error.message}.`)
           })
           .finally(() => {
             // current request finalized
             state.inRequest.set(key, false)
           })
+      })
+    },
+
+    deleteDefaultValue({ commit, rootGetters }, {
+      parentUuid,
+      containerUuid,
+      uuid,
+      contextColumnNames = [],
+      value
+    }) {
+      return new Promise(resolve => {
+        const clientId = rootGetters.getPreferenceClientId
+        let key = `${clientId}|${uuid}`
+
+        const contextAttributesList = getContextAttributes({
+          parentUuid,
+          containerUuid,
+          contextColumnNames,
+          isBooleanToString: true
+        })
+
+        const contextKey = generateContextKey(contextAttributesList)
+
+        key += contextKey
+        key += `|${value}`
+
+        commit('deleteDefaultValue', {
+          key
+        })
+
+        resolve()
       })
     }
   },
@@ -114,26 +225,27 @@ const defaultValueManager = {
     getStoredDefaultValue: (state, getters, rootState, rootGetters) => ({
       parentUuid,
       containerUuid,
-      query
+      contextColumnNames = [],
+      contextAttributesList = [],
+      uuid
     }) => {
-      let parsedQuery = query
-      if (!isEmptyValue(query) && query.includes('@')) {
-        parsedQuery = parseContext({
+      if (isEmptyValue(contextAttributesList) && !isEmptyValue(contextColumnNames)) {
+        contextAttributesList = getContextAttributes({
           parentUuid,
           containerUuid,
-          value: query,
+          contextColumnNames,
           isBooleanToString: true
-        }).value
+        })
       }
 
       const clientId = rootGetters.getPreferenceClientId
-      const key = `${clientId}_${parsedQuery}`
+      let key = `${clientId}|${uuid}`
+      const contextKey = generateContextKey(contextAttributesList)
+      key += contextKey
 
-      const defaultValue = state.storedDefaultValue[key]
-      if (!isEmptyValue(defaultValue)) {
-        return defaultValue.value
-      }
-      return undefined
+      const values = state.storedDefaultValue[key]
+
+      return values
     }
   }
 }

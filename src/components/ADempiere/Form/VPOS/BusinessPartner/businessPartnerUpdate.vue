@@ -47,7 +47,11 @@
                 :container-uuid="'Business-Partner-Update'"
                 :container-manager="{
                   ...containerManager,
-                  isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic}
+                  getLookupList,
+                  isDisplayedField,
+                  isMandatoryField,
+                  isReadOnlyField,
+                  changeFieldShowedFromUser
                 }"
               />
             </div>
@@ -138,6 +142,13 @@ import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
 import AddAddress from './addAddress.vue'
 import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'BusinessPartnerUpdate',
@@ -163,11 +174,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     },
@@ -290,6 +297,11 @@ export default {
     }
   },
   methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     requestGetCountryDefinition,
     handleClose() {
       this.$store.commit('setShowAddNewAddress', false)

@@ -319,9 +319,8 @@ export function getFieldTemplate(overwriteDefinition) {
     reference: {
       tableName: '',
       keyColumnName: '',
-      query: '',
-      directQuery: '',
-      validationCode: '',
+      displayColumnName: '',
+      contextColumnNames: [],
       zoomWindows: []
     },
     contextInfo: undefined,

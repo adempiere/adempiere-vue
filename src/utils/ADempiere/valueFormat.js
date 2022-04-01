@@ -45,26 +45,6 @@ export function convertObjectToKeyValue({
 }
 
 /**
- * Convert array pairs of object to literal object { key: value }
- * @param {array} array, Array to convert
- * @param {string} keyName, name from key in pairs
- * @param {string} valueName, name from value in pairs
- * @returns {object} { key: value, key2: value2 }
- */
-export function convertArrayKeyValueToObject({
-  array,
-  keyName = 'columnName',
-  valueName = 'value'
-}) {
-  const result = {}
-  array.forEach(element => {
-    result[element[keyName]] = element[valueName]
-  })
-
-  return result
-}
-
-/**
  * Convert map of pairs to literal object
  * @param {object} object
  * @returns {map}

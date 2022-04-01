@@ -148,14 +148,10 @@ export default defineComponent({
     const tabUuid = ref(props.tabsList[tabNo].uuid)
 
     const tabStyle = computed(() => {
-      let height = '68vh'
-      if (!isShowedTabs.value) {
-        height = '0vh'
-      }
       // height tab content
       return {
         // height: '75vh',
-        height,
+        height: 'auto',
         overflow: 'auto'
       }
     })

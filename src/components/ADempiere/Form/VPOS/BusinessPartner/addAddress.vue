@@ -31,7 +31,14 @@
             :metadata="fieldsList[0]"
             :value-model="fieldsList[0].value"
             :container-uuid="'New-Address'"
-            :container-manager="containerManager"
+            :container-manager="{
+              ...containerManager,
+              getLookupList,
+              isDisplayedField,
+              isMandatoryField,
+              isReadOnlyField,
+              changeFieldShowedFromUser
+            }"
           />
         </el-row>
       </div>
@@ -82,6 +89,13 @@ import FieldLocation from './AddNewFieldLocation'
 
 // api request methods
 import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'AddAddress',
@@ -127,11 +141,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -232,6 +242,11 @@ export default {
   //   this.unsubscribe()
   // },
   methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     getCustomer() {
       this.$store.dispatch('changeCopyShippingAddress', false)
       customer({

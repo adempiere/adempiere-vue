@@ -53,7 +53,14 @@
                         labelCurrency: currentFieldCurrency
                       } : field"
                       :container-uuid="'Collection'"
-                      :container-manager="containerManager"
+                      :container-manager="{
+                        ...containerManager,
+                        getLookupList,
+                        isDisplayedField,
+                        isMandatoryField,
+                        isReadOnlyField,
+                        changeFieldShowedFromUser
+                      }"
                     />
                   </el-col>
                   <el-col :span="size">
@@ -97,7 +104,14 @@
                     <field-definition
                       :metadata-field="field"
                       :container-uuid="'Collection'"
-                      :container-manager="containerManager"
+                      :container-manager="{
+                        ...containerManager,
+                        getLookupList,
+                        isDisplayedField,
+                        isMandatoryField,
+                        isReadOnlyField,
+                        changeFieldShowedFromUser
+                      }"
                     />
                   </el-col>
                 </el-row>
@@ -202,6 +216,13 @@ import overdrawnInvoice from './overdrawnInvoice'
 // utils and helper methods
 import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import { clientDateTime } from '@/utils/ADempiere/formatValue/dateFormat.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 // api request methods
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
@@ -240,11 +261,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -793,6 +810,11 @@ export default {
   },
 
   methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     formatDateToSend,
     showDayRate(rate) {
       const amount = rate.divideRate > rate.multiplyRate ? rate.divideRate : rate.multiplyRate

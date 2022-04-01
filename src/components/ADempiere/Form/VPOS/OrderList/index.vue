@@ -38,7 +38,14 @@
               :key="field.columnName"
               :metadata-field="field"
               :container-uuid="'Orders-List'"
-              :container-manager="containerManager"
+              :container-manager="{
+                ...containerManager,
+                getLookupList,
+                isDisplayedField,
+                isMandatoryField,
+                isReadOnlyField,
+                changeFieldShowedFromUser
+              }"
             />
           </template>
         </el-form>
@@ -270,6 +277,13 @@ import { holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
 
 // utils and helper methods
 import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
+import {
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
 import {
@@ -309,11 +323,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return false },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -407,6 +417,11 @@ export default {
   methods: {
     formatDate,
     formatQuantity,
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     createFieldFromDictionary,
     sortAscendingDate(listDate) {
       return listDate.sort((elementA, elementB) => {
