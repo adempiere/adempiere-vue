@@ -18,20 +18,37 @@
 
 <template>
   <span>
-    <!-- <embed
-      class="pdf-content"
-      :src="pdfAttachment"
-      type="application/pdf"
-      style="height:1000px;width:100%; position:relative;"
-    > -->
-    <div v-if="isEmptyValue(Attachment)">
+    <el-card v-if="!isEmptyValue(newImage)" shadow="always">
+      <div slot="header" class="clearfix">
+        <span>{{ $t('window.containerInfo.attachment.newFiles') }}</span>
+        <el-button
+          style="float: right; padding: 3px 0"
+          type="text"
+          icon="el-icon-upload2"
+          @click="submitUpload"
+        >
+          {{ $t('window.containerInfo.attachment.uploadFiles') }}
+        </el-button>
+      </div>
+      <el-image
+        v-for="(file, key) in newImage"
+        :key="key"
+        style="width: 150px;height: 150px;margin-left: 1%;margin-right: 1%;"
+        :src="file"
+        fit="fill"
+        :preview-src-list="newImage"
+      />
+    </el-card>
+    <div v-if="!Attachment">
       <el-empty />
     </div>
     <el-upload
+      ref="upload"
       action="#"
       list-type="picture-card"
-      :auto-upload="false"
+      :auto-upload="true"
       :file-list="listImageAll"
+      :before-upload="beforeAvatarUpload"
     >
       <i slot="default" class="el-icon-plus" />
       <div slot="file" slot-scope="{file}">
@@ -70,13 +87,14 @@
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="">
     </el-dialog>
+    <hr>
   </span>
 </template>
 
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 import { buildImageFromArrayBuffer, buildLinkHref } from '@/utils/ADempiere/resource.js'
-import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
+import { uploadAttachment } from '@/api/ADempiere/user-interface/resources.js'
 import axios from 'axios'
 import store from '@/store'
 
@@ -92,12 +110,23 @@ export default defineComponent({
       type: String,
       required: false
     },
+    recordId: {
+      type: Number,
+      default: 0
+    },
+    tableName: {
+      type: String,
+      default: ''
+    },
+    recordUuid: {
+      type: String,
+      default: ''
+    },
     isActiveTab: {
       type: Boolean,
       default: false
     }
   },
-
   setup(props, { root }) {
     const dialogImageUrl = ref('')
 
@@ -108,6 +137,8 @@ export default defineComponent({
     const organizationImagePath = ref('')
     const currentImageOfProduct = ref('')
     const pdfAttachment = ref([])
+    const newImage = ref([])
+    const newListImage = ref([])
     const imageAttachment = ref([])
     const listImageAll = computed(() => {
       if (imageAttachment.value) {
@@ -181,10 +212,31 @@ export default defineComponent({
       return urlImage.data.result.data
     }
 
+    const submitUpload = () => {
+      uploadAttachment({
+        tableName: props.tableName,
+        recordId: props.recordId,
+        recordUuid: props.recordUuid,
+        list: listImageAll.value
+      })
+    }
+    const beforeAvatarUpload = (file) => {
+      listImageAll.value.push({
+        name: file.name,
+        type: file.type,
+        status: 'newImage',
+        uuid: file.uid,
+        url: URL.createObjectURL(file)
+      })
+      newImage.value.push(URL.createObjectURL(file))
+    }
+
     return {
       dialogImageUrl,
       dialogVisible,
       disabled,
+      newImage,
+      newListImage,
       fileList,
       imageAttachment,
       pdfAttachment,
@@ -196,8 +248,11 @@ export default defineComponent({
       listImageAll,
       Attachment,
       // methods
+      // submitUpload,
+      submitUpload,
+      beforeAvatarUpload,
       converFile,
-      isEmptyValue,
+      // isEmptyValue,
       converImage,
       handleRemove,
       handlePictureCardPreview,

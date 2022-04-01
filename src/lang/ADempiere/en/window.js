@@ -19,7 +19,6 @@ const window = {
   deleteRecord: 'Delete Record',
   undoNew: 'Undo New Record',
   containerInfo: {
-    attachment: 'Attachment',
     notes: 'Notes List',
     changeLog: 'ACtivity',
     workflowLog: 'Workflow Log',
@@ -30,6 +29,11 @@ const window = {
       workflowName: 'Name of Workflow Status',
       timeElapsed: 'Time Elapsed',
       addNote: 'Add Note'
+    },
+    attachment: {
+      label: 'Attachment',
+      uploadFiles: 'Upload Files',
+      newFiles: 'New Files'
     }
   },
   documentStatus: 'Document Status',

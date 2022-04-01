@@ -123,7 +123,6 @@ export default defineComponent({
 
     // // use getter to reactive properties
     const listLogs = computed(() => {
-      console.log(store.getters.getRecordLogs)
       return store.getters.getRecordLogs
     })
     /**

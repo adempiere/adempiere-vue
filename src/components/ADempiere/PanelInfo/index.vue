@@ -53,10 +53,13 @@
         <el-tab-pane name="getAttachment">
           <span slot="label">
             <i class="el-icon-paperclip" />
-            Adjuntos
+            {{ $t('window.containerInfo.attachment.label') }}
           </span>
           <attachment
             :is-active-tab="'getAttachment' === nameTab"
+            :table-name="allTabsList[0].tableName"
+            :record-id="currentRecord[allTabsList[0].tableName + '_ID']"
+            :record-uuid="currentRecord.UUID"
           />
         </el-tab-pane>
       </el-tabs>

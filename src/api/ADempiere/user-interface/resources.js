@@ -64,3 +64,12 @@ export function getAttachment({
       return camelizeObjectKeys(response)
     })
 }
+
+export function uploadAttachment({
+  tableName,
+  recordId,
+  recordUuid,
+  list
+}) {
+  console.info(`Upload Files array ${list}, recordId ${recordId}, recordUuid ${recordUuid}, tableName ${tableName}`)
+}
