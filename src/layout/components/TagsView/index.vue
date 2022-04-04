@@ -10,8 +10,10 @@
       >
         <router-link
           v-for="tag in visitedViews"
+          v-slot="{ navigate }"
           ref="tag"
           :key="tag.path"
+          custom
           :class="isActive(tag)?'active':''"
           :to="{
             name: tag.name,
@@ -25,15 +27,21 @@
           @click.middle.native="!isAffix(tag) ? closeSelectedTag(tag) : ''"
           @contextmenu.prevent.native="openMenu(tag,$event)"
         >
-          <div class="tag-title">{{ generateTitle(tag.title) }}</div>
-          <div v-if="!tag.meta.affix" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
+          <span role="link" @click="navigate" @keypress.enter="navigate">
+            <div class="tag-title">
+              {{ generateTitle(tag.title) }}
+            </div>
+            <div v-if="!tag.meta.affix" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
+          </span>
         </router-link>
       </draggable>
       <router-link
         v-for="tag in visitedViews"
         v-else
+        v-slot="{ navigate }"
         ref="tag"
         :key="tag.path"
+        custom
         :class="isActive(tag)?'active':''"
         :to="{ name: tag.name, path: tag.path, query: tag.query, fullPath: tag.fullPath, params: tag.params }"
         tag="span"
@@ -41,8 +49,10 @@
         @click.middle.native="!isAffix(tag)?closeSelectedTag(tag):''"
         @contextmenu.prevent.native="openMenu(tag,$event)"
       >
-        {{ generateTitle(tag.title) }}
-        <span v-if="!isAffix(tag)" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
+        <span role="link" @click="navigate" @keypress.enter="navigate">
+          {{ generateTitle(tag.title) }}
+          <span v-if="!isAffix(tag)" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
+        </span>
       </router-link>
     </scroll-pane>
     <ul v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
