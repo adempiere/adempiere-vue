@@ -96,14 +96,41 @@ export function getEntities({
 
 /**
  * Get default value for a field, parameter or query criteria
- * @param {string} query, sql to get value
+ * @param {array} contextAttributesList, key value
+ * @param {string} fieldUuid, uuid of window field
+ * @param {string} processParameterUuid, uuid of process/report field
+ * @param {string} browseFieldUuid, uuid of browser field
+ * @param {integer} id, identifier of field
+ * @param {string} columnUuid, uuid of column
  */
-export function requestDefaultValue(query) {
+export function requestDefaultValue({
+  contextAttributesList,
+  fieldUuid,
+  processParameterUuid,
+  browseFieldUuid,
+  id,
+  columnUuid
+}) {
+  let contextAttributes = []
+  if (!isEmptyValue(contextAttributesList)) {
+    contextAttributes = contextAttributesList.map(attribute => {
+      return {
+        key: attribute.columnName,
+        value: attribute.value
+      }
+    })
+  }
+
   return request({
     url: '/user-interface/window/default-value',
     method: 'get',
     params: {
-      query
+      context_attributes: contextAttributes,
+      field_uuid: fieldUuid,
+      process_parameter_uuid: processParameterUuid,
+      browse_field_uuid: browseFieldUuid,
+      id,
+      column_uuid: columnUuid
     }
   })
     .then(valueResponse => {

@@ -40,7 +40,14 @@
               :key="field.columnName"
               :metadata-field="field"
               :container-uuid="'Business-Partner-List'"
-              :container-manager="containerManager"
+              :container-manager="{
+                ...containerManager,
+                getLookupList,
+                isDisplayedField,
+                isMandatoryField,
+                isReadOnlyField,
+                changeFieldShowedFromUser
+              }"
             />
           </el-row>
         </el-form>
@@ -117,6 +124,13 @@ import {
   // createFieldFromDefinition,
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'BusinessPartnersList',
@@ -162,11 +176,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -236,6 +246,11 @@ export default {
   },
 
   methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     createFieldFromDictionary,
     actionList(event) {
       this.$store.dispatch('changePopoverListBusinessPartner', false)

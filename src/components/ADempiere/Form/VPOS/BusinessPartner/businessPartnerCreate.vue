@@ -45,7 +45,11 @@
                   :container-uuid="'Business-Partner-Create'"
                   :container-manager="{
                     ...containerManager,
-                    isMandatoryField({ isMandatory, isMandatoryFromLogic }) {return field.isMandatory || field.isMandatoryFromLogic}
+                    getLookupList,
+                    isDisplayedField,
+                    isMandatoryField,
+                    isReadOnlyField,
+                    changeFieldShowedFromUser
                   }"
                 />
               </div>
@@ -75,6 +79,13 @@ import BParterMixin from './mixinBusinessPartner.js'
 
 // api request methods
 import { createCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'BusinessPartnerCreate',
@@ -104,11 +115,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     },
@@ -208,6 +215,11 @@ export default {
   },
 
   methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     actionCreate(commands) {
       if (commands.srcKey) {
         switch (commands.srcKey) {

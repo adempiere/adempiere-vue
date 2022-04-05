@@ -45,7 +45,14 @@
             ref="ProductValue"
             :key="field.columnName"
             :container-uuid="containerUuid"
-            :container-manager="containerManager"
+            :container-manager="{
+              ...containerManager,
+              getLookupList,
+              isDisplayedField,
+              isMandatoryField,
+              isReadOnlyField,
+              changeFieldShowedFromUser
+            }"
             :metadata-field="field"
             :v-model="field.value"
             class="product-value"
@@ -121,6 +128,13 @@ import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
 import formMixin from '@/components/ADempiere/Form/formMixin.js'
 
 // api request methods
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 import { getProductPrice } from '@/api/ADempiere/form/price-checking.js'
 
 // methods and helpers
@@ -147,11 +161,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -236,6 +246,11 @@ export default {
     formatDateToSend,
     formatPrice,
     formatQuantity,
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     focusProductValue() {
       if (!this.isEmptyValue(this.$refs.ProductValue[0]) && !this.isEmptyValue(this.$refs.ProductValue[0].$children[0]) && !this.isEmptyValue(this.$refs.ProductValue[0].$children[0].$children[0]) && !this.isEmptyValue(this.$refs.ProductValue[0].$children[0].$children[0].$children[1])) {
         this.$refs.ProductValue[0].$children[0].$children[0].$children[1].$children[0].focus()

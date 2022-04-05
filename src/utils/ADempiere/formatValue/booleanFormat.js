@@ -31,15 +31,19 @@ export const convertBooleanToTranslationLang = (booleanValue) => {
 
 /**
  * Convert boolean value to string value
- * @param {boolean} booleanValue
+ * @param {boolean|string} booleanValue
+ * @param {boolean} isForce
  * @returns {strin}
  */
-export const convertBooleanToString = (booleanValue) => {
+export const convertBooleanToString = (booleanValue, isForce = true) => {
   if (booleanValue === true || booleanValue === 'true' || booleanValue === 'Y') {
     return 'Y'
   }
+  if (isForce) {
+    return 'N'
+  }
 
-  return 'N'
+  return booleanValue
 }
 
 /**

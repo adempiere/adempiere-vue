@@ -1,7 +1,12 @@
 <template>
-  <component :is="type" v-bind="linkProps(to)">
+  <a v-if="isExternal" :href="to" target="_blank" rel="noopener">
     <slot />
-  </component>
+  </a>
+  <router-link v-else v-slot="{ navigate }" :to="to" custom>
+    <span role="link" @click="navigate" @keypress.enter="navigate">
+      <slot />
+    </span>
+  </router-link>
 </template>
 
 <script>

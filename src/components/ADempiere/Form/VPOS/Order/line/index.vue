@@ -35,14 +35,28 @@
                 labelCurrency: currencyPointOfSales.iSOCode,
               }"
               :container-uuid="'line'"
-              :container-manager="containerManager"
+              :container-manager="{
+                ...containerManager,
+                getLookupList,
+                isDisplayedField,
+                isMandatoryField,
+                isReadOnlyField,
+                changeFieldShowedFromUser
+              }"
             />
             <field-definition
               v-if="field.columnName === 'QtyEntered'"
               :key="field.columnName"
               :metadata-field="field"
               :container-uuid="'line'"
-              :container-manager="containerManager"
+              :container-manager="{
+                ...containerManager,
+                getLookupList,
+                isDisplayedField,
+                isMandatoryField,
+                isReadOnlyField,
+                changeFieldShowedFromUser
+              }"
             />
             <field-definition
               v-if="field.columnName === 'Discount'"
@@ -50,7 +64,14 @@
               :key="field.columnName"
               :metadata-field="field"
               :container-uuid="'line'"
-              :container-manager="containerManager"
+              :container-manager="{
+                ...containerManager,
+                getLookupList,
+                isDisplayedField,
+                isMandatoryField,
+                isReadOnlyField,
+                changeFieldShowedFromUser
+              }"
             />
           </el-form>
         </el-col>
@@ -82,6 +103,13 @@ import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 import {
   createFieldFromDictionary
 } from '@/utils/ADempiere/lookupFactory'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'FieldLine',
@@ -107,11 +135,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -204,6 +228,11 @@ export default {
   },
 
   methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     createFieldFromDictionary,
     setFieldsList() {
       const fieldsList = []

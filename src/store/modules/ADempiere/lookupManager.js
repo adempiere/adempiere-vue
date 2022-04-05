@@ -17,11 +17,11 @@
 import Vue from 'vue'
 
 // api request methods
-import { requestLookup, requestLookupList } from '@/api/ADempiere/window.js'
+import { requestLookupList } from '@/api/ADempiere/window.js'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { parseContext, getContextAttributes } from '@/utils/ADempiere/contextUtils.js'
+import { getContextAttributes, generateContextKey } from '@/utils/ADempiere/contextUtils.js'
 
 const initStateLookup = {
   lookupItem: {},
@@ -35,17 +35,13 @@ const lookupManager = {
   mutations: {
     setLookupItem(state, {
       clientId,
-      parsedDirectQuery,
-      tableName,
+      key,
       option,
       value
     }) {
-      const key = `${clientId}_${tableName}_${parsedDirectQuery}_${value}`
-
       Vue.set(state.lookupItem, key, {
         clientId,
-        tableName,
-        parsedDirectQuery,
+        key,
         option,
         value
       })
@@ -65,16 +61,6 @@ const lookupManager = {
       })
     },
 
-    deleteLookupItem(state, {
-      clientId,
-      tableName,
-      parsedDirectQuery,
-      value
-    }) {
-      const key = `${clientId}_${tableName}_${parsedDirectQuery}_${value}`
-      Vue.set(state.lookupItem, key, undefined)
-    },
-
     deleteLookupList(state, {
       key
     }) {
@@ -87,69 +73,6 @@ const lookupManager = {
   },
 
   actions: {
-    /**
-    * Get display column from lookup
-    * @param {string} parentUuid
-    * @param {string} containerUuid
-    * @param {string} tableName
-    * @param {string} directQuery
-    * @param {string|number} value identifier or key
-    */
-    getLookupItemFromServer({ commit, rootGetters }, {
-      parentUuid,
-      containerUuid,
-      tableName,
-      directQuery,
-      value
-    }) {
-      return new Promise(resolve => {
-        if (isEmptyValue(directQuery)) {
-          resolve()
-          return
-        }
-
-        let parsedDirectQuery = directQuery
-        if (directQuery.includes('@')) {
-          parsedDirectQuery = parseContext({
-            parentUuid,
-            containerUuid,
-            value: directQuery,
-            isBooleanToString: true
-          }).value
-        }
-
-        requestLookup({
-          tableName,
-          directQuery: parsedDirectQuery,
-          value
-        })
-          .then(lookupItemResponse => {
-            const {
-              DisplayColumn: label
-            } = lookupItemResponse.values
-            const option = {
-              label: isEmptyValue(label) ? ' ' : label,
-              uuid: lookupItemResponse.uuid,
-              value // lookupItemResponse.values.KeyColumn
-            }
-
-            commit('setLookupItem', {
-              parentUuid, // used by suscription filter
-              containerUuid, // used by suscription filter
-              option,
-              value, // isNaN(value) ? value : parseInt(value, 10),
-              parsedDirectQuery: directQuery,
-              tableName,
-              clientId: rootGetters.getPreferenceClientId
-            })
-
-            resolve(option)
-          })
-          .catch(error => {
-            console.warn(`Get Lookup, Select Base - Error ${error.code}: ${error.message}.`)
-          })
-      })
-    },
 
     /**
      * Get display column from lookup
@@ -168,10 +91,14 @@ const lookupManager = {
       fieldUuid,
       processParameterUuid,
       browseFieldUuid,
+      id,
+      //
       referenceUuid,
+      searchValue,
+      //
       tableName,
       columnName,
-      searchValue
+      columnUuid
     }) {
       return new Promise(resolve => {
         if (isEmptyValue(fieldUuid) && isEmptyValue(processParameterUuid) && isEmptyValue(browseFieldUuid)) {
@@ -182,7 +109,8 @@ const lookupManager = {
         const contextAttributesList = getContextAttributes({
           parentUuid,
           containerUuid,
-          contextColumnNames
+          contextColumnNames,
+          isBooleanToString: true
         })
 
         requestLookupList({
@@ -190,10 +118,14 @@ const lookupManager = {
           fieldUuid,
           processParameterUuid,
           browseFieldUuid,
+          id,
+          //
           referenceUuid,
+          searchValue,
+          //
           tableName,
           columnName,
-          searchValue
+          columnUuid
         })
           .then(lookupListResponse => {
             const optionsList = []
@@ -201,12 +133,12 @@ const lookupManager = {
             lookupListResponse.recordsList.forEach(itemLookup => {
               const {
                 KeyColumn: value,
-                DisplayColumn: label
+                DisplayColumn: displayedValue
               } = itemLookup.values
 
               if (!isEmptyValue(value)) {
                 optionsList.push({
-                  label,
+                  displayedValue,
                   value,
                   uuid: itemLookup.uuid
                 })
@@ -214,7 +146,7 @@ const lookupManager = {
             })
             if (isAddBlankValue) {
               optionsList.unshift({
-                label: ' ',
+                displayedValue: ' ',
                 value: blankValue,
                 uuid: undefined
               })
@@ -224,21 +156,15 @@ const lookupManager = {
 
             let key = clientId
             if (!isEmptyValue(fieldUuid)) {
-              key += `_${fieldUuid}`
+              key += `|${fieldUuid}`
             } else if (!isEmptyValue(processParameterUuid)) {
-              key += `_${processParameterUuid}`
+              key += `|${processParameterUuid}`
             } else if (!isEmptyValue(browseFieldUuid)) {
-              key += `_${browseFieldUuid}`
+              key += `|${browseFieldUuid}`
             }
 
-            if (!isEmptyValue(contextAttributesList)) {
-              let contextKey = ''
-              contextAttributesList.map(attribute => {
-                contextKey += '_' + attribute.columnName + '_' + attribute.value
-              })
-
-              key += '_' + contextKey
-            }
+            const contextKey = generateContextKey(contextAttributesList)
+            key += contextKey
 
             commit('setLookupList', {
               clientId,
@@ -257,54 +183,42 @@ const lookupManager = {
       })
     },
 
-    deleteLookupList({ commit, rootGetters }, {
+    deleteLookup({ commit, dispatch, rootGetters }, {
       parentUuid,
       containerUuid,
       uuid,
       contextColumnNames = [],
-      tableName,
-      directQuery,
       value
     }) {
       return new Promise(resolve => {
-        const clientId = rootGetters.getPreferenceClientId
-
-        let parsedDirectQuery = directQuery
-        if (directQuery && parsedDirectQuery.includes('@')) {
-          parsedDirectQuery = parseContext({
-            parentUuid,
-            containerUuid,
-            value: directQuery,
-            isBooleanToString: true
-          }).value
-        }
-        commit('deleteLookupItem', {
-          clientId,
-          tableName,
-          parsedDirectQuery,
+        dispatch('deleteDefaultValue', {
+          parentUuid,
+          containerUuid,
+          uuid,
+          contextColumnNames,
           value
         })
 
-        let key = clientId
-        if (!isEmptyValue(uuid)) {
-          key += `_${uuid}`
-        }
+        const clientId = rootGetters.getPreferenceClientId
 
         const contextAttributesList = getContextAttributes({
           parentUuid,
           containerUuid,
-          contextColumnNames
+          contextColumnNames,
+          isBooleanToString: true
         })
-        if (!isEmptyValue(contextAttributesList)) {
-          let contextKey = ''
-          contextAttributesList.map(attribute => {
-            contextKey += '_' + attribute.columnName + '_' + attribute.value
-          })
 
-          key += '_' + contextKey
+        const contextKey = generateContextKey(contextAttributesList)
+
+        let keyList = clientId
+        if (!isEmptyValue(uuid)) {
+          keyList += `|${uuid}`
         }
+
+        keyList += contextKey
+
         commit('deleteLookupList', {
-          key
+          key: keyList
         })
 
         resolve()
@@ -313,58 +227,28 @@ const lookupManager = {
   },
 
   getters: {
-    getStoredLookupItem: (state, getters, rootState, rootGetters) => ({
-      parentUuid,
-      containerUuid,
-      tableName,
-      directQuery,
-      value
-    }) => {
-      let parsedDirectQuery = directQuery
-      if (!isEmptyValue(parsedDirectQuery) && parsedDirectQuery.includes('@')) {
-        parsedDirectQuery = parseContext({
-          parentUuid,
-          containerUuid,
-          value: directQuery,
-          isBooleanToString: true
-        }).value
-      }
-
-      const clientId = rootGetters.getPreferenceClientId
-      const key = `${clientId}_${tableName}_${parsedDirectQuery}_${value}`
-
-      const lookupItem = state.lookupItem[key]
-      if (lookupItem) {
-        return lookupItem.option
-      }
-      return undefined
-    },
-
     getStoredLookupList: (state, getters, rootState, rootGetters) => ({
       parentUuid,
       containerUuid,
-      uuid,
-      contextColumnNames = []
+      contextColumnNames = [],
+      contextAttributesList = [],
+      uuid
     }) => {
       let key = rootGetters.getPreferenceClientId
       if (!isEmptyValue(uuid)) {
-        key += `_${uuid}`
+        key += `|${uuid}`
       }
 
-      const contextAttributesList = getContextAttributes({
-        parentUuid,
-        containerUuid,
-        contextColumnNames
-      })
-
-      if (!isEmptyValue(contextAttributesList)) {
-        let contextKey = ''
-        contextAttributesList.map(attribute => {
-          contextKey += '_' + attribute.columnName + '_' + attribute.value
+      if (isEmptyValue(contextAttributesList) && !isEmptyValue(contextColumnNames)) {
+        contextAttributesList = getContextAttributes({
+          parentUuid,
+          containerUuid,
+          contextColumnNames,
+          isBooleanToString: true
         })
-
-        key += '_' + contextKey
       }
+      const contextKey = generateContextKey(contextAttributesList)
+      key += contextKey
 
       const lookupList = state.lookupList[key]
       if (lookupList) {
@@ -376,28 +260,35 @@ const lookupManager = {
     /**
      * Get all lookups, item and list joined
      */
-    getStoredLookupAll: (state, getters) => ({
+    getStoredLookupAll: (state, getters, rootState, rootGetters) => ({
       parentUuid,
       containerUuid,
-      uuid,
-      tableName,
-      directQuery,
-      value
+      contextColumnNames,
+      uuid
     }) => {
+      const contextAttributesList = getContextAttributes({
+        parentUuid,
+        containerUuid,
+        contextColumnNames,
+        isBooleanToString: true
+      })
+
       const optionsList = getters.getStoredLookupList({
         parentUuid,
         containerUuid,
-        uuid
+        uuid,
+        contextColumnNames,
+        contextAttributesList
       })
 
       // set item values getter from server into list
       if (isEmptyValue(optionsList)) {
-        const option = getters.getStoredLookupItem({
+        const option = rootGetters.getStoredDefaultValue({
           parentUuid,
           containerUuid,
-          tableName,
-          directQuery,
-          value
+          contextColumnNames,
+          contextAttributesList,
+          uuid
         })
 
         // add a item option

@@ -26,7 +26,7 @@ import {
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
-import { convertArrayKeyValueToObject } from '@/utils/ADempiere/valueFormat.js'
+import { convertArrayKeyValueToObject } from '@/utils/ADempiere/formatValue/iterableFormat.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'
 import {
   getPreference
@@ -117,7 +117,7 @@ const actions = {
           .filter(itemField => {
             return itemField.componentPath === 'FieldSelect' ||
               typeValue(values[itemField.columnName]) === 'OBJECT' ||
-              itemField.isSQLValue
+              itemField.isGetServerValue
           })
           .map(async itemField => {
             const { columnName, componentPath } = itemField
@@ -153,11 +153,12 @@ const actions = {
               }
             }
 
+            // TODO: Add support with displayedValue response
             if (!isEmptyValue(valueGetDisplayColumn) &&
               typeValue(valueGetDisplayColumn) === 'OBJECT' &&
               valueGetDisplayColumn.isSQL) {
               // get value from Query
-              valueGetDisplayColumn = await dispatch('getDefaultValue', {
+              valueGetDisplayColumn = await dispatch('getDefaultValueFromServer', {
                 parentUuid,
                 containerUuid,
                 query: itemField.defaultValue
@@ -171,12 +172,15 @@ const actions = {
             }
 
             // get label (DisplayColumn) from vuex store
-            const options = rootGetters.getLookupAll({
+            const options = rootGetters.getStoredLookupAll({
               parentUuid,
               containerUuid,
+              contextColumnNames: itemField.reference.contextColumnNames,
+              //
+              id: itemField.id,
+              fieldUuid: itemField.uuid,
+              columnName: itemField.columnName,
               tableName: itemField.reference.tableName,
-              query: itemField.reference.query,
-              directQuery: itemField.reference.directQuery,
               value: valueGetDisplayColumn
             })
 
@@ -201,16 +205,19 @@ const actions = {
                 return
               }
             }
-            // get value to displayed from server
-            const { label } = await dispatch('getLookupItemFromServer', {
+            // TODO: Deprecated get value to displayed from server
+            const { displayedValue } = await dispatch('getLookupItemFromServer', {
               parentUuid,
               containerUuid,
+              contextColumnNames: itemField.reference.contextColumnNames,
+              //
+              id: itemField.id,
+              fieldUuid: itemField.uuid,
               columnName: itemField.columnName,
               tableName: itemField.reference.tableName,
-              directQuery: itemField.reference.directQuery,
               value: valueGetDisplayColumn
             })
-            values[itemField.displayColumnName] = label
+            values[itemField.displayColumnName] = displayedValue
           })
       }
 

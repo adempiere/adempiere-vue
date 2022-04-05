@@ -19,36 +19,6 @@ import { request } from '@/utils/ADempiere/request'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
- * Request a Lookup data from Reference
- * The main attributes that function hope are:
- * @param {string} tableName
- * @param {string} directQuery
- * @param {string|number} value
- */
-export function requestLookup({
-  tableName,
-  directQuery,
-  value
-}) {
-  const filters = [{
-    value
-  }]
-
-  return request({
-    url: '/user-interface/window/lookup-item',
-    method: 'get',
-    params: {
-      table_name: tableName,
-      query: directQuery,
-      filters
-    }
-  })
-    .then(respose => {
-      return respose
-    })
-}
-
-/**
  * Request a Lookup list data from Reference
  * The main attributes that function hope are:
  * @param {string} fieldUuid
@@ -63,10 +33,15 @@ export function requestLookupList({
   fieldUuid,
   processParameterUuid,
   browseFieldUuid,
+  id,
+  //
   referenceUuid,
+  searchValue,
+  //
   tableName,
   columnName,
-  searchValue,
+  columnUuid,
+  //
   pageToken,
   pageSize
 }) {
@@ -74,7 +49,7 @@ export function requestLookupList({
   if (!isEmptyValue(contextAttributesList)) {
     contextAttributes = contextAttributesList.map(attribute => {
       return {
-        column_name: attribute.columnName,
+        key: attribute.columnName,
         value: attribute.value
       }
     })
@@ -84,15 +59,18 @@ export function requestLookupList({
     url: '/user-interface/window/lookup-items',
     method: 'get',
     params: {
-      context_attribures: contextAttributes,
+      context_attributes: contextAttributes,
       field_uuid: fieldUuid,
       process_parameter_uuid: processParameterUuid,
       browse_field_uuid: browseFieldUuid,
+      id,
       //
       reference_uuid: referenceUuid,
       search_value: searchValue,
+      //
       table_name: tableName,
       column_name: columnName,
+      column_uuid: columnUuid,
       // Page Data
       pageToken,
       pageSize

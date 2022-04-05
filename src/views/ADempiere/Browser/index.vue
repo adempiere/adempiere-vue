@@ -312,10 +312,25 @@ export default defineComponent({
         })
       },
 
-      getLookupList({ parentUuid, containerUuid, uuid }) {
+      /**
+       * @returns Promisse with value and displayedValue
+       */
+      getDefaultValue({ parentUuid, containerUuid, uuid, id, contextColumnNames, columnName }) {
+        return store.dispatch('getDefaultValueFromServer', {
+          parentUuid,
+          containerUuid,
+          contextColumnNames,
+          browseFieldUuid: uuid,
+          id,
+          //
+          columnName
+        })
+      },
+      getLookupList({ parentUuid, containerUuid, contextColumnNames, uuid }) {
         return store.dispatch('getLookupListFromServer', {
           parentUuid,
           containerUuid,
+          contextColumnNames,
           browseFieldUuid: uuid
         })
       }

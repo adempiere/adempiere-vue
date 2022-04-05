@@ -15,12 +15,12 @@
 -->
 
 <template>
-  <iframe
+  <embed
     class="pdf-content"
     :src="src"
-    width="100%"
-    height="100%"
-  />
+    :type="typeFormat"
+    style="height:1000px;width:100%; position:relative;"
+  >
 </template>
 
 <script>
@@ -33,6 +33,10 @@ export default defineComponent({
     src: {
       type: String,
       required: true
+    },
+    typeFormat: {
+      type: String,
+      default: 'application/pdf'
     }
   }
 

@@ -19,62 +19,62 @@ export const OPERATOR_EQUAL = {
   symbol: '='
 }
 
-const OPERATOR_NOT_EQUAL = {
+export const OPERATOR_NOT_EQUAL = {
   operator: 'NOT_EQUAL',
   symbol: '<>'
 }
 
-const OPERATOR_LIKE = {
+export const OPERATOR_LIKE = {
   operator: 'LIKE',
   symbol: '%'
 }
 
-const OPERATOR_NOT_LIKE = {
+export const OPERATOR_NOT_LIKE = {
   operator: 'NOT_LIKE',
   symbol: '!%'
 }
 
-const OPERATOR_GREATER = {
+export const OPERATOR_GREATER = {
   operator: 'GREATER',
   symbol: '>'
 }
 
-const OPERATOR_GREATER_EQUAL = {
+export const OPERATOR_GREATER_EQUAL = {
   operator: 'GREATER_EQUAL',
   symbol: '>='
 }
 
-const OPERATOR_LESS = {
+export const OPERATOR_LESS = {
   operator: 'LESS',
   symbol: '<'
 }
 
-const OPERATOR_LESS_EQUAL = {
+export const OPERATOR_LESS_EQUAL = {
   operator: 'LESS_EQUAL',
   symbol: '<='
 }
 
-const OPERATOR_BETWEEN = {
+export const OPERATOR_BETWEEN = {
   operator: 'BETWEEN',
   symbol: '>-<'
 }
 
-const OPERATOR_NULL = {
+export const OPERATOR_NULL = {
   operator: 'NULL',
   symbol: ''
 }
 
-const OPERATOR_NOT_NULL = {
+export const OPERATOR_NOT_NULL = {
   operator: 'NOT_NULL',
   symbol: ''
 }
 
-const OPERATOR_IN = {
+export const OPERATOR_IN = {
   operator: 'IN',
   symbol: '()'
 }
 
-const OPERATOR_NOT_IN = {
+export const OPERATOR_NOT_IN = {
   operator: 'NOT_IN',
   symbol: '!()'
 }

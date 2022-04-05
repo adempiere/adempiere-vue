@@ -25,7 +25,14 @@
       <field-definition
         :metadata-field="fieldsList[0]"
         :container-uuid="'Sales-Discount-Off'"
-        :container-manager="containerManager"
+        :container-manager="{
+          ...containerManager,
+          getLookupList,
+          isDisplayedField,
+          isMandatoryField,
+          isReadOnlyField,
+          changeFieldShowedFromUser
+        }"
       />
     </el-form>
   </span>
@@ -34,7 +41,13 @@
 <script>
 // constants
 import fieldListDiscount from './fieldsList.js'
-
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 import formMixin from '@/components/ADempiere/Form/formMixin'
 
 export default {
@@ -56,11 +69,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -69,6 +78,13 @@ export default {
     return {
       fieldsList: fieldListDiscount
     }
+  },
+  methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser
   }
 }
 </script>

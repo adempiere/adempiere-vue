@@ -22,6 +22,13 @@ import FieldsList from './fieldsList.js'
 
 // utils and helpers methods
 import { getSequenceAsList } from '@/utils/ADempiere/location'
+import {
+  getLookupList,
+  isDisplayedField,
+  isMandatoryField,
+  isReadOnlyField,
+  changeFieldShowedFromUser
+} from '@/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'MixinLocationField',
@@ -31,11 +38,7 @@ export default {
       type: Object,
       default: () => ({
         actionPerformed: () => {},
-        changeFieldShowedFromUser: () => {},
         getFieldsLit: () => {},
-        isDisplayedField: () => { return true },
-        isMandatoryField: () => { return true },
-        isReadOnlyField: () => { return false },
         setDefaultValues: () => {}
       })
     }
@@ -71,6 +74,11 @@ export default {
   },
 
   methods: {
+    getLookupList,
+    isDisplayedField,
+    isMandatoryField,
+    isReadOnlyField,
+    changeFieldShowedFromUser,
     getLocationAddress,
     toggleShowedLocationForm() {
       this.isShowedLocationForm = !this.isShowedLocationForm

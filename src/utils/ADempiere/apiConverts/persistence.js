@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { convertArrayKeyValueToObject } from '@/utils/ADempiere/valueFormat.js'
+import { convertArrayKeyValueToObject } from '@/utils/ADempiere/formatValue/iterableFormat.js'
 import { camelizeObjectKeys } from '../transformObject'
 
 export function convertEntityList(entityList) {
