@@ -2,14 +2,22 @@
 const path = require('path')
 // use fs to get certificates files
 // const fs = require('fs')
+const config = require('./config/default.json')
 
-const defaultSettings = require('./src/settings.js')
+const pathTheme = './' + config.theme + 'settings.js'
+
+const theme = config.theme
+
+const themeIcon = config.theme + 'icons'
+
+const themeComponents = theme + 'components'
+
+const defaultSettingsTheme = require(pathTheme)
 
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || 'Adempiere Vue' // page title
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
@@ -51,15 +59,14 @@ module.exports = {
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
-    name: name,
+    name: defaultSettingsTheme.title, // page title
     resolve: {
       alias: {
-        '@': resolve('src')
+        '@': resolve(theme)
       }
     }
   },
   chainWebpack(config) {
-    // it can improve the speed of the first screen, it is recommended to turn on preload
     // it can improve the speed of the first screen, it is recommended to turn on preload
     config.plugin('preload').tap(() => [
       {
@@ -76,13 +83,9 @@ module.exports = {
 
     // set svg-sprite-loader
     config.module
-      .rule('svg')
-      .exclude.add(resolve('src/icons'))
-      .end()
-    config.module
       .rule('icons')
       .test(/\.svg$/)
-      .include.add(resolve('src/icons'))
+      .include.add(resolve(themeIcon))
       .end()
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
@@ -90,7 +93,10 @@ module.exports = {
         symbolId: 'icon-[name]'
       })
       .end()
-
+    config.module
+      .rule('svg')
+      .exclude.add(resolve(themeIcon))
+      .end()
     config
       .when(process.env.NODE_ENV !== 'development',
         config => {
@@ -119,7 +125,7 @@ module.exports = {
                 },
                 commons: {
                   name: 'chunk-commons',
-                  test: resolve('src/components'), // can customize your rules
+                  test: resolve(themeComponents), // can customize your rules
                   minChunks: 3, //  minimum common number
                   priority: 5,
                   reuseExistingChunk: true
