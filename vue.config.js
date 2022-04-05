@@ -8,8 +8,6 @@ const pathTheme = './' + config.theme + 'settings.js'
 
 const theme = config.theme
 
-const themeIcon = config.theme + 'icons'
-
 const themeComponents = theme + 'components'
 
 const defaultSettingsTheme = require(pathTheme)
@@ -85,7 +83,7 @@ module.exports = {
     config.module
       .rule('icons')
       .test(/\.svg$/)
-      .include.add(resolve(themeIcon))
+      .include.add(resolve('src/icons'))
       .end()
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
@@ -95,7 +93,7 @@ module.exports = {
       .end()
     config.module
       .rule('svg')
-      .exclude.add(resolve(themeIcon))
+      .exclude.add(resolve('src/icons'))
       .end()
     config
       .when(process.env.NODE_ENV !== 'development',
