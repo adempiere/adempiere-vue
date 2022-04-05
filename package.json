@@ -48,7 +48,7 @@
     "js-cookie": "2.2.1",
     "jsonlint": "1.6.3",
     "jszip": "3.7.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "normalize.css": "8.0.1",
     "nprogress": "0.2.0",
     "path-to-regexp": "6.2.0",
