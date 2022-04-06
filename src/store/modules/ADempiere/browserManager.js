@@ -133,85 +133,99 @@ const browserControl = {
       pageNumber,
       isClearSelection = false
     }) {
-      showMessage({
-        title: language.t('notifications.loading'),
-        message: language.t('notifications.searching'),
-        type: 'info'
-      })
-
-      let pageToken
-      if (!isEmptyValue(pageNumber)) {
-        pageNumber-- // TODO: Remove with fix in backend
-        const token = getters.getBrowserPageToken({
-          containerUuid
+      return new Promise(resolve => {
+        showMessage({
+          title: language.t('notifications.loading'),
+          message: language.t('notifications.searching'),
+          type: 'info'
         })
-        pageToken = generatePageToken({ pageNumber, token })
-      }
 
-      const { fieldsList, contextColumnNames } = rootGetters.getStoredBrowser(containerUuid)
-
-      // parameters isQueryCriteria
-      const parametersList = rootGetters.getBrowserQueryCriteria({
-        containerUuid,
-        fieldsList
-      })
-
-      // get context values
-      const contextAttributesList = getContextAttributes({
-        containerUuid,
-        contextColumnNames
-      })
-
-      return requestBrowserSearch({
-        uuid: containerUuid,
-        contextAttributesList,
-        parametersList,
-        nextPageToken: pageToken
-      })
-        .then(browserSearchResponse => {
-          const recordsList = browserSearchResponse.recordsList.map((record, rowIndex) => {
-            return {
-              ...record.attributes,
-              // datatables app attributes
-              ...ROW_ATTRIBUTES,
-              rowIndex
-            }
-          })
-
-          let token = browserSearchResponse.nextPageToken
-          if (token !== undefined) {
-            token = token.slice(0, -2)
-          }
-
-          commit('setBrowserData', {
-            containerUuid,
-            recordsList,
-            recordCount: browserSearchResponse.recordCount,
-            nextPageToken: token
-          })
-
-          showMessage({
-            title: language.t('notifications.succesful'),
-            message: language.t('notifications.succcessSearch'),
-            type: 'success'
-          })
-          return recordsList
-        })
-        .catch(error => {
-          // Set default registry values so that the table does not say loading,
-          // there was already a response from the server
-          commit('setBrowserData', {
+        let pageToken
+        if (!isEmptyValue(pageNumber)) {
+          pageNumber-- // TODO: Remove with fix in backend
+          const token = getters.getBrowserPageToken({
             containerUuid
           })
+          pageToken = generatePageToken({ pageNumber, token })
+        }
 
-          showMessage({
-            title: language.t('notifications.error'),
-            message: language.t('notifications.errorSearch'),
-            summary: error.message,
-            type: 'error'
-          })
-          console.warn(`Error getting browser search: ${error.message}. Code: ${error.code}.`)
+        const { fieldsList, contextColumnNames } = rootGetters.getStoredBrowser(containerUuid)
+
+        // parameters isQueryCriteria
+        const parametersList = rootGetters.getBrowserQueryCriteria({
+          containerUuid,
+          fieldsList
         })
+
+        // get context values
+        const contextAttributesList = getContextAttributes({
+          containerUuid,
+          contextColumnNames
+        })
+
+        const isWithoutValues = contextAttributesList.find(attribute => isEmptyValue(attribute.value))
+        if (isWithoutValues) {
+          console.warn(`Without response, fill the ${isWithoutValues.columnName} field.`)
+          showMessage({
+            message: language.t('notifications.mandatoryFieldMissing') + isWithoutValues.columnName,
+            type: 'info'
+          })
+          resolve([])
+          return
+        }
+
+        requestBrowserSearch({
+          uuid: containerUuid,
+          contextAttributesList,
+          parametersList,
+          nextPageToken: pageToken
+        })
+          .then(browserSearchResponse => {
+            const recordsList = browserSearchResponse.recordsList.map((record, rowIndex) => {
+              return {
+                ...record.attributes,
+                // datatables app attributes
+                ...ROW_ATTRIBUTES,
+                rowIndex
+              }
+            })
+
+            let token = browserSearchResponse.nextPageToken
+            if (token !== undefined) {
+              token = token.slice(0, -2)
+            }
+
+            commit('setBrowserData', {
+              containerUuid,
+              recordsList,
+              recordCount: browserSearchResponse.recordCount,
+              nextPageToken: token
+            })
+
+            showMessage({
+              title: language.t('notifications.succesful'),
+              message: language.t('notifications.succcessSearch'),
+              type: 'success'
+            })
+
+            resolve(recordsList)
+          })
+          .catch(error => {
+            // Set default registry values so that the table does not say loading,
+            // there was already a response from the server
+            commit('setBrowserData', {
+              containerUuid
+            })
+
+            showMessage({
+              title: language.t('notifications.error'),
+              message: language.t('notifications.errorSearch'),
+              summary: error.message,
+              type: 'error'
+            })
+            console.warn(`Error getting browser search: ${error.message}. Code: ${error.code}.`)
+          })
+      })
     }
   },
 
