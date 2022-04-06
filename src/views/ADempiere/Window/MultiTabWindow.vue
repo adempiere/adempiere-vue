@@ -28,10 +28,16 @@
       :relations-manager="relationsManager"
     />
 
+    <embedded
+      :visible="showRecordAccess"
+    >
+      <record-access />
+    </embedded>
     <tab-manager
       :parent-uuid="windowMetadata.uuid"
       :container-manager="containerManager"
       :tabs-list="windowMetadata.tabsListParent"
+      :all-tabs-list="allTabsList"
     />
 
     <tab-manager
@@ -39,6 +45,7 @@
       :parent-uuid="windowMetadata.uuid"
       :container-manager="containerManager"
       :tabs-list="windowMetadata.tabsListChild"
+      :all-tabs-list="allTabsList"
       :is-parent-tabs="false"
     />
   </div>
@@ -53,6 +60,8 @@ import store from '@/store'
 // components and mixins
 import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
 import TabManager from '@/components/ADempiere/TabManager/index.vue'
+import Embedded from '@/components/ADempiere/Dialog/embedded'
+import RecordAccess from '@/components/ADempiere/RecordAccess'
 
 // utils and helpers methods
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
@@ -63,6 +72,8 @@ export default defineComponent({
 
   components: {
     ActionMenu,
+    RecordAccess,
+    Embedded,
     TabManager
   },
 
@@ -80,6 +91,12 @@ export default defineComponent({
   setup(props, { root }) {
     const isWithChildsTab = computed(() => {
       return !isEmptyValue(props.windowMetadata.tabsListChild)
+    })
+
+    const allTabsList = ref([])
+
+    const showRecordAccess = computed(() => {
+      return store.getters.getShowPanelRecordAccess
     })
 
     const containerManager = {
@@ -196,7 +213,7 @@ export default defineComponent({
       containerUuid: props.windowMetadata.currentTabUuid,
 
       defaultActionName: lang.t('actionMenu.createNewRecord'),
-
+      tableName: store.getters.getTableName(props.windowMetadata.uuid, props.windowMetadata.currentTabUuid),
       getActionList: () => {
         return store.getters.getStoredActionsMenu({
           containerUuid: props.windowMetadata.currentTabUuid
@@ -216,11 +233,16 @@ export default defineComponent({
     const relationsManager = ref({
       menuParentUuid: root.$route.meta.parentUuid
     })
+    if (props.windowMetadata.tabsList) {
+      allTabsList.value = props.windowMetadata.tabsList
+    }
 
     return {
       currentTabUuid: props.windowMetadata.currentTabUuid,
       actionsManager,
+      allTabsList,
       referencesManager,
+      showRecordAccess,
       relationsManager,
       isWithChildsTab,
       containerManager

@@ -19,24 +19,22 @@ import { request } from '@/utils/ADempiere/request'
 import { config } from '@/utils/ADempiere/config'
 
 // Download a resource from file name
-export function requestResource({ resourceUuid }, callBack = {
+export function requestResource({ resourceUuid, resourceName }, callBack = {
   onData: () => {},
   onStatus: () => {},
   onEnd: () => {}
 }) {
-  const stream = request({
-    url: '/resource',
-    method: 'get',
-    params: {
-      resource_uuid: resourceUuid
-    }
+  const { getResoursePath } = require('@/utils/ADempiere/resource.js')
+  const { urn } = getResoursePath({
+    resourceUuid,
+    resourceName
   })
-
-  stream.on('data', (response) => callBack.onData(response))
-  stream.on('status', (status) => callBack.onStatus(status))
-  stream.on('end', (end) => callBack.onEnd(end))
-
-  return stream
+  return request({
+    url: urn,
+    method: 'get',
+    responseType: 'arraybuffer',
+    baseURL: config.adempiere.resource.url
+  })
 }
 
 /**

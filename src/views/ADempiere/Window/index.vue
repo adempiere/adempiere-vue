@@ -317,6 +317,22 @@ export default defineComponent({
           id,
           columnName
         })
+      },
+
+      getRecordLogs({ tableName, recordId, recordUuid }) {
+        return store.dispatch('listRecordLogs', {
+          tableName,
+          recordId,
+          recordUuid
+        })
+      },
+
+      getAttachment({ tableName, recordId, recordUuid }) {
+        return store.dispatch('findAttachment', {
+          tableName,
+          recordId,
+          recordUuid
+        })
       }
 
     }

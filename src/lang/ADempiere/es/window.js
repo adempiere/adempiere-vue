@@ -5,7 +5,6 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,7 +18,6 @@ const window = {
   deleteRecord: 'Eliminar Registro',
   undoNew: 'Descartar Nuevo Registro',
   containerInfo: {
-    attachment: 'Anexo',
     notes: 'Listado de Notas',
     changeLog: 'Actividad',
     workflowLog: 'Histórico de Flujo de Trabajo',
@@ -30,6 +28,11 @@ const window = {
       workflowName: 'Nombre de estado del flujo de trabajo',
       timeElapsed: 'Tiempo transcurrido',
       addNote: 'Agregar Nota'
+    },
+    attachment: {
+      label: 'Anexo',
+      uploadFiles: 'Cargar Archivos',
+      newFiles: 'Nuevos Archivos'
     }
   },
   documentStatus: 'Estatus del Documento',

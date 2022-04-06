@@ -32,7 +32,7 @@ export function getEntities({
   tabUuid,
   conditions = [],
   columns = [],
-  attributes = [],
+  contextAttributesList = [],
   sorting = [],
   filters,
   pageToken,
@@ -52,13 +52,13 @@ export function getEntities({
   }
 
   // context attributes
-  if (!isEmptyValue(attributes)) {
-    attributes.forEach(attributeValue => {
-      filters.push({
-        column_name: attributeValue.columnName,
-        operator: attributeValue.operator,
-        value: attributeValue.value
-      })
+  let contextAttributes = []
+  if (!isEmptyValue(contextAttributesList)) {
+    contextAttributes = contextAttributesList.map(attribute => {
+      return {
+        key: attribute.columnName,
+        value: attribute.value
+      }
     })
   }
 
@@ -78,6 +78,7 @@ export function getEntities({
     params: {
       window_uuid: windowUuid,
       tab_uuid: tabUuid,
+      context_attributes: contextAttributes,
       // DSL Query
       filters,
       columns,

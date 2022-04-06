@@ -29,7 +29,8 @@ import {
   refreshRecords
 } from '@/utils/ADempiere/dictionary/window.js'
 import {
-  sharedLink
+  sharedLink,
+  recordAccess
 } from '@/utils/ADempiere/constants/actionsMenuList.js'
 
 export default {
@@ -89,6 +90,7 @@ export default {
 
     actionsList.push(deleteRecord)
     actionsList.push(refreshRecords)
+    actionsList.push(recordAccess)
     actionsList.push(sharedLink)
 
     commit('setActionMenu', {

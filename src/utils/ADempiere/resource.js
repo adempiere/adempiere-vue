@@ -87,6 +87,29 @@ export function getImagePath({
 }
 
 /**
+ * Get path to get file
+ * @author elsiosanchez <Elsiosanches@gmail.com>
+ * @param {string} resourceUuid
+ * @param {string} resourceName
+ * @returns {object} url, urn and uri with path to request
+ */
+
+export function getResoursePath({
+  resourceUuid,
+  resourceName
+}) {
+  const url = config.adempiere.resource.url
+  const urn = `resource?token=${getToken()}&resource_uuid=${resourceUuid}&resource_name=${resourceName}`
+  const uri = `${url}${urn}`
+
+  return {
+    url,
+    urn,
+    uri
+  }
+}
+
+/**
  * Generate blob file and data values
  * @param {string} mimeType
  * @param {array} outputStream

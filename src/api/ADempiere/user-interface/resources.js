@@ -16,6 +16,7 @@
 
 // Get Instance for connection
 import { request } from '@/utils/ADempiere/request'
+import { camelizeObjectKeys } from '@/utils/ADempiere/transformObject.js'
 
 /**
  * Get Attachment
@@ -35,7 +36,7 @@ export function getResourceReference({
     }
   })
     .then(response => {
-      return response
+      return camelizeObjectKeys(response)
     })
 }
 
@@ -59,7 +60,16 @@ export function getAttachment({
       uuid: recordUuid
     }
   })
-    .then(respose => {
-      return respose
+    .then(response => {
+      return camelizeObjectKeys(response)
     })
+}
+
+export function uploadAttachment({
+  tableName,
+  recordId,
+  recordUuid,
+  list
+}) {
+  console.info(`Upload Files array ${list}, recordId ${recordId}, recordUuid ${recordUuid}, tableName ${tableName}`)
 }

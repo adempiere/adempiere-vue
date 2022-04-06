@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <div :class="className" :style="{height:height,width:width}" />
 </template>
@@ -55,7 +56,7 @@ export default {
   mounted() {
     this.unsubscribe = this.subscribeChanges()
     this.$nextTick(() => {
-      this.initChart()
+      this.getMetricsFromServer()
     })
   },
   beforeDestroy() {
@@ -70,13 +71,16 @@ export default {
     subscribeChanges() {
       return this.$store.subscribe((mutation, state) => {
         if (mutation.type === 'notifyDashboardRefresh') {
-          this.initChart()
+          this.getMetricsFromServer()
         }
       })
     },
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
       this.chart.showLoading()
+    },
+    getMetricsFromServer() {
+      this.initChart()
       getMetrics({
         id: this.metadata.id
       })
@@ -84,10 +88,13 @@ export default {
           this.loadChartMetrics(metrics)
         })
         .catch(error => {
-          console.warn(`Error getting Metrics: ${error.message}. Code: ${error.code}.`)
+          console.warn(`Error getting Bar Chart: ${error.message}. Code: ${error.code}.`)
         })
     },
     loadChartMetrics(metrics) {
+      if (!this.chart) {
+        this.initChart()
+      }
       const xAxisValues = []
       let seriesToShow = []
       if (!this.isEmptyValue(metrics.series)) {

@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import Vue from 'vue'
+import language from '@/lang'
 import router from '@/router'
 
 // api request methods
@@ -31,6 +32,7 @@ import { ROW_ATTRIBUTES } from '@/utils/ADempiere/constants/table'
 // utils and helper methods
 import { getContextAttributes } from '@/utils/ADempiere/contextUtils.js'
 import { isEmptyValue, generatePageToken } from '@/utils/ADempiere/valueUtils.js'
+import { showMessage } from '@/utils/ADempiere/notification'
 
 const initState = {
   tabData: {}
@@ -95,27 +97,38 @@ const windowManager = {
       filters = [],
       pageNumber
     }) {
-      let pageToken
-      if (!isEmptyValue(pageNumber)) {
-        pageNumber-- // TODO: Remove with fix in backend
-        const token = getters.getTabPageToken({ containerUuid })
-        pageToken = generatePageToken({ pageNumber, token })
-      }
-
-      const { contextColumnNames } = rootGetters.getStoredTab(parentUuid, containerUuid)
-
-      // get context values
-      const contextAttributesList = getContextAttributes({
-        parentUuid,
-        containerUuid,
-        contextColumnNames
-      })
-
       return new Promise(resolve => {
+        let pageToken
+        if (!isEmptyValue(pageNumber)) {
+          pageNumber-- // TODO: Remove with fix in backend
+          const token = getters.getTabPageToken({ containerUuid })
+          pageToken = generatePageToken({ pageNumber, token })
+        }
+
+        const { contextColumnNames, name } = rootGetters.getStoredTab(parentUuid, containerUuid)
+
+        // get context values
+        const contextAttributesList = getContextAttributes({
+          parentUuid,
+          containerUuid,
+          contextColumnNames
+        })
+
+        const isWithoutValues = contextAttributesList.find(attribute => isEmptyValue(attribute.value))
+        if (isWithoutValues) {
+          console.warn(`Without response, fill the **${isWithoutValues.columnName}** field in **${name}** tab.`)
+          showMessage({
+            message: language.t('notifications.mandatoryFieldMissing') + isWithoutValues.columnName,
+            type: 'info'
+          })
+          resolve([])
+          return
+        }
+
         getEntities({
           windowUuid: parentUuid,
           tabUuid: containerUuid,
-          attributes: contextAttributesList,
+          contextAttributesList,
           filters,
           pageToken
         })

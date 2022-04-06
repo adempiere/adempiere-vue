@@ -10,6 +10,9 @@
     },
     "images": {
       "url": "https://api.erpya.com/adempiere-api/img/"
+    },
+    "resource": {
+      "url": "https://api.erpya.com/adempiere-api/"
     }
   },
   "repository": {
