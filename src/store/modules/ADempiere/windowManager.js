@@ -105,7 +105,7 @@ const windowManager = {
           pageToken = generatePageToken({ pageNumber, token })
         }
 
-        const { contextColumnNames } = rootGetters.getStoredTab(parentUuid, containerUuid)
+        const { contextColumnNames, name } = rootGetters.getStoredTab(parentUuid, containerUuid)
 
         // get context values
         const contextAttributesList = getContextAttributes({
@@ -116,7 +116,7 @@ const windowManager = {
 
         const isWithoutValues = contextAttributesList.find(attribute => isEmptyValue(attribute.value))
         if (isWithoutValues) {
-          console.warn(`Without response, fill the ${isWithoutValues.columnName} field.`)
+          console.warn(`Without response, fill the **${isWithoutValues.columnName}** field in **${name}** tab.`)
           showMessage({
             message: language.t('notifications.mandatoryFieldMissing') + isWithoutValues.columnName,
             type: 'info'
@@ -128,7 +128,7 @@ const windowManager = {
         getEntities({
           windowUuid: parentUuid,
           tabUuid: containerUuid,
-          attributes: contextAttributesList,
+          contextAttributesList,
           filters,
           pageToken
         })
