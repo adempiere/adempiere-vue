@@ -360,7 +360,7 @@ export const PRODUCT_ATTRIBUTE = {
   id: 35,
   isSupported: false,
   valueType: 'INTEGER',
-  componentPath: 'FieldText',
+  componentPath: 'FieldNumber',
   size: {
     xs: 24,
     sm: 12,

@@ -236,8 +236,7 @@ export default defineComponent({
       props.containerManager.seekRecord({
         parentUuid: props.parentUuid,
         containerUuid: props.containerUuid,
-        row,
-        tableName: props.panelMetadata.tableName
+        row
       })
 
       /*

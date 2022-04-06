@@ -315,7 +315,7 @@ export default defineComponent({
           props.containerManager.seekRecord({
             parentUuid: props.parentUuid,
             containerUuid,
-            tableName: tab.tableName
+            row: {}
           })
           return
         }
@@ -361,8 +361,7 @@ export default defineComponent({
         props.containerManager.seekRecord({
           parentUuid: props.parentUuid,
           containerUuid,
-          row,
-          tableName: tab.tableName
+          row
         })
       })
     }

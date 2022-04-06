@@ -135,7 +135,7 @@ export default defineComponent({
           })
       },
 
-      seekRecord: ({ row, tableName, parentUuid, containerUuid }) => {
+      seekRecord: ({ row, parentUuid, containerUuid }) => {
         if (isEmptyValue(row)) {
           store.dispatch('setTabDefaultValues', {
             parentUuid,
@@ -153,8 +153,8 @@ export default defineComponent({
             },
             params: {
               ...root.$route.params,
-              tableName,
-              recordId: row[`${tableName}_ID`]
+              tableName: tab.tableName,
+              recordId: row[`${tab.tableName}_ID`]
             }
           }, () => {})
         }

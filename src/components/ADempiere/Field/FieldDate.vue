@@ -265,7 +265,7 @@ export default {
           parentUuid: this.metadata.parentUuid,
           containerUuid,
           columnName,
-          value: value
+          value: startValue
         })
 
         if (!this.metadata.isRange) {
