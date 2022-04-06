@@ -16,7 +16,7 @@
     </div>
     <div class="right-menu">
       <template v-if="device!=='mobile'">
-        <el-tooltip :content="$t('route.guide')" placement="top-start">
+        <el-tooltip v-if="$route.meta.type !== 'window'" :content="$t('route.guide')" placement="top-start">
           <el-button icon="el-icon-info" type="text" style="color: black;font-size: larger" @click.prevent.stop="guide" />
         </el-tooltip>
         <search id="header-search" class="right-menu-item" />
@@ -154,26 +154,10 @@ export default {
       }
     }
   },
-  watch: {
-    defaultViews(value) {
-      if (value.type === 'window') {
-        this.loadDataWindows(value)
-      }
-    }
-  },
   mounted() {
     this.driver = new Driver()
-    this.loadDataWindows(this.defaultViews)
   },
   methods: {
-    loadDataWindows(window) {
-      this.$store.dispatch('getWindowDefinitionFromServer', {
-        uuid: window.uuid
-      })
-        .then(windowResponse => {
-          this.listWindow = this.$store.getters.getStoredFieldsFromTab(windowResponse.uuid, windowResponse.currentTabUuid).filter(field => field.isMandatory || field.isShowedFromUser)
-        })
-    },
     guide() {
       const value = this.formatGuide(this.$route.meta.type)
       this.driver.defineSteps(value)
