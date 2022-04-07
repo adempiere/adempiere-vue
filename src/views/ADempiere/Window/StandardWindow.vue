@@ -37,7 +37,7 @@
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
 
-import TabManager from '@/components/ADempiere/TabManager'
+import TabManager from '@/themes/default/components/ADempiere/TabManager'
 
 export default defineComponent({
   name: 'StandardWindow',

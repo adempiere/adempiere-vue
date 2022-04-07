@@ -58,10 +58,10 @@ import router from '@/router'
 import store from '@/store'
 
 // components and mixins
-import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
-import TabManager from '@/components/ADempiere/TabManager/index.vue'
-import Embedded from '@/components/ADempiere/Dialog/embedded'
-import RecordAccess from '@/components/ADempiere/RecordAccess'
+import ActionMenu from '@/themes/default/components/ADempiere/ActionMenu/index.vue'
+import TabManager from '@/themes/default/components/ADempiere/TabManager/index.vue'
+import Embedded from '@/themes/default/components/ADempiere/Dialog/embedded'
+import RecordAccess from '@/themes/default/components/ADempiere/RecordAccess'
 
 // utils and helpers methods
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'

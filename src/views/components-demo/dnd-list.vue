@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import DndList from '@/components/DndList'
+import DndList from '@/themes/default/components/DndList'
 import { fetchList } from '@/api/article'
 
 export default {

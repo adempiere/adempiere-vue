@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import Dashboard from '@/components/ADempiere/Dashboard'
+import Dashboard from '@/themes/default/components/ADempiere/Dashboard/index.vue'
 
 export default {
   name: 'DashboardAdmin',

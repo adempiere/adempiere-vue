@@ -2,9 +2,9 @@
 const path = require('path')
 // use fs to get certificates files
 // const fs = require('fs')
-
+const config = require('./config/default.json')
 const defaultSettings = require('./src/settings.js')
-
+const themeComponents = 'src/' + config.theme + 'components'
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
@@ -119,7 +119,7 @@ module.exports = {
                 },
                 commons: {
                   name: 'chunk-commons',
-                  test: resolve('src/components'), // can customize your rules
+                  test: resolve(themeComponents), // can customize your rules
                   minChunks: 3, //  minimum common number
                   priority: 5,
                   reuseExistingChunk: true

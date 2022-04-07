@@ -10,7 +10,7 @@
 
 <script>
 // components and mixins
-import ModalIdle from './components/ADempiere/ModalIdle'
+import ModalIdle from './themes/default/components/ADempiere/ModalIdle'
 
 export default {
   name: 'App',

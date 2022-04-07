@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import MarkdownEditor from '@/components/MarkdownEditor'
+import MarkdownEditor from '@/themes/default/components/MarkdownEditor'
 
 const content = `
 **This is test**

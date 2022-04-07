@@ -68,12 +68,12 @@ import router from '@/router'
 import store from '@/store'
 
 // components and mixins
-import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
-import FileRender from '@/components/ADempiere/FileRender/index.vue'
-import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import ActionMenu from '@/themes/default/components/ADempiere/ActionMenu/index.vue'
+import FileRender from '@/themes/default/components/ADempiere/FileRender/index.vue'
+import LoadingView from '@/themes/default/components/ADempiere/LoadingView/index.vue'
 import mixinReport from '@/views/ADempiere/Report/mixinReport.js'
-import ModalDialog from '@/components/ADempiere/ModalDialog/index.vue'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
+import ModalDialog from '@/themes/default/components/ADempiere/ModalDialog/index.vue'
+import TitleAndHelp from '@/themes/default/components/ADempiere/TitleAndHelp/index.vue'
 
 // utils and helper methods
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'
