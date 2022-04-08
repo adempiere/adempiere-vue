@@ -64,11 +64,11 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 import store from '@/store'
 
 // components and mixins
-import ActionMenu from '@/components/ADempiere/ActionMenu/index.vue'
-import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import ActionMenu from '@theme/components/ADempiere/ActionMenu/index.vue'
+import LoadingView from '@theme/components/ADempiere/LoadingView/index.vue'
 import mixinReport from '@/views/ADempiere/Report/mixinReport.js'
-import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp/index.vue'
+import PanelDefinition from '@theme/components/ADempiere/PanelDefinition/index.vue'
+import TitleAndHelp from '@theme/components/ADempiere/TitleAndHelp/index.vue'
 
 import { convertProcess as convertReport } from '@/utils/ADempiere/apiConverts/dictionary.js'
 import { generateProcess as generateReport } from '@/utils/ADempiere/dictionary/process.js'

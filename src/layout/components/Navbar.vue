@@ -16,7 +16,7 @@
     </div>
     <div class="right-menu">
       <template v-if="device!=='mobile'">
-        <el-tooltip :content="$t('route.guide')" placement="top-start">
+        <el-tooltip v-if="$route.meta.type !== 'window'" :content="$t('route.guide')" placement="top-start">
           <el-button icon="el-icon-info" type="text" style="color: black;font-size: larger" @click.prevent.stop="guide" />
         </el-tooltip>
         <search id="header-search" class="right-menu-item" />
@@ -57,14 +57,14 @@
 <script>
 import ProfilePreview from '@/layout/components/ProfilePreview'
 import { mapGetters } from 'vuex'
-import Breadcrumb from '@/components/Breadcrumb'
-import Hamburger from '@/components/Hamburger'
-import ErrorLog from '@/components/ErrorLog'
-import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import LangSelect from '@/components/LangSelect'
-import Search from '@/components/HeaderSearch'
-import HeaderNotification from '@/components/ADempiere/HeaderNotification'
+import Breadcrumb from '@theme/components/Breadcrumb'
+import Hamburger from '@theme/components/Hamburger'
+import ErrorLog from '@theme/components/ErrorLog'
+import Screenfull from '@theme/components/Screenfull'
+import SizeSelect from '@theme/components/SizeSelect'
+import LangSelect from '@theme/components/LangSelect'
+import Search from '@theme/components/HeaderSearch'
+import HeaderNotification from '@theme/components/ADempiere/HeaderNotification'
 import { getImagePath } from '@/utils/ADempiere/resource.js'
 import Driver from 'driver.js' // import driver.js
 import 'driver.js/dist/driver.min.css' // import driver.js css
@@ -134,10 +134,10 @@ export default {
       let form
       switch (this.getForm.fileName) {
         case 'WFActivity':
-          form = require('@/components/ADempiere/Form/WorkflowActivity/Guide/steps')
+          form = require('@theme/components/ADempiere/Form/WorkflowActivity/Guide/steps')
           break
         case 'VPOS':
-          form = require('@/components/ADempiere/Form/VPOS/Guide/steps')
+          form = require('@theme/components/ADempiere/Form/VPOS/Guide/steps')
           break
         default:
           form = {
@@ -154,26 +154,10 @@ export default {
       }
     }
   },
-  watch: {
-    defaultViews(value) {
-      if (value.type === 'window') {
-        this.loadDataWindows(value)
-      }
-    }
-  },
   mounted() {
     this.driver = new Driver()
-    this.loadDataWindows(this.defaultViews)
   },
   methods: {
-    loadDataWindows(window) {
-      this.$store.dispatch('getWindowDefinitionFromServer', {
-        uuid: window.uuid
-      })
-        .then(windowResponse => {
-          this.listWindow = this.$store.getters.getStoredFieldsFromTab(windowResponse.uuid, windowResponse.currentTabUuid).filter(field => field.isMandatory || field.isShowedFromUser)
-        })
-    },
     guide() {
       const value = this.formatGuide(this.$route.meta.type)
       this.driver.defineSteps(value)

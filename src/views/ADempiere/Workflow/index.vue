@@ -46,10 +46,10 @@
 <script>
 // When supporting the workflow, smart browser and reports,
 // the ContextMenu and sticky must be placed in the layout
-// import ContextMenu from '@/components/ADempiere/ContextMenu'
-// import MainPanel from '@/components/ADempiere/Panel'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
-import Workflow from '@/components/ADempiere/Workflow'
+// import ContextMenu from '@theme/components/ADempiere/ContextMenu'
+// import MainPanel from '@theme/components/ADempiere/Panel'
+import TitleAndHelp from '@theme/components/ADempiere/TitleAndHelp'
+import Workflow from '@theme/components/ADempiere/Workflow'
 import { getWorkflow } from '@/api/ADempiere/workflow.js'
 
 export default {

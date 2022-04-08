@@ -112,10 +112,10 @@
 </template>
 
 <script>
-import PanThumb from '@/components/PanThumb'
-import MdInput from '@/components/MDinput'
-import Mallki from '@/components/TextHoverEffect/Mallki'
-import DropdownMenu from '@/components/Share/DropdownMenu'
+import PanThumb from '@theme/components/PanThumb'
+import MdInput from '@theme/components/MDinput'
+import Mallki from '@theme/components/TextHoverEffect/Mallki'
+import DropdownMenu from '@theme/components/Share/DropdownMenu'
 import waves from '@/directive/waves/index.js' // 水波纹指令
 
 export default {

@@ -14,25 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import TabParent from '@/components/ADempiere/Tab'
-import TabChildren from '@/components/ADempiere/Tab/tabChildren'
+import TabParent from '@theme/themes/default/components/ADempiere/Tab'
+import TabChildren from '@theme/themes/default/components/ADempiere/Tab/tabChildren'
 // When supporting the processes, smart browser and reports,
 // the submenu and sticky must be placed in the layout
-import ContextMenu from '@/components/ADempiere/ContextMenu'
-import ModalDialog from '@/components/ADempiere/Dialog'
-import Embedded from '@/components/ADempiere/Dialog/embedded'
-import DataTable from '@/components/ADempiere/DataTable'
+import ContextMenu from '@theme/themes/default/components/ADempiere/ContextMenu'
+import ModalDialog from '@theme/themes/default/components/ADempiere/Dialog'
+import Embedded from '@theme/themes/default/components/ADempiere/Dialog/embedded'
+import DataTable from '@theme/themes/default/components/ADempiere/DataTable'
 import splitPane from 'vue-splitpane'
 // Container Info
-import ChatEntries from '@/components/ADempiere/ChatEntries'
-import ListChatEntry from '@/components/ADempiere/ChatEntries/listChatEntry'
-import RecordLogs from '@/components/ADempiere/ContainerInfo/recordLogs'
-import WorkflowLogs from '@/components/ADempiere/ContainerInfo/workflowLogs'
+import ChatEntries from '@theme/themes/default/components/ADempiere/ChatEntries'
+import ListChatEntry from '@theme/themes/default/components/ADempiere/ChatEntries/listChatEntry'
+import RecordLogs from '@theme/themes/default/components/ADempiere/ContainerInfo/recordLogs'
+import WorkflowLogs from '@theme/themes/default/components/ADempiere/ContainerInfo/workflowLogs'
 // Workflow
-import WorkflowStatusBar from '@/components/ADempiere/WorkflowStatusBar'
+import WorkflowStatusBar from '@theme/themes/default/components/ADempiere/WorkflowStatusBar'
 // Panel right the Context Menu Field
-import RightPanel from '@/components/ADempiere/RightPanel'
-import RecordAccess from '@/components/ADempiere/RecordAccess'
+import RightPanel from '@theme/themes/default/components/ADempiere/RightPanel'
+import RecordAccess from '@theme/themes/default/components/ADempiere/RecordAccess'
 /**
  * Window Logic Component View
  * Build and show window, tab and records view, generates with
@@ -101,22 +101,22 @@ export default {
       let component
       switch (this.currentFieldOption.name) {
         case this.$t('field.info'):
-          component = () => import('@/components/ADempiere/Field/FieldOptions/contextInfo')
+          component = () => import('@theme/components/ADempiere/Field/FieldOptions/contextInfo')
           break
         case this.$t('language'):
-          component = () => import('@/components/ADempiere/Field/FieldOptions/translated')
+          component = () => import('@theme/components/ADempiere/Field/FieldOptions/translated')
           break
         case this.$t('field.calculator'):
-          component = () => import('@/components/ADempiere/Field/FieldOptions/calculator')
+          component = () => import('@theme/components/ADempiere/Field/FieldOptions/calculator')
           break
         case this.$t('field.preference'):
-          component = () => import('@/components/ADempiere/Field/FieldOptions/preference')
+          component = () => import('@theme/components/ADempiere/Field/FieldOptions/preference')
           break
         case this.$t('field.logsField'):
-          component = () => import('@/components/ADempiere/Field/FieldOptions/changeLogs')
+          component = () => import('@theme/components/ADempiere/Field/FieldOptions/changeLogs')
           break
         case this.$t('operators.operator'):
-          component = () => import('@/components/ADempiere/Field/FieldOptions/operatorComparison')
+          component = () => import('@theme/components/ADempiere/Field/FieldOptions/operatorComparison')
           break
       }
       return component

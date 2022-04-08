@@ -40,7 +40,7 @@ import { defineComponent, computed, ref } from '@vue/composition-api'
 import store from '@/store'
 
 // components and mixins
-import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
+import LoadingView from '@theme/components/ADempiere/LoadingView/index.vue'
 
 // constants
 import { READ_ONLY_FORM_COLUMNS } from '@/utils/ADempiere/constants/systemColumns.js'

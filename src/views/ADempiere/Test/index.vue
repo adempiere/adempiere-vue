@@ -69,9 +69,9 @@
 
 <script>
 // components and mixins
-import FormMixin from '@/components/ADempiere/Form/formMixin'
-import LoadingView from '@/components/ADempiere/LoadingView/index.vue'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+import FormMixin from '@theme/components/ADempiere/Form/formMixin'
+import LoadingView from '@theme/components/ADempiere/LoadingView/index.vue'
+import TitleAndHelp from '@theme/components/ADempiere/TitleAndHelp'
 
 // constants
 import fieldsList from './fieldsList.js'

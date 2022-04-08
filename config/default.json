@@ -45,5 +45,6 @@
   },
   "session": {
     "timeout": 300000
-  }
+  },
+  "theme": "src/themes/default"
 }

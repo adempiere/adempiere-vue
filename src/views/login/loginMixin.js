@@ -1,4 +1,4 @@
-import LangSelect from '@/components/LangSelect'
+import LangSelect from '@theme/components/LangSelect'
 
 export default {
   name: 'MixinLogin',

@@ -15,7 +15,7 @@ import { createLocalVue, mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import ElementUI from 'element-ui'
 import i18n from '../../../../../src/lang/index.js'
-import Badge from '@/components/ADempiere/Badge/index.vue'
+import Badge from '@theme/components/ADempiere/Badge/index.vue'
 
 const tableComponent = 'el-table'
 const badgeComponent = 'el-badge'

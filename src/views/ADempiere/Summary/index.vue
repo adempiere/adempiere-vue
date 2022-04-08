@@ -51,8 +51,8 @@
 </template>
 
 <script>
-import DropdownMenu from '@/components/ADempiere/DropdownMenu'
-import TitleAndHelp from '@/components/ADempiere/TitleAndHelp'
+import DropdownMenu from '@theme/components/ADempiere/DropdownMenu'
+import TitleAndHelp from '@theme/components/ADempiere/TitleAndHelp'
 
 export default {
   name: 'SummaryView',

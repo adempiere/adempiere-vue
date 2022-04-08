@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
-import LoadingView from '@/components/ADempiere/LoadingView'
+import LoadingView from '@theme/components/ADempiere/LoadingView'
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 export default defineComponent({

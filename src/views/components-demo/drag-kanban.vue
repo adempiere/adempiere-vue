@@ -6,7 +6,7 @@
   </div>
 </template>
 <script>
-import Kanban from '@/components/Kanban'
+import Kanban from '@theme/components/Kanban'
 
 export default {
   name: 'DragKanbanDemo',
