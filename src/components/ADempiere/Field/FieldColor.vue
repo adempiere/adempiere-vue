@@ -15,23 +15,24 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-color-picker
-    :ref="metadata.columnName"
     v-model="value"
+    v-bind="commonsProperties"
     show-alpha
-    :disabled="isDisabled"
-    :class="cssClassStyle"
     @change="preHandleChange"
   />
 </template>
 
 <script>
+// components and mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 import fieldMixinText from '@/components/ADempiere/Field/mixin/mixinFieldText.js'
 
 export default {
   name: 'FieldColor',
+
   mixins: [
     fieldMixin,
     fieldMixinText

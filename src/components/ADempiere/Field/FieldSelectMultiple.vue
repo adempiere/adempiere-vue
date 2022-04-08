@@ -15,14 +15,14 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-select
     v-model="value"
+    v-bind="commonsProperties"
     multiple
     filterable
     allow-create
-    :placeholder="metadata.placeholder"
-    :class="'custom-field-select custom-field-select-multiple ' + metadata.cssClassName"
     @change="preHandleChange"
   >
     <el-option
@@ -34,6 +34,7 @@
 </template>
 
 <script>
+// components and mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 /**
@@ -41,8 +42,21 @@ import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
  */
 export default {
   name: 'FieldSelectMultiple',
+
   mixins: [
     fieldMixin
-  ]
+  ],
+
+  computed: {
+    cssClassStyle() {
+      let styleClass = ' custom-field-select custom-field-select-multiple '
+
+      if (!this.isEmptyValue(this.metadata.cssClassName)) {
+        styleClass += this.metadata.cssClassName
+      }
+
+      return styleClass
+    }
+  }
 }
 </script>

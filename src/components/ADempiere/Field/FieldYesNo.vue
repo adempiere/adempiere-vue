@@ -18,12 +18,10 @@
 
 <template>
   <el-switch
-    :ref="metadata.columnName"
     v-model="value"
+    v-bind="commonsProperties"
     :active-text="$t('components.switchActiveText')"
     :inactive-text="$t('components.switchInactiveText')"
-    :class="cssClassStyle"
-    :disabled="isDisabled"
     @change="preHandleChange"
     @blur="focusLost"
     @focus="focusGained"
@@ -31,8 +29,10 @@
 </template>
 
 <script>
+// components and mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
+// utils and helper methods
 import { convertStringToBoolean } from '@/utils/ADempiere/formatValue/booleanFormat.js'
 
 export default {

@@ -15,10 +15,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-autocomplete
     v-model="displayedValue"
-    :placeholder="metadata.placeholder"
+    v-bind="commonsProperties"
     :fetch-suggestions="localSearch"
     :trigger-on-focus="true"
     clearable
@@ -53,7 +54,7 @@
 </template>
 
 <script>
-// mixins
+// components and mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 import selectMixin from '@/components/ADempiere/Field/mixin/mixinFieldSelect.js'
 

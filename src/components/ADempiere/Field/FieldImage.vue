@@ -15,16 +15,15 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-upload
-    :ref="metadata.columnName"
+    v-bind="commonsProperties"
     action="https://jsonplaceholder.typicode.com/posts/"
     :show-file-list="false"
     :on-success="handleAvatarSuccess"
     :on-change="handleChange"
     :before-upload="beforeAvatarUpload"
-    :disabled="isDisabled"
-    :class="cssClassStyle"
   >
     <img v-if="value" :src="value" class="avatar">
     <i v-else class="el-icon-plus avatar-uploader-icon" />
@@ -32,12 +31,19 @@
 </template>
 
 <script>
+// components and mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+
+// api request methods
 import { getResource, updateResource } from '@/api/ADempiere/field/binary.js'
 
 export default {
   name: 'FieldImage',
-  mixins: [fieldMixin],
+
+  mixins: [
+    fieldMixin
+  ],
+
   props: {
     // receives the property that is an object with all the attributes
     binary: {
@@ -45,6 +51,7 @@ export default {
       default: () => []
     }
   },
+
   data() {
     return {
       valuesImage: [{
@@ -54,6 +61,7 @@ export default {
       }]
     }
   },
+
   computed: {
     cssClassStyle() {
       let styleClass = ' custom-field-image '
@@ -63,6 +71,7 @@ export default {
       return styleClass
     }
   },
+
   methods: {
     updateResource,
     getResource,

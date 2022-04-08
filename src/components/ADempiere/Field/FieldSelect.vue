@@ -18,18 +18,15 @@
 
 <template>
   <el-select
-    :ref="metadata.columnName"
     v-model="value"
+    v-bind="commonsProperties"
     :filterable="!isMobile"
-    :placeholder="metadata.placeholder"
     :loading="isLoading"
     value-key="value"
-    :class="cssClassStyle"
     clearable
     :multiple="isSelectMultiple"
     :allow-create="metadata.isSelectCreated"
     :collapse-tags="!isSelectMultiple"
-    :disabled="isDisabled"
     @change="preHandleChange"
     @visible-change="getDataLookupList"
     @clear="clearLookup"

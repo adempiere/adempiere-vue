@@ -18,13 +18,9 @@
 
 <template>
   <el-cascader
-    :ref="metadata.columnName"
     :v-model="[value]"
-    :class="cssClassStyle"
-    :placeholder="metadata.placeholder"
+    v-bind="commonsProperties"
     :options="options"
-    :readonly="Boolean(metadata.readonly)"
-    :disabled="isDisabled"
     :clearable="true"
     filterable
     lazy
@@ -37,7 +33,7 @@
 
 <script>
 // components and mixis
-import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 // api request methods
 import { getLocatorList } from '@/api/ADempiere/field/locator.js'
@@ -46,7 +42,7 @@ export default {
   name: 'FieldLocation',
 
   mixins: [
-    FieldMixin
+    fieldMixin
   ],
 
   data() {

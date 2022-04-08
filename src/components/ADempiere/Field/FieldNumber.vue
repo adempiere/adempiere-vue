@@ -27,17 +27,14 @@
     <el-input-number
       v-if="isFocus"
       key="number-input-focus"
-      :ref="metadata.columnName"
       v-model="value"
+      v-bind="commonsProperties"
       type="number"
       :min="minValue"
       :max="maxValue"
-      :placeholder="metadata.placeholder"
-      :disabled="isDisabled"
       :precision="precision"
       :controls="isShowControls"
       :controls-position="controlsPosition"
-      :class="cssClassStyle"
       style="text-align-last: end !important"
       autofocus
       @change="preHandleChange"
@@ -53,9 +50,7 @@
       key="number-displayed-blur"
       :ref="metadata.columnName"
       v-model="displayedValue"
-      :placeholder="metadata.placeholder"
-      :disabled="isDisabled"
-      :class="cssClassStyle"
+      v-bind="commonsProperties"
       readonly
       autofocus
       style="text-align-last: end !important"
@@ -66,7 +61,7 @@
 
 <script>
 // components and mixins
-import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 // utils and helper methods
 import { isDecimalField } from '@/utils/ADempiere/references.js'
@@ -76,7 +71,7 @@ export default {
   name: 'FieldNumber',
 
   mixins: [
-    FieldMixin
+    fieldMixin
   ],
 
   data() {

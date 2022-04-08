@@ -43,6 +43,15 @@ export default {
     isDisabled() {
       return Boolean(this.metadata.readonly || this.metadata.disabled)
     },
+    commonsProperties() {
+      return {
+        class: this.cssClassStyle,
+        disabled: this.isDisabled,
+        placeholder: this.metadata.placeholder,
+        readonly: Boolean(this.metadata.readonly),
+        ref: this.metadata.columnName
+      }
+    },
     cssClassStyle() {
       let styleClass = ''
       if (this.isEmptyRequired) {

@@ -18,19 +18,15 @@
 
 <template>
   <el-date-picker
-    :ref="metadata.columnName"
     v-model="value"
+    v-bind="commonsProperties"
     :format="formatView"
     :value-format="formatSend"
     :type="typePicker"
     range-separator="-"
-    :placeholder="metadata.placeholder"
     :start-placeholder="$t('components.dateStartPlaceholder')"
     :end-placeholder="$t('components.dateEndPlaceholder')"
     unlink-panels
-    :class="cssClassStyle"
-    :readonly="Boolean(metadata.readonly)"
-    :disabled="isDisabled"
     :picker-options="pickerOptions"
     @change="preHandleChange"
     @blur="focusLost"
@@ -42,7 +38,7 @@
 
 <script>
 // components and mixins
-import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 // constants
 import { DATE_PLUS_TIME } from '@/utils/ADempiere/references'
@@ -55,7 +51,7 @@ export default {
   name: 'FieldDate',
 
   mixins: [
-    FieldMixin
+    fieldMixin
   ],
 
   data() {

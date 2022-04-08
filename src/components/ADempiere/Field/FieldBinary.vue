@@ -15,17 +15,16 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-upload
-    :ref="metadata.columnName"
     v-model="value"
+    v-bind="commonsProperties"
     :limit="metadata.Limit"
     :on-remove="handleRemove"
     :on-success="handleSuccess"
     :on-error="handleError"
-    :class="cssClassStyle"
     action="https://jsonplaceholder.typicode.com/posts/"
-    :disabled="isDisabled"
     @change="preHandleChange"
   >
     <el-button size="small" type="primary">
@@ -38,11 +37,16 @@
 </template>
 
 <script>
+// components and mixins
 import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
 
 export default {
   name: 'FieldBinary',
-  mixins: [fieldMixin],
+
+  mixins: [
+    fieldMixin
+  ],
+
   computed: {
     cssClassStyle() {
       let styleClass = ' image-uploader '
@@ -52,6 +56,7 @@ export default {
       return styleClass
     }
   },
+
   methods: {
     handleRemove(file) {
       this.$message.success(`The previously uploaded file has been deleted.`)

@@ -18,15 +18,11 @@
 
 <template>
   <el-input
-    :ref="metadata.columnName"
     v-model="value"
+    v-bind="commonsProperties"
     :pattern="pattern"
     :rows="rows"
-    :class="cssClassStyle"
     :type="typeTextBox"
-    :placeholder="metadata.placeholder"
-    :readonly="Boolean(metadata.readonly)"
-    :disabled="isDisabled"
     :maxlength="maxLength"
     :show-password="Boolean(metadata.isEncrypted)"
     :autofocus="metadata.inTable"
@@ -44,8 +40,8 @@
 
 <script>
 // components and mixins
-import FieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
-import FieldMixinText from '@/components/ADempiere/Field/mixin/mixinFieldText.js'
+import fieldMixin from '@/components/ADempiere/Field/mixin/mixinField.js'
+import fieldMixinText from '@/components/ADempiere/Field/mixin/mixinFieldText.js'
 
 // constants
 import { TEXT } from '@/utils/ADempiere/references'
@@ -54,8 +50,8 @@ export default {
   name: 'FieldText',
 
   mixins: [
-    FieldMixin,
-    FieldMixinText
+    fieldMixin,
+    fieldMixinText
   ],
 
   props: {

@@ -157,7 +157,6 @@ export default {
     ExportTo: 'Exportar a',
     dateStartPlaceholder: 'Fecha inicial',
     dateEndPlaceholder: 'Fecha final',
-    timePlaceholder: 'Seleccione tiempo',
     dialogCancelButton: 'Cancelar',
     dialogConfirmButton: 'Confirmar',
     filterableItems: 'Columnas Opcionales',
