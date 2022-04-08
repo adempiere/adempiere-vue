@@ -317,7 +317,7 @@
                   @command="changePriceList"
                 >
                   <span>
-                    <svg-icon icon-class="tree-table" /> qlq
+                    <svg-icon icon-class="tree-table" />
                     {{ $t('form.pos.priceList') }}: <b style="cursor: pointer"> {{ currentPriceList.name }} </b>
                   </span>
                   <el-dropdown-menu slot="dropdown">
