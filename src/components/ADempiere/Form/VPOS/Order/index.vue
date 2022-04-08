@@ -317,7 +317,7 @@
                   @command="changePriceList"
                 >
                   <span>
-                    <svg-icon icon-class="tree-table" />
+                    <svg-icon icon-class="tree-table" /> qlq
                     {{ $t('form.pos.priceList') }}: <b style="cursor: pointer"> {{ currentPriceList.name }} </b>
                   </span>
                   <el-dropdown-menu slot="dropdown">
@@ -1094,6 +1094,13 @@ export default {
           this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
           this.visible = true
         } else {
+          this.$store.dispatch('updateOrder', {
+            orderUuid: this.currentOrder.uuid,
+            posUuid: this.currentPointOfSales.uuid,
+            documentTypeUuid: this.currentOrder.documentStatus.uuid,
+            priceListUuid: priceList.uuid,
+            warehouseUuid: this.currentPointOfSales.warehouse.uuid
+          })
           this.$store.commit('setCurrentPriceList', priceList)
         }
       }

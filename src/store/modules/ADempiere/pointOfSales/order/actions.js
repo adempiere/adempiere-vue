@@ -80,13 +80,16 @@ export default {
     documentTypeUuid,
     discountAmount,
     discountRateOff,
+    priceListUuid,
+    warehouseUuid,
     campaignUuid
   }) {
     const isCompleted = rootGetters.posAttributes.currentPointOfSales.currentOrder.isProcessed
     if (isCompleted) {
       return
     }
-    const { currentPriceList, currentWarehouse } = rootGetters.posAttributes.currentPointOfSales
+    const currentPriceList = isEmptyValue(priceListUuid) ? rootGetters.posAttributes.currentPointOfSales.currentPriceList.uuid : priceListUuid
+    const currentWarehouse = isEmptyValue(warehouseUuid) ? rootGetters.posAttributes.currentPointOfSales.currentWarehouse.uuid : warehouseUuid
     updateOrder({
       orderUuid,
       posUuid,
@@ -94,8 +97,8 @@ export default {
       discountAmount,
       discountRateOff,
       customerUuid,
-      priceListUuid: currentPriceList.uuid,
-      warehouseUuid: currentWarehouse.uuid,
+      priceListUuid: currentPriceList,
+      warehouseUuid: currentWarehouse,
       campaignUuid
     })
       .then(response => {
