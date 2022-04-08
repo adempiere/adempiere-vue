@@ -56,7 +56,7 @@ import { defineComponent, computed } from '@vue/composition-api'
 import store from '@/store'
 
 // components and mixins
-import PanelDefinition from '@/themes/default/components/ADempiere/PanelDefinition/index.vue'
+import PanelDefinition from '@theme/components/ADempiere/PanelDefinition/index.vue'
 
 export default defineComponent({
   name: 'ModalDialog',
@@ -109,7 +109,7 @@ export default defineComponent({
     })
 
     const componentRender = computed(() => {
-      // return () => import('@/themes/default/components/ADempiere/PanelDefinition/index.vue')
+      // return () => import('@theme/components/ADempiere/PanelDefinition/index.vue')
       return storedModalDialog.value.componentPath
     })
 

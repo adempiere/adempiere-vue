@@ -54,7 +54,7 @@
 <script>
 import { requestListRecentItems } from '@/api/ADempiere/dashboard/user'
 import { convertAction } from '@/utils/ADempiere/dictionaryUtils'
-import mixinDashboard from '@/themes/default/components/ADempiere/Dashboard/mixinDashboard.js'
+import mixinDashboard from '@theme/components/ADempiere/Dashboard/mixinDashboard.js'
 
 export default {
   name: 'RecentItems',

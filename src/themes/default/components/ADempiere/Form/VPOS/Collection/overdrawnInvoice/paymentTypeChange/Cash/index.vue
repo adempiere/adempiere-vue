@@ -57,8 +57,8 @@
 
 <script>
 import { formatPrice } from '@/utils/ADempiere/valueFormat.js'
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin'
-import posMixin from '@/themes/default/components/ADempiere/Form/VPOS/posMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin'
+import posMixin from '@theme/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListCash from './fieldsListCash.js'
 
 export default {

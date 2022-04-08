@@ -51,8 +51,8 @@
 </template>
 
 <script>
-import Carousel from '@/themes/default/components/ADempiere/Carousel'
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
+import Carousel from '@theme/components/ADempiere/Carousel'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldList.js'
 import SearchCriteria from './components/SearchCriteria/'
 import Invoices from './components/Invoices/index'

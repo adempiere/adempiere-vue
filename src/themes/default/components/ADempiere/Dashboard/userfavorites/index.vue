@@ -73,7 +73,7 @@
 <script>
 import { getFavoritesFromServer } from '@/api/ADempiere/dashboard/user.js'
 import { convertAction } from '@/utils/ADempiere/dictionaryUtils.js'
-import mixinDashboard from '@/themes/default/components/ADempiere/Dashboard/mixinDashboard.js'
+import mixinDashboard from '@theme/components/ADempiere/Dashboard/mixinDashboard.js'
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 
 export default {

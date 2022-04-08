@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin'
+import formMixin from '@theme/components/ADempiere/Form/formMixin'
 import fieldsListAssignSeller from './fieldsList.js'
 import {
   allocateSeller,

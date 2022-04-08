@@ -504,17 +504,17 @@
 
 <script>
 // components and mixins
-import OrdersList from '@/themes/default/components/ADempiere/Form/VPOS/OrderList/index'
-import ConfirmDelivery from '@/themes/default/components/ADempiere/Form/VPOS/ConfirmDelivery'
-import orderLineMixin from '@/themes/default/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
+import OrdersList from '@theme/components/ADempiere/Form/VPOS/OrderList/index'
+import ConfirmDelivery from '@theme/components/ADempiere/Form/VPOS/ConfirmDelivery'
+import orderLineMixin from '@theme/components/ADempiere/Form/VPOS/Order/orderLineMixin.js'
 import CashOpening from './CashOpening'
 import CashSummaryMovements from './CashSummaryMovements'
 import CashWithdrawal from './Cashwithdrawal'
 import DiscountOrder from './DiscountOrder'
 import AssignSeller from './AssignSeller'
 import SalesDiscountOff from './SalesDiscountOff'
-import ModalDialog from '@/themes/default/components/ADempiere/Dialog'
-import GeneralOptions from '@/themes/default/components/ADempiere/Form/VPOS/Options/generalOptions.vue'
+import ModalDialog from '@theme/components/ADempiere/Dialog'
+import GeneralOptions from '@theme/components/ADempiere/Form/VPOS/Options/generalOptions.vue'
 
 // api request methods
 import {
@@ -654,20 +654,20 @@ export default {
       switch (true) {
         case this.showCashOpen:
         case this.showMoneyIncome:
-          component = () => import('@/themes/default/components/ADempiere/Form/VPOS/Options/CashOpening')
+          component = () => import('@theme/components/ADempiere/Form/VPOS/Options/CashOpening')
           this.clearField('Cash-Opening')
           break
         case this.showCashWithdrawl:
         case this.showTransfer:
-          component = () => import('@/themes/default/components/ADempiere/Form/VPOS/Options/Cashwithdrawal')
+          component = () => import('@theme/components/ADempiere/Form/VPOS/Options/Cashwithdrawal')
           this.clearField('Cash-Withdrawal')
           break
         case this.showCashSummaryMovements:
-          component = () => import('@/themes/default/components/ADempiere/Form/VPOS/Options/CashSummaryMovements')
+          component = () => import('@theme/components/ADempiere/Form/VPOS/Options/CashSummaryMovements')
           break
         case this.showAssignSeller:
         case this.showUnassignSeller:
-          component = () => import('@/themes/default/components/ADempiere/Form/VPOS/Options/AssignSeller')
+          component = () => import('@theme/components/ADempiere/Form/VPOS/Options/AssignSeller')
           break
       }
       return component

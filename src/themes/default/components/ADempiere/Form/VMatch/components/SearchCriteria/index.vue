@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import Field from '@/themes/default/components/ADempiere/Field'
+import Field from '@theme/components/ADempiere/Field'
 
 export default {
   name: 'SearchCriteria',

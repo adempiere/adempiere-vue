@@ -77,8 +77,8 @@
 import { defineComponent, computed } from '@vue/composition-api'
 
 // components and mixins
-import DocumentStatusTag from '@/themes/default/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
-import FieldDefinition from '@/themes/default/components/ADempiere/Field/index.vue'
+import DocumentStatusTag from '@theme/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import FieldDefinition from '@theme/components/ADempiere/Field/index.vue'
 
 // utils and helpers methods
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'

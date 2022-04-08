@@ -82,7 +82,7 @@
 
 <script>
 // components and mixins
-import DocumentStatusTag from '@/themes/default/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import DocumentStatusTag from '@theme/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 // constants
 import { DOCUMENT_STATUS_COLUMNS_LIST } from '@/utils/ADempiere/constants/systemColumns'

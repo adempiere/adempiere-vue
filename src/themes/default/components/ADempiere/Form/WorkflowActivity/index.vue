@@ -78,9 +78,9 @@
 </template>
 
 <script>
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldsList.js'
-import Workflow from '@/themes/default/components/ADempiere/Workflow'
+import Workflow from '@theme/components/ADempiere/Workflow'
 
 export default {
   name: 'WorkflowActivity',

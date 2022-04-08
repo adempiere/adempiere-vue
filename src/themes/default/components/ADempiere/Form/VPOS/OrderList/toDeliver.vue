@@ -136,9 +136,9 @@
 import fieldsListOrders from './fieldsListOrders.js'
 
 // components and mixins
-import FieldDefinition from '@/themes/default/components/ADempiere/Field/index.vue'
-import DocumentStatusTag from '@/themes/default/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
-import CustomPagination from '@/themes/default/components/ADempiere/Pagination'
+import FieldDefinition from '@theme/components/ADempiere/Field/index.vue'
+import DocumentStatusTag from '@theme/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import CustomPagination from '@theme/components/ADempiere/Pagination'
 
 // api request methods
 import {

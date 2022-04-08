@@ -24,7 +24,7 @@ export const infoOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-info',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/ContextInfo')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/ContextInfo')
 }
 
 /**
@@ -35,7 +35,7 @@ export const zoomInOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-files',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/EmptyOption')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/EmptyOption')
 }
 
 /**
@@ -46,7 +46,7 @@ export const operatorOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-rank',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/OperatorComparison')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/OperatorComparison')
 }
 
 /**
@@ -57,7 +57,7 @@ export const translateOptionItem = {
   enabled: true,
   svg: true,
   icon: 'language',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/TranslatedField')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/TranslatedField')
 }
 
 /**
@@ -68,7 +68,7 @@ export const calculatorOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-s-operation',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/CalculatorField')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/CalculatorField')
 }
 
 export const preferenceValueOptionItem = {
@@ -76,7 +76,7 @@ export const preferenceValueOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-notebook-2',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/PreferenceValue')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/PreferenceValue')
 }
 
 export const logsOptionItem = {
@@ -84,7 +84,7 @@ export const logsOptionItem = {
   enabled: true,
   svg: true,
   icon: 'tree-table',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/ChangeLogs')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/ChangeLogs')
 }
 
 /**
@@ -95,7 +95,7 @@ export const documentStatusOptionItem = {
   enabled: true,
   svg: false,
   icon: 'el-icon-set-up',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/DocumentStatus')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/DocumentStatus')
 }
 
 /**
@@ -106,7 +106,7 @@ export const hideThisField = {
   enabled: true,
   svg: true,
   icon: 'eye',
-  componentRender: () => import('@/themes/default/components/ADempiere/Field/FieldOptions/EmptyOption')
+  componentRender: () => import('@theme/components/ADempiere/Field/FieldOptions/EmptyOption')
 }
 
 export const optionsListStandad = [

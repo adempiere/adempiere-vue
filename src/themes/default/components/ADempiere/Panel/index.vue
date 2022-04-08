@@ -71,9 +71,9 @@ export default {
     },
     templateDevice() {
       if (this.isMobile) {
-        return () => import('@/themes/default/components/ADempiere/Panel/mainPanelMobile')
+        return () => import('@theme/components/ADempiere/Panel/mainPanelMobile')
       }
-      return () => import('@/themes/default/components/ADempiere/Panel/mainPanelDesktop')
+      return () => import('@theme/components/ADempiere/Panel/mainPanelDesktop')
     }
   }
 }

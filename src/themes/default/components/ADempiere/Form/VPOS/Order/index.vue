@@ -482,16 +482,16 @@
 import fieldsListOrder from './fieldsListOrder.js'
 
 // components and mixins
-// import DocumentStatusTag from '@/themes/default/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
+// import DocumentStatusTag from '@theme/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
 import orderLineMixin from './orderLineMixin.js'
-import posMixin from '@/themes/default/components/ADempiere/Form/VPOS/posMixin.js'
-import BusinessPartner from '@/themes/default/components/ADempiere/Form/VPOS/BusinessPartner/index.vue'
-import fieldLine from '@/themes/default/components/ADempiere/Form/VPOS/Order/line/index'
-import ImageProduct from '@/themes/default/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
+import posMixin from '@theme/components/ADempiere/Form/VPOS/posMixin.js'
+import BusinessPartner from '@theme/components/ADempiere/Form/VPOS/BusinessPartner/index.vue'
+import fieldLine from '@theme/components/ADempiere/Form/VPOS/Order/line/index'
+import ImageProduct from '@theme/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
 // src/themes/default/components/ADempiere/Form/VPOS/Order/ImageProduct/index.vue
-import ProductInfo from '@/themes/default/components/ADempiere/Form/VPOS/ProductInfo'
-import FastOrdesList from '@/themes/default/components/ADempiere/Form/VPOS/OrderList/fastOrder'
+import ProductInfo from '@theme/components/ADempiere/Form/VPOS/ProductInfo'
+import FastOrdesList from '@theme/components/ADempiere/Form/VPOS/OrderList/fastOrder'
 
 // utils and helper methods
 // Format of values ( Date, Price, Quantity )

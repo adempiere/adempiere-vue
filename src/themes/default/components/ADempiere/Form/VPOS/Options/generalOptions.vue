@@ -129,7 +129,7 @@
 import { defineComponent, computed } from '@vue/composition-api'
 
 // components and mixins
-import ListProductPrice from '@/themes/default/components/ADempiere/Form/VPOS/ProductInfo/productList'
+import ListProductPrice from '@theme/components/ADempiere/Form/VPOS/ProductInfo/productList'
 
 export default defineComponent({
   name: 'GeneralOptions',

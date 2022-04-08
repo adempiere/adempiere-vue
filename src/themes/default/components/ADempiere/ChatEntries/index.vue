@@ -52,9 +52,9 @@ export default {
     },
     templateDevice() {
       if (this.isMobile) {
-        return () => import('@/themes/default/components/ADempiere/ChatEntries/modeMobile.vue')
+        return () => import('@theme/components/ADempiere/ChatEntries/modeMobile.vue')
       }
-      return () => import('@/themes/default/components/ADempiere/ChatEntries/modeDesktop.vue')
+      return () => import('@theme/components/ADempiere/ChatEntries/modeDesktop.vue')
     }
   }
 }

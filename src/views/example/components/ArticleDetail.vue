@@ -76,10 +76,10 @@
 </template>
 
 <script>
-import Tinymce from '@/themes/default/components/Tinymce'
-import Upload from '@/themes/default/components/Upload/SingleImage3'
-import MDinput from '@/themes/default/components/MDinput'
-import Sticky from '@/themes/default/components/Sticky' // 粘性header组件
+import Tinymce from '@theme/components/Tinymce'
+import Upload from '@theme/components/Upload/SingleImage3'
+import MDinput from '@theme/components/MDinput'
+import Sticky from '@theme/components/Sticky' // 粘性header组件
 import { validURL } from '@/utils/validate'
 import { fetchArticle } from '@/api/article'
 import { searchUser } from '@/api/remote-search'

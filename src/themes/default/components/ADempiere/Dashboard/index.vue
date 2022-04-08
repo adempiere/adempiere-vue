@@ -83,58 +83,58 @@ export default {
       if (this.metadata.dashboardType === 'dashboard') {
         switch (this.metadata.fileName) {
           case 'recentItems':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/recentItems')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/recentItems')
             break
           case 'userfavorites':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/userfavorites')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/userfavorites')
             break
           case 'docstatus':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/docstatus')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/docstatus')
             break
           default:
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/calendar')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/calendar')
             break
         }
       } else {
         switch (this.metadata.chartType) {
           //  Bar Chart
           case 'BC':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/BarChart')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/BarChart')
             break
           //  Area Chart
           case 'AC':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/AreaChart')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/AreaChart')
             break
           //  Line Chart
           case 'LC':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/LineChart')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/LineChart')
             break
           //  Pie Chart
           case 'PC':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/PieChart')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/PieChart')
             break
           //  Ring Chart
           case 'RC':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/PieChart')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/PieChart')
             break
           //  Raddar Chart
           case 'RA':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/RaddarChart')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/RaddarChart')
             break
           //  Waterfall Chart
           case 'WC':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/WaterfallChart')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/WaterfallChart')
             break
           //  Basic Scatter Chart
           case 'SC':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/Scatter')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/Scatter')
             break
           //  Gauge
           case 'GU':
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/Gauge')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/Gauge')
             break
           default:
-            dashboard = () => import('@/themes/default/components/ADempiere/Dashboard/charts/LineChart')
+            dashboard = () => import('@theme/components/ADempiere/Dashboard/charts/LineChart')
             break
         }
       }

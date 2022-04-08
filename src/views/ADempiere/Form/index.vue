@@ -84,10 +84,10 @@
 
 <script>
 // components and mixins
-import FormPanel from '@/themes/default/components/ADempiere/Form'
-import LoadingView from '@/themes/default/components/ADempiere/LoadingView/index.vue'
-import ModalDialog from '@/themes/default/components/ADempiere/Dialog'
-import TitleAndHelp from '@/themes/default/components/ADempiere/TitleAndHelp'
+import FormPanel from '@theme/components/ADempiere/Form'
+import LoadingView from '@theme/components/ADempiere/LoadingView/index.vue'
+import ModalDialog from '@theme/components/ADempiere/Dialog'
+import TitleAndHelp from '@theme/components/ADempiere/TitleAndHelp'
 
 export default {
   name: 'FormView',

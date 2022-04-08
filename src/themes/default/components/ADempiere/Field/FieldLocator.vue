@@ -37,7 +37,7 @@
 
 <script>
 // components and mixis
-import FieldMixin from '@/themes/default/components/ADempiere/Field/mixin/mixinField.js'
+import FieldMixin from '@theme/components/ADempiere/Field/mixin/mixinField.js'
 
 // api request methods
 import { getLocatorList } from '@/api/ADempiere/field/locator.js'

@@ -390,10 +390,10 @@
 
 <script>
 import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin'
-import posMixin from '@/themes/default/components/ADempiere/Form/VPOS/posMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin'
+import posMixin from '@theme/components/ADempiere/Form/VPOS/posMixin.js'
 import fieldsListOverdrawnInvoice from './fieldsListOverdrawnInvoice.js'
-import typeCollection from '@/themes/default/components/ADempiere/Form/VPOS/Collection/typeCollection'
+import typeCollection from '@theme/components/ADempiere/Form/VPOS/Collection/typeCollection'
 import { processOrder } from '@/api/ADempiere/form/point-of-sales.js'
 import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
 import {
@@ -402,7 +402,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 // import typeRefund from './typeRefund/index.vue'
 
 export default {

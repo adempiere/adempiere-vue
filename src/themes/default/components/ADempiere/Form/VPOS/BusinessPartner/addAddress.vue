@@ -80,10 +80,10 @@
 
 <script>
 // constants
-import fieldsList from '@/themes/default/components/ADempiere/Field/FieldLocation/fieldsList.js'
+import fieldsList from '@theme/components/ADempiere/Field/FieldLocation/fieldsList.js'
 
 // components and mixins
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
 import BParterMixin from './mixinBusinessPartner.js'
 import FieldLocation from './AddNewFieldLocation'
 
@@ -95,7 +95,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'AddAddress',

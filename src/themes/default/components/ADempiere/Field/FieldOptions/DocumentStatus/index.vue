@@ -105,7 +105,7 @@
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
 // components and mixins
-import DocumentStatusTag from '@/themes/default/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import DocumentStatusTag from '@theme/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 export default defineComponent({
   name: 'DocumentStatus',

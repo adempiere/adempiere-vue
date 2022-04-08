@@ -4,7 +4,8 @@ const path = require('path')
 // const fs = require('fs')
 const config = require('./config/default.json')
 const defaultSettings = require('./src/settings.js')
-const themeComponents = 'src/' + config.theme + 'components'
+const theme = config.theme
+const themeComponents = theme + '/components'
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
@@ -17,7 +18,6 @@ const name = defaultSettings.title || 'Adempiere Vue' // page title
 // You can change the port by the following method:
 // port = 9527 npm run dev OR npm run dev --port = 9527
 const port = process.env.port || process.env.npm_config_port || 9527 // dev port
-
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   /**
@@ -54,7 +54,8 @@ module.exports = {
     name: name,
     resolve: {
       alias: {
-        '@': resolve('src')
+        '@': resolve('src'),
+        '@theme': resolve(theme)
       }
     }
   },

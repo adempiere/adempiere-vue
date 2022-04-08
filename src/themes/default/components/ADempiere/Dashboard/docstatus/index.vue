@@ -46,7 +46,7 @@
 <script>
 import { getPendingDocumentsFromServer } from '@/api/ADempiere/dashboard/tasks'
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
-import mixinDashboard from '@/themes/default/components/ADempiere/Dashboard/mixinDashboard.js'
+import mixinDashboard from '@theme/components/ADempiere/Dashboard/mixinDashboard.js'
 
 export default {
   name: 'PendingDocuments',

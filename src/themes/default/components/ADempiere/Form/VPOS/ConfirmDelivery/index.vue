@@ -214,7 +214,7 @@
 </template>
 
 <script>
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
 import { formatPrice, formatQuantity } from '@/utils/ADempiere/valueFormat.js'
 import {
   createShipmentLine,
@@ -223,7 +223,7 @@ import {
   shipments,
   processShipment
 } from '@/api/ADempiere/form/point-of-sales.js'
-import ImageProduct from '@/themes/default/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
+import ImageProduct from '@theme/components/ADempiere/Form/VPOS/Order/ImageProduct/index'
 
 export default {
   name: 'ConfirmDelivery',

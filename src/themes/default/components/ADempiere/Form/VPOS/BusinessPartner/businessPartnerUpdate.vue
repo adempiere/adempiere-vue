@@ -137,7 +137,7 @@
 
 <script>
 import { updateCustomer, customer } from '@/api/ADempiere/form/point-of-sales.js'
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
 import fieldsList from './fieldListUpdate.js'
 import BParterMixin from './mixinBusinessPartner.js'
 import AddAddress from './addAddress.vue'
@@ -148,7 +148,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'BusinessPartnerUpdate',

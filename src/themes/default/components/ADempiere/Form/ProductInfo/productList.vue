@@ -152,8 +152,8 @@
 
 <script>
 // components and mixins
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
-import CustomPagination from '@/themes/default/components/ADempiere/DefaultTable/CustomPagination.vue'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
+import CustomPagination from '@theme/components/ADempiere/DefaultTable/CustomPagination.vue'
 
 // constants
 import fieldsListProductPrice from './fieldsList.js'
@@ -166,7 +166,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'ProductList',

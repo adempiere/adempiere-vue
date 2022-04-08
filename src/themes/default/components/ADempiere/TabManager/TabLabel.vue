@@ -62,7 +62,7 @@
 import { defineComponent, computed } from '@vue/composition-api'
 
 // components and mixins
-import LockRecord from '@/themes/default/components/ADempiere/ContainerOptions/LockRecord/index.vue'
+import LockRecord from '@theme/components/ADempiere/ContainerOptions/LockRecord/index.vue'
 
 export default defineComponent({
   name: 'TabLabel',

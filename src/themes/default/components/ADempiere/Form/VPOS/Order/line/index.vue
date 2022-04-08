@@ -94,7 +94,7 @@
 import fieldsListLine from './fieldsListLine.js'
 
 // components and mixins
-import FieldDefinition from '@/themes/default/components/ADempiere/Field/index.vue'
+import FieldDefinition from '@theme/components/ADempiere/Field/index.vue'
 
 // api request methods
 import { validatePin } from '@/api/ADempiere/form/point-of-sales.js'
@@ -109,7 +109,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'FieldLine',

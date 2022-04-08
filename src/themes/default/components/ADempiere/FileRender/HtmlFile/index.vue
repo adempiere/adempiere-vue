@@ -38,7 +38,7 @@
 import { defineComponent } from '@vue/composition-api'
 
 // components and mixins
-import DownloadFile from '@/themes/default/components/ADempiere/FileRender/downloadFile.vue'
+import DownloadFile from '@theme/components/ADempiere/FileRender/downloadFile.vue'
 
 export default defineComponent({
   name: 'HTML-TXT-File',

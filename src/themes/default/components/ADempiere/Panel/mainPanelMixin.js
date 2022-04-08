@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import FieldDefinition from '@/themes/default/components/ADempiere/Field'
-import FilterFields from '@/themes/default/components/ADempiere/FilterFields'
+import FieldDefinition from '@theme/components/ADempiere/Field'
+import FilterFields from '@theme/components/ADempiere/FilterFields'
 import { fieldIsDisplayed } from '@/utils/ADempiere/dictionaryUtils.js'
 import { parsedValueComponent } from '@/utils/ADempiere/valueUtils.js'
 import { convertObjectToKeyValue } from '@/utils/ADempiere/valueFormat.js'

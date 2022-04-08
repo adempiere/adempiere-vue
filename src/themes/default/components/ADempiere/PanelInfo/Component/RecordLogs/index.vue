@@ -95,7 +95,7 @@ import store from '@/store'
 
 // components and mixins
 import { DOCUMENT_STATUS_COLUMNS_LIST } from '@/utils/ADempiere/constants/systemColumns'
-import DocumentStatusTag from '@/themes/default/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import DocumentStatusTag from '@theme/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'

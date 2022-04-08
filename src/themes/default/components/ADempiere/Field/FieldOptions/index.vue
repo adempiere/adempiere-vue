@@ -126,7 +126,7 @@ import {
   documentStatusOptionItem, translateOptionItem,
   zoomInOptionItem, calculatorOptionItem,
   hideThisField
-} from '@/themes/default/components/ADempiere/Field/FieldOptions/fieldOptionsList.js'
+} from '@theme/components/ADempiere/Field/FieldOptions/fieldOptionsList.js'
 import { zoomIn } from '@/utils/ADempiere/coreUtils.js'
 import { isLookup, LIST } from '@/utils/ADempiere/references.js'
 import { typeValue } from '@/utils/ADempiere/valueUtils.js'

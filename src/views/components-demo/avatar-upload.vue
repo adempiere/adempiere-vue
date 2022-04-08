@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import ImageCropper from '@/themes/default/components/ImageCropper'
-import PanThumb from '@/themes/default/components/PanThumb'
+import ImageCropper from '@theme/components/ImageCropper'
+import PanThumb from '@theme/components/PanThumb'
 
 export default {
   name: 'AvatarUploadDemo',

@@ -30,7 +30,7 @@
 
 <script>
 import tableFrom from '../tableFrom'
-import labelTable from '@/themes/default/components/ADempiere/Form/VMatch/labelTable.js'
+import labelTable from '@theme/components/ADempiere/Form/VMatch/labelTable.js'
 export default {
   name: 'Invoices',
   components: {

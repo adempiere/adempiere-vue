@@ -128,9 +128,9 @@ import fieldsListOrders from './fieldsListOrders.js'
 
 // components and mixins
 import FindOrders from './FindOrders'
-import FieldDefinition from '@/themes/default/components/ADempiere/Field'
-import CustomPagination from '@/themes/default/components/ADempiere/DefaultTable/CustomPagination.vue'
-import DocumentStatusTag from '@/themes/default/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
+import FieldDefinition from '@theme/components/ADempiere/Field'
+import CustomPagination from '@theme/components/ADempiere/DefaultTable/CustomPagination.vue'
+import DocumentStatusTag from '@theme/components/ADempiere/ContainerOptions/DocumentStatusTag/index.vue'
 
 // api request methods
 import { createShipment, shipments, holdOrder } from '@/api/ADempiere/form/point-of-sales.js'
@@ -143,7 +143,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 // ultils and helper methods
 import {

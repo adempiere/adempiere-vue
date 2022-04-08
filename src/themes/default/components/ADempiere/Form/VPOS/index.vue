@@ -39,9 +39,9 @@ export default {
     },
     templateDevice() {
       if (this.isMobile) {
-        return () => import('@/themes/default/components/ADempiere/Form/VPOS/templateDevice/mobile')
+        return () => import('@theme/components/ADempiere/Form/VPOS/templateDevice/mobile')
       }
-      return () => import('@/themes/default/components/ADempiere/Form/VPOS/templateDevice/desktop')
+      return () => import('@theme/components/ADempiere/Form/VPOS/templateDevice/desktop')
     }
   }
 }

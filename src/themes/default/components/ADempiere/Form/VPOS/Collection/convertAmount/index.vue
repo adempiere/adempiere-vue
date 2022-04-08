@@ -54,7 +54,7 @@
   </el-card>
 </template>
 <script>
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin'
+import formMixin from '@theme/components/ADempiere/Form/formMixin'
 import { formatPrice, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 import fieldsListConvertAmountCollection from './fieldsListConvertAmountCollection.js'
 

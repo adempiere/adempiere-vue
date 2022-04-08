@@ -67,7 +67,7 @@
 
 <script>
 // mixins
-import fieldMixin from '@/themes/default/components/ADempiere/Field/mixin/mixinField.js'
+import fieldMixin from '@theme/components/ADempiere/Field/mixin/mixinField.js'
 import mixinLocation, { LOCATION_ADDRESS_FORM } from './mixinLocation.js'
 
 // components

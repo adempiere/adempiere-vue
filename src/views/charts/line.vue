@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Chart from '@/themes/default/components/Charts/LineMarker'
+import Chart from '@theme/components/Charts/LineMarker'
 
 export default {
   name: 'LineChart',

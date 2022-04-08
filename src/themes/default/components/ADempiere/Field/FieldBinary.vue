@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import fieldMixin from '@/themes/default/components/ADempiere/Field/mixin/mixinField.js'
+import fieldMixin from '@theme/components/ADempiere/Field/mixin/mixinField.js'
 
 export default {
   name: 'FieldBinary',

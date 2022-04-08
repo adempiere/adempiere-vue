@@ -47,8 +47,8 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin'
 
 export default {
   name: 'SalesDiscountOff',

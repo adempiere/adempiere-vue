@@ -76,10 +76,10 @@
 </template>
 
 <script>
-import Order from '@/themes/default/components/ADempiere/Form/VPOS/Order'
-import KeyLayout from '@/themes/default/components/ADempiere/Form/VPOS/KeyLayout'
-import Options from '@/themes/default/components/ADempiere/Form/VPOS/Options'
-import Collection from '@/themes/default/components/ADempiere/Form/VPOS/Collection'
+import Order from '@theme/components/ADempiere/Form/VPOS/Order'
+import KeyLayout from '@theme/components/ADempiere/Form/VPOS/KeyLayout'
+import Options from '@theme/components/ADempiere/Form/VPOS/Options'
+import Collection from '@theme/components/ADempiere/Form/VPOS/Collection'
 
 export default {
   name: 'VposDesktop',

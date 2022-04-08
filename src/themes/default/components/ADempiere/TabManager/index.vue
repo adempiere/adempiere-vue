@@ -112,11 +112,11 @@ import router from '@/router'
 import store from '@/store'
 
 // components and mixins
-import AuxiliaryPanel from '@/themes/default/components/ADempiere/AuxiliaryPanel/index.vue'
-import DefaultTable from '@/themes/default/components/ADempiere/DefaultTable/index.vue'
-import PanelDefinition from '@/themes/default/components/ADempiere/PanelDefinition/index.vue'
-import RecordNavigation from '@/themes/default/components/ADempiere/RecordNavigation/index.vue'
-import TabLabel from '@/themes/default/components/ADempiere/TabManager/TabLabel.vue'
+import AuxiliaryPanel from '@theme/components/ADempiere/AuxiliaryPanel/index.vue'
+import DefaultTable from '@theme/components/ADempiere/DefaultTable/index.vue'
+import PanelDefinition from '@theme/components/ADempiere/PanelDefinition/index.vue'
+import RecordNavigation from '@theme/components/ADempiere/RecordNavigation/index.vue'
+import TabLabel from '@theme/components/ADempiere/TabManager/TabLabel.vue'
 import PanelInfo from '../PanelInfo/index.vue'
 
 // constants

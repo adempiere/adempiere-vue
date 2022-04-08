@@ -256,8 +256,8 @@
 import fieldsListCashOpen from './fieldsList.js'
 
 // components and mixins
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin'
-import posMixin from '@/themes/default/components/ADempiere/Form/VPOS/posMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin'
+import posMixin from '@theme/components/ADempiere/Form/VPOS/posMixin.js'
 
 // api request methods
 import {
@@ -273,7 +273,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 import { formatPrice, formatDate, formatDateToSend } from '@/utils/ADempiere/valueFormat.js'
 
 export default {

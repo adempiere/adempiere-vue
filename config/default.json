@@ -46,5 +46,5 @@
   "session": {
     "timeout": 300000
   },
-  "theme": "themes/default"
+  "theme": "src/themes/default"
 }

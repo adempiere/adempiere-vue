@@ -15,7 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // components and mixins
-import FieldDefinition from '@/themes/default/components/ADempiere/Field'
+import FieldDefinition from '@theme/components/ADempiere/Field'
 
 // utils and helper methods
 import { createFieldFromDefinition, createFieldFromDictionary } from '@/utils/ADempiere/lookupFactory'
@@ -26,7 +26,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'FormMixn',

@@ -118,7 +118,7 @@
 
 <script>
 // components and mixins
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin'
+import formMixin from '@theme/components/ADempiere/Form/formMixin'
 
 // constants
 import preferenceFields from './preferenceValueFieldsList.js'

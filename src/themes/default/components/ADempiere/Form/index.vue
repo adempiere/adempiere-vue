@@ -37,7 +37,7 @@ export default {
       let form
       switch (this.metadata.fileName) {
         case 'PriceChecking':
-          form = import('@/themes/default/components/ADempiere/Form/PriceChecking')
+          form = import('@theme/components/ADempiere/Form/PriceChecking')
           this.$store.dispatch('settings/changeSetting', {
             key: 'showMenu',
             value: false
@@ -49,26 +49,26 @@ export default {
           })
           break
         case 'BarcodeReader':
-          form = import('@/themes/default/components/ADempiere/Form/BarcodeReader')
+          form = import('@theme/components/ADempiere/Form/BarcodeReader')
           break
         case 'ProductInfo':
-          form = import('@/themes/default/components/ADempiere/Form/ProductInfo')
+          form = import('@theme/components/ADempiere/Form/ProductInfo')
           break
         case 'WFActivity':
-          form = import('@/themes/default/components/ADempiere/Form/WorkflowActivity')
+          form = import('@theme/components/ADempiere/Form/WorkflowActivity')
           break
         case 'VMatch':
-          form = import('@/themes/default/components/ADempiere/Form/VMatch')
+          form = import('@theme/components/ADempiere/Form/VMatch')
           break
         case 'VPOS':
           this.$store.dispatch('settings/changeSetting', {
             key: 'showContextMenu',
             value: false
           })
-          form = import('@/themes/default/components/ADempiere/Form/VPOS')
+          form = import('@theme/components/ADempiere/Form/VPOS')
           break
         case 'VGetWeight':
-          form = import('@/themes/default/components/ADempiere/Form/VGetWeight')
+          form = import('@theme/components/ADempiere/Form/VGetWeight')
           break
         default:
           form = import('@/views/ADempiere/Unsupported')

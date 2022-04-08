@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import PanThumb from '@/themes/default/components/PanThumb'
+import PanThumb from '@theme/components/PanThumb'
 import { getImagePath } from '@/utils/ADempiere/resource.js'
 
 export default {

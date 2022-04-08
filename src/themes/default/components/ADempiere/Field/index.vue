@@ -66,7 +66,7 @@
 
 <script>
 // components and mixins
-import FieldOptions from '@/themes/default/components/ADempiere/Field/FieldOptions/index.vue'
+import FieldOptions from '@theme/components/ADempiere/Field/FieldOptions/index.vue'
 
 // constants
 import { UUID } from '@/utils/ADempiere/constants/systemColumns'
@@ -158,54 +158,54 @@ export default {
     // load the component that is indicated in the attributes of received property
     componentRender() {
       if (this.isEmptyValue(this.field.componentPath || !this.field.isSupported)) {
-        return () => import('@/themes/default/components/ADempiere/Field/FieldText')
+        return () => import('@theme/components/ADempiere/Field/FieldText')
       }
       if (this.isSelectCreated) {
-        return () => import('@/themes/default/components/ADempiere/Field/FieldSelectMultiple')
+        return () => import('@theme/components/ADempiere/Field/FieldSelectMultiple')
       }
       let field
       switch (this.field.componentPath) {
         case 'FieldAutocomplete':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldAutocomplete')
+          field = () => import('@theme/components/ADempiere/Field/FieldAutocomplete')
           break
         case 'FieldBinary':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldBinary')
+          field = () => import('@theme/components/ADempiere/Field/FieldBinary')
           break
         case 'FieldButton':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldButton')
+          field = () => import('@theme/components/ADempiere/Field/FieldButton')
           break
         case 'FieldColor':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldColor')
+          field = () => import('@theme/components/ADempiere/Field/FieldColor')
           break
         case 'FieldDate':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldDate')
+          field = () => import('@theme/components/ADempiere/Field/FieldDate')
           break
         case 'FieldImage':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldImage')
+          field = () => import('@theme/components/ADempiere/Field/FieldImage')
           break
         case 'FieldLocation':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldLocation')
+          field = () => import('@theme/components/ADempiere/Field/FieldLocation')
           break
         case 'FieldLocator':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldLocator')
+          field = () => import('@theme/components/ADempiere/Field/FieldLocator')
           break
         case 'FieldNumber':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldNumber')
+          field = () => import('@theme/components/ADempiere/Field/FieldNumber')
           break
         case 'FieldSelect':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldSelect')
+          field = () => import('@theme/components/ADempiere/Field/FieldSelect')
           break
         case 'FieldText':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldText')
+          field = () => import('@theme/components/ADempiere/Field/FieldText')
           break
         case 'FieldTextLong':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldTextLong')
+          field = () => import('@theme/components/ADempiere/Field/FieldTextLong')
           break
         case 'FieldTime':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldTime')
+          field = () => import('@theme/components/ADempiere/Field/FieldTime')
           break
         case 'FieldYesNo':
-          field = () => import('@/themes/default/components/ADempiere/Field/FieldYesNo')
+          field = () => import('@theme/components/ADempiere/Field/FieldYesNo')
           break
       }
       return field

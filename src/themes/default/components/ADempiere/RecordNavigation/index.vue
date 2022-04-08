@@ -45,8 +45,8 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import DefaultTable from '@/themes/default/components/ADempiere/DefaultTable'
-import PanelDefinition from '@/themes/default/components/ADempiere/PanelDefinition'
+import DefaultTable from '@theme/components/ADempiere/DefaultTable'
+import PanelDefinition from '@theme/components/ADempiere/PanelDefinition'
 
 export default defineComponent({
   name: 'RecordNavigation',

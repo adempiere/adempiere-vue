@@ -50,10 +50,10 @@
 
 <script>
 // constants
-import fieldsList from '@/themes/default/components/ADempiere/Field/FieldLocation/fieldsList.js'
+import fieldsList from '@theme/components/ADempiere/Field/FieldLocation/fieldsList.js'
 
 // components and mixins
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
 import mixinLocation from './mixinLocation.js'
 
 // api request methods

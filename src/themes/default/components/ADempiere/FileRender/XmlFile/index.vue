@@ -37,7 +37,7 @@ import { defineComponent, computed, ref, onMounted } from '@vue/composition-api'
 
 // components and mixins
 import XmlViewer from 'vue-xml-viewer'
-import DownloadFile from '@/themes/default/components/ADempiere/FileRender/downloadFile.vue'
+import DownloadFile from '@theme/components/ADempiere/FileRender/downloadFile.vue'
 
 export default defineComponent({
   name: 'XML-File',

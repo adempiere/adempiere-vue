@@ -25,9 +25,9 @@ export default {
     },
     templateDevice() {
       if (this.isMobile) {
-        return () => import('@/themes/default/components/ADempiere/RecordAccess/recordAccessMobile')
+        return () => import('@theme/components/ADempiere/RecordAccess/recordAccessMobile')
       }
-      return () => import('@/themes/default/components/ADempiere/RecordAccess/recordAccessDesktop')
+      return () => import('@theme/components/ADempiere/RecordAccess/recordAccessDesktop')
     }
   }
 }

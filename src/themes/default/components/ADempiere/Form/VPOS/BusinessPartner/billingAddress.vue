@@ -50,7 +50,7 @@
 import fieldsList from './BillingFieldLocation/fieldsList.js'
 
 // components and mixins
-import formMixin from '@/themes/default/components/ADempiere/Form/formMixin.js'
+import formMixin from '@theme/components/ADempiere/Form/formMixin.js'
 import BParterMixin from './mixinBusinessPartner.js'
 import FieldLocation from './BillingFieldLocation'
 import {
@@ -59,7 +59,7 @@ import {
   isMandatoryField,
   isReadOnlyField,
   changeFieldShowedFromUser
-} from '@/themes/default/components/ADempiere/Form/VPOS/containerManagerPos.js'
+} from '@theme/components/ADempiere/Form/VPOS/containerManagerPos.js'
 
 export default {
   name: 'BillingAddress',

@@ -54,8 +54,8 @@
 
 <script>
 // mixins
-import fieldMixin from '@/themes/default/components/ADempiere/Field/mixin/mixinField.js'
-import selectMixin from '@/themes/default/components/ADempiere/Field/mixin/mixinFieldSelect.js'
+import fieldMixin from '@theme/components/ADempiere/Field/mixin/mixinField.js'
+import selectMixin from '@theme/components/ADempiere/Field/mixin/mixinFieldSelect.js'
 
 export default {
   name: 'FieldAutocomplete',

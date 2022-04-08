@@ -61,8 +61,8 @@ import { defineComponent, computed } from '@vue/composition-api'
 import store from '@/store'
 
 // components and mixins
-import FieldDefinition from '@/themes/default/components/ADempiere/Field/index.vue'
-import FilterFields from '@/themes/default/components/ADempiere/FilterFields/index.vue'
+import FieldDefinition from '@theme/components/ADempiere/Field/index.vue'
+import FilterFields from '@theme/components/ADempiere/FilterFields/index.vue'
 
 export default defineComponent({
   name: 'StandardPanel',

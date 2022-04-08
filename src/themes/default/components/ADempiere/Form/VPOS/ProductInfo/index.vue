@@ -95,7 +95,7 @@
 import ProductInfoList from './productList'
 
 // components and mixins
-// import fieldMixin from '@/themes/default/components/ADempiere/Field/mixin/mixinField.js'
+// import fieldMixin from '@theme/components/ADempiere/Field/mixin/mixinField.js'
 
 // utils and helper methods
 import {
@@ -103,7 +103,7 @@ import {
   formatQuantity
 } from '@/utils/ADempiere/valueFormat.js'
 
-import posMixin from '@/themes/default/components/ADempiere/Form/VPOS/posMixin.js'
+import posMixin from '@theme/components/ADempiere/Form/VPOS/posMixin.js'
 /**
  * This component is made to be the prototype of the Product Info search field
  */
