@@ -25,7 +25,6 @@
       :container-manager="containerManager"
       :panel-metadata="panelMetadata"
       :header="tableheaders"
-      :data-table="listDataTabla"
     />
     <!-- <div class="infinite-list-wrapper" style="overflow:auto;max-height: 200px;">
       <ul
@@ -45,8 +44,9 @@
 <script>
 import { defineComponent, computed, ref } from '@vue/composition-api'
 
-import DefaultTable from '@/components/ADempiere/DefaultTable'
-import PanelDefinition from '@/components/ADempiere/PanelDefinition'
+// components and mixins
+import DefaultTable from '@/components/ADempiere/DefaultTable/index.vue'
+import PanelDefinition from '@/components/ADempiere/PanelDefinition/index.vue'
 
 export default defineComponent({
   name: 'RecordNavigation',
@@ -78,8 +78,8 @@ export default defineComponent({
   setup(props, { root }) {
     const activeName = ref([])
     const listDataTabla = ref([])
-    const timeOut = ref(() => {})
     const loading = ref(false)
+
     // TODO: Manage attribute with vuex store in window module
     if (root.$route.query.action && root.$route.query.action === 'advancedQuery') {
       activeName.value.push('PanelAdvancedQuery')
@@ -113,27 +113,6 @@ export default defineComponent({
       return []
     })
 
-    const tabData = computed(() => {
-      return root.$store.getters.getTabData({
-        containerUuid: props.containerUuid
-      })
-    })
-
-    // get records list
-    const recordsList = computed(() => {
-      return tabData.value.recordsList
-    })
-
-    function load(value) {
-      clearTimeout(timeOut.value)
-      timeOut.value = setTimeout(() => {
-        console.log(listDataTabla.value)
-        listDataTabla.value = tabData.value.recordsList
-      }, 1)
-    }
-
-    load()
-
     const actionAdvancedQuery = () => {
       const activeNames = []
       if (!activeName.value.length) {
@@ -144,17 +123,14 @@ export default defineComponent({
 
     return {
       activeName,
-      timeOut,
       listDataTabla,
       loading,
       // computeds
-      recordsList,
       isLoadedPanel,
       panelMetadata,
       tableheaders,
       shorcutKey,
       // methods
-      load,
       actionAdvancedQuery
     }
   }

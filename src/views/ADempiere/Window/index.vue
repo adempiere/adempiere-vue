@@ -252,6 +252,18 @@ export default defineComponent({
       isMandatoryField,
       isMandatoryColumn,
 
+      getStoredData({ containerUuid }) {
+        return store.getters.getTabData({
+          containerUuid
+        })
+      },
+
+      getRecordsList: ({ containerUuid }) => {
+        return store.getters.getTabRecordsList({
+          containerUuid: containerUuid
+        })
+      },
+
       getRow: ({ containerUuid, rowIndex, rowUuid }) => {
         return store.getters.getTabRowData({
           containerUuid,

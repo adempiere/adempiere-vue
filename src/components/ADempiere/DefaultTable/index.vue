@@ -25,7 +25,6 @@
           clearable
           size="mini"
           class="input-search"
-          @change="filterRecord"
           @input="handleChangeSearch"
         >
           <i
@@ -116,7 +115,7 @@ import CustomPagination from './CustomPagination.vue'
 
 // utils and helper methods
 import { isLookup } from '@/utils/ADempiere/references'
-import { tableColumnDataType } from '@/utils/ADempiere/valueUtils'
+import { isEmptyValue, tableColumnDataType } from '@/utils/ADempiere/valueUtils'
 
 export default defineComponent({
   name: 'DefaultTable',
@@ -152,7 +151,6 @@ export default defineComponent({
     },
     dataTable: {
       type: Array,
-      required: true,
       default: () => []
     },
     // Show check column from selection row
@@ -170,6 +168,11 @@ export default defineComponent({
     const valueToSearch = ref('')
 
     const isLoadingDataTale = computed(() => {
+      if (props.containerManager && props.containerManager.getStoredData) {
+        return !props.containerManager.getStoredData({
+          containerUuid: props.containerUuid
+        }).isLoaded
+      }
       return root.isEmptyValue(props.dataTable)
     })
 
@@ -211,8 +214,9 @@ export default defineComponent({
         containerUuid: props.containerUuid
       }).length
     })
+
     const recordsLength = computed(() => {
-      return props.dataTable.length
+      return recordsWithFilter.value.length
     })
 
     /**
@@ -282,40 +286,51 @@ export default defineComponent({
         pageNumber
       })
     }
+
     const timeOut = ref(() => {})
+
     function handleChangeSearch(value) {
       clearTimeout(timeOut.value)
       timeOut.value = setTimeout(() => {
         // get records
-        this.filterRecord(value)
+        filterRecord(value)
       }, 1000)
     }
 
     // get table data
     const recordsWithFilter = computed(() => {
+      if (props.containerManager && props.containerManager.getRecordsList) {
+        return props.containerManager.getRecordsList({
+          containerUuid: props.containerUuid
+        })
+      }
       return props.dataTable
     })
 
-    let isLoadFilter = ref(false)
-    function filterRecord(selections) {
-      isLoadFilter = true
-      const params = []
-      selectionColumns.value.forEach(filter => {
-        params.push({
-          column_name: filter,
-          operator: 'LIKE',
-          value: '%' + selections + '%'
+    const isLoadFilter = ref(false)
+
+    function filterRecord(searchText) {
+      isLoadFilter.value = true
+      const filtersList = []
+
+      if (!isEmptyValue(searchText)) {
+        selectionColumns.value.forEach(filter => {
+          filtersList.push({
+            column_name: filter,
+            operator: 'LIKE',
+            value: '%' + searchText + '%'
+          })
         })
-      })
+      }
+
       root.$store.dispatch('getEntities', {
         parentUuid: props.parentUuid,
         containerUuid: props.containerUuid,
-        filters: params
+        filters: filtersList
       })
-        .then(() => {
-          isLoadFilter = false
+        .finally(() => {
           clearTimeout(timeOut.value)
-          return
+          isLoadFilter.value = false
         })
     }
 
@@ -395,6 +410,12 @@ export default defineComponent({
   display: contents;
   height: 50% !important;
   overflow: hidden;
+
+  .el-form-item {
+    >.el-form-item__content {
+      display: contents !important;
+    }
+  }
 
   .input-search {
     width: 100%;
