@@ -301,6 +301,7 @@ export default {
     contextInfo: 'Context Info',
     container: {
       help: 'Help',
+      defaultValue: 'Default Value',
       description: 'Description'
     }
   },

@@ -256,6 +256,7 @@ export default {
           keyCode: value.keyCode
         })
       }
+      this.preHandleChange(value.target.value)
     },
     keyReleased(value) {
       if (this.metadata.handleKeyReleased) {

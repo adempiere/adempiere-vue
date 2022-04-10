@@ -275,6 +275,7 @@ export default {
     contextInfo: 'Información del Contexto',
     logsFieldEmpty: 'El campo no tiene cambios aún',
     container: {
+      defaultValue: 'Valor Predeterminado',
       help: 'Ayuda',
       description: 'Descripción'
     }

@@ -22,6 +22,7 @@
       <span>
         {{ $t('field.field') }}
         <b> {{ fieldAttributes.name }} </b>
+        ({{ fieldAttributes.id }}, {{ fieldAttributes.columnName }})
       </span>
     </div>
 
@@ -55,6 +56,14 @@
           class="justify-text"
         >
           {{ fieldAttributes.help }}
+        </el-form-item>
+
+        <el-form-item
+          v-if="!isEmptyValue(fieldAttributes.defaultValue)"
+          :label="$t('field.container.defaultValue')"
+          class="justify-text"
+        >
+          <pre>{{ fieldAttributes.defaultValue }}</pre>
         </el-form-item>
       </el-form>
     </el-scrollbar>
@@ -176,6 +185,10 @@ export default defineComponent({
         .el-form-item__content {
           // text content interline
           line-height: 20px;
+
+          pre {
+            margin: 0px;
+          }
         }
       }
     }

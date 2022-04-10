@@ -55,7 +55,7 @@ export default {
       return this.$store.getters.getStoredLookupList({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
-        contextColumnNames: this.metadata.reference.contextColumnNames,
+        contextColumnNames: this.metadata.contextColumnNames,
         uuid: this.metadata.uuid,
         id: this.metadata.id,
         //
@@ -67,7 +67,7 @@ export default {
       const allOptions = this.$store.getters.getStoredLookupAll({
         parentUuid: this.metadata.parentUuid,
         containerUuid: this.metadata.containerUuid,
-        contextColumnNames: this.metadata.reference.contextColumnNames,
+        contextColumnNames: this.metadata.contextColumnNames,
         uuid: this.metadata.uuid,
         id: this.metadata.id,
         //
