@@ -98,7 +98,7 @@ export function generateField({
       }
     }
 
-    if (['FieldText', 'FieldTextLong'].includes(componentReference.componentPath)) {
+    if (['FieldText', 'FieldTextLong', 'FieldUrl'].includes(componentReference.componentPath)) {
       operator = OPERATOR_LIKE.operator
     }
   } else {
