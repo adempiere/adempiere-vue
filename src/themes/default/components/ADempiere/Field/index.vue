@@ -202,7 +202,7 @@ export default {
           field = () => import('@theme/components/ADempiere/Field/FieldTextLong')
           break
         case 'FieldUrl':
-          field = () => import('@/components/ADempiere/Field/FieldUrl')
+          field = () => import('@theme/components/ADempiere/Field/FieldUrl')
           break
         case 'FieldTime':
           field = () => import('@theme/components/ADempiere/Field/FieldTime')
