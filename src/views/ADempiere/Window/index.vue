@@ -258,6 +258,12 @@ export default defineComponent({
         })
       },
 
+      getRecordCount({ containerUuid }) {
+        return store.getters.getTabRecordCount({
+          containerUuid
+        })
+      },
+
       getRecordsList: ({ containerUuid }) => {
         return store.getters.getTabRecordsList({
           containerUuid: containerUuid

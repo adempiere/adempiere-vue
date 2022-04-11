@@ -114,8 +114,7 @@ import ColumnsDisplayOption from './ColumnsDisplayOption'
 import CustomPagination from './CustomPagination.vue'
 
 // utils and helper methods
-import { isLookup } from '@/utils/ADempiere/references'
-import { isEmptyValue, tableColumnDataType } from '@/utils/ADempiere/valueUtils'
+import { tableColumnDataType } from '@/utils/ADempiere/valueUtils'
 
 export default defineComponent({
   name: 'DefaultTable',
@@ -216,24 +215,12 @@ export default defineComponent({
     })
 
     const recordsLength = computed(() => {
-      return recordsWithFilter.value.length
-    })
-
-    /**
-     * Selection columns to be taken into account during the search
-     */
-    const selectionColumns = computed(() => {
-      const displayColumnsName = []
-      const columnsName = props.header
-        .filter(fieldItem => {
-          return fieldItem.isSelectionColumn && fieldItem.valueType === 'STRING'
-        }).map(fieldItem => {
-          if (isLookup(fieldItem.diplayType)) {
-            displayColumnsName.push(fieldItem.displayColumnName)
-          }
-          return fieldItem.columnName
+      if (props.containerManager.getRecordCount) {
+        return props.containerManager.getRecordCount({
+          containerUuid: props.containerUuid
         })
-      return columnsName.concat(displayColumnsName)
+      }
+      return recordsWithFilter.value.length
     })
 
     function handleRowClick(row, column, event) {
@@ -311,22 +298,10 @@ export default defineComponent({
 
     function filterRecord(searchText) {
       isLoadFilter.value = true
-      const filtersList = []
-
-      if (!isEmptyValue(searchText)) {
-        selectionColumns.value.forEach(filter => {
-          filtersList.push({
-            column_name: filter,
-            operator: 'LIKE',
-            value: '%' + searchText + '%'
-          })
-        })
-      }
-
       root.$store.dispatch('getEntities', {
         parentUuid: props.parentUuid,
         containerUuid: props.containerUuid,
-        filters: filtersList
+        searchValue: searchText
       })
         .finally(() => {
           clearTimeout(timeOut.value)
