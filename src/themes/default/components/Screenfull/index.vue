@@ -1,6 +1,6 @@
 <template>
   <div>
-    <svg-icon :icon-class="isFullscreen?'exit-fullscreen':'fullscreen'" @click="click" />
+    <svg-icon :icon-class="isFullscreen" @click="click" />
   </div>
 </template>
 
@@ -11,19 +11,19 @@ export default {
   data() {
     return {
       elem: document.documentElement,
-      isFullscreen: false
+      isFullscreen: 'fullscreen'
     }
   },
   methods: {
     click() {
-      if (this.isFullscreen) {
+      if (document.fullscreenElement) {
         this.closeFullscreen()
-        this.isFullscreen = true
-        return this.isFullscreen
+        this.isFullscreen = 'fullscreen'
+        return
       }
       this.openFullscreen()
-      this.isFullscreen = false
-      return this.isFullscreen
+      this.isFullscreen = 'exit-fullscreen'
+      return
     },
     openFullscreen() {
       if (this.elem.requestFullscreen) {

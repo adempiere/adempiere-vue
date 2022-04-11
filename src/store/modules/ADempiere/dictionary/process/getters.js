@@ -36,6 +36,52 @@ export default {
   },
 
   /**
+   * Determinate if panel is ready to send, all fields mandatory and displayed with values
+   * @param {string}  containerUuid
+   * @param {object}  row, data to compare if is table
+   * @returns {object}
+   */
+  getProcessParametersEmptyMandatory: (state, getters, rootState, rootGetters) => ({
+    containerUuid,
+    fieldsList,
+    formatReturn = 'name'
+  }) => {
+    if (isEmptyValue(fieldsList)) {
+      fieldsList = getters.getStoredFieldsFromProcess(containerUuid)
+    }
+
+    const fieldsEmpty = fieldsList.filter(fieldItem => {
+      const isMandatory = isMandatoryField(fieldItem)
+      const isDisplayed = isDisplayedField(fieldItem)
+
+      if (!(isDisplayed && isMandatory)) {
+        return false
+      }
+
+      const value = rootGetters.getValueOfField({
+        containerUuid,
+        columnName: fieldItem.columnName
+      })
+
+      if (!isEmptyValue(value)) {
+        return false
+      }
+
+      // displayed or madatory and empty
+      return true
+    })
+
+    if (formatReturn) {
+      return fieldsEmpty.map(fieldItem => {
+        // fieldItem.name by default
+        return fieldItem[formatReturn]
+      })
+    }
+
+    return fieldsEmpty
+  },
+
+  /**
    * Getter converter params with value format
    * @param {String} containerUuid
    * @param {Array<Object>} fieldsList

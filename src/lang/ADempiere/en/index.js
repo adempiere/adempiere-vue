@@ -157,7 +157,6 @@ export default {
     contextMenuDownload: 'Download',
     dateStartPlaceholder: 'Start date',
     dateEndPlaceholder: 'End date',
-    timePlaceholder: 'Select time',
     dialogCancelButton: 'Cancel',
     dialogConfirmButton: 'Confirm',
     filterableItems: 'Optional Columns',

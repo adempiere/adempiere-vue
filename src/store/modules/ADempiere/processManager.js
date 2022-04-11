@@ -26,7 +26,7 @@ import {
 // utils and helper methods
 import { getToken } from '@/utils/auth'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils'
-import { showNotification } from '@/utils/ADempiere/notification'
+import { showMessage, showNotification } from '@/utils/ADempiere/notification'
 
 const initState = {
   printFormatList: {}
@@ -50,9 +50,23 @@ const processManager = {
     }) {
       return new Promise(resolve => {
         const processDefinition = rootGetters.getStoredProcess(containerUuid)
+        const { fieldsList } = processDefinition
+
+        const fieldsEmpty = rootGetters.getProcessParametersEmptyMandatory({
+          containerUuid,
+          fieldsList
+        })
+        if (!isEmptyValue(fieldsEmpty)) {
+          showMessage({
+            message: language.t('notifications.mandatoryFieldMissing') + fieldsEmpty,
+            type: 'info'
+          })
+          return
+        }
 
         const parametersList = rootGetters.getProcessParameters({
-          containerUuid
+          containerUuid,
+          fieldsList
         })
 
         const isSession = !isEmptyValue(getToken())

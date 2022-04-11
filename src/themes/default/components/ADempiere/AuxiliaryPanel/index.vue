@@ -136,7 +136,7 @@ export default defineComponent({
   top: 0px;
 }
 .table {
-  padding: 20px;
+  padding: 20px 0px;
   height: 100% !important;
 }
 /* Enter and leave animations can use different */

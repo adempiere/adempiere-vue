@@ -177,6 +177,16 @@ export const OPERATORS_FIELD_TEXT_LONG = {
   ]
 }
 
+export const OPERATORS_FIELD_URL = {
+  componentPath: 'FieldUrl',
+  isRange: false,
+  operatorsList: [
+    ...STANDARD_OPERATORS_LIST,
+    ...TEXT_OPERATORS_LIST,
+    ...MULTIPLE_OPERATORS_LIST
+  ]
+}
+
 export const OPERATORS_FIELD_TIME = {
   componentPath: 'FieldTime',
   isRange: true,
@@ -203,7 +213,7 @@ export const FIELD_OPERATORS_LIST = [
   OPERATORS_FIELD_SELECT,
   OPERATORS_FIELD_TEXT,
   OPERATORS_FIELD_TEXT_LONG,
-  OPERATORS_FIELD_TEXT_LONG,
+  OPERATORS_FIELD_URL,
   OPERATORS_FIELD_TIME,
   OPERATORS_FIELD_YES_NO
 ]
