@@ -201,6 +201,9 @@ export default {
         case 'FieldTextLong':
           field = () => import('@/components/ADempiere/Field/FieldTextLong')
           break
+        case 'FieldUrl':
+          field = () => import('@/components/ADempiere/Field/FieldUrl')
+          break
         case 'FieldTime':
           field = () => import('@/components/ADempiere/Field/FieldTime')
           break
