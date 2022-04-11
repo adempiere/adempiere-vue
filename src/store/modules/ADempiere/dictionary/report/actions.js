@@ -208,7 +208,6 @@ export default {
    */
   changeReportFieldShowedFromUser({ commit, getters }, {
     containerUuid,
-    groupField,
     fieldsShowed = [],
     fieldsList = []
   }) {
@@ -217,18 +216,16 @@ export default {
     }
 
     fieldsList.forEach(itemField => {
-      if (groupField === itemField.groupAssigned) {
-        let isShowedFromUser = false
-        if (fieldsShowed.includes(itemField.columnName)) {
-          isShowedFromUser = true
-        }
-
-        commit('changeReportFieldAttribute', {
-          field: itemField,
-          attributeName: 'isShowedFromUser',
-          attributeValue: isShowedFromUser
-        })
+      let isShowedFromUser = false
+      if (fieldsShowed.includes(itemField.columnName)) {
+        isShowedFromUser = true
       }
+
+      commit('changeReportFieldAttribute', {
+        field: itemField,
+        attributeName: 'isShowedFromUser',
+        attributeValue: isShowedFromUser
+      })
     })
   },
 
