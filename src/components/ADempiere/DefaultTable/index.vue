@@ -410,7 +410,7 @@ export default defineComponent({
     }
 
     function deleteRecord(record) {
-      root.$store.dispatch('deleteEntity', {
+      props.containerManager.deleteAction({
         parentUuid: props.parentUuid,
         containerUuid: props.containerUuid,
         recordUuid: record.row.UUID
@@ -428,7 +428,6 @@ export default defineComponent({
           })
           console.warn(`Delete Entity - Error ${error.message}, Code: ${error.code}.`)
         })
-      console.info(`Delete Record ${record.row.name} UUID ${record.row.UUID}`)
     }
 
     function editRecord(record) {

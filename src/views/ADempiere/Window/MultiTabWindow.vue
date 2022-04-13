@@ -205,6 +205,13 @@ export default defineComponent({
           containerUuid,
           pageNumber
         })
+      },
+      deleteAction: ({ parentUuid, containerUuid, recordUuid }) => {
+        return store.dispatch('deleteEntity', {
+          parentUuid,
+          containerUuid,
+          recordUuid
+        })
       }
     }
 
