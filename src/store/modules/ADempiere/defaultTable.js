@@ -1,7 +1,7 @@
 import language from '@/lang'
 
 const defaultTable = {
-  tableOption: language.t('table.dataTable.showAllColumns')
+  tableOption: language.t('table.dataTable.showMinimalistView')
 }
 
 export default {

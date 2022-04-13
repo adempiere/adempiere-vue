@@ -217,6 +217,7 @@ export default {
       advancedQuery: 'Consulta Avanzada',
       exportZip: 'Exportar Zip',
       showAllColumns: 'Mostrar todas las Columnas',
+      showMinimalistView: 'Mostrar Vista Minimalista',
       showOnlyMandatoryColumns: 'Mostrar Solo Columnas Obligatorias',
       showTableColumnsOnly: 'Mostrar Solo Columnas de la Tabla',
       showAllAvailableColumns: 'Mostrar Todas Columnas Disponibles',

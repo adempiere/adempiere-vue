@@ -18,8 +18,8 @@
 
 <template>
   <el-main class="default-table">
-    <el-row>
-      <el-col v-if="isShowSearch" :span="24">
+    <el-row v-if="isShowSearch">
+      <el-col :span="23">
         <el-input
           v-model="valueToSearch"
           clearable
@@ -33,8 +33,12 @@
           />
         </el-input>
       </el-col>
+      <el-col :span="1">
+        <columns-display-option
+          :option="currentOption"
+        />
+      </el-col>
     </el-row>
-
     <el-table
       ref="multipleTable"
       v-loading="isLoadingDataTale"
@@ -73,24 +77,67 @@
         >
           <template slot-scope="scope">
             <!-- formatted displayed value -->
-            <cell-info
+            <!--<cell-info
               :container-uuid="containerUuid"
               :field-attributes="fieldAttributes"
               :container-manager="containerManager"
               :scope="scope"
               :data-row="scope.row"
-            />
+            />-->
+            <p style="max-height: 40px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+              {{ displayValue(scope.row, fieldAttributes, scope.row[fieldAttributes.columnName], fieldAttributes) }}
+            </p>
           </template>
         </el-table-column>
       </template>
       <el-table-column
-        fixed="right"
-        width="50"
+        v-if="isShowSearch"
+        width="180"
+        label="Opciones"
       >
-        <template slot="header">
-          <columns-display-option
-            :option="currentOption"
+        <template slot-scope="scope">
+          <el-button
+            type="danger"
+            icon="el-icon-delete"
+            size="mini"
+            @click="deleteRecord(scope)"
           />
+          <el-button
+            type="success"
+            icon="el-icon-edit"
+            size="mini"
+            @click="editRecord(scope)"
+          />
+          <el-dropdown style="padding-left: 5%;" @command="handleCommand">
+            <span class="el-dropdown-link">
+              <el-button
+                type="primary"
+                size="mini"
+              >
+                <svg-icon icon-class="more-svgrepo-com" />
+              </el-button>
+            </span>
+            <el-dropdown-menu slot="dropdown" style="padding: 0px">
+              <el-dropdown-item :command="{ scope, option: $t('form.pos.tableProduct.remove') }">
+                <el-button
+                  class="delete"
+                  type="text"
+                  icon="el-icon-delete"
+                >
+                  {{ $t('form.pos.tableProduct.remove') }}
+                </el-button>
+              </el-dropdown-item>
+              <el-dropdown-item :command="scope">
+                <el-button
+                  class="edit"
+                  type="text"
+                  icon="el-icon-edit"
+                >
+                  {{ $t('form.pos.order.BusinessPartnerCreate.address.editAddress') }}
+                </el-button>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -107,7 +154,6 @@
 
 <script>
 import { defineComponent, computed, onMounted, ref } from '@vue/composition-api'
-
 // components and mixins
 import CellInfo from './CellInfo.vue'
 import ColumnsDisplayOption from './ColumnsDisplayOption'
@@ -115,6 +161,8 @@ import CustomPagination from './CustomPagination.vue'
 
 // utils and helper methods
 import { tableColumnDataType } from '@/utils/ADempiere/valueUtils'
+import language from '@/lang'
+import { showMessage } from '@/utils/ADempiere/notification.js'
 
 export default defineComponent({
   name: 'DefaultTable',
@@ -350,6 +398,50 @@ export default defineComponent({
       }
     })
 
+    function handleCommand(params) {
+      switch (params.option) {
+        case language.t('form.pos.tableProduct.remove'):
+          deleteRecord(params.scope)
+          break
+        case language.t('form.pos.order.BusinessPartnerCreate.address.editAddress'):
+          editRecord(params.scope)
+          break
+      }
+    }
+
+    function deleteRecord(record) {
+      root.$store.dispatch('deleteEntity', {
+        parentUuid: props.parentUuid,
+        containerUuid: props.containerUuid,
+        recordUuid: record.row.UUID
+      })
+        .then(() => {
+          showMessage({
+            message: language.t('recordManager.deleteRecordSuccessful'),
+            type: 'success'
+          })
+        })
+        .catch(error => {
+          showMessage({
+            message: language.t('recordManager.deleteRecordError'),
+            type: 'error'
+          })
+          console.warn(`Delete Entity - Error ${error.message}, Code: ${error.code}.`)
+        })
+      console.info(`Delete Record ${record.row.name} UUID ${record.row.UUID}`)
+    }
+
+    function editRecord(record) {
+      console.info(`Edit Record ${record.row.name} UUID ${record.row.UUID}`)
+    }
+    function displayValue(row, field, fieldValue, fieldAttributes) {
+      if (typeof fieldValue === 'boolean') {
+        return fieldValue ? language.t('components.switchActiveText') : language.t('components.switchInactiveText')
+      } else if (fieldAttributes.columnName.includes('_ID')) {
+        return row['DisplayColumn_' + fieldAttributes.columnName]
+      }
+      return fieldValue
+    }
     return {
       // data
       valueToSearch,
@@ -373,7 +465,11 @@ export default defineComponent({
       handleRowDblClick,
       handleSelection,
       handleSelectionAll,
-      isDisplayed
+      isDisplayed,
+      handleCommand,
+      editRecord,
+      displayValue,
+      deleteRecord
     }
   }
 })

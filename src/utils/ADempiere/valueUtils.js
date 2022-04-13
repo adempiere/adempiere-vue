@@ -550,10 +550,16 @@ export function tableColumnDataType(column, currentOption) {
   if (currentOption === language.t('table.dataTable.showAllColumns')) {
     return true
   }
+  if (currentOption === language.t('table.dataTable.showAllColumns')) {
+    return true
+  }
   if (currentOption === language.t('table.dataTable.showOnlyMandatoryColumns') && (column.isMandatory || column.isMandatoryFromLogic)) {
     return true
   }
   if (currentOption === language.t('table.dataTable.showTableColumnsOnly') && column.isDisplayedGrid) {
+    return true
+  }
+  if (currentOption === language.t('table.dataTable.showMinimalistView') && column.columnName !== 'AD_Client_ID' && column.columnName !== 'AD_Org_ID' && column.columnName !== 'IsActive') {
     return true
   }
   return false
