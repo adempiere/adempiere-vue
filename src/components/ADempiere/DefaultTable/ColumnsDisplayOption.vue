@@ -24,6 +24,12 @@
 
     <el-dropdown-menu slot="dropdown" style="max-width: 300px;">
       <el-dropdown-item
+        :command="$t('table.dataTable.showMinimalistView')"
+      >
+        <svg-icon :icon-class="optionIcon($t('table.dataTable.showMinimalistView'))" />
+        {{ $t('table.dataTable.showMinimalistView') }}
+      </el-dropdown-item>
+      <el-dropdown-item
         :command="$t('table.dataTable.showAllColumns')"
       >
         <svg-icon :icon-class="optionIcon($t('table.dataTable.showAllColumns'))" />
