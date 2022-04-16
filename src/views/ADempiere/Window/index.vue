@@ -326,14 +326,15 @@ export default defineComponent({
           columnName
         })
       },
-      getLookupList({ parentUuid, containerUuid, uuid, id, contextColumnNames, columnName }) {
+      getLookupList({ parentUuid, containerUuid, uuid, id, contextColumnNames, columnName, searchValue }) {
         return store.dispatch('getLookupListFromServer', {
           parentUuid,
           containerUuid,
           contextColumnNames,
           fieldUuid: uuid,
           id,
-          columnName
+          columnName,
+          searchValue
         })
       },
 

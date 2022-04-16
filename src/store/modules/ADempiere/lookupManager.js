@@ -172,6 +172,7 @@ const lookupManager = {
               containerUuid, // used by suscription filter
               contextAttributesList,
               optionsList,
+              searchValue,
               key
             })
 

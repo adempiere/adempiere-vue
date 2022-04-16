@@ -70,8 +70,7 @@ export default {
     return {
       recordsBusinessPartners: [],
       controlDisplayed: this.displayedValue,
-      isFocus: false,
-      timeOut: null
+      isFocus: false
     }
   },
 

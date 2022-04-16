@@ -288,12 +288,13 @@ const getters = {
     const attributesObject = {}
     let attributesList = fieldsList
       .map(fieldItem => {
-        const { columnName, defaultValue } = fieldItem
+        const { id, uuid, columnName, defaultValue, contextColumnNames } = fieldItem
         const isSQL = String(defaultValue).includes('@SQL=') && isGetServer
 
         const parsedDefaultValue = getDefaultValue({
           ...fieldItem,
           parentUuid,
+          contextColumnNames,
           isSOTrxMenu
         })
         attributesObject[columnName] = parsedDefaultValue
@@ -305,6 +306,7 @@ const getters = {
           const parsedDefaultValueTo = getDefaultValue({
             ...fieldItem,
             parentUuid,
+            contextColumnNames,
             isSOTrxMenu,
             columnName: columnNameTo,
             elementName: elementNameTo
@@ -324,20 +326,17 @@ const getters = {
           const { displayColumnName } = fieldItem
           let displayedValue
           if (!isEmptyValue(parsedDefaultValue)) {
-            const { tableName, contextColumnNames } = fieldItem.reference
             const optionsList = rootGetters.getStoredLookupAll({
               parentUuid,
               containerUuid,
               contextColumnNames,
-              id: fieldItem.id,
-              uuid: fieldItem.uuid,
-              tableName,
-              value: parsedDefaultValue
+              id,
+              uuid
             })
             if (!isEmptyValue(optionsList)) {
               const option = optionsList.find(item => item.id === parsedDefaultValue)
               if (!isEmptyValue(option)) {
-                displayedValue = option.label
+                displayedValue = option.displayedValue
               }
             }
           }
