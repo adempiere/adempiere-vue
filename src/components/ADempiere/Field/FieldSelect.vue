@@ -20,7 +20,7 @@
   <el-select
     v-model="value"
     v-bind="commonsProperties"
-    :filterable="!isMobile"
+    :filterable="true"
     :loading="isLoading"
     value-key="value"
     clearable
@@ -86,6 +86,17 @@ export default {
       }
 
       return styleClass
+    },
+
+    isWithSearchValue() {
+      return Boolean(
+        this.$store.getters.getStoredSearchValueLookup({
+          parentUuid: this.metadata.parentUuid,
+          containerUuid: this.metadata.containerUuid,
+          contextColumnNames: this.metadata.contextColumnNames,
+          uuid: this.metadata.uuid
+        })
+      )
     },
 
     value: {
@@ -347,8 +358,8 @@ export default {
       // refresh local list component
       this.optionsList = list
       if (isShowList) {
-        if (this.isEmptyValue(list) || (list.length === 1 &&
-          this.blankValues.includes(list[0].value))) {
+        if (this.isEmptyValue(list) || this.isWithSearchValue ||
+          (list.length === 1 && this.blankValues.includes(list[0].value))) {
           this.loadListFromServer()
         }
       }
