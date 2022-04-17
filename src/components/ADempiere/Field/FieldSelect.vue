@@ -358,7 +358,7 @@ export default {
 
       const results = this.localSearch(searchQuery)
 
-      if (this.isEmptyValue(results) || (!this.isEmptyValue(searchQuery) && searchQuery.length >= 3)) {
+      if ((this.isEmptyValue(results) && !this.isEmptyValue(searchQuery)) || this.isEmptyValue(searchQuery)) {
         this.timeOut = setTimeout(() => {
           this.loadListFromServer(searchQuery)
         }, 600)
