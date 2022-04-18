@@ -1,10 +1,11 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import VueCompositionApi from '@vue/composition-api'
 
 import Cookies from 'js-cookie'
 
 import 'normalize.css/normalize.css' // a modern alternative to CSS resets
-
+// import ElementPlus from 'element-plus'
+// import 'element-plus/lib/theme-chalk/index.css'
 import Element from 'element-ui'
 import './styles/element-variables.scss'
 import enLang from 'element-ui/lib/locale/lang/en'// 如果使用中文语言包请默认支持，无需额外引入，请删除该依赖
@@ -13,6 +14,8 @@ import VueSplit from 'vue-split-panel'
 import 'vue-resize/dist/vue-resize.css'
 import VueResize from 'vue-resize'
 import WorkflowChart from 'vue-workflow-chart'
+// import ElementPlus from 'element-plus'
+// import 'element-plus/lib/theme-chalk/index.css'
 /**
  * TODO: Waiting for PR to:
  * https://github.com/vue-extend/v-markdown/pull/4
@@ -49,34 +52,38 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
-Vue.use(VueCompositionApi)
-Vue.use(VMarkdown)
-Vue.use(VueShortkey)
-Vue.use(VueSplit)
-Vue.use(VueResize)
-Vue.use(WorkflowChart)
-Vue.use(Element, {
-  size: Cookies.get('size') || 'medium', // set element-ui default size
-  i18n: (key, value) => i18n.t(key, value),
-  locale: enLang // 如果使用中文，无需设置，请删除
-})
+createApp.use(VueCompositionApi)
+createApp.use(VMarkdown)
+createApp.use(VueShortkey)
+createApp.use(VueSplit)
+createApp.use(VueResize)
+createApp.use(WorkflowChart)
+
+// Vue.use(ElementPlus)
 
 // register global utility filters
 Object.keys(filters).forEach(key => {
-  Vue.filter(key, filters[key])
+  createApp.filter(key, filters[key])
 })
 
 // register global utility methods
 Object.keys(globalMethods).forEach(key => {
-  Vue.prototype[key] = globalMethods[key]
+  createApp.prototype[key] = globalMethods[key]
 })
 
-Vue.config.productionTip = false
-
-new Vue({
+createApp.config.productionTip = false
+createApp(App).use(Element, {
+  size: Cookies.get('size') || 'medium', // set element-ui default size
+  i18n: (key, value) => i18n.t(key, value),
+  locale: enLang // 如果使用中文，无需设置，请删除
+})
+const app = createApp({
   el: '#app',
   router,
   store,
   i18n,
   render: h => h(App)
 })
+
+// createApp(App).use(ElementPlus)
+app.mount('#app')

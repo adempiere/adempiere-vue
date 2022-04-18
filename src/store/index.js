@@ -1,8 +1,11 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+// import Vue from 'vue'
+// import Vuex from 'vuex'
+import { createApp } from 'vue'
+import { createStore } from 'vuex'
 import getters from './getters'
 
-Vue.use(Vuex)
+// Vue.use(Vuex)
+createApp.use(createStore)
 
 // https://webpack.js.org/guides/dependency-management/#requirecontext
 const modulesFiles = require.context('./modules', true, /\.js$/)
@@ -18,9 +21,18 @@ const modules = modulesFiles.keys().reduce((modules, modulePath) => {
   return modules
 }, {})
 
-const store = new Vuex.Store({
+// const store = new Vuex.Store({
+//   modules,
+//   getters
+// })
+const store = createStore({
   modules,
   getters
 })
+
+// const app = createApp({ /* your root component */ })
+
+// // Install the store instance as a plugin
+// app.use(store)
 
 export default store

@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import VueI18n from 'vue-i18n'
 import Cookies from 'js-cookie'
 import elementEnLocale from 'element-ui/lib/locale/lang/en' // element-ui lang
@@ -13,7 +13,7 @@ import jaLocale from './ja'
 import esADempiere from './ADempiere/es/index.js'
 import enADempiere from './ADempiere/en/index.js'
 
-Vue.use(VueI18n)
+createApp.use(VueI18n)
 
 const dateTimeFormats = {
   'en': {

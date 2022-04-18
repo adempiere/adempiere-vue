@@ -1,20 +1,20 @@
 <template>
   <div id="app">
-    <modal-idle
+    <!--<modal-idle
       v-if="isSession && isIdle"
       :is-idle="isIdle"
-    />
+    />-->
     <router-view />
   </div>
 </template>
 
 <script>
 // components and mixins
-import ModalIdle from './components/ADempiere/ModalIdle'
+// import ModalIdle from './components/ADempiere/ModalIdle'
 
 export default {
   name: 'App',
-  components: { ModalIdle },
+  // components: { ModalIdle },
   computed: {
     isIdle() {
       return this.$store.state.idleVue.isIdle

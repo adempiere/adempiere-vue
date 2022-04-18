@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
@@ -23,7 +23,7 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  */
 export default {
   addBrowserToList(state, browser) {
-    Vue.set(state.storedBrowsers, browser.uuid, browser)
+    createApp.set(state.storedBrowsers, browser.uuid, browser)
   },
 
   changeBrowserAttribute(state, {
@@ -37,7 +37,7 @@ export default {
       value = state.storedBrowsers[uuid][attributeNameControl]
     }
 
-    Vue.set(state.storedBrowsers[uuid], attributeName, value)
+    createApp.set(state.storedBrowsers[uuid], attributeName, value)
   },
 
   /**

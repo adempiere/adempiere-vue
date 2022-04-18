@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 // Delete when get global context and account context
 import { isEmptyValue, typeValue } from '@/utils/ADempiere/valueUtils.js'
 import { CLIENT, ORGANIZATION } from '@/utils/ADempiere/constants/systemColumns.js'
@@ -38,18 +38,18 @@ const preference = {
 
         // set context for window
         const keyParent = key + payload.columnName
-        Vue.set(state.preference, keyParent, payload.value)
+        createApp.set(state.preference, keyParent, payload.value)
       }
       if (payload.containerUuid) {
         key += payload.containerUuid + '|'
       }
       key += payload.columnName
       // set property to object
-      Vue.set(state.preference, key, payload.value)
+      createApp.set(state.preference, key, payload.value)
     },
     setInitialContext(state, objectContext) {
       Object.keys(objectContext).forEach(key => {
-        Vue.set(state.preference, key, objectContext[key])
+        createApp.set(state.preference, key, objectContext[key])
       })
     },
     setMultiplePreference(state, preferenceToSet) {

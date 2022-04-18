@@ -107,8 +107,8 @@
           <el-container>
             <el-main style="min-height: 150px;">
               <el-row :gutter="24">
-                <template v-for="(payment) in listCastOpen">
-                  <el-col :key="payment.uuid" :span="8" style="padding-left: 5px; padding-right: 5px;">
+                <template>
+                  <el-col v-for="(payment) in listCastOpen" :key="payment.uuid" :span="8" style="padding-left: 5px; padding-right: 5px;">
                     <el-card :body-style="{ padding: '0px' }" style="max-height: 120px;">
                       <el-row>
                         <el-col :span="6" style="padding: 10px">

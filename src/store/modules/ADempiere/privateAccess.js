@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import language from '@/lang'
 
 // api request methods
@@ -41,7 +41,7 @@ const privateAccess = {
     setPrivateAccess(state, { tableName, recordUuid, recordId, isLocked }) {
       const key = `${tableName}_${recordUuid}`
 
-      Vue.set(state.privateAccessRecord, key, {
+      createApp.set(state.privateAccessRecord, key, {
         tableName,
         recordUuid,
         recordId,

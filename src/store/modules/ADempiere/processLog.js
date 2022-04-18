@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import language from '@/lang'
 
 // api request methods
@@ -42,12 +42,12 @@ const processLog = {
 
     // Add process in request metadata from server
     addInRequestMetadata(state, containerUuid) {
-      Vue.set(state.inRequestMetadata, containerUuid, true)
+      createApp.set(state.inRequestMetadata, containerUuid, true)
     },
 
     // Delete process in request metadata
     deleteInRequestMetadata(state, containerUuid) {
-      Vue.set(state.inRequestMetadata, containerUuid, undefined)
+      createApp.set(state.inRequestMetadata, containerUuid, undefined)
     }
   },
 

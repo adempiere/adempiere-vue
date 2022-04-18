@@ -7,8 +7,8 @@
           :title="maindashboard.name"
         />
       </el-col>
-      <template v-for="(dashboardAttributes, index) in listDashboard">
-        <el-col :key="index" :xs="{ span: 24 }" :sm="{ span: 24 }" :md="{ span: 24 }" :lg="{ span: 12 }" :xl="{ span: 12 }" style="padding-right:8px;margin-bottom:2px;">
+      <template>
+        <el-col v-for="(dashboardAttributes, index) in listDashboard" :key="index" :xs="{ span: 24 }" :sm="{ span: 24 }" :md="{ span: 24 }" :lg="{ span: 12 }" :xl="{ span: 12 }" style="padding-right:8px;margin-bottom:2px;">
           <dashboard
             :metadata="dashboardAttributes"
             :title="dashboardAttributes.name"

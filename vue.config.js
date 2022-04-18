@@ -27,6 +27,9 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
+  // baseUrl: '/',
+  outputDir: 'dist',
+  runtimeCompiler: true,
   publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'static',
@@ -58,7 +61,7 @@ module.exports = {
       }
     }
   },
-  chainWebpack(config) {
+  chainWebpack: (config) => {
     // it can improve the speed of the first screen, it is recommended to turn on preload
     // it can improve the speed of the first screen, it is recommended to turn on preload
     config.plugin('preload').tap(() => [

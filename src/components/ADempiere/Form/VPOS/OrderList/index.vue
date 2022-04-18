@@ -31,10 +31,9 @@
           label-width="10px"
           @submit.native.prevent="notSubmitForm"
         >
-          <template
-            v-for="(field) in sortFieldsListOrder"
-          >
+          <template>
             <field-definition
+              v-for="(field) in sortFieldsListOrder"
               :key="field.columnName"
               :metadata-field="field"
               :container-uuid="'Orders-List'"

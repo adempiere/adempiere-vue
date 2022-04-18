@@ -61,9 +61,10 @@
         min-width="50"
       />
 
-      <template v-for="(fieldAttributes, key) in headerList">
+      <template>
         <el-table-column
-          :key="key"
+          v-for="(fieldAttributes, index) in headerList"
+          :key="index"
           :label="headerLabel(fieldAttributes)"
           :column-key="fieldAttributes.columnName"
           :prop="fieldAttributes.columnName"

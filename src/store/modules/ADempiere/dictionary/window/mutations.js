@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 
 /**
@@ -23,7 +23,7 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
  */
 export default {
   addWindowToList(state, window) {
-    Vue.set(state.storedWindows, window.uuid, window)
+    createApp.set(state.storedWindows, window.uuid, window)
   },
 
   changeWindowAttribute(state, {
@@ -37,7 +37,7 @@ export default {
       value = state.storedWindows[uuid][attributeNameControl]
     }
 
-    Vue.set(state.storedWindows[uuid], attributeName, value)
+    createApp.set(state.storedWindows[uuid], attributeName, value)
     // state.storedWindows[uuid][attributeName] = value
   },
 
@@ -57,7 +57,7 @@ export default {
    * @param {object} tab
    */
   setCurrentTab(state, { parentUuid, tab }) {
-    Vue.set(state.storedWindows[parentUuid], 'currentTab', tab)
+    createApp.set(state.storedWindows[parentUuid], 'currentTab', tab)
   },
 
   /**
@@ -66,7 +66,7 @@ export default {
    * @param {object} tab
    */
   setCurrentTabChild(state, { parentUuid, tab }) {
-    Vue.set(state.storedWindows[parentUuid], 'currentTabChild', tab)
+    createApp.set(state.storedWindows[parentUuid], 'currentTabChild', tab)
   },
 
   /**

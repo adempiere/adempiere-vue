@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 import { updateEntity } from '@/api/ADempiere/common/persistence.js'
 import { requestTranslations } from '@/api/ADempiere/actions/translation.js'
@@ -39,7 +39,7 @@ const languageManager = {
       values
     }) {
       const key = `${language}_${tableName}_${recordUuid}`
-      Vue.set(state.translationsList, key, {
+      createApp.set(state.translationsList, key, {
         key,
         uuid,
         values,
@@ -56,7 +56,7 @@ const languageManager = {
     }) {
       const key = `${language}_${tableName}_${recordUuid}`
 
-      Vue.set(state.translationsList[key].values, columnName, value)
+      createApp.set(state.translationsList[key].values, columnName, value)
     },
 
     cancelTranslated(state, {
@@ -67,7 +67,7 @@ const languageManager = {
       const key = `${language}_${tableName}_${recordUuid}`
       const { originalValues } = state.translationsList[key]
 
-      Vue.set(state.translationsList[key], 'values', originalValues)
+      createApp.set(state.translationsList[key], 'values', originalValues)
     }
   },
 

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 // api request methods
 import { requestLookupList } from '@/api/ADempiere/window.js'
@@ -40,7 +40,7 @@ const lookupManager = {
       contextAttributesList,
       optionsList
     }) {
-      Vue.set(state.lookupList, key, {
+      createApp.set(state.lookupList, key, {
         clientId,
         key,
         searchValue,
@@ -52,7 +52,7 @@ const lookupManager = {
     deleteLookupList(state, {
       key
     }) {
-      Vue.set(state.lookupList, key, undefined)
+      createApp.set(state.lookupList, key, undefined)
     },
 
     resetStateLookup(state) {

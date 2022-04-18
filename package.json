@@ -41,6 +41,7 @@
     "driver.js": "0.9.8",
     "dropzone": "5.9.3",
     "echarts": "5.3.1",
+    "element-plus": "^2.1.9",
     "element-ui": "2.15.6",
     "file-saver": "2.0.5",
     "fuse.js": "6.5.3",
@@ -58,7 +59,7 @@
     "sortablejs": "1.15.0",
     "tui-editor": "1.4.10",
     "v-markdown": "^1.0.2",
-    "vue": "2.6.14",
+    "vue": "3.2.33",
     "vue-count-to": "1.0.13",
     "vue-i18n": "8.27.0",
     "vue-multipane": "^0.9.5",
@@ -70,7 +71,7 @@
     "vue-workflow-chart": "^0.4.5",
     "vue-xml-viewer": "0.1.4",
     "vuedraggable": "2.24.3",
-    "vuex": "3.6.2",
+    "vuex": "^4.0.2",
     "xlsx": "0.18.4"
   },
   "devDependencies": {

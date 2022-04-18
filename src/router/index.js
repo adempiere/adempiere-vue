@@ -1,7 +1,7 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import Router from 'vue-router'
 
-Vue.use(Router)
+createApp.use(Router)
 
 /* Layout */
 import Layout from '@/layout'
@@ -10,7 +10,7 @@ import Layout from '@/layout'
 import componentsRouter from './modules/components'
 import chartsRouter from './modules/charts'
 import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
+// import nestedRouter from './modules/nested'
 
 import enrollmentRoute from './modules/ADempiere/enrollment.js'
 import language from '@/lang'
@@ -203,7 +203,7 @@ export const asyncRoutes = [
   /** when your routing map is too long, you can split it into small modules **/
   componentsRouter,
   chartsRouter,
-  nestedRouter,
+  // nestedRouter,
   tableRouter,
 
   {

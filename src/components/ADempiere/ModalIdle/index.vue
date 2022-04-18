@@ -20,13 +20,13 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import { createApp } from 'vue'
 import IdleVue from 'idle-vue'
 import store from '../../../store'
 
 const connectionTimeout = (store.getters['user/userInfo'].connection_timeout > 0) ? store.getters['user/userInfo'].connection_timeout : 86400000
-Vue.use(IdleVue, {
-  eventEmitter: new Vue(),
+createApp.use(IdleVue, {
+  // eventEmitter: new Vue(),
   store,
   idleTime: `${connectionTimeout}`,
   startAtIdle: false

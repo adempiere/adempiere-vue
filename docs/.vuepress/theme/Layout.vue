@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import { createApp } from 'vue'
 import nprogress from 'nprogress'
 import Navbar from '@default-theme/Navbar.vue'
 import Page from '@default-theme/Page.vue'
@@ -146,7 +146,7 @@ export default {
     // configure progress bar
     nprogress.configure({ showSpinner: false })
     this.$router.beforeEach((to, from, next) => {
-      if (to.path !== from.path && !Vue.component(to.name)) {
+      if (to.path !== from.path && !createApp.component(to.name)) {
         nprogress.start()
       }
       next()

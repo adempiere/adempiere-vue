@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 // api request methods
 import { requestGetCountryDefinition } from '@/api/ADempiere/system-core.js'
@@ -35,7 +35,7 @@ const locationAddress = {
 
   mutations: {
     setCountryDefinition(state, country) {
-      Vue.set(state.countries, country.id, country)
+      createApp.set(state.countries, country.id, country)
     },
     setShowedLocation(state, isShowed) {
       state.isShowedLocation = isShowed
