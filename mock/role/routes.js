@@ -202,12 +202,12 @@ const asyncRoutes = [
         name: 'DragDialogDemo',
         meta: { title: 'Drag Dialog' }
       },
-      {
-        path: 'drag-select',
-        component: 'views/components-demo/drag-select',
-        name: 'DragSelectDemo',
-        meta: { title: 'Drag Select' }
-      },
+      // {
+      //   path: 'drag-select',
+      //   component: 'views/components-demo/drag-select',
+      //   name: 'DragSelectDemo',
+      //   meta: { title: 'Drag Select' }
+      // },
       {
         path: 'dnd-list',
         component: 'views/components-demo/dnd-list',

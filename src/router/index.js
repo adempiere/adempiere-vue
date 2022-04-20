@@ -1,7 +1,4 @@
-import { createApp } from 'vue'
-import Router from 'vue-router'
-
-createApp.use(Router)
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 /* Layout */
 import Layout from '@/layout'
@@ -416,21 +413,11 @@ export const asyncRoutes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
-const createRouter = () => new Router({
-  // mode: 'history', // require service support
-  scrollBehavior: (to, from, savedPosition) => {
-    // does not position the scroll at the top when changing the query
-    if (to.path !== from.path) {
-      return {
-        x: 0,
-        y: 0
-      }
-    }
-  },
-  routes: constantRoutes
+const routes = constantRoutes.concat(asyncRoutes)
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes
 })
-
-const router = createRouter()
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
