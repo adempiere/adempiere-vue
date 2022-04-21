@@ -187,8 +187,8 @@ const actions = {
             const option = options.find(itemOption => itemOption.key === valueGetDisplayColumn)
             // if there is a lookup option, assign the display column with the label
             if (option) {
-              values[itemField.displayColumnName] = option.label
-              // if (isEmptyValue(option.label) && !itemField.isMandatory) {
+              values[itemField.displayColumnName] = option.displayedValue
+              // if (isEmptyValue(option.displayedValue) && !itemField.isMandatory) {
               //   values[columnName] = undefined
               // }
               return

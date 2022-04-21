@@ -94,6 +94,7 @@ const windowManager = {
     }, {
       parentUuid,
       containerUuid,
+      searchValue,
       filters = [],
       pageNumber
     }) {
@@ -129,6 +130,7 @@ const windowManager = {
           windowUuid: parentUuid,
           tabUuid: containerUuid,
           contextAttributesList,
+          searchValue,
           filters,
           pageToken
         })
@@ -146,11 +148,19 @@ const windowManager = {
               parentUuid,
               containerUuid,
               recordsList: dataToStored,
+              pageNumber,
               nextPageToken: dataResponse.nextPageToken,
               recordCount: dataResponse.recordCount
             })
 
             resolve(dataToStored)
+          })
+          .catch(() => {
+            commit('setTabData', {
+              parentUuid,
+              containerUuid
+            })
+            resolve([])
           })
       })
     },
@@ -227,6 +237,9 @@ const windowManager = {
         pageNumber: 1,
         isLoaded: false
       }
+    },
+    getTabRecordCount: (state, getters) => ({ containerUuid }) => {
+      return getters.getTabData({ containerUuid }).recordCount
     },
     getTabRecordsList: (state, getters) => ({ containerUuid }) => {
       return getters.getTabData({ containerUuid }).recordsList

@@ -20,13 +20,15 @@
   <el-select
     v-model="value"
     v-bind="commonsProperties"
-    :filterable="!isMobile"
+    :filterable="true"
     :loading="isLoading"
     value-key="value"
     clearable
     :multiple="isSelectMultiple"
     :allow-create="metadata.isSelectCreated"
     :collapse-tags="!isSelectMultiple"
+    remote
+    :remote-method="remoteSearch"
     @change="preHandleChange"
     @visible-change="getDataLookupList"
     @clear="clearLookup"
@@ -84,6 +86,17 @@ export default {
       }
 
       return styleClass
+    },
+
+    isWithSearchValue() {
+      return Boolean(
+        this.$store.getters.getStoredSearchValueLookup({
+          parentUuid: this.metadata.parentUuid,
+          containerUuid: this.metadata.containerUuid,
+          contextColumnNames: this.metadata.contextColumnNames,
+          uuid: this.metadata.uuid
+        })
+      )
     },
 
     value: {
@@ -340,18 +353,41 @@ export default {
      * @param {boolean} isShowList triggers when the pull-down menu appears or disappears
      */
     getDataLookupList(isShowList) {
+      // get stored list values
+      const list = this.getLookupList
+      // refresh local list component
+      this.optionsList = list
       if (isShowList) {
-        // get stored list values
-        const list = this.getLookupList
-        // refresh local list component
-        this.optionsList = list
-        if (this.isEmptyValue(list) || (list.length === 1 &&
-          this.blankValues.includes(list[0].value))) {
-          this.remoteMethod()
+        if (this.isEmptyValue(list) || this.isWithSearchValue ||
+          (list.length === 1 && this.blankValues.includes(list[0].value))) {
+          this.loadListFromServer()
         }
       }
     },
-    remoteMethod() {
+    remoteSearch(searchQuery = '') {
+      clearTimeout(this.timeOut)
+
+      const results = this.localSearch(searchQuery)
+
+      if ((this.isEmptyValue(results) && !this.isEmptyValue(searchQuery)) || this.isEmptyValue(searchQuery)) {
+        this.timeOut = setTimeout(() => {
+          this.loadListFromServer(searchQuery)
+        }, 600)
+        return
+      }
+      // use this, if remote is enabled, local search not working
+      this.optionsList = results
+    },
+    localSearch(searchQuery = '') {
+      if (this.isEmptyValue(searchQuery)) {
+        return this.optionsList
+      }
+
+      return this.optionsList.filter(option => {
+        return option.displayedValue.toLowerCase().includes(searchQuery.toLowerCase())
+      })
+    },
+    loadListFromServer(searchQuery = '') {
       this.isLoading = true
 
       this.containerManager.getLookupList({
@@ -362,6 +398,7 @@ export default {
         //
         tableName: this.metadata.reference.tableName,
         columnName: this.metadata.columnName,
+        searchValue: searchQuery,
         // app attributes
         isAddBlankValue: true,
         blankValue: this.blankOption.value

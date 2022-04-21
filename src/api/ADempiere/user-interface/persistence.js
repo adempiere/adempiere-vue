@@ -34,6 +34,7 @@ export function getEntities({
   columns = [],
   contextAttributesList = [],
   sorting = [],
+  searchValue,
   filters,
   pageToken,
   pageSize
@@ -80,6 +81,7 @@ export function getEntities({
       tab_uuid: tabUuid,
       context_attributes: contextAttributes,
       // DSL Query
+      search_value: searchValue,
       filters,
       columns,
       // replace sql values
