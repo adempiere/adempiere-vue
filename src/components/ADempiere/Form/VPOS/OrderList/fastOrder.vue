@@ -38,83 +38,85 @@
           <i class="el-icon-arrow-down el-icon--right" />
         </el-button>
         <el-dropdown-menu slot="dropdown">
-          <template v-for="(option, key) in quickOptions">
-            <el-dropdown-item v-show="option.isShow" :key="key" :command="option">
-              <el-popover
-                :key="key"
-                v-model="option.isVisible"
-                placement="right"
-                trigger="click"
-                width="900"
-              >
-                <find-orders
-                  :data="option"
-                  :data-list="orderList"
-                  :is-loading-table="isloading"
-                  :params="option.params"
-                  :show-field="showToDeliveOrders"
+          <template>
+            <span v-for="(option, key) in quickOptions" :key="key">
+              <el-dropdown-item v-show="option.isShow" :command="option">
+                <el-popover
+                  :key="key"
+                  v-model="option.isVisible"
+                  placement="right"
+                  trigger="click"
+                  width="900"
                 >
-                  <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
-                    <el-form-item label="No. del Documento">
-                      <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
-                    </el-form-item>
-                    <el-form-item
-                      v-for="(field) in metadataList"
-                      :key="field.columnName"
-                    >
-                      <field-definition
-                        :metadata-field="{
-                          ...field,
-                          size: 6,
-                          name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
-                        }"
-                        :container-uuid="'Cash-Withdrawal'"
-                        :container-manager="{
-                          ...containerManager,
-                          getLookupList,
-                          isDisplayedField,
-                          isMandatoryField,
-                          isReadOnlyField,
-                          changeFieldShowedFromUser
-                        }"
-                      />
-                    </el-form-item>
-                  </el-form>
-                </find-orders>
-                <custom-pagination
-                  :total="total"
-                  :current-page="currentPage"
-                  :handle-change-page="handleChangePage"
-                  layout="total, prev, pager, next"
-                  style="float: right;"
-                />
-                <el-button
-                  type="text"
-                  class="custom-button-create-bp"
-                />
-                <el-row :gutter="24">
-                  <el-col :span="24">
-                    <samp style="float: right; padding-right: 10px;">
-                      <el-button
-                        type="danger"
-                        class="custom-button-create-bp"
-                        icon="el-icon-close"
-                        @click="closeSearch(option)"
-                      />
-                      <el-button
-                        type="primary"
-                        class="custom-button-create-bp"
-                        icon="el-icon-check"
-                        @click="openOrder(option)"
-                      />
-                    </samp>
-                  </el-col>
-                </el-row>
-                <el-button slot="reference" type="text" style="color: #333" @click="option.isVisible = true">
-                  {{ option.title }}
-                </el-button>
-              </el-popover>
-            </el-dropdown-item>
+                  <find-orders
+                    :data="option"
+                    :data-list="orderList"
+                    :is-loading-table="isloading"
+                    :params="option.params"
+                    :show-field="showToDeliveOrders"
+                  >
+                    <el-form label-position="top" :inline="true" class="demo-form-inline" @submit.native.prevent="notSubmitForm">
+                      <el-form-item label="No. del Documento">
+                        <el-input v-model="input" placeholder="Please input" @change="listOrdersInvoiced" />
+                      </el-form-item>
+                      <el-form-item
+                        v-for="(field) in metadataList"
+                        :key="field.columnName"
+                      >
+                        <field-definition
+                          :metadata-field="{
+                            ...field,
+                            size: 6,
+                            name: field.columnName === 'DateOrderedFrom' ? $t('form.pos.optionsPoinSales.generalOptions.dateOrder') : field.name
+                          }"
+                          :container-uuid="'Cash-Withdrawal'"
+                          :container-manager="{
+                            ...containerManager,
+                            getLookupList,
+                            isDisplayedField,
+                            isMandatoryField,
+                            isReadOnlyField,
+                            changeFieldShowedFromUser
+                          }"
+                        />
+                      </el-form-item>
+                    </el-form>
+                  </find-orders>
+                  <custom-pagination
+                    :total="total"
+                    :current-page="currentPage"
+                    :handle-change-page="handleChangePage"
+                    layout="total, prev, pager, next"
+                    style="float: right;"
+                  />
+                  <el-button
+                    type="text"
+                    class="custom-button-create-bp"
+                  />
+                  <el-row :gutter="24">
+                    <el-col :span="24">
+                      <samp style="float: right; padding-right: 10px;">
+                        <el-button
+                          type="danger"
+                          class="custom-button-create-bp"
+                          icon="el-icon-close"
+                          @click="closeSearch(option)"
+                        />
+                        <el-button
+                          type="primary"
+                          class="custom-button-create-bp"
+                          icon="el-icon-check"
+                          @click="openOrder(option)"
+                        />
+                      </samp>
+                    </el-col>
+                  </el-row>
+                  <el-button slot="reference" type="text" style="color: #333" @click="option.isVisible = true">
+                    {{ option.title }}
+                  </el-button>
+                </el-popover>
+              </el-dropdown-item>
+            </span>
           </template>
         </el-dropdown-menu>
       </el-dropdown>

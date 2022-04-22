@@ -1,51 +1,6 @@
 <template>
-  <div v-if="!item.hidden">
-    <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
-      <app-link v-if="onlyOneChild.meta" :to="onlyOneChild">
-        <el-menu-item
-          :index="resolvePath(onlyOneChild.path)"
-          :route="item"
-          :class="{'submenu-title-noDropdown':!isNest}"
-          @click="openItemMenu"
-        >
-          <el-tooltip v-if="!sidebar.opened && !isNest" effect="dark" :content="onlyOneChild.meta.title" placement="right">
-            <item
-              :icon="onlyOneChild.meta.icon || (item.meta && item.meta.icon)"
-              :add-margin="true"
-            />
-          </el-tooltip>
-          <item
-            v-else
-            :icon="onlyOneChild.meta.icon || (item.meta && item.meta.icon)"
-            :title="generateTitle(onlyOneChild.meta.title)"
-            :is-collapsed="isCollapsed"
-          />
-        </el-menu-item>
-      </app-link>
-    </template>
-
-    <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
-      <template slot="title">
-        <item
-          v-if="sidebar.opened"
-          :icon="item.meta && item.meta.icon"
-          :title="generateTitle(item.meta.title)"
-          :is-collapsed="isCollapsed"
-          :has-child-items="true"
-        />
-        <el-tooltip v-else effect="dark" :content="item.meta.title" placement="top-start">
-          <item v-if="item.meta && !isNest" :icon="item.meta && item.meta.icon" />
-        </el-tooltip>
-      </template>
-      <sidebar-item
-        v-for="child in item.children"
-        :key="child.path"
-        :is-nest="true"
-        :item="child"
-        :base-path="resolvePath(child.path)"
-        class="nest-menu"
-      />
-    </el-submenu>
+  <div>
+    alo
   </div>
 </template>
 
@@ -53,15 +8,15 @@
 import path from 'path'
 import { generateTitle } from '@/utils/i18n'
 import { isExternal } from '@/utils/validate'
-import Item from './Item'
-import AppLink from './Link'
+// import Item from './Item'
+// import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
 import { mapGetters } from 'vuex'
 import { capitalize } from '@/utils/ADempiere/formatValue/stringFormat'
 
 export default {
   name: 'SidebarItem',
-  components: { Item, AppLink },
+  // components: { Item, AppLink },
   mixins: [FixiOSBug],
   props: {
     // route object

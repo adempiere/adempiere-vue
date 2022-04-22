@@ -1,4 +1,5 @@
-import router, { constantRoutes, resetRouter } from '@/router'
+import router from '@/router'
+// import router, { constantRoutes, resetRouter } from '@/router'
 import { loadMainMenu } from '@/router/modules/ADempiere/menu'
 import { getToken } from '@/utils/auth'
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -13,7 +14,7 @@ const state = {
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
-    state.routes = constantRoutes.concat(routes)
+    state.routes = routes
   },
   setTimeOutMenu(state, payload) {
     state.timeOutMenu = payload
@@ -59,7 +60,7 @@ const actions = {
         })
         .start()
 
-      resetRouter()
+      // resetRouter()
       dispatch('generateRoutes')
         .then(accessRoutes => {
           // dynamically add accessible routes

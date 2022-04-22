@@ -17,7 +17,7 @@
 /**
  * Product Price Mutations
  */
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 export default {
   setListProductPrice(state, productsPrices) {
@@ -30,11 +30,11 @@ export default {
     state.productPrice.pageNumber = pageNumber
   },
   showListProductPrice(state, payload) {
-    Vue.set(state.productPrice, payload.attribute, payload.isShowed)
+    createApp.set(state.productPrice, payload.attribute, payload.isShowed)
   },
   setIsReloadProductPrice(state) {
-    Vue.set(state.productPrice, 'isReload', true)
-    Vue.set(state.productPrice, 'isLoaded', false)
+    createApp.set(state.productPrice, 'isReload', true)
+    createApp.set(state.productPrice, 'isLoaded', false)
   },
   updtaeSearchProduct(state, searchProduct) {
     state.searchProduct = searchProduct

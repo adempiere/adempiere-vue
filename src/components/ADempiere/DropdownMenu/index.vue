@@ -24,8 +24,8 @@
     <el-collapse v-model="activeNames" class="collapse-wrapper">
       <el-collapse-item :title="title" name="1" class="collapse-item">
         <el-row justify="space-around">
-          <template v-for="(childItems, index) in items.children">
-            <el-col :key="index" :span="isMobile">
+          <template>
+            <el-col v-for="(childItems, index) in items.children" :key="index" :span="isMobile">
               <menu-card :items="childItems" size="small" />
             </el-col>
           </template>

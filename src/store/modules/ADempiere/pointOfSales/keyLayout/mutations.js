@@ -17,14 +17,14 @@
 /**
  * KeyLayout Mutations
  */
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 export default {
   setKeyLayout(state, keyLayout) {
-    Vue.set(state, 'keyLayout', keyLayout)
+    createApp.set(state, 'keyLayout', keyLayout)
   },
   setIsReloadKeyLayout(state) {
-    Vue.set(state.keyLayout, 'isReload', true)
-    Vue.set(state.keyLayout, 'isLoaded', false)
+    createApp.set(state.keyLayout, 'isReload', true)
+    createApp.set(state.keyLayout, 'isLoaded', false)
   }
 }

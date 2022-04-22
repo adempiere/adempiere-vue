@@ -43,8 +43,8 @@
         v-if="!isEmptyValue(getKeyList)"
       >
         <el-row style="padding: 2px">
-          <template v-for="(keyValue, key) in getKeyList">
-            <el-col :key="key" :span="size">
+          <template>
+            <el-col v-for="(keyValue, key) in getKeyList" :key="key" :span="size">
               <el-card
                 shadow="never"
                 class="custom-card"

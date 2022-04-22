@@ -21,10 +21,8 @@
     <el-row
       v-if="!isEmptyValue(metadataList) && isLoadedField"
     >
-      <template
-        v-for="(field, index) in metadataList"
-      >
-        <el-col :key="index" :span="8">
+      <template>
+        <el-col v-for="(field, index) in metadataList" :key="index" :span="8">
           <el-form label-position="top" label-width="10px" @submit.native.prevent="notSubmitForm">
             <field-definition
               v-if="field.columnName === 'PriceEntered'"

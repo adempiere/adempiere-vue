@@ -68,8 +68,9 @@
       </el-form>
     </el-scrollbar>
 
-    <template v-for="(zoomItem, index) in fieldAttributes.reference.zoomWindows">
+    <template>
       <el-button
+        v-for="(zoomItem, index) in fieldAttributes.reference.zoomWindows"
         :key="index"
         type="text"
         @click="redirect({ window: zoomItem })"

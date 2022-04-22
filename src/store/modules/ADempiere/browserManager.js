@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import language from '@/lang'
 
 // api request methods
@@ -57,18 +57,18 @@ const browserControl = {
         recordCount,
         selectionsList
       }
-      Vue.set(state.browserData, containerUuid, dataBrowser)
+      createApp.set(state.browserData, containerUuid, dataBrowser)
     },
 
     clearBrowserData(state, { containerUuid }) {
-      Vue.set(state.browserData, containerUuid, undefined)
+      createApp.set(state.browserData, containerUuid, undefined)
     },
 
     setBrowserSelectionsList(state, {
       containerUuid,
       selectionsList
     }) {
-      Vue.set(state.browserData[containerUuid], 'selectionsList', selectionsList)
+      createApp.set(state.browserData[containerUuid], 'selectionsList', selectionsList)
     },
 
     setBrowserRow(state, {
@@ -76,7 +76,7 @@ const browserControl = {
       rowIndex,
       row
     }) {
-      Vue.set(state.browserData[containerUuid].recordsList, rowIndex, row)
+      createApp.set(state.browserData[containerUuid].recordsList, rowIndex, row)
     },
 
     setBrowserCell(state, {
@@ -85,9 +85,9 @@ const browserControl = {
       columnName,
       value
     }) {
-      Vue.set(state.browserData[containerUuid].recordsList[rowIndex], columnName, value)
+      createApp.set(state.browserData[containerUuid].recordsList[rowIndex], columnName, value)
       // TODO: Change selection columns
-      // Vue.set(state.browserData[containerUuid].selectionsList[rowIndex], columnName, value)
+      // createApp.set(state.browserData[containerUuid].selectionsList[rowIndex], columnName, value)
     },
 
     resetStateBrowserManager(state) {

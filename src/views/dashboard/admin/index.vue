@@ -1,14 +1,15 @@
 <template>
   <div class="dashboard-editor-container">
-    <el-row v-if="!isEmptyValue(listDashboard)" :gutter="8">
+    {{ maindashboard.name }}
+    <!-- <el-row v-if="!isEmptyValue(listDashboard)" :gutter="8">
       <el-col v-if="!isEmptyValue(maindashboard)" :span="24" style="padding-right:8px;margin-bottom:2px;">
         <dashboard
           :metadata="maindashboard"
           :title="maindashboard.name"
         />
       </el-col>
-      <template v-for="(dashboardAttributes, index) in listDashboard">
-        <el-col :key="index" :xs="{ span: 24 }" :sm="{ span: 24 }" :md="{ span: 24 }" :lg="{ span: 12 }" :xl="{ span: 12 }" style="padding-right:8px;margin-bottom:2px;">
+      <template>
+        <el-col v-for="(dashboardAttributes, index) in listDashboard" :key="index" :xs="{ span: 24 }" :sm="{ span: 24 }" :md="{ span: 24 }" :lg="{ span: 12 }" :xl="{ span: 12 }" style="padding-right:8px;margin-bottom:2px;">
           <dashboard
             :metadata="dashboardAttributes"
             :title="dashboardAttributes.name"
@@ -16,18 +17,18 @@
           />
         </el-col>
       </template>
-    </el-row>
+    </el-row> -->
   </div>
 </template>
 
 <script>
-import Dashboard from '@/components/ADempiere/Dashboard'
+// import Dashboard from '@/components/ADempiere/Dashboard'
 
 export default {
   name: 'DashboardAdmin',
-  components: {
-    Dashboard
-  },
+  // components: {
+  //   Dashboard
+  // },
   data() {
     return {
       roleUuid: this.$store.getters.getRoleUuid,

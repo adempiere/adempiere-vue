@@ -14,16 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Message, Notification } from 'element-ui'
-import language from '@/lang'
+// import { Message, Notification } from 'element-ui'
+import { ElNotification } from 'element-plus'
+// import language from '@/lang'
 import router from '@/router'
 
 export function hasTranslation(text) {
-  const hasKey = language.te('notifications.' + text)
-  if (hasKey) {
-    const translatedText = language.t('notifications.' + text)
-    return translatedText
-  }
+  // const hasKey = language.te('notifications.' + text)
+  // if (hasKey) {
+  //   const translatedText = language.t('notifications.' + text)
+  //   return translatedText
+  // }
   return text
 }
 
@@ -61,7 +62,7 @@ export function showNotification({ type = 'success', title, message = '', summar
     message = `${name} ${message}`
   }
 
-  return Notification({
+  return ElNotification({
     title,
     message: `
       <div style="max-height: 100px; overflow-y: auto;">
@@ -95,11 +96,18 @@ export function showMessage({ type = 'success', message, duration = 0 }) {
   if (duration) {
     delay = duration
   }
-
-  return Message({
+  console.log({
     message,
     type,
     showClose: true,
     duration: delay
   })
+  return 12
+
+  // return Message({
+  //   message,
+  //   type,
+  //   showClose: true,
+  //   duration: delay
+  // })
 }

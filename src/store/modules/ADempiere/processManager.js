@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import router from '@/router'
 import language from '@/lang'
 
@@ -37,7 +37,7 @@ const processManager = {
 
   mutations: {
     setPrintFormatsList(state, { containerUuid, printFormatList }) {
-      Vue.set(state.printFormatList, containerUuid, printFormatList)
+      createApp.set(state.printFormatList, containerUuid, printFormatList)
     },
     resetStateProcessManager(state) {
       state = initState

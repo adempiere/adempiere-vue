@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 /**
  * Report Mutations
@@ -22,7 +22,7 @@ import Vue from 'vue'
  */
 export default {
   addReportToList(state, report) {
-    Vue.set(state.storedReports, report.uuid, report)
+    createApp.set(state.storedReports, report.uuid, report)
   },
 
   /**

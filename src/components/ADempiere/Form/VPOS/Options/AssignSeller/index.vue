@@ -21,8 +21,8 @@
       <el-card class="box-card" style="padding-left: 0px;padding-right: 0px;">
         <el-scrollbar wrap-class="scroll-seller">
           <el-row style="padding: 2px">
-            <template v-for="(seller, key) in listSellers">
-              <el-col :key="key" :span="8">
+            <template>
+              <el-col v-for="(seller, key) in listSellers" :key="key" :span="8">
                 <el-card
                   :shadow="seller.uuid === salesRepresentative.uuid ? 'always' : 'never'"
                   :class="seller.uuid === salesRepresentative.uuid ? 'custom-card-select' : 'custom-card'"

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import router from '@/router'
 import language from '@/lang'
 
@@ -54,19 +54,19 @@ const reportManager = {
 
   mutations: {
     setPrintFormatsList(state, { containerUuid, printFormatList }) {
-      Vue.set(state.printFormatList, containerUuid, printFormatList)
+      createApp.set(state.printFormatList, containerUuid, printFormatList)
     },
     setReportFormatsList(state, { containerUuid, reportFormatsList }) {
-      Vue.set(state.reportFormatsList, containerUuid, reportFormatsList)
+      createApp.set(state.reportFormatsList, containerUuid, reportFormatsList)
     },
     setReportViewsList(state, { containerUuid, reportViewsList }) {
-      Vue.set(state.reportViewsList, containerUuid, reportViewsList)
+      createApp.set(state.reportViewsList, containerUuid, reportViewsList)
     },
     setDrillTablesList(state, { containerUuid, drillTablesList }) {
-      Vue.set(state.drillTablesList, containerUuid, drillTablesList)
+      createApp.set(state.drillTablesList, containerUuid, drillTablesList)
     },
     setReportOutput(state, reportOutput) {
-      Vue.set(state.reportsOutput, reportOutput.instanceUuid, reportOutput)
+      createApp.set(state.reportsOutput, reportOutput.instanceUuid, reportOutput)
     },
     resetStateReportManager(state) {
       state = initState

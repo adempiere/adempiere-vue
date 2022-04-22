@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 // constants
 import {
@@ -57,11 +57,11 @@ const value = {
       if (parentUuid) {
         const keyParent = parentUuid + '_' + columnName
         if (isOverWriteParent) {
-          Vue.set(state.field, keyParent, value)
+          createApp.set(state.field, keyParent, value)
         } else {
           if (!isEmptyValue(value)) {
             // tab child no replace parent context with empty
-            Vue.set(state.field, keyParent, value)
+            createApp.set(state.field, keyParent, value)
           }
         }
       }
@@ -69,7 +69,7 @@ const value = {
       // Only Container
       if (containerUuid) {
         const keyContainer = containerUuid + '_' + columnName
-        Vue.set(state.field, keyContainer, value)
+        createApp.set(state.field, keyContainer, value)
       }
     },
 
@@ -100,11 +100,11 @@ const value = {
         if (parentUuid) {
           const keyParent = parentUuid + '_' + columnName
           if (isOverWriteParent) {
-            Vue.set(state.field, keyParent, value)
+            createApp.set(state.field, keyParent, value)
           } else {
             if (!isEmptyValue(value)) {
               // tab child no replace parent context with empty
-              Vue.set(state.field, keyParent, value)
+              createApp.set(state.field, keyParent, value)
             }
           }
         }
@@ -112,7 +112,7 @@ const value = {
         // Only Container
         if (containerUuid) {
           const keyContainer = containerUuid + '_' + columnName
-          Vue.set(state.field, keyContainer, value)
+          createApp.set(state.field, keyContainer, value)
         }
       })
     }

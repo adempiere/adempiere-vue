@@ -1,26 +1,32 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import getters from './getters'
+/*
+ * @Description:
+ * @Author: gumingchen
+ * @Email: 1240235512@qq.com
+ * @Date: 2021-04-29 17:23:32
+ * @LastEditors: gumingchen
+ * @LastEditTime: 2021-04-30 17:47:52
+ */
+import { createStore } from 'vuex'
 
-Vue.use(Vuex)
+const path = require('path')
+const requireModules = require.context('./epale', true, /index\.(ts|js)$/iu)
 
-// https://webpack.js.org/guides/dependency-management/#requirecontext
-const modulesFiles = require.context('./modules', true, /\.js$/)
+const modules = {}
 
-// you do not need `import app from './modules/app'`
-// it will auto require all vuex module from modules file
-const modules = modulesFiles.keys().reduce((modules, modulePath) => {
-  // set './app.js' => 'app'
-  var moduleName = modulePath.replace(/^\.\/(.*)\.\w+$/, '$1')
-  moduleName = moduleName.substring(moduleName.indexOf('/') + 1)
-  const value = modulesFiles(modulePath)
-  modules[moduleName] = value.default
-  return modules
-}, {})
+requireModules.keys().forEach(filePath => {
+  const modular = requireModules(filePath)
+  let name = path.resolve(filePath, '..')
+  name = name.split('/').pop()
+  modules[name] = {
+    namespaced: true,
+    ...modular.default
+  }
+})
 
-const store = new Vuex.Store({
-  modules,
-  getters
+const store = createStore({
+  modules: {
+    ...modules
+  }
 })
 
 export default store

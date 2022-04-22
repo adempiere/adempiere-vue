@@ -1,20 +1,64 @@
 <template>
   <div id="app">
-    <modal-idle
+    <!--<modal-idle
       v-if="isSession && isIdle"
       :is-idle="isIdle"
-    />
+    />-->
     <router-view />
   </div>
 </template>
 
 <script>
+import { defineComponent, computed, nextTick, onUnmounted } from 'vue'
+
+export default defineComponent({
+  setup() {
+    const isIdle = computed(() => {
+      return ''
+      // return store.state.idleVue.isIdle
+    })
+
+    const isSession = computed(() => {
+      return ''
+      // return store.getters['user/getIsSession']
+    })
+
+    function getWindowWidth() {
+      return ''
+      // store.dispatch('setWidth', document.documentElement.clientWidth)
+    }
+
+    function getWindowHeight() {
+      return ''
+      // store.dispatch('setWidth', document.documentElement.clientWidth)
+    }
+
+    onUnmounted(() => {
+      nextTick(() => {
+        window.addEventListener('resize', getWindowWidth)
+        window.addEventListener('resize', getWindowHeight)
+      })
+    })
+
+    return {
+      isIdle,
+      isSession,
+      // function
+      getWindowWidth,
+      getWindowHeight
+
+    }
+  }
+})
+</script>
+
+<!-- <script>
 // components and mixins
-import ModalIdle from './components/ADempiere/ModalIdle'
+// import ModalIdle from './components/ADempiere/ModalIdle'
 
 export default {
   name: 'App',
-  components: { ModalIdle },
+  // components: { ModalIdle },
   computed: {
     isIdle() {
       return this.$store.state.idleVue.isIdle
@@ -38,11 +82,22 @@ export default {
   },
   methods: {
     getWindowWidth(event) {
-      this.$store.dispatch('setWidth', document.documentElement.clientWidth)
+      console.log({ getWindowWidth: event }, document.documentElement.clientWidth)
+      // this.$store.dispatch('setWidth', document.documentElement.clientWidth)
     },
     getWindowHeight(event) {
-      this.$store.dispatch('setHeight', document.documentElement.clientHeight)
+      console.log({ getWindowHeight: event })
+      // this.$store.dispatch('setHeight', document.documentElement.clientHeight)
     }
   }
 }
-</script>
+</script> -->
+<style lang="scss">
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  color: #2c3e50;
+}
+</style>

@@ -1,5 +1,6 @@
 <template>
   <div class="login-container">
+    {{ epale }}
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
       <el-row>
         <el-col :span="3">
@@ -8,9 +9,9 @@
         <el-col :span="20">
           <div class="title-container">
             <h3 class="title">
-              {{ $t('login.title') }}
+              {{ 'login.title' }}
             </h3>
-            <lang-select class="set-language" />
+            <!-- <lang-select class="set-language" /> -->
           </div>
         </el-col>
       </el-row>
@@ -22,7 +23,7 @@
         <el-input
           ref="userName"
           v-model="loginForm.userName"
-          :placeholder="$t('login.userName')"
+          placeholder="login.userName"
           name="userName"
           type="text"
           tabindex="1"
@@ -30,7 +31,7 @@
         />
       </el-form-item>
 
-      <el-tooltip v-model="capsTooltip" :content="$t('login.capsLock')" placement="right" manual>
+      <el-tooltip v-model="capsTooltip" content="login.capsLock" placement="right" manual>
         <el-form-item prop="password">
           <span class="svg-container">
             <svg-icon icon-class="password" />
@@ -40,35 +41,39 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            :placeholder="$t('login.password')"
+            placeholder="login.password"
             name="password"
             tabindex="2"
             autocomplete="on"
-            @keyup.native="checkCapslock"
+            @keyup="checkCapslock"
             @blur="capsTooltip = false"
-            @keyup.enter.native="handleLogin"
+            @keyup.enter="handleLogin"
           />
           <span class="show-pwd" @click="showPwd">
             <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
           </span>
         </el-form-item>
       </el-tooltip>
-      <el-button :loading="loading" type="primary" style="width:100%" @click.native.prevent="handleLogin">
-        {{ $t('login.logIn') }}
+      <el-button
+        :loading="loading"
+        type="primary"
+        style="width:100%"
+        @click.prevent="handleLogin"
+      >
+        {{ 'login.logIn' }}
       </el-button>
       <el-button
         type="text"
         style="float: left"
-        @click.native.prevent="pathRedirect('forgotPassword')"
       >
-        {{ $t('route.forgotPassword') }}
+        {{ 'route.forgotPassword' }}
       </el-button>
       <el-button
         type="text"
         style="float: right"
-        @click.native.prevent="pathRedirect('userEnrollment')"
+        @click.prevent="pathRedirect('userEnrollment')"
       >
-        {{ $t('route.userEnrollment') }}
+        {{ 'route.userEnrollment' }}
       </el-button>
 
       <div>
@@ -82,36 +87,131 @@
         </div>
       </div>
     </el-form>
-
-    <el-dialog :title="$t('login.thirdparty')" :visible.sync="showDialog">
-      {{ $t('login.thirdpartyTips') }}
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog>
+    {{ store }}
   </div>
 </template>
 
 <script>
-import loginMixin from './loginMixin.js'
-import SocialSign from './components/SocialSignin'
+import {
+  defineComponent,
+  ref
+} from 'vue'
+import { request } from '@/utils/ADempiere/request'
+import { useStore } from 'vuex'
+export default defineComponent({
+  setup() {
+    const store = useStore()
+    console.log({ store })
+    const epale = ref('epale')
+    const loginForm = ref(
+      {
+        userName: '',
+        password: '',
+        roleUuid: '',
+        organizationUuid: ''
+      }
+    )
+    const passwordType = ref('password')
+    const capsTooltip = ref(false)
+    const loading = ref(false)
+    const showDialog = ref(false)
+    const redirect = ref(undefined)
+    const otherQuery = ref({})
+    function name(params) {
+      return request({
+        url: '/user/log/entity-logs',
+        method: 'get'
+      })
+        .then(entityLogsListResponse => {
+          // const { convertEntityLog } = require('@/utils/ADempiere/apiConverts/window.js')
+
+          // return {
+          //   nextPageToken: entityLogsListResponse.next_page_token,
+          //   recordCount: entityLogsListResponse.record_count,
+          //   entityLogsList: entityLogsListResponse.records.map(entityLog => {
+          //     return convertEntityLog(entityLog)
+          //   })
+          // }
+          console.log({ entityLogsListResponse })
+          return entityLogsListResponse
+        })
+    }
+    function handleLogin() {
+      const query = this.$route.query.redirect
+      const expr = '/'
+      if (!this.isEmptyValue(query)) {
+        this.loginForm = {
+          ...this.loginForm,
+          roleUuid: this.clientIdRedirect(query, expr),
+          organizationUuid: this.organizationIdRedirect(query, expr)
+        }
+      }
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          this.$store.dispatch('user/login', this.loginForm)
+            .then(() => {
+              this.$router.push({
+                path: this.redirect || '/',
+                query: this.otherQuery
+              }, () => {})
+            })
+            .catch(error => {
+              let message = 'login.unexpectedError'
+              if ([13, 500].includes(error.code)) {
+                message = 'login.invalidLogin'
+              }
+
+              this.$message.error(message)
+            })
+            .finally(() => {
+              this.loading = false
+            })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    }
+
+    name()
+
+    return {
+      epale,
+      passwordType,
+      capsTooltip,
+      loading,
+      showDialog,
+      redirect,
+      otherQuery,
+      store,
+      loginForm,
+      // function
+      name,
+      handleLogin
+    }
+  }
+})
+</script>
+<!-- <script>
+// import loginMixin from './loginMixin.js'
+// import SocialSign from './components/SocialSignin'
 
 export default {
   name: 'Login',
-  components: { SocialSign },
-  mixins: [loginMixin],
+  // components: { SocialSign },
+  // mixins: [loginMixin],
   data() {
     const validateUsername = (rule, value, callback) => {
       if ((value.trim()).length < 1) {
-        callback(new Error(this.$t('login.noValidUser')))
+        callback(new Error('login.noValidUser'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 1) {
-        callback(new Error(this.$t('login.noValidPassword')))
+        callback(new Error('login.noValidPassword'))
       } else {
         callback()
       }
@@ -187,9 +287,9 @@ export default {
               }, () => {})
             })
             .catch(error => {
-              let message = this.$t('login.unexpectedError')
+              let message = 'login.unexpectedError'
               if ([13, 500].includes(error.code)) {
-                message = this.$t('login.invalidLogin')
+                message = 'login.invalidLogin'
               }
 
               this.$message.error(message)
@@ -224,7 +324,7 @@ export default {
     }
   }
 }
-</script>
+</script> -->
 
 <style lang="scss">
 /* 修复input 背景不协调 和光标变色 */

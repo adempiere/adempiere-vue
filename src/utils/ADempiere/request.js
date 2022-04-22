@@ -18,7 +18,7 @@
 import requestAPI from '@/utils/request'
 import { config } from '@/utils/ADempiere/config'
 import { getToken } from '@/utils/auth'
-import { getLanguage } from '@/lang/index'
+// import { getLanguage } from '@/lang/index'
 
 // Request with default parameters
 export function request(requestValues) {
@@ -36,7 +36,7 @@ export function request(requestValues) {
     requestValues.timeout = config.adempiere.api.timeout
   }
   requestValues.params.token = getToken()
-  requestValues.params.language = getLanguage() || 'en_US'
+  requestValues.params.language = 'en_US'
   return new Promise((resolve, reject) => {
     requestAPI(requestValues)
       .then(response => {

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import language from '@/lang'
 import router from '@/router'
 
@@ -64,14 +64,14 @@ const windowManager = {
         isLoadedContext,
         pageNumber
       }
-      Vue.set(state.tabData, containerUuid, dataTab)
+      createApp.set(state.tabData, containerUuid, dataTab)
     },
 
     setTabSelectionsList(state, {
       containerUuid,
       selectionsList
     }) {
-      Vue.set(state.tabData[containerUuid], 'selectionsList', selectionsList)
+      createApp.set(state.tabData[containerUuid], 'selectionsList', selectionsList)
     },
 
     resetStateWindowManager(state) {

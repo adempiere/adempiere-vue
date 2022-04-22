@@ -38,8 +38,9 @@
             :body-style="{ padding: '10px' }"
           >
             <el-row>
-              <template v-for="(fieldAttributes, subKey) in fieldsList">
+              <template>
                 <field-definition
+                  v-for="(fieldAttributes, subKey) in fieldsList"
                   :key="subKey"
                   :parent-uuid="parentUuid"
                   :container-uuid="containerUuid"

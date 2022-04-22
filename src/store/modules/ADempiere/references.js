@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 import { requestReferencesList } from '@/api/ADempiere/window'
 
 const references = {
@@ -27,7 +27,7 @@ const references = {
       const { windowUuid, tableName, recordUuid } = payload
       const key = windowUuid + '_' + tableName + '_' + recordUuid
 
-      Vue.set(state.storedReferences, key, payload)
+      createApp.set(state.storedReferences, key, payload)
     }
   },
 

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 // api request methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -35,7 +35,7 @@ const modalDialogManager = {
       title,
       isShowed
     }) {
-      Vue.set(state.modalDialogManager, containerUuid, {
+      createApp.set(state.modalDialogManager, containerUuid, {
         containerUuid,
         componentPath,
         doneMethod,
@@ -49,7 +49,7 @@ const modalDialogManager = {
       containerUuid,
       isShowed = false
     }) {
-      Vue.set(state.modalDialogManager, containerUuid, {
+      createApp.set(state.modalDialogManager, containerUuid, {
         ...state.modalDialogManager[containerUuid] || {},
         isShowed
       })

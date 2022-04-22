@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 // utils and helper methods
 import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
@@ -31,7 +31,7 @@ const actionMenuManager = {
       containerUuid,
       actionsList
     }) {
-      Vue.set(state.actionMenuManager, containerUuid, {
+      createApp.set(state.actionMenuManager, containerUuid, {
         containerUuid,
         actionsList
       })

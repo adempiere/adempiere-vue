@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 // api request methods
 import { requestDefaultValue } from '@/api/ADempiere/user-interface/persistence.js'
@@ -34,7 +34,7 @@ const defaultValueManager = {
 
   mutations: {
     setDefaultValue(state, { key, clientId, contextAttributesList, uuid, displayedValue, value }) {
-      Vue.set(state.storedDefaultValue, key, {
+      createApp.set(state.storedDefaultValue, key, {
         clientId,
         contextAttributesList,
         uuid,
@@ -46,7 +46,7 @@ const defaultValueManager = {
     deleteDefaultValue(state, {
       key
     }) {
-      Vue.set(state.storedDefaultValue, key, undefined)
+      createApp.set(state.storedDefaultValue, key, undefined)
     },
 
     resetStateDefaultValue(state) {

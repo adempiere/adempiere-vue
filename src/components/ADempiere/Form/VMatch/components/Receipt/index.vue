@@ -29,10 +29,8 @@
       <el-tab-pane :label="$t('form.match.title.deliveryReceipt')">
         <br>
         <el-row>
-          <template
-            v-for="(option, index) in filtersSearch"
-          >
-            <el-col :key="index" :span="4">
+          <template>
+            <el-col v-for="(option, index) in filtersSearch" :key="index" :span="4">
               <el-checkbox v-model="option.value" :label="option.label" />
             </el-col>
           </template>
@@ -49,10 +47,8 @@
       </el-tab-pane>
     </el-tabs>
     <el-form :inline="true" label-position="top" class="demo-form-inline">
-      <template
-        v-for="(item, index) in field"
-      >
-        <el-form-item :key="index" :label="item.label" style="width: 30%;text-align: center;">
+      <template>
+        <el-form-item v-for="(item, index) in field" :key="index" :label="item.label" style="width: 30%;text-align: center;">
           <el-input-number v-model="item.value" :controls="false" disabled />
         </el-form-item>
       </template>
