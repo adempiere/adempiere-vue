@@ -38,7 +38,7 @@ import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import {
   buildLinkHref
 } from '@/utils/ADempiere/resource.js'
-import { showNotification } from '@/utils/ADempiere/notification.js'
+import { showMessage, showNotification } from '@/utils/ADempiere/notification.js'
 
 const initState = {
   printFormatList: {},
@@ -82,9 +82,23 @@ const reportManager = {
     }) {
       return new Promise(resolve => {
         const reportDefinition = rootGetters.getStoredReport(containerUuid)
+        const { fieldsList } = reportDefinition
+
+        const fieldsEmpty = rootGetters.getProcessParametersEmptyMandatory({
+          containerUuid,
+          fieldsList
+        })
+        if (!isEmptyValue(fieldsEmpty)) {
+          showMessage({
+            message: language.t('notifications.mandatoryFieldMissing') + fieldsEmpty,
+            type: 'info'
+          })
+          return
+        }
 
         const parametersList = rootGetters.getReportParameters({
-          containerUuid
+          containerUuid,
+          fieldsList
         })
 
         let reportingNotification = {

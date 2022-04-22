@@ -15,10 +15,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https:www.gnu.org/licenses/>.
 -->
+
 <template>
   <el-autocomplete
     v-model="displayedValue"
-    :placeholder="metadata.placeholder"
+    v-bind="commonsProperties"
     :fetch-suggestions="localSearch"
     :trigger-on-focus="true"
     clearable
@@ -69,8 +70,7 @@ export default {
     return {
       recordsBusinessPartners: [],
       controlDisplayed: this.displayedValue,
-      isFocus: false,
-      timeOut: null
+      isFocus: false
     }
   },
 

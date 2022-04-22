@@ -458,6 +458,7 @@ const actions = {
         dispatch('permission/sendRequestMenu', null, {
           root: true
         })
+        location.href = '/'
       })
   },
 
@@ -564,6 +565,7 @@ const actions = {
         dispatch('permission/sendRequestMenu', null, {
           root: true
         })
+        location.href = '/'
       })
   }
 }

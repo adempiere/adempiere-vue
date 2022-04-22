@@ -375,6 +375,7 @@ export function parsedValueComponent({
 
     // data type String
     case 'FieldText':
+    case 'FieldUrl':
     case 'FieldTextArea':
       if (typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, 'query')) {
         returnValue = value

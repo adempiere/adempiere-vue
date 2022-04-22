@@ -50,6 +50,7 @@ export const runReport = {
   name: language.t('actionMenu.generateReport'),
   description: language.t('actionMenu.generateDefaultReport'),
   enabled: () => {
+    // TODO: Verify mandatory with report view
     // always active
     return true
   },
