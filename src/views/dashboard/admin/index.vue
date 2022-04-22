@@ -1,6 +1,7 @@
 <template>
   <div class="dashboard-editor-container">
-    <el-row v-if="!isEmptyValue(listDashboard)" :gutter="8">
+    {{ maindashboard.name }}
+    <!-- <el-row v-if="!isEmptyValue(listDashboard)" :gutter="8">
       <el-col v-if="!isEmptyValue(maindashboard)" :span="24" style="padding-right:8px;margin-bottom:2px;">
         <dashboard
           :metadata="maindashboard"
@@ -16,18 +17,18 @@
           />
         </el-col>
       </template>
-    </el-row>
+    </el-row> -->
   </div>
 </template>
 
 <script>
-import Dashboard from '@/components/ADempiere/Dashboard'
+// import Dashboard from '@/components/ADempiere/Dashboard'
 
 export default {
   name: 'DashboardAdmin',
-  components: {
-    Dashboard
-  },
+  // components: {
+  //   Dashboard
+  // },
   data() {
     return {
       roleUuid: this.$store.getters.getRoleUuid,

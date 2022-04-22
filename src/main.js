@@ -6,9 +6,9 @@
 // import 'normalize.css/normalize.css' // a modern alternative to CSS resets
 // // import ElementPlus from 'element-plus'
 // // import 'element-plus/lib/theme-chalk/index.css'
-// // import Element from 'element-ui'
-// // import './styles/element-variables.scss'
-// // import enLang from 'element-ui/lib/locale/lang/en'// 如果使用中文语言包请默认支持，无需额外引入，请删除该依赖
+// import Element from 'element-ui'
+// import './styles/element-variables.scss'
+// import enLang from 'element-ui/lib/locale/lang/en'// 如果使用中文语言包请默认支持，无需额外引入，请删除该依赖
 
 // import VueSplit from 'vue-split-panel'
 // import 'vue-resize/dist/vue-resize.css'
@@ -32,7 +32,7 @@
 // import store from './store'
 // import router from './router'
 
-// import i18n from './lang' // internationalization
+import i18n from './lang' // internationalization
 // import './icons' // icon
 // import './permission' // permission control
 // import './utils/error-log' // error log
@@ -67,9 +67,6 @@
 // })
 
 // // register global utility methods
-// Object.keys(globalMethods).forEach(key => {
-//   createApp.prototype[key] = globalMethods[key]
-// })
 
 // createApp.config.productionTip = false
 // createApp(App).use(Element, {
@@ -91,7 +88,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 // import './registerServiceWorker'
 import router from './router'
-// import store from './store'
+import store from './store'
 // import '@/assets/sass/index.scss'
 // import * as ElIconModules from '@element-plus/icons'
 // import Components from '@/components/global/index'
@@ -100,10 +97,16 @@ import router from './router'
 const app = createApp(App)
 
 // element 全局配置
-app.config.globalProperties.$ELEMENT = { size: 'small', zIndex: 3000 }
+// app.config.globalProperties.$ELEMENT = { size: 'small', zIndex: 3000 }
+app.config.globalProperties.$http = () => {}
 // 全局注册 element icon
 // for (const iconName in ElIconModules) {
 //   app.component(`${ iconName }`, ElIconModules[iconName])
 // }
-
-app.use(router).mount('#app')
+// Object.keys(globalMethods).forEach(key => {
+//   app.config.globalProperties[key] = globalMethods[key]
+// })
+app.use(router)
+app.use(store)
+app.use(i18n)
+app.mount('#app')

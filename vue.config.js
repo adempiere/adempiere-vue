@@ -61,7 +61,8 @@ module.exports = {
     resolve: {
       alias: {
         '@': resolve('src')
-      }
+      },
+      extensions: ['*', '.mjs', '.js', '.vue', '.json']
     },
     plugins: [
       // 按需引入Element-plus
@@ -90,6 +91,13 @@ module.exports = {
     ])
 
     // when there are many pages, it will cause too many meaningless requests
+    config.module // fixes https://github.com/graphql/graphql-js/issues/1272
+      .rule('mjs$')
+      .test(/\.mjs$/)
+      .include
+          .add(/node_modules/)
+          .end()
+      .type('javascript/auto')
     config.plugins.delete('prefetch')
 
     // set svg-sprite-loader
