@@ -495,7 +495,7 @@ export const URL = {
   id: 40,
   isSupported: true,
   valueType: 'STRING',
-  componentPath: 'FieldText',
+  componentPath: 'FieldUrl',
   size: {
     xs: 24,
     sm: 12,

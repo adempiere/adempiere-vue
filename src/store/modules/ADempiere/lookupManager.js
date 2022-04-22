@@ -33,29 +33,17 @@ const lookupManager = {
   state: initStateLookup,
 
   mutations: {
-    setLookupItem(state, {
-      clientId,
-      key,
-      option,
-      value
-    }) {
-      Vue.set(state.lookupItem, key, {
-        clientId,
-        key,
-        option,
-        value
-      })
-    },
-
     setLookupList(state, {
       clientId,
       key,
+      searchValue,
       contextAttributesList,
       optionsList
     }) {
       Vue.set(state.lookupList, key, {
         clientId,
         key,
+        searchValue,
         contextAttributesList,
         optionsList
       })
@@ -172,6 +160,7 @@ const lookupManager = {
               containerUuid, // used by suscription filter
               contextAttributesList,
               optionsList,
+              searchValue,
               key
             })
 
@@ -227,7 +216,7 @@ const lookupManager = {
   },
 
   getters: {
-    getStoredLookupList: (state, getters, rootState, rootGetters) => ({
+    getStoredLookup: (state, getters, rootState, rootGetters) => ({
       parentUuid,
       containerUuid,
       contextColumnNames = [],
@@ -252,6 +241,47 @@ const lookupManager = {
 
       const lookupList = state.lookupList[key]
       if (lookupList) {
+        return lookupList
+      }
+      return {}
+    },
+
+    getStoredSearchValueLookup: (state, getters) => ({
+      parentUuid,
+      containerUuid,
+      contextColumnNames = [],
+      contextAttributesList = [],
+      uuid
+    }) => {
+      const lookup = getters.getStoredLookup({
+        parentUuid,
+        containerUuid,
+        contextColumnNames,
+        contextAttributesList,
+        uuid
+      })
+
+      if (lookup) {
+        return lookup.searchValue
+      }
+      return ''
+    },
+
+    getStoredLookupList: (state, getters, rootState, rootGetters) => ({
+      parentUuid,
+      containerUuid,
+      contextColumnNames = [],
+      contextAttributesList = [],
+      uuid
+    }) => {
+      const lookupList = getters.getStoredLookup({
+        parentUuid,
+        containerUuid,
+        contextColumnNames,
+        contextAttributesList,
+        uuid
+      })
+      if (!isEmptyValue(lookupList)) {
         return lookupList.optionsList
       }
       return []

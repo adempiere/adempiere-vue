@@ -14,9 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import lang from '@/lang'
+import language from '@/lang'
 import store from '@/store'
 
+// utils and helpers methods
+import { isEmptyValue } from '@/utils/ADempiere/valueUtils.js'
 import { generateField } from '@/utils/ADempiere/dictionaryUtils'
 import { sortFields } from '@/utils/ADempiere/dictionary/panel'
 import { isHiddenField } from '@/utils/ADempiere/references'
@@ -125,9 +127,13 @@ export function generateProcess({
 }
 
 export const runProcess = {
-  name: lang.t('actionMenu.runProcess'),
-  enabled: () => {
-    return true
+  name: language.t('actionMenu.runProcess'),
+  enabled: ({ containerUuid }) => {
+    const fieldsEmpty = store.getters.getProcessParametersEmptyMandatory({
+      containerUuid
+    })
+
+    return isEmptyValue(fieldsEmpty)
   },
   svg: false,
   icon: 'el-icon-setting',

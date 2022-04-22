@@ -128,6 +128,11 @@ export default {
         })
     },
     changeOrganization(organizationUuid) {
+      this.$message({
+        message: this.$t('notifications.loading'),
+        showClose: true,
+        iconClass: 'el-icon-loading'
+      })
       const currentOrganization = this.organizationsList.find(element => element.uuid === organizationUuid)
       this.$router.push({
         path: '/'

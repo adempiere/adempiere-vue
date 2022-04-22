@@ -56,7 +56,7 @@ export default defineComponent({
     },
     pageSize: {
       type: Number,
-      default: 50
+      default: 15
     },
     total: {
       type: Number,

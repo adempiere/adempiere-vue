@@ -79,12 +79,13 @@ export default (reportUuid) => {
         columnName
       })
     },
-    getLookupList({ parentUuid, containerUuid, contextColumnNames, uuid }) {
+    getLookupList({ parentUuid, containerUuid, contextColumnNames, uuid, searchValue }) {
       return store.dispatch('getLookupListFromServer', {
         parentUuid,
         containerUuid,
         contextColumnNames,
-        processParameterUuid: uuid
+        processParameterUuid: uuid,
+        searchValue
       })
     }
   }

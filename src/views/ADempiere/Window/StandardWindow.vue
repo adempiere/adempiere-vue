@@ -37,6 +37,7 @@
 <script>
 import { defineComponent, computed } from '@vue/composition-api'
 
+// components and mixins
 import TabManager from '@theme/components/ADempiere/TabManager'
 
 export default defineComponent({
