@@ -903,6 +903,9 @@ export default {
         .then(response => {
           this.clearOrder()
           this.$message.success(this.$t('form.pos.generalNotifications.orderReleased') + response.documentNo)
+          this.$store.commit('setCurrentWarehousePos', this.currentPointOfSales.warehouse)
+          this.$store.commit('setCurrentPriceList', this.currentPointOfSales.priceList)
+          this.$store.commit('setCurrentDocumentTypePos', this.currentPointOfSales.documentType)
         })
         .catch(error => {
           this.$message({
@@ -1056,6 +1059,13 @@ export default {
           this.visible = visible
           this.$store.dispatch('changePopoverOverdrawnInvoice', { attributePin, visible: true })
         } else {
+          this.$store.dispatch('updateOrder', {
+            orderUuid: this.currentOrder.uuid,
+            posUuid: this.currentPointOfSales.uuid,
+            documentTypeUuid: this.currentOrder.documentStatus.uuid,
+            priceListUuid: this.currentPointOfSales.priceList.uuid,
+            warehouseUuid: warehouse.uuid
+          })
           this.$store.commit('setCurrentWarehousePos', warehouse)
         }
       }
