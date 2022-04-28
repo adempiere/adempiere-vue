@@ -40,13 +40,13 @@ jobs:
         run: yarn global add @vue/cli
 
       - name: Install Theme
-        run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/advDefaultTheme
+        run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
 
       - name: isntall package the theme 
-        run: cd src/themes/advDefaultTheme && rm -r yarn.lock && yarn install
+        run: cd src/themes/default && rm -r yarn.lock && yarn install
         
       - name: install lerna
-        run: cd src/themes/advDefaultTheme && yarn global add lerna && yarn
+        run: cd src/themes/default && yarn global add lerna && yarn
 
       - name: Fetch all the data
         run: git submodule update --init --remote
