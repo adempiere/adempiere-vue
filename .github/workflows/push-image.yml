@@ -52,7 +52,7 @@ jobs:
         run: git submodule update --init --remote
 
       - name: Compile dist
-        run: yarn && yarn dev
+        run: yarn && yarn build:prod
 
       - name: Upload dist app
         uses: actions/upload-artifact@v2
