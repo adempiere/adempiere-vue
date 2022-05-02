@@ -74,7 +74,7 @@ Understanding and learning this knowledge in advance will greatly help the use o
 ### For all enviroment you should run the follow images:
 - ADempiere gRPC: https://hub.docker.com/r/erpya/adempiere-grpc-all-in-one
 ```shell
-docker pull erpya/adempiere-grpc-all-in-one
+docker pull erpya/adempiere-grpc-all-in-one-
 ```
 - Proxy ADempiere API: https://hub.docker.com/r/erpya/proxy-adempiere-api
 ```shell
