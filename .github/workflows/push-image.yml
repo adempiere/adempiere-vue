@@ -56,55 +56,6 @@ jobs:
           name: adempiere-vue
           path: dist
 
-  # Publish docker image in Github Container Registry to application
-  push-imame-ghcr:
-    name: Push Docker image to GitHub Container
-    needs:
-      - build-app
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-
-      - name: Download build dist app
-        uses: actions/download-artifact@v2
-        with:
-          name: adempiere-vue
-          path: dist
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set Lower Case to owner and repository
-        run: |
-          echo "OWNER_LC=${OWNER,,}" >> ${GITHUB_ENV}
-          echo "REPO_LC=${NAME,,}" >> ${GITHUB_ENV}
-        env:
-          OWNER: '${{ github.repository_owner }}'
-          NAME: '${{ github.event.repository.name }}'
-
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v4.8
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./build/Dockerfile.prod
-          push: true
-          tags: |
-            ghcr.io/${{ env.OWNER_LC }}/${{ env.REPO_LC }}:${{ steps.branch-name.outputs.current_branch }}
-            ghcr.io/${{ env.OWNER_LC }}/${{ env.REPO_LC }}:${{ github.sha }}
-
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
-
-
   # Publish docker image in Docker Hub registry to application
   push-imame-dhr:
     name: Push Docker image to Docker Hub
