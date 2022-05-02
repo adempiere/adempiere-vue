@@ -1,3 +1,6 @@
+# This workflow will run tests using node and then publish a package to GitHub Container Registry and Docker Hub Regitry when a pushed into main branches
+# This file was contributed by EdwinBetanc0urt@outlook.com from ERP Consultores y Asociados, C.A
+
 name: Push Main Branches
 
 on:
@@ -5,6 +8,8 @@ on:
   push:
     branches:
       - develop
+      - master
+      - main
       - test**
     paths-ignore:
       - 'docs/**'
@@ -28,29 +33,20 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 
-      - name: change repository git to https
-        run: git config --global url."https://github.com/".insteadOf git://github.com/
+      - name: Set tag version into config file
+        run: sed -i "s|releaseNoForDocumentation|${{ github.event.release.tag_name }}|g" config/default.json
 
-      - name: isntall package the ADempiere Vue
-        run: rm -r yarn.lock && yarn install
-        
-      - name: install vue/cli
-        run: yarn global add @vue/cli
+      - name: Install packages
+        run: yarn ci
 
-      - name: Install Theme
+      - name: Add sub module
         run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
 
-      - name: isntall package the theme 
-        run: cd src/themes/default && rm -r yarn.lock && yarn install
-        
-      - name: install lerna
-        run: cd src/themes/default && yarn global add lerna && yarn
-
-      - name: Fetch all the data
+      - name: Update sub module
         run: git submodule update --init --remote
 
       - name: Compile dist
-        run: yarn && yarn build:prod
+        run: yarn build:prod
 
       - name: Upload dist app
         uses: actions/upload-artifact@v2
@@ -102,6 +98,7 @@ jobs:
           tags: |
             ghcr.io/${{ env.OWNER_LC }}/${{ env.REPO_LC }}:${{ steps.branch-name.outputs.current_branch }}
             ghcr.io/${{ env.OWNER_LC }}/${{ env.REPO_LC }}:${{ github.sha }}
+
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
@@ -159,5 +156,6 @@ jobs:
           tags: |
             ${{ env.ORG_LC }}/${{ env.REPO_LC }}:${{ steps.branch-name.outputs.current_branch }}
             ${{ env.ORG_LC }}/${{ env.REPO_LC }}:${{ github.sha }}
+
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
