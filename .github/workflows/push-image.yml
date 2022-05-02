@@ -38,6 +38,15 @@ jobs:
       - name: Install packages
         run: yarn ci
 
+      - name: Install packages
+        run: yarn global add lerna
+
+      - name: Add sub module
+        run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
+
+      - name: Update sub module
+        run: git submodule update --init --remote
+
       - name: Compile dist
         run: yarn build:prod
 
