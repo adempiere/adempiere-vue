@@ -8,27 +8,6 @@ LABEL maintainer="EdwinBetanc0urt@outlook.com" \
 ENV API_URL="https://api.erpya.com"
 
 
-RUN rm -rf /var/cache/apk/* && \
-  apk add --no-cache --virtual .build-deps ca-certificates wget python3 make g++ \
-  && apk add --no-cache git \
-  && yarn install --no-cache \
-  && apk del .build-deps && \
-  apk --no-cache --update upgrade musl && \
-  apk add --no-cache \
-      --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-      --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-      --virtual .build-deps \
-    unzip \
-    curl && \
-    echo "Downloading ... $URL_BASE_REPOSITORY to $REPOSITORY_PATH" && \
-    git clone $URL_BASE_REPOSITORY $REPOSITORY_PATH && \
-    cd $REPOSITORY_PATH && \
-    git submodule add /var/www/adv-default-theme ./src/themes/default && \
-    git submodule update --init ./src/themes/default && \
-    yarn && \
-    yarn build:prod && \
-    chmod -R 777 $REPOSITORY_PATH
-
 COPY build/start.sh .
 COPY dist/ /usr/share/nginx/html/
 
