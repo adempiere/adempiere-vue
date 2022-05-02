@@ -82,7 +82,7 @@ docker pull erpya/proxy-adempiere-api
 ```
 - ADempiere Vue: https://hub.docker.com/r/erpya/adempiere-vue
 ```shell
-docker pull erpya/adempiere-vue
+docker pull erpya/adempiere-vue 
 ```
 
 ## Run docker container:
