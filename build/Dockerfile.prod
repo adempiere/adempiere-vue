@@ -31,7 +31,6 @@ RUN rm -rf /var/cache/apk/* && \
     yarn build:prod && \
     chmod -R 777 $REPOSITORY_PATH
 
-COPY build/default.json $REPOSITORY_PATH/config/
 COPY build/start.sh $REPOSITORY_PATH
 
 WORKDIR $REPOSITORY_PATH
