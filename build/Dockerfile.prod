@@ -19,7 +19,7 @@ ENV VS_ENV=prod \
     MEMORY_RESTART="1G" \
     EXEC_INSTANCES="1"
 
-COPY dist-app/ /var/www/adv-default-theme/
+COPY dist-app/ /var/www/adempiere-vue/
 
 RUN rm -rf /var/cache/apk/* && \
   apk add --no-cache --virtual .build-deps ca-certificates wget python3 make g++ \
@@ -43,7 +43,7 @@ RUN rm -rf /var/cache/apk/* && \
      chmod -R 777 $REPOSITORY_PATH
 
 # Copy Default files
-COPY build/default.json $REPOSITORY_PATH/config/
+# COPY build/default.json $REPOSITORY_PATH/config/
 COPY build/start.sh $REPOSITORY_PATH
 
 WORKDIR $REPOSITORY_PATH
