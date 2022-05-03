@@ -119,7 +119,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./build/Dockerfile
+          file: ./build/Dockerfile.prod
           push: true
           tags: |
             ${{ env.ORG_LC }}/${{ env.REPO_LC }}:${{ steps.branch-name.outputs.current_branch }}
