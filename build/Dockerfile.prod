@@ -7,9 +7,9 @@ LABEL maintainer="EdwinBetanc0urt@outlook.com" \
 
 ENV API_URL="https://api.erpya.com"
 
-
+COPY dist-app/ /var/www/adempiere-vue
 COPY build/start.sh .
-COPY dist/ /usr/share/nginx/html/
+COPY dist-app/ /usr/share/nginx/html/
 
 
 CMD 'sh' 'start.sh'
