@@ -30,31 +30,44 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
 
-      - name: Set tag version into config file
-        run: sed -i "s|releaseNoForDocumentation|${{ github.event.release.tag_name }}|g" config/default.json
+      - name: Compress files for application dist
+        uses: TheDoctor0/zip-release@0.6.0
+        with:
+          type: 'zip'
+          filename: 'adempiere-vue.zip'
+          path: './'
+          exclusions: './dist ./docker ./docs'
 
-      - name: Install packages
-        run: yarn ci
-
-      - name: Install packages
-        run: yarn global add lerna
-
-      - name: Add sub module
-        run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
-
-      - name: Update sub module
-        run: git submodule update --init --remote
-
-      - name: Compile dist
-        run: yarn build:prod
-
-      - name: Upload dist app
+      - name: Upload app as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: adempiere-vue
-          path: dist
+          name: adempiere-vue        
+          path: ./adempiere-vue.zip
+
+      # - name: Set tag version into config file
+      #   run: sed -i "s|releaseNoForDocumentation|${{ github.event.release.tag_name }}|g" config/default.json
+
+      # - name: Install packages
+      #   run: yarn ci
+
+      # - name: Install packages
+      #   run: yarn global add lerna
+
+      # - name: Add sub module
+      #   run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
+
+      # - name: Update sub module
+      #   run: git submodule update --init --remote
+
+      # - name: Compile dist
+      #   run: yarn build:prod
+
+      # - name: Upload dist app
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: adempiere-vue
+      #     path: dist
 
   # Publish docker image in Docker Hub registry to application
   push-imame-dhr:
