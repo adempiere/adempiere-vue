@@ -6,7 +6,7 @@ LABEL maintainer="Elsiosanches@gmail.com" \
 
 
 ENV VS_ENV=prod \
-	REPOSITORY_PATH="/var/www/adempiere-vue" \
+	# REPOSITORY_PATH="/var/www/adempiere-vue" \
     REPOSITORY_NAME="adv-default-theme" \
 	API_URL="https://api.erpya.com"
 
@@ -32,12 +32,13 @@ RUN rm -rf /var/cache/apk/* && \
     # git submodule add /var/www/adv-default-theme ./src/themes/default && \
     # git submodule update --init ./src/themes/default && \
     yarn && \
-    yarn build:prod && \
-    chmod -R 777 $REPOSITORY_PATH
+    yarn build:prod
+    # chmod -R 777 $REPOSITORY_PATH
 
-COPY build/start.sh $REPOSITORY_PATH
+COPY build/start.sh .
+# COPY build/start.sh $REPOSITORY_PATH
 
-WORKDIR $REPOSITORY_PATH
+# WORKDIR $REPOSITORY_PATH
 
 
 CMD 'sh' 'start.sh'

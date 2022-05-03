@@ -6,5 +6,5 @@ cd /var/www/adempiere-vue/dist/static/js
 # Set API Proxy connection
 find -name 'app.*.js' -exec sed -i "s|https://api.erpya.com|$API_URL|g" {} \;
 
-# Start nginx web server
-yarn start && tail -f /dev/null
+# Run app
+yarn start && tail -f /dev/nul
