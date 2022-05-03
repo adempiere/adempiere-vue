@@ -17,7 +17,7 @@ jobs:
 
   # Build dist application ADempiere-Vue
   build-app:
-    name: Build dist ADempiere-Vue
+    name: Build dist adempiere-vue
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -45,29 +45,29 @@ jobs:
           name: adempiere-vue        
           path: ./adempiere-vue.zip
 
-      - name: Set tag version into config file
-        run: sed -i "s|releaseNoForDocumentation|${{ github.event.release.tag_name }}|g" config/default.json
+      # - name: Set tag version into config file
+      #   run: sed -i "s|releaseNoForDocumentation|${{ github.event.release.tag_name }}|g" config/default.json
 
-      - name: Install packages
-        run: yarn ci
+      # - name: Install packages
+      #   run: yarn ci
 
-      - name: Install packages
-        run: yarn global add lerna
+      # - name: Install packages
+      #   run: yarn global add lerna
 
-      - name: Add sub module
-        run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
+      # - name: Add sub module
+      #   run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
 
-      - name: Update sub module
-        run: git submodule update --init --remote
+      # - name: Update sub module
+      #   run: git submodule update --init --remote
 
-      - name: Compile dist
-        run: yarn build:prod
+      # - name: Compile dist
+      #   run: yarn build:prod
 
-      - name: Upload dist app
-        uses: actions/upload-artifact@v2
-        with:
-          name: adempiere-vue
-          path: dist
+      # - name: Upload dist app
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: adempiere-vue
+      #     path: dist
 
   # Publish docker image in Docker Hub registry to application
   push-imame-dhr:
@@ -82,10 +82,10 @@ jobs:
       - name: Download build dist app
         uses: actions/download-artifact@v2
         with:
-          name: adv-default-theme
+          name: adempiere-vue
 
       - name: Uncompress dist files
-        run: unzip adv-default-theme.zip -d dist-app
+        run: unzip adempiere-vue.zip -d dist-app
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
