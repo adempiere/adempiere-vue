@@ -16,33 +16,33 @@ ENV VS_ENV=prod \
 
 # COPY dist-app/ $REPOSITORY_PATH
 
-RUN rm -rf /var/cache/apk/* && \
-  apk add --no-cache --virtual .build-deps ca-certificates wget python3 make g++ \
-  && apk add --no-cache git \
-  && yarn install --no-cache \
-  && apk del .build-deps && \
-  apk --no-cache --update upgrade musl && \
-  apk add --no-cache \
-      --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-      --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-      --virtual .build-deps \
-    unzip \
-    curl && \
-    # echo "Downloading ... $URL_BASE_REPOSITORY to $REPOSITORY_PATH" && \
-    # git clone $URL_BASE_REPOSITORY $REPOSITORY_PATH && \
-	ls &&\
-    cd $REPOSITORY_PATH && \
-    git submodule add -b develop https://github.com/adempiere/adv-default-theme.git ./src/themes/default && \
-    git submodule update --init ./src/themes/default && \
-    yarn && \
-    yarn build:prod && \
-    chmod -R 777 $REPOSITORY_PATH
+# RUN rm -rf /var/cache/apk/* && \
+#   apk add --no-cache --virtual .build-deps ca-certificates wget python3 make g++ \
+#   && apk add --no-cache git \
+#   && yarn install --no-cache \
+#   && apk del .build-deps && \
+#   apk --no-cache --update upgrade musl && \
+#   apk add --no-cache \
+#       --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
+#       --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+#       --virtual .build-deps \
+#     unzip \
+#     curl && \
+#     # echo "Downloading ... $URL_BASE_REPOSITORY to $REPOSITORY_PATH" && \
+#     # git clone $URL_BASE_REPOSITORY $REPOSITORY_PATH && \
+# 	ls &&\
+#     cd $REPOSITORY_PATH && \
+#     git submodule add -b develop https://github.com/adempiere/adv-default-theme.git ./src/themes/default && \
+#     git submodule update --init ./src/themes/default && \
+#     yarn && \
+#     yarn build:prod && \
+#     chmod -R 777 $REPOSITORY_PATH
 
 # Copy Default files
 # COPY build/default.json $REPOSITORY_PATH/config/
-COPY build/start.sh $REPOSITORY_PATH
+COPY build/start.sh .
 
-WORKDIR $REPOSITORY_PATH
+# WORKDIR $REPOSITORY_PATH
 
 # Start app
 CMD	'sh' 'start.sh'
