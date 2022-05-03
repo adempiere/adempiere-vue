@@ -7,4 +7,4 @@ cd /var/www/adempiere-vue/dist/static/js
 find -name 'app.*.js' -exec sed -i "s|https://api.erpya.com|$API_URL|g" {} \;
 
 # Run app
-yarn start && tail -f /dev/null
+tail -f /dev/null
