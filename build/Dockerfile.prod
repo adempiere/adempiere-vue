@@ -43,10 +43,10 @@ COPY dist-app/ /var/www/adempiere-vue
 
 
 # Copy Default files
-COPY build/default.json $REPOSITORY_PATH/config/
-COPY build/start.sh $REPOSITORY_PATH
+# COPY build/default.json $REPOSITORY_PATH/config/
+COPY build/start.sh .
 
-WORKDIR $REPOSITORY_PATH
+# WORKDIR $REPOSITORY_PATH
 
 # Start app
 CMD	'sh' 'start.sh
