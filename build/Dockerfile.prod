@@ -1,7 +1,7 @@
 FROM nginx:1.21.6-alpine
 
 
-LABEL maintainer="EdwinBetanc0urt@outlook.com" \
+LABEL maintainer="Elsiosanches@gmail.com" \
 	description="ADempiere-Vue"
 
 
@@ -22,11 +22,15 @@ RUN rm -rf /var/cache/apk/* && \
       --virtual .build-deps \
     unzip \
     curl && \
-    echo "Downloading ... $URL_BASE_REPOSITORY to $REPOSITORY_PATH" && \
-    git clone $URL_BASE_REPOSITORY $REPOSITORY_PATH && \
-    cd $REPOSITORY_PATH && \
-    git submodule add /var/www/adv-default-theme ./src/themes/default && \
-    git submodule update --init ./src/themes/default && \
+	yarn global add lerna && \
+	cd /src/ && \
+	git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default && \
+	git submodule update --init --remote && \
+    # echo "Downloading ... $URL_BASE_REPOSITORY to $REPOSITORY_PATH" && \
+    # git clone $URL_BASE_REPOSITORY $REPOSITORY_PATH && \
+    # cd $REPOSITORY_PATH && \
+    # git submodule add /var/www/adv-default-theme ./src/themes/default && \
+    # git submodule update --init ./src/themes/default && \
     yarn && \
     yarn build:prod && \
     chmod -R 777 $REPOSITORY_PATH
