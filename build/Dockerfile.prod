@@ -35,7 +35,7 @@ RUN rm -rf /var/cache/apk/* && \
      curl && \
     #  echo "Downloading ... $URL_BASE_REPOSITORY to $REPOSITORY_PATH" && \
     #  git clone $URL_BASE_REPOSITORY $REPOSITORY_PATH && \
-     cd $REPOSITORY_PATH && \
+    #  cd $REPOSITORY_PATH && \
      git submodule add -b develop https://github.com/adempiere/adv-default-theme.git ./src/themes/default && \
      git submodule update --init ./src/themes/default && \
      yarn && \
