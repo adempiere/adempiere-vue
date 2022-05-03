@@ -14,7 +14,7 @@ ENV VS_ENV=prod \
     MEMORY_RESTART="1G" \
     EXEC_INSTANCES="1"
 
-COPY dist-app/ $REPOSITORY_PATH
+# COPY dist-app/ $REPOSITORY_PATH
 
 RUN rm -rf /var/cache/apk/* && \
   apk add --no-cache --virtual .build-deps ca-certificates wget python3 make g++ \
