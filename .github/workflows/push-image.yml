@@ -51,11 +51,17 @@ jobs:
       - name: Install packages
         run: yarn ci
 
-      - name: Install packages
+      - name: Install packages lerna
         run: yarn global add lerna
 
       - name: Add sub module
         run: git submodule add -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
+
+      - name: Add sub module
+        run: git clone -b develop https://github.com/adempiere/adv-default-theme.git src/themes/default
+
+      - name: Install packages
+        run: yarn
 
       - name: Update sub module
         run: git submodule update --init --remote
@@ -85,7 +91,7 @@ jobs:
           name: adempiere-vue
 
       - name: Uncompress dist files
-        run: unzip adempiere-vue.zip -d dist-app
+        run: unzip adempiere-vue.zip -d dist
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
