@@ -31,20 +31,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Compress files for application dist
-        uses: TheDoctor0/zip-release@0.6.0
-        with:
-          type: 'zip'
-          filename: 'adempiere-vue.zip'
-          path: './'
-          exclusions: './dist ./docker ./docs'
-
-      - name: Upload app as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: adempiere-vue        
-          path: ./adempiere-vue.zip
-
       # - name: Set tag version into config file
       #   run: sed -i "s|releaseNoForDocumentation|${{ github.event.release.tag_name }}|g" config/default.json
 
