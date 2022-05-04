@@ -1,7 +1,7 @@
 FROM nginx:1.21.6-alpine
 
 
-LABEL maintainer="EdwinBetanc0urt@outlook.com" \
+LABEL maintainer="Elsiosanches@gmail.com" \
 	description="ADempiere-Vue"
 
 
