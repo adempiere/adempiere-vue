@@ -29,7 +29,7 @@
 
 English | [Spanish](./README.es.md)
 
-## Introduction
+## Introduction.
 
 [adempiere-vue](https://github.com/adempiere/adempiere-vue) is a new UI for [ADempiere ERP, CRM & SCM](https://github.com/adempiere/adempiere)]. It based on [vue](https://github.com/vuejs/vue) and use the UI Toolkit [element-ui](https://github.com/ElemeFE/element).
 
