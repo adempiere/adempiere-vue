@@ -49,7 +49,7 @@
   "dependencies": {
     "axios": "0.26.1",
     "blockadblock": "3.2.1",
-    "sweetalert2": "9.17.2",
+    "sweetalert2": "9.17.4",
     "webpack-dev-middleware": "3.6.0"
   }
 }
