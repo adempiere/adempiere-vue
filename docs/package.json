@@ -47,7 +47,7 @@
     "vuepress": "0.14.9"
   },
   "dependencies": {
-    "axios": "0.26.1",
+    "axios": "1.13.5",
     "blockadblock": "3.2.1",
     "sweetalert2": "9.17.2",
     "webpack-dev-middleware": "3.6.0"
