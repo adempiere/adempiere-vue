@@ -16,13 +16,16 @@ jobs:
   build-app:
     name: Build dist ADempiere-Vue
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Node configuration
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 14.x
           cache: 'yarn'
@@ -39,12 +42,6 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn@1.22.22
 
-      # - name: Install packages lerna
-      #   run: yarn global add lerna
-
-      # - name: Update sub module
-      #   run: git submodule update --init --remote
-
       - name: Install packages
         run: yarn ci
 
@@ -52,7 +49,7 @@ jobs:
         run: yarn build:prod
 
       - name: Upload dist app
-        uses: actions/upload-artifact@v4  # Switch to Versión 4
+        uses: actions/upload-artifact@v4
         with:
           name: adempiere-vue
           path: dist
@@ -61,11 +58,12 @@ jobs:
   # Publish dist binaries to application
   publish-app-dist:
     name: Upload ADempiere-Vue binaries
-    # TODO: Does not support edit release: {"resource":"Release","code":"already_exists","field":"tag_name"}
     if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
     needs:
       - build-app
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download build dist app
         uses: actions/download-artifact@v4
@@ -85,39 +83,20 @@ jobs:
         with:
           args: 'Adempiere-Vue.zip'
 
-  # Check secrets to push image in docker hub registry
-  check-docker-secrets:
-    name: Check if docker hub registry information was set on secrets
+
+  # Publish docker alpine image to GitHub Container Registry
+  push-alpine-image-ghcr:
+    name: Push docker alpine image to GHCR
     needs:
       - build-app
+    if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
     runs-on: ubuntu-latest
-    outputs:
-      is_have_secrets: ${{ steps.check_secret_job.outputs.is_have_secrets }}
-    steps:
-      - id: check_secret_job
-        run: |
-          if [[ "${{ secrets.DOCKER_REPO_FRONTEND }}" != "" && \
-                "${{ secrets.DOCKER_USERNAME }}" != "" && \
-                "${{ secrets.DOCKER_TOKEN }}" != "" ]]; \
-          then
-            echo "Secrets to use a container registry are configured in the repo"
-            echo "is_have_secrets=true" >> $GITHUB_OUTPUT
-          else
-            echo "Secrets to use a container registry were not configured in the repo"
-            echo "is_have_secrets=false" >> $GITHUB_OUTPUT
-          fi
-
-  # Publish docker alpine image in Docker Hub registry to application
-  push-alpine-imame-dhr:
-    name: Push docker alpine image to Docker Hub
-    needs:
-      - check-docker-secrets
-    # Skip step based on secret
-    if: needs.check-docker-secrets.outputs.is_have_secrets == 'true'
-    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download build dist app
         uses: actions/download-artifact@v4
@@ -126,60 +105,64 @@ jobs:
           path: dist
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
-          # CONFIGURE DOCKER SECRETS INTO REPOSITORY
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker Image Alpine
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./build/production-alpine.Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_REPO_FRONTEND }}:alpine
-            ${{ secrets.DOCKER_REPO_FRONTEND }}:alpine-${{ github.event.release.tag_name }}
+            ghcr.io/adempiere/adempiere-vue:alpine
+            ghcr.io/adempiere/adempiere-vue:alpine-${{ github.event.release.tag_name }}
 
 
-  # Publish docker image in Docker Hub registry to application
-  push-imame-dhr:
-    name: Push docker image to Docker Hub
+  # Publish docker image to GitHub Container Registry
+  push-image-ghcr:
+    name: Push docker image to GHCR
     needs:
-      - check-docker-secrets
-    # Skip step based on secret
-    if: needs.check-docker-secrets.outputs.is_have_secrets == 'true'
+      - build-app
+    if: ${{ github.event_name == 'release' && github.event.action == 'created' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
       - name: Download build dist app
         uses: actions/download-artifact@v4
         with:
           name: adempiere-vue
           path: dist
+
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
-          # CONFIGURE DOCKER SECRETS INTO REPOSITORY
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3.2.0
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./build/production.Dockerfile
           platforms: linux/amd64,linux/amd64/v2,linux/arm64/v8
           push: true
           tags: |
-            ${{ secrets.DOCKER_REPO_FRONTEND }}:latest
-            ${{ secrets.DOCKER_REPO_FRONTEND }}:${{ github.event.release.tag_name }}
+            ghcr.io/adempiere/adempiere-vue:latest
+            ghcr.io/adempiere/adempiere-vue:${{ github.event.release.tag_name }}
 
 
   # Build dist documentation ADempiere-Vue
@@ -189,10 +172,10 @@ jobs:
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Node configuration
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 14.x
           cache: 'yarn'
@@ -207,7 +190,7 @@ jobs:
           yarn build
 
       - name: Upload dist docs
-        uses: actions/upload-artifact@v4  # Switch to Versión 4
+        uses: actions/upload-artifact@v4
         with:
           name: adempiere-vue-docs
           path: docs/.vuepress/dist
@@ -219,6 +202,8 @@ jobs:
     needs:
       - build-docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download build dist docs
         uses: actions/download-artifact@v4
