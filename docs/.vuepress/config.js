@@ -34,8 +34,12 @@ module.exports = {
         editLinkText: 'Edit this page on GitHub',
         nav: [
           {
-            text: 'Guide',
-            link: '/guide/'
+            text: 'ADempiere',
+            link: '/adempiere/guide/'
+          },
+          {
+            text: 'Framework',
+            link: '/framework/'
           },
           {
             text: 'Features',
@@ -55,21 +59,22 @@ module.exports = {
           }
         ],
         sidebar: {
-          '/guide/': [
+          '/adempiere/guide/': [
+            '/adempiere/guide/',
+            {
+              title: 'Architecture',
+              collapsable: true,
+              children: [
+                '/adempiere/guide/architecture/overview.md',
+                '/adempiere/guide/architecture/component-tree.md',
+                '/adempiere/guide/architecture/store.md',
+                '/adempiere/guide/architecture/api-layer.md'
+              ]
+            },
             {
               title: 'Essentials',
               collapsable: true,
-              children: genEssentialsSidebar()
-            },
-            {
-              title: 'Use Cases',
-              collapsable: true,
-              children: genUseCasesSidebar()
-            },
-            {
-              title: 'Advanced',
-              collapsable: true,
-              children: genAdvancedSidebar()
+              children: ['/adempiere/guide/essentials/dev-setup.md']
             },
             {
               title: 'Components',
@@ -82,23 +87,52 @@ module.exports = {
               children: genFormsSidebar()
             },
             {
+              title: 'Use Cases',
+              collapsable: true,
+              children: genUseCasesSidebar()
+            },
+            {
+              title: 'Debugging',
+              collapsable: true,
+              children: [
+                '/adempiere/guide/debugging/',
+                '/adempiere/guide/debugging/browser-devtools.md',
+                '/adempiere/guide/debugging/pos-debugging-cases.md',
+                '/adempiere/guide/debugging/vuex-inspection.md'
+              ]
+            },
+            {
               title: 'Other',
               collapsable: true,
               children: [
-                '/guide/other/discord.md',
-                '/guide/other/gitter.md',
-                '/guide/other/telegram.md',
-                '/guide/other/release-notes.md'
+                '/adempiere/guide/other/discord.md',
+                '/adempiere/guide/other/gitter.md',
+                '/adempiere/guide/other/telegram.md',
+                '/adempiere/guide/other/release-notes.md'
               ]
             }
           ],
-          '/feature/component/': getComponentSidebar(
+          '/framework/': [
+            '/framework/',
+            '/framework/vuepress.md',
+            {
+              title: 'Essentials',
+              collapsable: true,
+              children: genEssentialsSidebar()
+            },
+            {
+              title: 'Advanced',
+              collapsable: true,
+              children: genAdvancedSidebar()
+            }
+          ],
+          '/framework/feature/component/': getComponentSidebar(
             deepClone(ComponentNav),
             'EN'
           ),
-          '/feature/script/': [
-            '/feature/script/svgo.md',
-            '/feature/script/new.md'
+          '/framework/feature/script/': [
+            '/framework/feature/script/svgo.md',
+            '/framework/feature/script/new.md'
           ]
         }
       },
@@ -108,8 +142,12 @@ module.exports = {
         editLinkText: 'Editar esta página en GitHub',
         nav: [
           {
-            text: 'Guía',
-            link: '/es/guide/'
+            text: 'ADempiere',
+            link: '/es/adempiere/guide/'
+          },
+          {
+            text: 'Framework',
+            link: '/es/framework/'
           },
           {
             text: 'Características',
@@ -125,22 +163,7 @@ module.exports = {
           }
         ],
         sidebar: {
-          '/es/guide/': [
-            {
-              title: 'Esenciales',
-              collapsable: true,
-              children: genEssentialsSidebar('/es')
-            },
-            {
-              title: 'Casos de Uso',
-              collapsable: true,
-              children: genUseCasesSidebar('/es')
-            },
-            {
-              title: 'Avanzado',
-              collapsable: true,
-              children: genAdvancedSidebar('/es')
-            },
+          '/es/adempiere/guide/': [
             {
               title: 'Componentes',
               collapsable: true,
@@ -152,23 +175,41 @@ module.exports = {
               children: genFormsSidebar('/es')
             },
             {
+              title: 'Casos de Uso',
+              collapsable: true,
+              children: genUseCasesSidebar('/es')
+            },
+            {
               title: 'Otro',
               collapsable: true,
               children: [
-                '/es/guide/other/discord.md',
-                '/es/guide/other/gitter.md',
-                '/es/guide/other/telegram.md',
-                '/es/guide/other/release-notes.md'
+                '/es/adempiere/guide/other/discord.md',
+                '/es/adempiere/guide/other/gitter.md',
+                '/es/adempiere/guide/other/telegram.md',
+                '/es/adempiere/guide/other/release-notes.md'
               ]
             }
           ],
-          '/es/feature/component/': getComponentSidebar(
+          '/es/framework/': [
+            '/es/framework/',
+            {
+              title: 'Esenciales',
+              collapsable: true,
+              children: genEssentialsSidebar('/es')
+            },
+            {
+              title: 'Avanzado',
+              collapsable: true,
+              children: genAdvancedSidebar('/es')
+            }
+          ],
+          '/es/framework/feature/component/': getComponentSidebar(
             deepClone(ComponentNav),
             'ES'
           ),
-          '/es/feature/script/': [
-            '/es/feature/script/svgo.md',
-            '/es/feature/script/new.md'
+          '/es/framework/feature/script/': [
+            '/es/framework/feature/script/svgo.md',
+            '/es/framework/feature/script/new.md'
           ]
         }
       },
@@ -178,8 +219,12 @@ module.exports = {
         editLinkText: '在 GitHub 上编辑此页',
         nav: [
           {
-            text: '指南',
-            link: '/zh/guide/'
+            text: 'ADempiere',
+            link: '/zh/adempiere/guide/'
+          },
+          {
+            text: 'Framework',
+            link: '/zh/framework/'
           },
           {
             text: '功能',
@@ -203,11 +248,16 @@ module.exports = {
           }
         ],
         sidebar: {
-          '/zh/guide/': [
+          '/zh/adempiere/guide/': [
             {
-              title: '組件',
+              title: '成分',
               collapsable: true,
-              children: genEssentialsSidebar('/zh')
+              children: genComponentSidebar('/zh')
+            },
+            {
+              title: '形式',
+              collapsable: true,
+              children: genFormsSidebar('/zh')
             },
             {
               title: 'Use Cases',
@@ -215,36 +265,34 @@ module.exports = {
               children: genUseCasesSidebar()
             },
             {
-              title: '进阶',
-              collapsable: true,
-              children: genAdvancedSidebar('/zh')
-            },
-            {
-              title: '成分',
-              collapsable: true,
-              children: genComponentSidebar()
-            },
-            {
-              title: '形式',
-              collapsable: true,
-              children: genFormsSidebar()
-            },
-            {
               title: '其它',
               collapsable: true,
               children: [
-                '/zh/guide/other/faq.md',
-                '/zh/guide/other/release-notes.md'
+                '/zh/adempiere/guide/other/faq.md',
+                '/zh/adempiere/guide/other/release-notes.md'
               ]
             }
           ],
-          '/zh/feature/component/': getComponentSidebar(
+          '/zh/framework/': [
+            '/zh/framework/',
+            {
+              title: '組件',
+              collapsable: true,
+              children: genEssentialsSidebar('/zh')
+            },
+            {
+              title: '进阶',
+              collapsable: true,
+              children: genAdvancedSidebar('/zh')
+            }
+          ],
+          '/zh/framework/feature/component/': getComponentSidebar(
             deepClone(ComponentNav),
             'ZH'
           ),
-          '/zh/feature/script/': [
-            '/zh/feature/script/svgo.md',
-            '/zh/feature/script/new.md'
+          '/zh/framework/feature/script/': [
+            '/zh/framework/feature/script/svgo.md',
+            '/zh/framework/feature/script/new.md'
           ]
         }
       }
@@ -277,18 +325,18 @@ module.exports = {
 
 function genEssentialsSidebar(type = '') {
   const mapArr = [
-    '/guide/',
-    '/guide/essentials/layout.md',
-    '/guide/essentials/router-and-nav.md',
-    '/guide/essentials/permission.md',
-    '/guide/essentials/tags-view.md',
-    '/guide/essentials/new-page.md',
-    '/guide/essentials/style.md',
-    '/guide/essentials/server.md',
-    '/guide/essentials/mock-api.md',
-    '/guide/essentials/import.md',
-    '/guide/essentials/deploy.md',
-    '/guide/essentials/env.md'
+    '/framework/',
+    '/framework/essentials/layout.md',
+    '/framework/essentials/router-and-nav.md',
+    '/framework/essentials/permission.md',
+    '/framework/essentials/tags-view.md',
+    '/framework/essentials/new-page.md',
+    '/framework/essentials/style.md',
+    '/framework/essentials/server.md',
+    '/framework/essentials/mock-api.md',
+    '/framework/essentials/import.md',
+    '/framework/essentials/deploy.md',
+    '/framework/essentials/env.md'
   ]
   return mapArr.map(i => {
     return type + i
@@ -297,13 +345,13 @@ function genEssentialsSidebar(type = '') {
 
 function genUseCasesSidebar(type = '') {
   const mapArr = [
-    '/guide/use-cases/process.md',
-    '/guide/use-cases/reports.md',
-    '/guide/use-cases/smartBrowser.md',
-    '/guide/use-cases/window.md',
-    '/guide/use-cases/searchTypeForms.md',
-    '/guide/use-cases/notes.md',
-    '/guide/use-cases/activity.md',
+    '/adempiere/guide/use-cases/process.md',
+    '/adempiere/guide/use-cases/reports.md',
+    '/adempiere/guide/use-cases/smartBrowser.md',
+    '/adempiere/guide/use-cases/window.md',
+    '/adempiere/guide/use-cases/searchTypeForms.md',
+    '/adempiere/guide/use-cases/notes.md',
+    '/adempiere/guide/use-cases/activity.md'
   ]
   return mapArr.map(i => {
     return type + i
@@ -312,19 +360,19 @@ function genUseCasesSidebar(type = '') {
 
 function genAdvancedSidebar(type = '') {
   const mapArr = [
-    '/guide/advanced/cors.md',
-    '/guide/advanced/eslint.md',
-    '/guide/advanced/git-hook.md',
-    '/guide/advanced/style-guide.md',
-    '/guide/advanced/lazy-loading.md',
-    '/guide/advanced/chart.md',
-    '/guide/advanced/icon.md',
-    '/guide/advanced/cdn.md',
-    '/guide/advanced/theme.md',
-    '/guide/advanced/i18n.md',
-    '/guide/advanced/error.md',
-    '/guide/advanced/webpack.md',
-    '/guide/advanced/sass.md'
+    '/framework/advanced/cors.md',
+    '/framework/advanced/eslint.md',
+    '/framework/advanced/git-hook.md',
+    '/framework/advanced/style-guide.md',
+    '/framework/advanced/lazy-loading.md',
+    '/framework/advanced/chart.md',
+    '/framework/advanced/icon.md',
+    '/framework/advanced/cdn.md',
+    '/framework/advanced/theme.md',
+    '/framework/advanced/i18n.md',
+    '/framework/advanced/error.md',
+    '/framework/advanced/webpack.md',
+    '/framework/advanced/sass.md'
   ]
   return mapArr.map(i => {
     return type + i
@@ -333,29 +381,13 @@ function genAdvancedSidebar(type = '') {
 
 function genComponentSidebar(type = '') {
   const mapArr = [
-    // '/guide/components/preference.md',
-    // '/guide/components/record-access.md',
-    '/guide/components/notes.md',
-    // '/guide/components/information.md',
-    // '/guide/components/update.md',
-    // '/guide/components/translation.md',
-    // '/guide/components/zoom-in.md',
-    '/guide/components/activity.md',
-    // '/guide/components/close-tab.md',
-    // '/guide/components/close-other-tabs.md',
-    // '/guide/components/close-all.md',
-    // '/guide/components/export-download-reports.md',
-    // '/guide/components/search.md',
-    // '/guide/components/change-role.md',
-    // '/guide/components/hide-menu.md',
-    // '/guide/components/references.md',
-    // '/guide/components/lock-unlock-records.md',
-    // '/guide/components/dashboard.md',
-    '/guide/components/process.md',
-    '/guide/components/reports.md',
-    '/guide/components/smart-browser.md',
-    '/guide/components/guide.md',
-    '/guide/components/workflows-and-activities.md'
+    '/adempiere/guide/components/notes.md',
+    '/adempiere/guide/components/activity.md',
+    '/adempiere/guide/components/process.md',
+    '/adempiere/guide/components/reports.md',
+    '/adempiere/guide/components/smart-browser.md',
+    '/adempiere/guide/components/guide.md',
+    '/adempiere/guide/components/workflows-and-activities.md'
   ]
   return mapArr.map(i => {
     return type + i
@@ -364,9 +396,9 @@ function genComponentSidebar(type = '') {
 
 function genFormsSidebar(type = '') {
   const mapArr = [
-    '/guide/forms/point-of-sales.md',
-    '/guide/forms/check-price.md',
-    '/guide/forms/product-information.md'
+    '/adempiere/guide/forms/point-of-sales.md',
+    '/adempiere/guide/forms/check-price.md',
+    '/adempiere/guide/forms/product-information.md'
   ]
   return mapArr.map(i => {
     return type + i

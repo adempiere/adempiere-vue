@@ -1,22 +1,22 @@
 ---
 home: true
 heroImage: /home.png
-title: a
-actionText: Get Started →
-actionLink: /guide/
+title: ADempiere Vue
+actionText: ADempiere Documentation →
+actionLink: /adempiere/guide/
 features:
-  - title: Feature-rich
-    details: A strong framework of ADempiere for many enterprise applications and various components
-  - title: Best Practice
-    details: Reasonable framework choice, good engineering practice
-  - title: Up-to-date Dev Stack
-    details: Development using front-end advanced technology
-  - title: Permission Validation
-    details: Dynamic loading of route and rendering sidebar based on permissions
-  - title: Globalization
-    details: Built-in industry universal international solution
-  - title: Theming
-    details: Supports multiple dynamic skin methods
+  - title: Modern ERP Interface
+    details: Vue-based Single Page Application for ADempiere ERP — fast, responsive, works on desktop and mobile
+  - title: Dictionary-driven UI
+    details: Windows, browsers, and processes are rendered from the ADempiere Application Dictionary — no hard-coded forms
+  - title: Point of Sale
+    details: Full POS form with cash session management, payment collection, overpayment handling, and product catalog
+  - title: Smart Browser
+    details: Powerful search and batch-process UI driven by ADempiere Smart Browsers
+  - title: Reports and Processes
+    details: Run ADempiere reports and processes directly from the UI, with parameter validation and output download
+  - title: Role-based Permissions
+    details: Menu, routes, and actions are filtered dynamically based on the logged-in user's ADempiere role
 footer: GNU/GPL v3 Licensed | Copyright © 2019-present ADempiere
 ---
 
@@ -24,24 +24,14 @@ footer: GNU/GPL v3 Licensed | Copyright © 2019-present ADempiere
   <img width="320" src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Adempiere-logo.png">
 </p>
 
-## Getting Started
+## Where to start
 
-```bash
-# clone the project
-git clone https://github.com/adempiere/adempiere-vue.git
-
-# be located on the path
-cd adempiere-vue/docs/
-
-# install dependency
-yarn install
-
-# develop
-yarn dev
-```
-
-## Live Preview
-
-[ADempiere UI Demo](https://demo-ui.erpya.com/)
-
-[ADempiere UI Documentation](https://adempiere.github.io/adempiere-vue/)
+| I want to…                                                 | Go to                                                               |
+| ---------------------------------------------------------- | ------------------------------------------------------------------- |
+| Understand how the app connects to the backend             | [Architecture Overview](./adempiere/guide/architecture/overview.md) |
+| Set up a local development environment                     | [Development Setup](./adempiere/guide/essentials/dev-setup.md)      |
+| Read about a specific UI component                         | [Components](./adempiere/guide/components/notes.md)                 |
+| Understand the POS form                                    | [Point of Sale](./adempiere/guide/forms/point-of-sales.md)          |
+| Debug a frontend error                                     | [Debugging](./adempiere/guide/debugging/README.md)                  |
+| Learn how this documentation site works                    | [How this documentation works](./framework/vuepress.md)             |
+| Read the framework (vue-element-admin) developer reference | [Framework](./framework/README.md)                                  |
