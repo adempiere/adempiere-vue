@@ -54,6 +54,20 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/additional-info',
+    component: Layout,
+    redirect: '/additional-info/index',
+    meta: { title: 'additionalInfoPage', icon: 'info' }, // Placeholder for now
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/additional-info/AdditionalInfo.vue'),
+        name: 'AdditionalInfo',
+        meta: { title: 'additionalInfoPage', icon: 'info' } // Placeholder for now
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true

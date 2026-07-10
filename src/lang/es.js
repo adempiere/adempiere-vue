@@ -63,7 +63,8 @@ export default {
     clipboardDemo: 'Clipboard',
     i18n: 'I18n',
     externalLink: 'Enlace externo',
-    profile: 'Profile'
+    profile: 'Profile',
+    additionalInfoPage: 'Información Adicional'
   },
   navbar: {
     logOut: 'Salir',
@@ -172,5 +173,9 @@ export default {
     tagsView: 'Open Tags-View',
     fixedHeader: 'Fixed Header',
     sidebarLogo: 'Sidebar Logo'
+  },
+  additionalInfo: {
+    title: 'Información Adicional',
+    message: 'Esta es una nueva página creada para demostrar cómo agregar nuevos cambios al repositorio.'
   }
 }
